@@ -79,6 +79,7 @@ const server = http.createServer((req, res) => {
   if (reqPath === '/checkout') reqPath = '/checkout.html';
   if (reqPath === '/product-detail') reqPath = '/product-detail.html';
   if (reqPath === '/admin') reqPath = '/admin.html';
+  if (reqPath === '/admin/live-editor' || reqPath === '/live-editor') reqPath = '/live-editor.html';
 
   const filePath = path.join(__dirname, reqPath);
   const ext = path.extname(filePath).toLowerCase();

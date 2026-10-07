@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Save &amp; Smile - Add &amp; Manage Products</title>
+  <link rel="icon" type="image/png" href="images/save-and-smile-logo.png">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .admin-container {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .admin-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 2rem;
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 1rem;
+    }
+    .admin-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .admin-form-grid .full-width {
+      grid-column: span 2;
+    }
+    .admin-btn {
+      background: var(--bg-gradient);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .admin-btn:hover {
+      opacity: 0.95;
+    }
+    .products-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    .products-table th, .products-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.9rem;
+    }
+    .products-table th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #475569;
+    }
+    .btn-delete {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-delete:hover {
+      background: #fca5a5;
+    }
+    .image-preview-box {
+      width: 70px;
+      height: 70px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      object-fit: contain;
+      background: #f8fafc;
+      display: block;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body style="background-color: #f1f5f9;">
+
+  <!-- Header -->
+  <header class="header-wrapper">
+    <div class="site-container">
+      <div class="header-inner">
+        <a href="index.html" class="brand-logo" title="Save &amp; Smile Admin">
+          <img src="images/save-and-smile-logo.png" alt="Save &amp; Smile" class="site-brand-logo">
+        </a>
+        <a href="index.html" class="action-pill-btn">
+          👁️ Go to Store (ویب سائٹ دیکھیں)
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="admin-container">
+    
+    <!-- Add Product Form Card -->
+    <div class="admin-card">
+      <div class="admin-header">
+        <div>
+          <h2 style="font-size: 1.5rem; color: #0f172a; font-weight: 800;">Add New Product (نیا پروڈکٹ شامل کریں)</h2>
+          <p style="color: #64748b; font-size: 0.88rem;">یہاں تفصیل درج کر کے محفوظ کریں، پروڈکٹ فوری طور پر ویب سائٹ پر لائیو نظر آئے گا۔</p>
+        </div>
+      </div>
+
+      <form id="addProductForm" onsubmit="handleAddNewProduct(event)">
+        <div class="admin-form-grid">
+          
+          <div class="form-group full-width">
+            <label>Product Title / Name (پروڈکٹ کا نام) *</label>
+            <input type="text" id="prodTitle" required placeholder="e.g. Ultra 9 Max Smart Watch with 7 Straps">
+          </div>
+
+          <div class="form-group">
+            <label>Category (کیٹیگری) *</label>
+            <select id="prodCategory" required>
+              <option value="storage">Storage & Racks</option>
+              <option value="smartwatches">Smart Watches</option>
+              <option value="kitchen">Kitchen Gadgets</option>
+              <option value="bottles">Mugs & Bottles</option>
+              <option value="beauty">Beauty & Makeup</option>
+              <option value="insect-killers">Insect Killers</option>
+              <option value="accessories">Mobile Accessories</option>
+              <option value="massager">Electric Massagers</option>
+              <option value="cleaning">Wipers & Cleaning</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Front Tab (ہوم پیج ٹیب)</label>
+            <select id="prodTab">
+              <option value="storage">Storage & Organization</option>
+              <option value="jewelry">Jewelry & Accessories</option>
+              <option value="travel">Fashion Bags & Travel</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Wholesale Price in PKR (ہول سیل قیمت) *</label>
+            <input type="number" id="prodPrice" required placeholder="e.g. 1250">
+          </div>
+
+          <div class="form-group">
+            <label>Original Crossed-out Price (پرانی قیمت) *</label>
+            <input type="number" id="prodOrigPrice" required placeholder="e.g. 2500">
+          </div>
+
+          <div class="form-group">
+            <label>Product Code / SKU (کوڈ)</label>
+            <input type="text" id="prodCode" placeholder="e.g. QGW-990101">
+          </div>
+
+          <div class="form-group">
+            <label>Badge Label (بیج)</label>
+            <select id="prodBadge">
+              <option value="HOT SELLER">HOT SELLER</option>
+              <option value="WHOLESALE">WHOLESALE</option>
+              <option value="50% OFF">50% OFF</option>
+              <option value="NEW ARRIVAL">NEW ARRIVAL</option>
+              <option value="SALE">SALE</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Product Image URL (تصویر کا لنک یا آن لائن URL) *</label>
+            <input type="url" id="prodImage" required placeholder="https://www.qadrigadgets.pk/images/product_gallery/... or https://i.imgur.com/..." oninput="updateImagePreview(this.value)">
+            <img id="imgPreview" class="image-preview-box" src="https://via.placeholder.com/70x70?text=Preview" alt="Image Preview">
+          </div>
+
+          <div class="form-group full-width">
+            <label>Description (تفصیلات)</label>
+            <textarea id="prodDesc" rows="3" placeholder="Enter key features, specifications, battery life, warranty etc."></textarea>
+          </div>
+
+        </div>
+
+        <div style="margin-top: 1.5rem; display: flex; gap: 12px;">
+          <button type="submit" class="admin-btn">
+            ➕ Add Product to Store (شامل کریں)
+          </button>
+          <button type="reset" class="action-pill-btn" style="background:#cbd5e1; color:#1e293b;" onclick="document.getElementById('imgPreview').src='https://via.placeholder.com/70x70?text=Preview'">
+            Reset Form
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Managed Products List Card -->
+    <div class="admin-card">
+      <div class="admin-header">
+        <div>
+          <h2 style="font-size: 1.35rem; color: #0f172a; font-weight: 800;">Your Custom Products List (آپ کے شامل کردہ پروڈکٹس)</h2>
+          <p style="color: #64748b; font-size: 0.85rem;">یہاں سے آپ اپنے شامل کردہ پروڈکٹس دیکھ سکتے ہیں اور ڈیلیٹ بھی کر سکتے ہیں۔</p>
+        </div>
+        <button class="btn-delete" onclick="clearAllCustomProducts()">Delete All Custom Items</button>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Title</th>
+              <th>SKU</th>
+              <th>Category</th>
+              <th>Wholesale Price</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="customProductsTableBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast-notice" id="toastNotice">Saved successfully!</div>
+
+  <script src="js/products-data.js"></script>
+  <script>
+    function getCustomProducts() {
+      return JSON.parse(localStorage.getItem('qadri_custom_products')) || [];
+    }
+
+    function saveCustomProducts(list) {
+      localStorage.setItem('qadri_custom_products', JSON.stringify(list));
+      renderTable();
+    }
+
+    function updateImagePreview(url) {
+      const img = document.getElementById('imgPreview');
+      if (url && url.startsWith('http')) {
+        img.src = url;
+      }
+    }
+
+    function handleAddNewProduct(e) {
+      e.preventDefault();
+      const title = document.getElementById('prodTitle').value.trim();
+      const category = document.getElementById('prodCategory').value;
+      const tab = document.getElementById('prodTab').value;
+      const price = parseInt(document.getElementById('prodPrice').value, 10);
+      const originalPrice = parseInt(document.getElementById('prodOrigPrice').value, 10);
+      const code = document.getElementById('prodCode').value.trim() || ('QGW-' + Math.floor(100000 + Math.random() * 900000));
+      const badge = document.getElementById('prodBadge').value;
+      const image = document.getElementById('prodImage').value.trim();
+      const description = document.getElementById('prodDesc').value.trim() || title;
+
+      const newProd = {
+        id: Date.now(),
+        title,
+        category,
+        tab,
+        price,
+        originalPrice,
+        code,
+        badge,
+        image,
+        description,
+        rating: 4.9,
+        reviews: Math.floor(10 + Math.random() * 80),
+        stock: 100,
+        isFlashSale: true
+      };
+
+      const list = getCustomProducts();
+      list.unshift(newProd);
+      saveCustomProducts(list);
+
+      // Sync to Neon Database
+      try {
+        fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newProd)
+        }).catch(err => console.log('Admin offline/fallback mode:', err));
+      } catch (err) {}
+
+      showAdminToast(`Product "${title.substring(0, 20)}..." added successfully!`);
+      document.getElementById('addProductForm').reset();
+      document.getElementById('imgPreview').src = 'https://via.placeholder.com/70x70?text=Preview';
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('customProductsTableBody');
+      const list = getCustomProducts();
+      
+      if (list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; color: #94a3b8; padding: 2rem;">
+              ابھی تک آپ نے کوئی نیا پروڈکٹ شامل نہیں کیا۔ فارم بھر کر "Add Product" پر کلک کریں۔
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = list.map((item, idx) => `
+        <tr>
+          <td><img src="${item.image}" style="width: 45px; height: 45px; object-fit: contain; border-radius: 6px; border: 1px solid #e2e8f0;"></td>
+          <td><strong>${item.title}</strong></td>
+          <td><code>${item.code}</code></td>
+          <td><span style="background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem;">${item.category}</span></td>
+          <td><strong>Rs. ${item.price.toLocaleString()}</strong> <small style="color: #94a3b8; text-decoration: line-through;">Rs. ${item.originalPrice}</small></td>
+          <td>
+            <button class="btn-delete" onclick="deleteCustomProduct(${item.id})">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function deleteCustomProduct(id) {
+      if (!confirm('کیا آپ واقعی یہ پروڈکٹ ڈیلیٹ کرنا چاہتے ہیں؟')) return;
+      let list = getCustomProducts();
+      list = list.filter(i => i.id !== id);
+      saveCustomProducts(list);
+      showAdminToast('Product deleted!');
+    }
+
+    function clearAllCustomProducts() {
+      if (!confirm('کیا آپ تمام کسٹم پروڈکٹس ڈیلیٹ کرنا چاہتے ہیں؟')) return;
+      localStorage.removeItem('qadri_custom_products');
+      renderTable();
+      showAdminToast('All custom products cleared!');
+    }
+
+    function showAdminToast(msg) {
+      const t = document.getElementById('toastNotice');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    document.addEventListener('DOMContentLoaded', renderTable);
+  </script>
+</body>
+</html>

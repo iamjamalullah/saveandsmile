@@ -1,0 +1,22 @@
+{
+  "name": "qadri-gadgets-replica",
+  "version": "1.0.0",
+  "description": "Full-featured replica of https://www.qadrigadgets.pk/ wholesale e-commerce store",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "db:seed": "node scripts/seed-neon.js"
+  },
+  "keywords": [
+    "ecommerce",
+    "wholesale",
+    "pakistan",
+    "gadgets"
+  ],
+  "author": "Antigravity Developer",
+  "license": "ISC",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
+    "dotenv": "^18.0.6"
+  }
+}

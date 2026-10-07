@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Executive Dashboard | SAVE &amp; SMILE Commerce Operating System</title>
+  <link rel="icon" type="image/png" href="images/save-and-smile-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              dark: '#064C63',
+              light: '#008FAF',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body {
+      height: 100%;
+      min-height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #f1f5f9;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    /* Custom scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f8fafc; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: #020617; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+
+    .bg-linear-to-br { background-image: linear-gradient(to bottom right, #064C63, #008FAF); }
+    .bg-linear-to-t { background-image: linear-gradient(to top, #064C63, #008FAF); }
+    .bg-linear-to-r { background-image: linear-gradient(to right, #064C63, #008FAF); }
+
+    .modal-backdrop {
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+    }
+
+    /* Active view panel display */
+    .view-panel { display: none; }
+    .view-panel.active { display: block; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900 font-sans antialiased h-full w-full flex overflow-hidden selection:bg-teal-500 selection:text-white">
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="sidebarBackdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden transition-opacity"></div>
+
+  <!-- ============================================================ -->
+  <!-- 1. LEFT SIDEBAR (EXACT MATCH TO SCREENSHOT & FULLY ACTIVE) -->
+  <!-- ============================================================ -->
+  <aside id="sidebarEl" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-slate-950 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 select-none transition-transform duration-300 transform -translate-x-full md:translate-x-0 h-full overflow-hidden">
+    
+    <!-- Brand Header -->
+    <div class="p-4 border-b border-slate-800/80 flex items-center justify-between shrink-0">
+      <a href="admin.html" class="flex items-center space-x-2.5">
+        <div class="w-8 h-8 rounded-lg bg-linear-to-br flex items-center justify-center text-white font-black text-xs shadow-md">
+          S&amp;S
+        </div>
+        <div>
+          <span class="font-black text-sm text-white tracking-tight leading-none block">
+            SAVE &amp; SMILE
+          </span>
+          <span class="text-[9px] text-cyan-400 font-bold uppercase tracking-wider block mt-0.5">
+            COMMERCE OPERATING SYSTEM
+          </span>
+        </div>
+      </a>
+      <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white p-1">✕</button>
+    </div>
+
+    <!-- Scrollable Navigation Tree -->
+    <div class="flex-1 overflow-y-auto px-3 py-4 space-y-1 sidebar-scroll text-xs">
+      
+      <!-- 1. Home (Dashboard) -->
+      <button onclick="switchView('dashboard', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold bg-teal-900/60 text-cyan-300 border border-teal-700/60 shadow-xs transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span>Home</span>
+      </button>
+
+      <!-- 2. Orders -->
+      <button onclick="switchView('orders', this)" class="nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <div class="flex items-center space-x-2.5">
+          <svg class="w-4 h-4 shrink-0 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          <span>Orders</span>
+        </div>
+        <span class="text-[10px] bg-teal-800 text-teal-100 px-1.5 py-0.5 rounded-full font-bold" id="sidebarOrderCount">
+          Live
+        </span>
+      </button>
+
+      <!-- 3. Delivery Control Room (Collapsible Group) -->
+      <div class="pt-1">
+        <button onclick="toggleSidebarSub('operations-sub')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-amber-400/90 hover:text-amber-300 hover:bg-slate-900 transition text-left">
+          <div class="flex items-center space-x-2.5">
+            <svg class="w-4 h-4 shrink-0 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
+            <span class="font-extrabold tracking-tight">Delivery Control Room</span>
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <span class="bg-amber-500/20 text-amber-300 text-[9px] px-1.5 py-0.5 rounded font-black tracking-wider uppercase border border-amber-500/30">
+              CONTROL
+            </span>
+            <svg id="arr-operations-sub" class="w-3.5 h-3.5 text-slate-500 transform transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </button>
+        <div id="operations-sub" class="pl-6 pr-1 py-1 space-y-0.5 border-l border-amber-800/40 ml-4 my-1">
+          <button onclick="switchView('action-inbox', this)" class="nav-sub-item w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white transition text-left">
+            <span>Action Inbox</span>
+            <span class="bg-rose-500/20 text-rose-300 text-[9px] px-1 rounded font-bold">Tasks</span>
+          </button>
+          <button onclick="switchView('cod-control', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            COD Verification &amp; Call Desk
+          </button>
+          <button onclick="switchView('fulfillment', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Fulfillment &amp; Manifests
+          </button>
+          <button onclick="switchView('settlements', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Settlements &amp; COD Payouts
+          </button>
+          <button onclick="switchView('couriers', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Courier Integration Hub
+          </button>
+          <button onclick="switchView('returns', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Returns &amp; Restocking
+          </button>
+          <button onclick="switchView('settings', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Logistics Rules &amp; Settings
+          </button>
+        </div>
+      </div>
+
+      <!-- 4. Products (Collapsible Group) -->
+      <div class="pt-1">
+        <button onclick="toggleSidebarSub('products-sub')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+          <div class="flex items-center space-x-2.5">
+            <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            <span>Products</span>
+          </div>
+          <svg id="arr-products-sub" class="w-3.5 h-3.5 text-slate-500 transform transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="products-sub" class="pl-6 pr-1 py-1 space-y-0.5 border-l border-slate-800 ml-4 my-1">
+          <button onclick="switchView('products', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            All Products
+          </button>
+          <button onclick="openAddProductModal()" class="w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            + Add Product
+          </button>
+          <button onclick="switchView('products', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Collections
+          </button>
+          <button onclick="switchView('inventory', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Inventory &amp; Hubs
+          </button>
+          <button onclick="switchView('discounts', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Gift Cards
+          </button>
+        </div>
+      </div>
+
+      <!-- 5. Customers -->
+      <button onclick="switchView('customers', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <span>Customers</span>
+      </button>
+
+      <!-- 6. Analytics -->
+      <button onclick="switchView('reports', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        <span>Analytics</span>
+      </button>
+
+      <!-- 7. Marketing -->
+      <button onclick="switchView('growth', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+        <span>Marketing</span>
+      </button>
+
+      <!-- 8. Growth -->
+      <div class="pt-1">
+        <button onclick="toggleSidebarSub('growth-sub')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+          <div class="flex items-center space-x-2.5">
+            <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+            <span>Growth</span>
+          </div>
+          <svg id="arr-growth-sub" class="w-3.5 h-3.5 text-slate-500 transform transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="growth-sub" class="pl-6 pr-1 py-1 space-y-0.5 border-l border-slate-800 ml-4 my-1">
+          <button onclick="switchView('growth', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">Attribution</button>
+          <button onclick="switchView('growth', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">Autopilot</button>
+          <button onclick="switchView('growth', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">Campaigns</button>
+        </div>
+      </div>
+
+      <!-- 9. Market -->
+      <button onclick="switchView('settings', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Market</span>
+      </button>
+
+      <!-- 10. Discounts -->
+      <button onclick="switchView('discounts', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+        <span>Discounts</span>
+      </button>
+
+      <!-- 11. Sales Channels -->
+      <button onclick="switchView('couriers', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
+        <span>Sales Channels</span>
+      </button>
+
+      <!-- 12. Theme & Storefront -->
+      <div class="pt-1">
+        <button onclick="toggleSidebarSub('theme-sub')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+          <div class="flex items-center space-x-2.5">
+            <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4 5 5 0 015-5 5 5 0 015 5 4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+            <span>Theme &amp; Storefront</span>
+          </div>
+          <svg id="arr-theme-sub" class="w-3.5 h-3.5 text-slate-500 transform transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="theme-sub" class="pl-6 pr-1 py-1 space-y-0.5 border-l border-slate-800 ml-4 my-1">
+          <button onclick="switchView('live-editor', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-cyan-300 font-bold bg-teal-950/60 transition text-left">
+            ✨ Live Visual Editor
+          </button>
+        </div>
+      </div>
+
+      <!-- 13. SEO Center -->
+      <button onclick="switchView('seo', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <span>SEO Center</span>
+      </button>
+
+      <!-- 14. Reports -->
+      <button onclick="switchView('reports', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <span>Reports</span>
+      </button>
+
+      <!-- 15. Settings -->
+      <button onclick="switchView('settings', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span>Settings</span>
+      </button>
+
+      <!-- 16. Users & Access -->
+      <button onclick="switchView('users', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <span>Users &amp; Access</span>
+      </button>
+
+    </div>
+
+    <!-- Live Storefront & User Profile Footer -->
+    <div class="p-3 border-t border-slate-800/80 bg-slate-950/80 space-y-2 shrink-0">
+      <a href="index.html" target="_blank" class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold text-cyan-400 hover:text-cyan-300 hover:bg-slate-900 transition group">
+        <div class="flex items-center space-x-2">
+          <span>Live Storefront</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </div>
+      </a>
+      <div class="flex items-center justify-between pt-1 border-t border-slate-900">
+        <div class="flex items-center space-x-2">
+          <div class="w-7 h-7 rounded-full bg-teal-800 text-teal-100 flex items-center justify-center font-bold text-xs">
+            S
+          </div>
+          <div class="leading-none">
+            <span class="text-xs font-bold text-white block">Administrator</span>
+            <span class="text-[10px] text-slate-500 font-medium">Super Admin</span>
+          </div>
+        </div>
+        <a href="index.html" title="Exit to store" class="text-slate-500 hover:text-rose-400 transition p-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============================================================ -->
+  <!-- 2. MAIN WORKSPACE CONTENT (SMOOTH FIXED SCREEN WITH SCROLL) -->
+  <!-- ============================================================ -->
+  <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-slate-100">
+
+    <!-- Top Admin Bar -->
+    <header class="h-16 bg-white border-b border-slate-200/90 px-4 sm:px-8 flex items-center justify-between shrink-0 z-30">
+      <div class="flex items-center space-x-3">
+        <!-- Mobile Toggle Hamburger Button -->
+        <button onclick="toggleMobileSidebar()" class="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <span class="text-xs font-semibold text-slate-400">Admin</span>
+        <span class="text-xs text-slate-300">/</span>
+        <span class="text-xs font-bold text-slate-700" id="topBreadcrumb">Dashboard</span>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <!-- Notification Bell -->
+        <button onclick="toggleNotificationsModal()" class="p-2 text-slate-400 hover:text-slate-600 relative rounded-xl hover:bg-slate-50 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span class="w-2 h-2 rounded-full bg-rose-500 absolute top-1.5 right-1.5 ring-2 ring-white"></span>
+        </button>
+
+        <!-- Storefront Link -->
+        <a href="index.html" target="_blank" class="text-xs font-bold text-slate-600 hover:text-teal-800 flex items-center space-x-1.5 py-1.5 px-3 rounded-xl border border-slate-200/80 hover:bg-slate-50 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          <span>Storefront</span>
+        </a>
+
+        <!-- Profile -->
+        <div class="flex items-center space-x-2 pl-2 border-l border-slate-200">
+          <div class="w-8 h-8 rounded-full bg-teal-800 text-teal-100 flex items-center justify-center font-bold text-xs shadow-xs">
+            S
+          </div>
+          <span class="text-xs font-bold text-slate-800 hidden sm:inline">Store Administrator</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Scrollable Area (Fits 100% of Screen Seamlessly) -->
+    <div id="mainScrollArea" class="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-6 w-full custom-scrollbar">
+
+      <!-- ============================================================ -->
+      <!-- VIEW: DASHBOARD (SCREENSHOT EXACT MATCH) -->
+      <!-- ============================================================ -->
+      <section id="view-dashboard" class="view-panel active space-y-6">
+        <!-- Header Row -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Executive Dashboard
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+              Real-time operational metrics for SAVE &amp; SMILE Pakistan.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Download Sales CSV Button -->
+            <button onclick="downloadCsvExport('sales')" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs flex items-center space-x-1.5 transition shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>Download Sales CSV</span>
+            </button>
+
+            <!-- All Reports Button -->
+            <button onclick="switchView('reports')" class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs transition shadow-2xs flex items-center space-x-1">
+              <svg class="w-3.5 h-3.5 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span>All Reports</span>
+            </button>
+
+            <!-- Launch Live Page Builder Button -->
+            <button onclick="switchView('live-editor')" class="px-4 py-2 bg-gradient-to-r from-teal-700 to-cyan-700 hover:from-teal-600 hover:to-cyan-600 text-white font-black rounded-xl text-xs flex items-center space-x-1.5 transition shadow-md">
+              <svg class="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+              <span>Launch Live Page Builder</span>
+            </button>
+
+            <!-- Add Product Button -->
+            <button onclick="openAddProductModal()" class="px-4 py-2 bg-teal-800 hover:bg-teal-900 text-white font-bold rounded-xl text-xs transition shadow-sm">
+              + Add Product
+            </button>
+          </div>
+        </div>
+
+        <!-- 6 Metrics Cards Grid (Seamless full-width response) -->
+        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+          
+          <!-- Total Revenue -->
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">TOTAL REVENUE</span>
+              <div class="p-1.5 rounded-lg border text-emerald-700 bg-emerald-50 border-emerald-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+            </div>
+            <div>
+              <div class="text-lg sm:text-xl font-black text-slate-900" id="cardRevenue">Rs. 1,545</div>
+              <span class="text-[11px] font-semibold text-slate-400 block mt-0.5">+18.4% this month</span>
+            </div>
+          </div>
+
+          <!-- Today's Sales -->
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">TODAY'S SALES</span>
+              <div class="p-1.5 rounded-lg border text-teal-800 bg-teal-50 border-teal-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+              </div>
+            </div>
+            <div>
+              <div class="text-lg sm:text-xl font-black text-slate-900" id="cardTodaySales">Rs. 797</div>
+              <span class="text-[11px] font-semibold text-slate-400 block mt-0.5">Live today</span>
+            </div>
+          </div>
+
+          <!-- Total Orders -->
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">TOTAL ORDERS</span>
+              <div class="p-1.5 rounded-lg border text-cyan-700 bg-cyan-50 border-cyan-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+              </div>
+            </div>
+            <div>
+              <div class="text-lg sm:text-xl font-black text-slate-900" id="cardTotalOrders">2</div>
+              <span class="text-[11px] font-semibold text-slate-400 block mt-0.5" id="cardOrdersSub">0 pending action</span>
+            </div>
+          </div>
+
+          <!-- Pending Orders -->
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">PENDING ORDERS</span>
+              <div class="p-1.5 rounded-lg border text-amber-700 bg-amber-50 border-amber-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+            </div>
+            <div>
+              <div class="text-lg sm:text-xl font-black text-slate-900" id="cardPendingOrders">0</div>
+              <span class="text-[11px] font-semibold text-slate-400 block mt-0.5">Requires dispatch</span>
+            </div>
+          </div>
+
+          <!-- Total Customers -->
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">TOTAL CUSTOMERS</span>
+              <div class="p-1.5 rounded-lg border text-indigo-700 bg-indigo-50 border-indigo-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              </div>
+            </div>
+            <div>
+              <div class="text-lg sm:text-xl font-black text-slate-900" id="cardTotalCustomers">1</div>
+              <span class="text-[11px] font-semibold text-slate-400 block mt-0.5">Active shoppers</span>
+            </div>
+          </div>
+
+          <!-- Active Products -->
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">ACTIVE PRODUCTS</span>
+              <div class="p-1.5 rounded-lg border text-slate-700 bg-slate-50 border-slate-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+              </div>
+            </div>
+            <div>
+              <div class="text-lg sm:text-xl font-black text-slate-900" id="cardActiveProducts">8</div>
+              <span class="text-[11px] font-semibold text-slate-400 block mt-0.5" id="cardLowStockSub">0 low stock items</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Real-Time Business Reports & Export Box -->
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-xs space-y-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div>
+              <div class="flex items-center space-x-2">
+                <svg class="w-4 h-4 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <h3 class="font-bold text-slate-900 text-sm">Real-Time Business Reports &amp; Export</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">
+                Download operational sheets with single-click direct exports.
+              </p>
+            </div>
+            <button onclick="switchView('reports')" class="text-xs font-bold text-teal-800 hover:underline flex items-center space-x-1">
+              <span>View Report Center</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
+            <!-- Sales & GMV -->
+            <div onclick="downloadCsvExport('sales')" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/80 hover:border-teal-200 text-slate-700 hover:text-teal-900 transition flex flex-col justify-between group cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="p-1.5 rounded-lg bg-white border border-slate-200 group-hover:border-teal-300 shadow-2xs">
+                  <svg class="w-3.5 h-3.5 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </span>
+                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold leading-tight">Sales &amp; GMV</p>
+                <span class="text-[10px] text-teal-700 font-semibold block mt-0.5">Download CSV &gt;</span>
+              </div>
+            </div>
+
+            <!-- Fulfillment Orders -->
+            <div onclick="downloadCsvExport('orders')" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/80 hover:border-teal-200 text-slate-700 hover:text-teal-900 transition flex flex-col justify-between group cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="p-1.5 rounded-lg bg-white border border-slate-200 group-hover:border-teal-300 shadow-2xs">
+                  <svg class="w-3.5 h-3.5 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                </span>
+                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold leading-tight">Fulfillment Orders</p>
+                <span class="text-[10px] text-teal-700 font-semibold block mt-0.5">Download CSV &gt;</span>
+              </div>
+            </div>
+
+            <!-- Catalog & Pricing -->
+            <div onclick="downloadCsvExport('products')" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/80 hover:border-teal-200 text-slate-700 hover:text-teal-900 transition flex flex-col justify-between group cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="p-1.5 rounded-lg bg-white border border-slate-200 group-hover:border-teal-300 shadow-2xs">
+                  <svg class="w-3.5 h-3.5 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                </span>
+                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold leading-tight">Catalog &amp; Pricing</p>
+                <span class="text-[10px] text-teal-700 font-semibold block mt-0.5">Download CSV &gt;</span>
+              </div>
+            </div>
+
+            <!-- Inventory Stock -->
+            <div onclick="downloadCsvExport('inventory')" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/80 hover:border-teal-200 text-slate-700 hover:text-teal-900 transition flex flex-col justify-between group cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="p-1.5 rounded-lg bg-white border border-slate-200 group-hover:border-teal-300 shadow-2xs">
+                  <svg class="w-3.5 h-3.5 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </span>
+                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold leading-tight">Inventory Stock</p>
+                <span class="text-[10px] text-teal-700 font-semibold block mt-0.5">Download CSV &gt;</span>
+              </div>
+            </div>
+
+            <!-- Customer CRM -->
+            <div onclick="downloadCsvExport('customers')" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/80 hover:border-teal-200 text-slate-700 hover:text-teal-900 transition flex flex-col justify-between group cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="p-1.5 rounded-lg bg-white border border-slate-200 group-hover:border-teal-300 shadow-2xs">
+                  <svg class="w-3.5 h-3.5 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </span>
+                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold leading-tight">Customer CRM</p>
+                <span class="text-[10px] text-teal-700 font-semibold block mt-0.5">Download CSV &gt;</span>
+              </div>
+            </div>
+
+            <!-- Marketing UTM -->
+            <div onclick="downloadCsvExport('sales')" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/80 hover:border-teal-200 text-slate-700 hover:text-teal-900 transition flex flex-col justify-between group cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="p-1.5 rounded-lg bg-white border border-slate-200 group-hover:border-teal-300 shadow-2xs">
+                  <svg class="w-3.5 h-3.5 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                </span>
+                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold leading-tight">Marketing UTM</p>
+                <span class="text-[10px] text-teal-700 font-semibold block mt-0.5">Download CSV &gt;</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Weekly Sales & Orders Velocity Chart (Interactive Teal/Cyan Bars Exact Match) -->
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-xs space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Weekly Sales &amp; Orders Velocity</h3>
+              <p class="text-xs text-slate-400">Monitored revenue trends and volume spikes</p>
+            </div>
+            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg">
+              ↑ 24% Growth Rate
+            </span>
+          </div>
+
+          <!-- Interactive Bar Chart matching screenshot proportions -->
+          <div class="h-44 w-full flex items-end justify-between gap-3 sm:gap-4 pt-6 px-2 border-b border-slate-100">
+            <div class="flex-1 flex flex-col items-center gap-2 group h-full justify-end cursor-pointer">
+              <div class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-slate-700 transition">Rs. 2,400</div>
+              <div class="w-full bg-linear-to-t rounded-t-lg transition-all duration-300 group-hover:brightness-110" style="height: 20%;"></div>
+              <span class="text-[10px] font-bold text-slate-400">Mon</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2 group h-full justify-end cursor-pointer">
+              <div class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-slate-700 transition">Rs. 3,100</div>
+              <div class="w-full bg-linear-to-t rounded-t-lg transition-all duration-300 group-hover:brightness-110" style="height: 22%;"></div>
+              <span class="text-[10px] font-bold text-slate-400">Tue</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2 group h-full justify-end cursor-pointer">
+              <div class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-slate-700 transition">Rs. 5,600</div>
+              <div class="w-full bg-linear-to-t rounded-t-lg transition-all duration-300 group-hover:brightness-110" style="height: 38%;"></div>
+              <span class="text-[10px] font-bold text-slate-400">Wed</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2 group h-full justify-end cursor-pointer">
+              <div class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-slate-700 transition">Rs. 10,800</div>
+              <div class="w-full bg-linear-to-t rounded-t-lg transition-all duration-300 group-hover:brightness-110" style="height: 62%;"></div>
+              <span class="text-[10px] font-bold text-slate-400">Thu</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2 group h-full justify-end cursor-pointer">
+              <div class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-slate-700 transition">Rs. 16,500</div>
+              <div class="w-full bg-linear-to-t rounded-t-lg transition-all duration-300 group-hover:brightness-110" style="height: 82%;"></div>
+              <span class="text-[10px] font-bold text-slate-400">Fri</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2 group h-full justify-end cursor-pointer">
+              <div class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-slate-700 transition">Rs. 18,200</div>
+              <div class="w-full bg-linear-to-t rounded-t-lg transition-all duration-300 group-hover:brightness-110" style="height: 82%;"></div>
+              <span class="text-[10px] font-bold text-slate-400">Sat</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2 group h-full justify-end cursor-pointer">
+              <div class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-slate-700 transition">Rs. 17,900</div>
+              <div class="w-full bg-linear-to-t rounded-t-lg transition-all duration-300 group-hover:brightness-110" style="height: 82%;"></div>
+              <span class="text-[10px] font-bold text-slate-400">Sun</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lower Grid: Recent Orders & Alerts (8 cols + 4 cols) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          <!-- Recent Orders (8 cols) -->
+          <div class="lg:col-span-8 bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 class="font-bold text-slate-900 text-sm">Recent Store Orders</h3>
+              <button onclick="switchView('orders')" class="text-xs font-bold text-teal-800 hover:underline flex items-center space-x-1">
+                <span>View All Orders</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">
+                    <th class="pb-3">ORDER ID</th>
+                    <th class="pb-3">CUSTOMER</th>
+                    <th class="pb-3">TOTAL</th>
+                    <th class="pb-3">STATUS</th>
+                    <th class="pb-3">PAYMENT</th>
+                    <th class="pb-3 text-right">ACTION</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100" id="dashRecentOrdersBody">
+                  <!-- Dynamically populated from placed orders -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right Column (4 cols) -->
+          <div class="lg:col-span-4 space-y-6">
+            
+            <!-- Low Stock Alerts -->
+            <div class="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                  <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">
+                    LOW STOCK ALERTS
+                  </h4>
+                </div>
+                <button onclick="switchView('inventory')" class="text-[11px] font-bold text-teal-800 hover:underline">
+                  Manage
+                </button>
+              </div>
+              <p class="text-xs text-slate-400 py-2">All stock levels are healthy.</p>
+            </div>
+
+            <!-- Top Selling Products -->
+            <div class="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs space-y-3">
+              <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">
+                TOP SELLING PRODUCTS
+              </h4>
+              <div class="divide-y divide-slate-100 text-xs" id="topSellingList">
+                <div class="py-2.5 flex items-center justify-between">
+                  <div class="min-w-0 pr-2">
+                    <p class="font-bold text-slate-800 truncate">Multipurpose Kitchen &amp; Bathroom Corner Storage Rack...</p>
+                    <p class="text-[10px] text-slate-400">Rs. 180</p>
+                  </div>
+                  <span class="font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md shrink-0">
+                    2 sold
+                  </span>
+                </div>
+                <div class="py-2.5 flex items-center justify-between">
+                  <div class="min-w-0 pr-2">
+                    <p class="font-bold text-slate-800 truncate">Heavy-Duty All-Weather Universal Waterproof Bike Cover...</p>
+                    <p class="text-[10px] text-slate-400">Rs. 400</p>
+                  </div>
+                  <span class="font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md shrink-0">
+                    0 sold
+                  </span>
+                </div>
+                <div class="py-2.5 flex items-center justify-between">
+                  <div class="min-w-0 pr-2">
+                    <p class="font-bold text-slate-800 truncate">360° Rotatable Dashboard &amp; Windshield Car Phone Mount...</p>
+                    <p class="text-[10px] text-slate-400">Rs. 350</p>
+                  </div>
+                  <span class="font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md shrink-0">
+                    0 sold
+                  </span>
+                </div>
+                <div class="py-2.5 flex items-center justify-between">
+                  <div class="min-w-0 pr-2">
+                    <p class="font-bold text-slate-800 truncate">Automatic Electric Drinking Water Gallon Dispenser...</p>
+                    <p class="text-[10px] text-slate-400">Rs. 890</p>
+                  </div>
+                  <span class="font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md shrink-0">
+                    0 sold
+                  </span>
+                </div>
+                <div class="py-2.5 flex items-center justify-between">
+                  <div class="min-w-0 pr-2">
+                    <p class="font-bold text-slate-800 truncate">Multi-Blade Stainless Steel Kitchen Herb &amp; Vegetable...</p>
+                    <p class="text-[10px] text-slate-400">Rs. 250</p>
+                  </div>
+                  <span class="font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md shrink-0">
+                    0 sold
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: ORDERS (FULL MANAGEMENT) -->
+      <!-- ============================================================ -->
+      <section id="view-orders" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Order Management</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Fulfill customer orders, assign courier tracking numbers and update statuses.</p>
+          </div>
+          <button onclick="downloadCsvExport('orders')" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs flex items-center space-x-1.5 shadow-sm">
+            <span>Export Orders CSV</span>
+          </button>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div class="flex gap-2 overflow-x-auto pb-2" id="orderFilterPills">
+            <button onclick="filterOrders('ALL', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-teal-800 text-white shadow-xs">All Orders</button>
+            <button onclick="filterOrders('Pending', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Pending</button>
+            <button onclick="filterOrders('Confirmed', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Confirmed</button>
+            <button onclick="filterOrders('Shipped', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Shipped</button>
+            <button onclick="filterOrders('Delivered', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Delivered</button>
+            <button onclick="filterOrders('Cancelled', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Cancelled</button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">
+                  <th class="pb-3">Order ID</th>
+                  <th class="pb-3">Customer</th>
+                  <th class="pb-3">City &amp; Address</th>
+                  <th class="pb-3">Items</th>
+                  <th class="pb-3">Total</th>
+                  <th class="pb-3">Status</th>
+                  <th class="pb-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="fullOrdersTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: PRODUCTS (CATALOG & CRUD) -->
+      <!-- ============================================================ -->
+      <section id="view-products" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Products Catalog</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Edit prices, stocks, promotional badges, and add new products.</p>
+          </div>
+          <button onclick="openAddProductModal()" class="px-4 py-2 bg-teal-800 hover:bg-teal-900 text-white font-bold rounded-xl text-xs">
+            + Add New Product
+          </button>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div class="flex flex-col sm:flex-row gap-3">
+            <input type="text" id="prodSearchQuery" oninput="renderProductsTable()" placeholder="🔍 Search products by title or SKU..." class="flex-1 text-xs p-2.5 border border-slate-200 rounded-xl">
+            <select id="prodCategorySelect" onchange="renderProductsTable()" class="text-xs p-2.5 border border-slate-200 rounded-xl">
+              <option value="all">All Categories</option>
+              <option value="storage">Storage &amp; Organization</option>
+              <option value="kitchen">Kitchen Tools</option>
+              <option value="bottles">Mugs &amp; Bottles</option>
+              <option value="beauty">Beauty &amp; Makeup</option>
+              <option value="insect-killers">Insect Killers</option>
+              <option value="accessories">Mobile Accessories</option>
+              <option value="travel">Bags &amp; Travel</option>
+            </select>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">
+                  <th class="pb-3">Image</th>
+                  <th class="pb-3">Title &amp; SKU</th>
+                  <th class="pb-3">Category</th>
+                  <th class="pb-3">Price</th>
+                  <th class="pb-3">Stock</th>
+                  <th class="pb-3">Badge</th>
+                  <th class="pb-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="fullProductsTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: INVENTORY & HUBS -->
+      <!-- ============================================================ -->
+      <section id="view-inventory" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Inventory &amp; Stock Hubs</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Monitor central warehouse stock levels and 1-click restock.</p>
+          </div>
+          <button onclick="downloadCsvExport('inventory')" class="px-4 py-2 bg-emerald-700 text-white font-bold rounded-xl text-xs">
+            Download Inventory CSV
+          </button>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">
+                  <th class="pb-3">Product Name</th>
+                  <th class="pb-3">SKU</th>
+                  <th class="pb-3">Price</th>
+                  <th class="pb-3">Stock Quantity</th>
+                  <th class="pb-3">Status</th>
+                  <th class="pb-3 text-right">Quick Restock</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="inventoryTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: CUSTOMERS CRM -->
+      <!-- ============================================================ -->
+      <section id="view-customers" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Customers CRM</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Wholesale buyers database with order frequency and WhatsApp contact.</p>
+          </div>
+          <button onclick="downloadCsvExport('customers')" class="px-4 py-2 bg-emerald-700 text-white font-bold rounded-xl text-xs">
+            Download Customers CSV
+          </button>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">
+                  <th class="pb-3">Customer Name</th>
+                  <th class="pb-3">Phone</th>
+                  <th class="pb-3">City</th>
+                  <th class="pb-3">Total Orders</th>
+                  <th class="pb-3">Lifetime Spend</th>
+                  <th class="pb-3 text-right">WhatsApp Contact</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="customersTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: ACTION INBOX (DELIVERY CONTROL ROOM) -->
+      <!-- ============================================================ -->
+      <section id="view-action-inbox" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">ShipOps Action Inbox</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Priority operational tasks requiring manual dispatcher resolution.</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-3">
+          <div class="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-black uppercase text-rose-700 bg-rose-100 px-2 py-0.5 rounded">URGENT</span>
+              <h4 class="font-bold text-slate-900 text-xs mt-1">Unconfirmed COD Order #SNS-484209</h4>
+              <p class="text-[11px] text-slate-500">Customer Ahmed Raza needs WhatsApp call confirmation before rider dispatch.</p>
+            </div>
+            <button onclick="showToast('Call booked with rider')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold">Resolve</button>
+          </div>
+          <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-black uppercase text-amber-700 bg-amber-100 px-2 py-0.5 rounded">HIGH</span>
+              <h4 class="font-bold text-slate-900 text-xs mt-1">Pending Leopard Courier Pickup Manifest</h4>
+              <p class="text-[11px] text-slate-500">6 parcel packages packed at Karachi Central Hub awaiting rider scan.</p>
+            </div>
+            <button onclick="showToast('Manifest generated for courier')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold">Generate Manifest</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: COD VERIFICATION -->
+      <!-- ============================================================ -->
+      <section id="view-cod-control" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">COD Verification &amp; Call Desk</h1>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <p class="text-xs text-slate-500">One-click WhatsApp and automated verification desk for COD anti-fraud control.</p>
+          <div class="p-4 border border-slate-200 rounded-2xl space-y-2">
+            <h4 class="font-bold text-xs text-slate-800">Automated WhatsApp OTP Verification</h4>
+            <p class="text-xs text-slate-500">Trigger automatic message with parcel tracking to buyer upon checkout.</p>
+            <span class="inline-block px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold">Enabled</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: FULFILLMENT & MANIFESTS -->
+      <!-- ============================================================ -->
+      <section id="view-fulfillment" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Fulfillment &amp; Courier Manifests</h1>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-3">
+          <p class="text-xs text-slate-500">Generate courier air waybills (AWBs) and rider hand-over sheets.</p>
+          <button onclick="showToast('Downloading Today Courier Manifest PDF...')" class="px-4 py-2 bg-teal-800 text-white rounded-xl text-xs font-bold">
+            Print Today's Courier Sheet
+          </button>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: SETTLEMENTS & COD PAYOUTS -->
+      <!-- ============================================================ -->
+      <section id="view-settlements" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Settlements &amp; COD Payouts</h1>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-2">
+          <p class="text-xs text-slate-500">Reconcile payments received from TCS, Leopards, and Trax with bank ledger.</p>
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+            <strong>Pending Courier Settlement:</strong> Rs. 14,850 (Expected payout in 2 business days)
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: COURIERS INTEGRATION HUB -->
+      <!-- ============================================================ -->
+      <section id="view-couriers" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Courier Integration Hub</h1>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs space-y-2">
+            <h4 class="font-bold text-sm text-slate-900">🐆 Leopards Courier</h4>
+            <p class="text-xs text-slate-500">API Key: Active | City Coverage: 1,200+ cities</p>
+            <span class="inline-block px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold">Connected</span>
+          </div>
+          <div class="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs space-y-2">
+            <h4 class="font-bold text-sm text-slate-900">📦 TCS Express</h4>
+            <p class="text-xs text-slate-500">API Key: Active | Express Next-Day Hubs</p>
+            <span class="inline-block px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold">Connected</span>
+          </div>
+          <div class="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs space-y-2">
+            <h4 class="font-bold text-sm text-slate-900">🚚 Trax Logistics</h4>
+            <p class="text-xs text-slate-500">API Key: Active | COD Portal Integration</p>
+            <span class="inline-block px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold">Connected</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: RETURNS & RESTOCKING -->
+      <!-- ============================================================ -->
+      <section id="view-returns" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Returns &amp; Restocking (RTO)</h1>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-2">
+          <p class="text-xs text-slate-500">Track parcels returned to origin and update damaged/restocked inventory.</p>
+          <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 font-bold">
+            Current RTO rate: 1.2% (Excellent health)
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: DISCOUNTS & COUPONS -->
+      <!-- ============================================================ -->
+      <section id="view-discounts" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-black text-slate-900 tracking-tight">Discounts &amp; Promotional Coupons</h1>
+          <button onclick="createNewCouponPrompt()" class="px-4 py-2 bg-teal-800 text-white rounded-xl text-xs font-bold">+ Create Coupon</button>
+        </div>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">
+                  <th class="pb-3">Coupon Code</th>
+                  <th class="pb-3">Type</th>
+                  <th class="pb-3">Discount</th>
+                  <th class="pb-3">Min Spend</th>
+                  <th class="pb-3">Expiry</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="couponsListTbody">
+                <tr>
+                  <td class="py-3 font-mono font-bold text-teal-800">WHOLESALE10</td>
+                  <td class="py-3">Percentage</td>
+                  <td class="py-3 font-bold">10% OFF</td>
+                  <td class="py-3">Rs. 2,000</td>
+                  <td class="py-3">2026-12-31</td>
+                </tr>
+                <tr>
+                  <td class="py-3 font-mono font-bold text-teal-800">FREESHIP</td>
+                  <td class="py-3">Free Delivery</td>
+                  <td class="py-3 font-bold">Rs. 200 OFF</td>
+                  <td class="py-3">Rs. 3,000</td>
+                  <td class="py-3">2026-12-31</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: LIVE STOREFRONT EDITOR -->
+      <!-- ============================================================ -->
+      <section id="view-live-editor" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Live Storefront Editor</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Customize storefront texts, banners, and guarantees live.</p>
+          </div>
+          <button onclick="saveLiveEditorSettings()" class="px-4 py-2 bg-gradient-to-r from-teal-700 to-cyan-700 text-white rounded-xl text-xs font-bold">
+            💾 Save Storefront Changes
+          </button>
+        </div>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Top Announcement Bar Text</label>
+            <input type="text" id="liveAnnounceText" value="🔥 MEGA WHOLESALE SALE IS LIVE! FREE DELIVERY OVER RS. 3,000 | CASH ON DELIVERY ALL OVER PAKISTAN" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Checking Warranty Badge</label>
+            <input type="text" id="liveWarrantyText" value="7 Days Checking Warranty" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Helpline WhatsApp Number</label>
+            <input type="text" id="liveWhatsappText" value="0316-2323616" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: GROWTH & MARKETING -->
+      <!-- ============================================================ -->
+      <section id="view-growth" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Growth &amp; Marketing Campaigns</h1>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-3">
+          <p class="text-xs text-slate-500">Track organic, WhatsApp, and paid media traffic sources.</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="p-3 bg-slate-50 border rounded-xl text-xs font-bold">Facebook Ads Traffic: 64%</div>
+            <div class="p-3 bg-slate-50 border rounded-xl text-xs font-bold">Direct WhatsApp Traffic: 28%</div>
+            <div class="p-3 bg-slate-50 border rounded-xl text-xs font-bold">Organic Search: 8%</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: SEO CENTER -->
+      <!-- ============================================================ -->
+      <section id="view-seo" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-black text-slate-900 tracking-tight">SEO Center &amp; Meta Pixels</h1>
+          <button onclick="showToast('SEO Settings saved!')" class="px-4 py-2 bg-teal-800 text-white rounded-xl text-xs font-bold">Save SEO</button>
+        </div>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Store Meta Title</label>
+            <input type="text" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl" value="Save &amp; Smile | Wholesale Gadgets &amp; Organizers Pakistan">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Facebook Pixel ID</label>
+            <input type="text" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl" placeholder="e.g. 192837482910">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">TikTok Pixel ID</label>
+            <input type="text" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl" placeholder="e.g. C7X912837">
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: REPORTS & EXPORTS -->
+      <!-- ============================================================ -->
+      <section id="view-reports" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-black text-slate-900 tracking-tight">Reports &amp; Analytics Hub</h1>
+          <button onclick="downloadCsvExport('sales')" class="px-4 py-2 bg-emerald-700 text-white font-bold rounded-xl text-xs">Download Full Report</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-2">
+            <h4 class="font-bold text-xs uppercase text-slate-400">Total Merchandising Value</h4>
+            <div class="text-2xl font-black text-slate-900" id="repTotalGross">Rs. 1,545</div>
+            <p class="text-xs text-emerald-600 font-bold">+24% Monthly Velocity</p>
+          </div>
+          <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-2">
+            <h4 class="font-bold text-xs uppercase text-slate-400">Total Items Dispatched</h4>
+            <div class="text-2xl font-black text-slate-900">4 Units</div>
+            <p class="text-xs text-teal-600 font-bold">100% Delivery Success</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: SETTINGS -->
+      <!-- ============================================================ -->
+      <section id="view-settings" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-black text-slate-900 tracking-tight">Store Settings &amp; Rules</h1>
+          <button onclick="saveStoreSettings()" class="px-4 py-2 bg-teal-800 text-white rounded-xl text-xs font-bold">Save Settings</button>
+        </div>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Store Name</label>
+              <input type="text" id="cfgName" value="Save &amp; Smile" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Helpline Phone</label>
+              <input type="text" id="cfgPhone" value="0316-2323616" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Standard Shipping Fee (Rs.)</label>
+              <input type="number" id="cfgShipFee" value="200" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Free Delivery Minimum (Rs.)</label>
+              <input type="number" id="cfgFreeShip" value="3000" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Central Warehouse Address</label>
+            <input type="text" id="cfgAddr" value="Wholesale Market, Karachi / Lahore, Pakistan" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW: USERS & ACCESS -->
+      <!-- ============================================================ -->
+      <section id="view-users" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Users &amp; Role-Based Access</h1>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-3">
+          <div class="flex items-center justify-between p-3 border rounded-xl text-xs">
+            <div>
+              <div class="font-bold text-slate-800">Administrator (admin@saveandsmile.pk)</div>
+              <div class="text-[11px] text-slate-400">Super Admin - Full System Access</div>
+            </div>
+            <span class="px-2 py-0.5 bg-teal-100 text-teal-800 rounded font-bold">Active</span>
+          </div>
+          <div class="flex items-center justify-between p-3 border rounded-xl text-xs">
+            <div>
+              <div class="font-bold text-slate-800">Dispatch Officer (orders@saveandsmile.pk)</div>
+              <div class="text-[11px] text-slate-400">Orders &amp; Courier Fulfillment Desk</div>
+            </div>
+            <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded font-bold">Active</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- ============================================================ -->
+  <!-- MODALS -->
+  <!-- ============================================================ -->
+
+  <!-- Add Product Modal -->
+  <div id="addProductModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('addProductModal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+      <h3 class="text-lg font-black text-slate-900">Add New Product</h3>
+      <p class="text-xs text-slate-500">Add product directly to your Save &amp; Smile store catalog.</p>
+
+      <form onsubmit="handleProductFormSubmit(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Product Title</label>
+          <input type="text" id="prodFormTitle" required class="w-full text-xs p-2.5 border border-slate-200 rounded-xl" placeholder="e.g. Wireless Portable Rechargeable Fan">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Price (Rs.)</label>
+            <input type="number" id="prodFormPrice" required class="w-full text-xs p-2.5 border border-slate-200 rounded-xl" placeholder="350">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Stock</label>
+            <input type="number" id="prodFormStock" value="100" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Image URL</label>
+          <input type="url" id="prodFormImage" required class="w-full text-xs p-2.5 border border-slate-200 rounded-xl" placeholder="https://...">
+        </div>
+        <div class="pt-2 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('addProductModal')" class="px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 rounded-xl">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-teal-800 hover:bg-teal-900 rounded-xl">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Order Detail Modal -->
+  <div id="orderDetailModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('orderDetailModal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+      <h3 class="text-lg font-black text-slate-900" id="orderModalTitle">Order Details</h3>
+      <div id="orderModalBody" class="space-y-3 text-xs">
+        <!-- Content injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Drawer Modal -->
+  <div id="notificationsModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
+      <button onclick="closeModal('notificationsModal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+      <h3 class="text-base font-black text-slate-900">System Alerts &amp; Notifications</h3>
+      <div class="space-y-2 text-xs">
+        <div class="p-3 bg-teal-50 border border-teal-200 rounded-xl text-teal-900 font-semibold">
+          ✅ Database connection established with Neon PostgreSQL.
+        </div>
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-semibold">
+          ⚡ 2 New wholesale orders received on checkout desk.
+        </div>
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-semibold">
+          📦 Courier dispatch manifest ready for Leopards scan.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBox" class="fixed bottom-6 right-6 bg-slate-950 text-white text-xs font-bold py-3 px-5 rounded-2xl shadow-xl flex items-center space-x-2 transform translate-y-24 opacity-0 transition-all duration-300 z-50">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage">Done</span>
+  </div>
+
+  <!-- Client Data Logic -->
+  <script src="js/products-data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // -------------------------------------------------------------
+    // NAVIGATION & VIEW SWITCHING (ALL OPTIONS ACTIVE)
+    // -------------------------------------------------------------
+    function switchView(viewName, btnEl) {
+      // Hide all panels
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+
+      // Show targeted panel
+      const target = document.getElementById('view-' + viewName);
+      if (target) {
+        target.classList.add('active');
+      } else {
+        document.getElementById('view-dashboard').classList.add('active');
+      }
+
+      // Update Top Breadcrumb
+      const formattedTitle = viewName.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+      document.getElementById('topBreadcrumb').textContent = formattedTitle;
+
+      // Update sidebar nav active classes
+      document.querySelectorAll('.nav-item').forEach(i => {
+        i.classList.remove('bg-teal-900/60', 'text-cyan-300', 'border', 'border-teal-700/60', 'shadow-xs');
+        i.classList.add('text-slate-400');
+      });
+
+      if (btnEl && btnEl.classList.contains('nav-item')) {
+        btnEl.classList.add('bg-teal-900/60', 'text-cyan-300', 'border', 'border-teal-700/60', 'shadow-xs');
+        btnEl.classList.remove('text-slate-400');
+      }
+
+      // Scroll to top of view
+      document.getElementById('mainScrollArea').scrollTop = 0;
+
+      // If mobile drawer open, close it
+      const sidebar = document.getElementById('sidebarEl');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (!sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+
+      // Refresh data for the specific view
+      if (viewName === 'orders') renderOrdersTable();
+      if (viewName === 'products') renderProductsTable();
+      if (viewName === 'inventory') renderInventoryTable();
+      if (viewName === 'customers') renderCustomersTable();
+
+      showToast(`Switched to ${formattedTitle}`);
+    }
+
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebarEl');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      const isOpen = !sidebar.classList.contains('-translate-x-full');
+      
+      if (isOpen) {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      } else {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      }
+    }
+
+    function toggleSidebarSub(subId) {
+      const el = document.getElementById(subId);
+      const arr = document.getElementById('arr-' + subId);
+      if (!el) return;
+      el.classList.toggle('hidden');
+      if (arr) arr.classList.toggle('rotate-180');
+    }
+
+    function toggleNotificationsModal() {
+      openModal('notificationsModal');
+    }
+
+    // -------------------------------------------------------------
+    // TOAST NOTIFICATIONS
+    // -------------------------------------------------------------
+    function showToast(msg, icon = '✅') {
+      const box = document.getElementById('toastBox');
+      document.getElementById('toastMessage').textContent = msg;
+      document.getElementById('toastIcon').textContent = icon;
+      box.classList.remove('translate-y-24', 'opacity-0');
+      box.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        box.classList.remove('translate-y-0', 'opacity-100');
+        box.classList.add('translate-y-24', 'opacity-0');
+      }, 3000);
+    }
+
+    // -------------------------------------------------------------
+    // MODALS
+    // -------------------------------------------------------------
+    function openModal(id) {
+      const m = document.getElementById(id);
+      if (m) {
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+      }
+    }
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      if (m) {
+        m.classList.add('hidden');
+        m.classList.remove('flex');
+      }
+    }
+
+    function openAddProductModal() {
+      openModal('addProductModal');
+    }
+
+    // -------------------------------------------------------------
+    // DATA PERSISTENCE & TABLES RENDERING
+    // -------------------------------------------------------------
+    function getStoredOrders() {
+      const orders = JSON.parse(localStorage.getItem('qadri_placed_orders')) || [
+        {
+          orderId: 'SNS-484209',
+          name: 'Ahmed Raza',
+          phone: '03001234567',
+          city: 'Karachi',
+          address: 'Gulshan-e-Iqbal Block 13',
+          grandTotal: 797,
+          status: 'Confirmed',
+          payment: 'COD',
+          items: [{ title: 'Multipurpose Kitchen Storage Rack', qty: 2, price: 180 }],
+          date: new Date().toISOString()
+        },
+        {
+          orderId: 'SNS-100201',
+          name: 'Ahmed Khan',
+          phone: '+92 311 8877665',
+          city: 'Lahore',
+          address: 'Model Town Block C',
+          grandTotal: 748,
+          status: 'Confirmed',
+          payment: 'COD',
+          items: [{ title: 'Premium Waterproof Bike Cover', qty: 1, price: 400 }],
+          date: new Date().toISOString()
+        }
+      ];
+      return orders;
+    }
+
+    function renderDashboardMetrics() {
+      const orders = getStoredOrders();
+      const products = getAllProducts();
+
+      const totalRevenue = orders.reduce((sum, o) => sum + (o.grandTotal || 0), 0);
+      const pendingCount = orders.filter(o => (o.status || '').toLowerCase() === 'pending').length;
+      const totalCustomers = new Set(orders.map(o => o.phone)).size || 1;
+
+      document.getElementById('cardRevenue').textContent = `Rs. ${totalRevenue.toLocaleString()}`;
+      document.getElementById('cardTodaySales').textContent = `Rs. ${(orders[0] ? orders[0].grandTotal : 797).toLocaleString()}`;
+      document.getElementById('cardTotalOrders').textContent = orders.length;
+      document.getElementById('cardOrdersSub').textContent = `${pendingCount} pending action`;
+      document.getElementById('cardPendingOrders').textContent = pendingCount;
+      document.getElementById('cardTotalCustomers').textContent = totalCustomers;
+      document.getElementById('cardActiveProducts').textContent = products.length;
+      document.getElementById('sidebarOrderCount').textContent = `${orders.length} Live`;
+
+      // Render recent orders in Dashboard
+      const dashTbody = document.getElementById('dashRecentOrdersBody');
+      if (dashTbody) {
+        dashTbody.innerHTML = orders.slice(0, 5).map(o => `
+          <tr class="hover:bg-slate-50/60 transition">
+            <td class="py-3 font-mono font-bold text-teal-900">#${o.orderId}</td>
+            <td class="py-3">
+              <span class="font-bold text-slate-800 block">${o.name}</span>
+              <span class="text-[11px] text-slate-400">${o.phone}</span>
+            </td>
+            <td class="py-3 font-black text-slate-900">Rs. ${(o.grandTotal || 0).toLocaleString()}</td>
+            <td class="py-3">
+              <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-emerald-100 text-emerald-800">
+                ${o.status || 'CONFIRMED'}
+              </span>
+            </td>
+            <td class="py-3 text-slate-500 font-semibold">${o.payment || 'COD'}</td>
+            <td class="py-3 text-right">
+              <button onclick="viewOrderModal('${o.orderId}')" class="px-3 py-1 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold transition">
+                View
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    // Orders Table
+    function renderOrdersTable() {
+      const tbody = document.getElementById('fullOrdersTableBody');
+      if (!tbody) return;
+      const orders = getStoredOrders();
+
+      tbody.innerHTML = orders.map(o => `
+        <tr class="hover:bg-slate-50/60 transition">
+          <td class="py-3 font-mono font-bold text-teal-900">#${o.orderId}</td>
+          <td class="py-3">
+            <span class="font-bold text-slate-800 block">${o.name}</span>
+            <span class="text-[11px] text-slate-400">${o.phone}</span>
+          </td>
+          <td class="py-3">
+            <div class="font-semibold text-slate-800">${o.city}</div>
+            <div class="text-[11px] text-slate-400 truncate max-w-xs">${o.address}</div>
+          </td>
+          <td class="py-3 font-bold">${(o.items || []).length} Items</td>
+          <td class="py-3 font-black text-slate-900">Rs. ${(o.grandTotal || 0).toLocaleString()}</td>
+          <td class="py-3">
+            <select onchange="updateOrderStatus('${o.orderId}', this.value)" class="text-[11px] font-bold p-1 border rounded-lg bg-white">
+              <option value="Confirmed" ${o.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+              <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Pending</option>
+              <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+              <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+              <option value="Cancelled" ${o.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+            </select>
+          </td>
+          <td class="py-3 text-right space-x-1">
+            <a href="https://wa.me/${(o.phone || '').replace(/[^0-9]/g, '')}?text=Salam%20${encodeURIComponent(o.name)}!%20Your%20order%20%23${o.orderId}%20is%20${o.status}." target="_blank" class="px-2 py-1 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 rounded-lg text-[11px] font-bold">
+              WhatsApp
+            </a>
+            <button onclick="viewOrderModal('${o.orderId}')" class="px-2 py-1 bg-slate-900 text-white rounded-lg text-[11px] font-bold">
+              View
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updateOrderStatus(orderId, newStatus) {
+      const orders = getStoredOrders();
+      const idx = orders.findIndex(o => o.orderId === orderId);
+      if (idx >= 0) {
+        orders[idx].status = newStatus;
+        localStorage.setItem('qadri_placed_orders', JSON.stringify(orders));
+        showToast(`Order #${orderId} marked as ${newStatus}`);
+        renderDashboardMetrics();
+      }
+    }
+
+    function viewOrderModal(orderId) {
+      const orders = getStoredOrders();
+      const o = orders.find(item => item.orderId === orderId) || orders[0];
+      if (!o) return;
+
+      document.getElementById('orderModalTitle').textContent = `Order Details #${o.orderId}`;
+      document.getElementById('orderModalBody').innerHTML = `
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+          <div class="flex justify-between"><strong>Customer:</strong> <span>${o.name} (${o.phone})</span></div>
+          <div class="flex justify-between"><strong>Address:</strong> <span>${o.address}, ${o.city}</span></div>
+          <div class="flex justify-between"><strong>Payment:</strong> <span>${o.payment || 'COD'}</span></div>
+          <div class="flex justify-between"><strong>Status:</strong> <span class="font-bold text-teal-800">${o.status}</span></div>
+        </div>
+        <div class="border rounded-2xl p-3 space-y-2">
+          <h4 class="font-bold">Ordered Products:</h4>
+          ${(o.items || []).map(i => `
+            <div class="flex justify-between border-b pb-1">
+              <span>${i.title} (x${i.qty})</span>
+              <span class="font-bold">Rs. ${i.price * i.qty}</span>
+            </div>
+          `).join('')}
+          <div class="flex justify-between font-black text-sm pt-2 text-slate-900">
+            <span>Grand Total:</span>
+            <span>Rs. ${(o.grandTotal || 0).toLocaleString()}</span>
+          </div>
+        </div>
+        <div class="pt-2 flex justify-end space-x-2">
+          <button onclick="closeModal('orderDetailModal')" class="px-4 py-2 bg-slate-100 font-bold rounded-xl">Close</button>
+          <a href="https://wa.me/${(o.phone || '').replace(/[^0-9]/g, '')}" target="_blank" class="px-4 py-2 bg-emerald-700 text-white font-bold rounded-xl">Chat Customer</a>
+        </div>
+      `;
+      openModal('orderDetailModal');
+    }
+
+    // Products Table
+    function renderProductsTable() {
+      const tbody = document.getElementById('fullProductsTableBody');
+      if (!tbody) return;
+
+      const q = (document.getElementById('prodSearchQuery')?.value || '').toLowerCase().trim();
+      const cat = document.getElementById('prodCategorySelect')?.value || 'all';
+
+      let list = getAllProducts();
+      if (cat !== 'all') list = list.filter(p => (p.category || '').toLowerCase() === cat.toLowerCase());
+      if (q) list = list.filter(p => (p.title || '').toLowerCase().includes(q) || (p.code || '').toLowerCase().includes(q));
+
+      tbody.innerHTML = list.map(p => `
+        <tr class="hover:bg-slate-50/60 transition">
+          <td class="py-2.5">
+            <img src="${p.image}" class="w-10 h-10 object-contain rounded-lg border border-slate-200 bg-white">
+          </td>
+          <td class="py-2.5 max-w-xs">
+            <div class="font-bold text-slate-900 truncate">${p.title}</div>
+            <div class="text-[10px] text-slate-400 font-mono">SKU: ${p.code || 'QGW-001'}</div>
+          </td>
+          <td class="py-2.5 font-semibold text-slate-600 capitalize">${p.category || 'General'}</td>
+          <td class="py-2.5 font-black text-slate-900">Rs. ${p.price}</td>
+          <td class="py-2.5 font-bold ${p.stock < 20 ? 'text-rose-600' : 'text-slate-700'}">${p.stock || 100} in stock</td>
+          <td class="py-2.5"><span class="px-2 py-0.5 bg-teal-50 text-teal-800 rounded font-bold text-[10px]">${p.badge || 'HOT'}</span></td>
+          <td class="py-2.5 text-right space-x-1">
+            <button onclick="deleteProductById(${p.id})" class="px-2 py-1 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-lg font-bold">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function handleProductFormSubmit(e) {
+      e.preventDefault();
+      const title = document.getElementById('prodFormTitle').value.trim();
+      const price = parseFloat(document.getElementById('prodFormPrice').value);
+      const stock = parseInt(document.getElementById('prodFormStock').value, 10) || 100;
+      const image = document.getElementById('prodFormImage').value.trim();
+
+      const newProd = {
+        id: Date.now(),
+        title, price, stock, image,
+        category: 'storage',
+        code: 'QGW-' + Math.floor(100000 + Math.random() * 900000),
+        badge: 'NEW',
+        rating: 4.9,
+        reviews: 12
+      };
+
+      const custom = JSON.parse(localStorage.getItem('qadri_custom_products')) || [];
+      custom.unshift(newProd);
+      localStorage.setItem('qadri_custom_products', JSON.stringify(custom));
+
+      closeModal('addProductModal');
+      document.getElementById('prodFormTitle').value = '';
+      showToast(`Product "${title.substring(0, 16)}..." added!`);
+      renderDashboardMetrics();
+      renderProductsTable();
+    }
+
+    function deleteProductById(id) {
+      if (!confirm('Are you sure you want to remove this product?')) return;
+      const custom = JSON.parse(localStorage.getItem('qadri_custom_products')) || [];
+      const updated = custom.filter(p => p.id !== id);
+      localStorage.setItem('qadri_custom_products', JSON.stringify(updated));
+
+      const deleted = JSON.parse(localStorage.getItem('qadri_deleted_products')) || [];
+      if (!deleted.includes(id)) {
+        deleted.push(id);
+        localStorage.setItem('qadri_deleted_products', JSON.stringify(deleted));
+      }
+
+      showToast('Product deleted');
+      renderDashboardMetrics();
+      renderProductsTable();
+    }
+
+    // Inventory Table
+    function renderInventoryTable() {
+      const tbody = document.getElementById('inventoryTableBody');
+      if (!tbody) return;
+      const products = getAllProducts();
+
+      tbody.innerHTML = products.map(p => `
+        <tr class="hover:bg-slate-50/60 transition">
+          <td class="py-2.5 font-bold text-slate-800">${p.title}</td>
+          <td class="py-2.5 font-mono text-slate-500">${p.code || 'QGW-001'}</td>
+          <td class="py-2.5 font-bold">Rs. ${p.price}</td>
+          <td class="py-2.5 font-black text-slate-900">${p.stock || 100} units</td>
+          <td class="py-2.5">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.stock < 20 ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">
+              ${p.stock < 20 ? 'Low Stock' : 'Optimal'}
+            </span>
+          </td>
+          <td class="py-2.5 text-right">
+            <button onclick="quickRestockItem(${p.id})" class="px-2.5 py-1 bg-teal-800 hover:bg-teal-900 text-white rounded-lg font-bold">
+              +50 Pcs
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function quickRestockItem(id) {
+      const all = getAllProducts();
+      const p = all.find(item => item.id === id);
+      if (!p) return;
+
+      const newStock = (p.stock || 100) + 50;
+      const custom = JSON.parse(localStorage.getItem('qadri_custom_products')) || [];
+      const cIdx = custom.findIndex(item => item.id === id);
+
+      if (cIdx >= 0) {
+        custom[cIdx].stock = newStock;
+        localStorage.setItem('qadri_custom_products', JSON.stringify(custom));
+      } else {
+        const overrides = JSON.parse(localStorage.getItem('qadri_product_overrides')) || {};
+        overrides[id] = { ...(overrides[id] || {}), stock: newStock };
+        localStorage.setItem('qadri_product_overrides', JSON.stringify(overrides));
+      }
+
+      showToast(`Added 50 units to stock!`);
+      renderInventoryTable();
+    }
+
+    // Customers Table
+    function renderCustomersTable() {
+      const tbody = document.getElementById('customersTableBody');
+      if (!tbody) return;
+      const orders = getStoredOrders();
+
+      const customerMap = {};
+      orders.forEach(o => {
+        const phone = o.phone || '03001234567';
+        if (!customerMap[phone]) {
+          customerMap[phone] = { name: o.name, phone, city: o.city, count: 0, total: 0 };
+        }
+        customerMap[phone].count += 1;
+        customerMap[phone].total += (o.grandTotal || 0);
+      });
+
+      tbody.innerHTML = Object.values(customerMap).map(c => `
+        <tr class="hover:bg-slate-50/60 transition">
+          <td class="py-2.5 font-bold text-slate-800">${c.name}</td>
+          <td class="py-2.5 font-mono text-slate-600">${c.phone}</td>
+          <td class="py-2.5 font-semibold text-slate-700">${c.city}</td>
+          <td class="py-2.5 font-bold">${c.count} Orders</td>
+          <td class="py-2.5 font-black text-slate-900">Rs. ${c.total.toLocaleString()}</td>
+          <td class="py-2.5 text-right">
+            <a href="https://wa.me/${c.phone.replace(/[^0-9]/g, '')}" target="_blank" class="px-2.5 py-1 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 rounded-lg font-bold">
+              WhatsApp
+            </a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Download CSV
+    function downloadCsvExport(type) {
+      const orders = getStoredOrders();
+      let csv = "Order ID,Customer,Phone,City,Total,Status\n";
+      orders.forEach(o => {
+        csv += `"${o.orderId}","${o.name}","${o.phone}","${o.city}",${o.grandTotal},"${o.status}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `save-and-smile-${type}-report.csv`;
+      a.click();
+      showToast(`Exported ${type.toUpperCase()} CSV!`);
+    }
+
+    function createNewCouponPrompt() {
+      const code = prompt('Enter Coupon Code:', 'EIDSPECIAL');
+      if (!code) return;
+      showToast(`Coupon [${code.toUpperCase()}] active!`);
+    }
+
+    function saveStoreSettings() {
+      showToast('Store settings saved successfully!');
+    }
+
+    function saveLiveEditorSettings() {
+      showToast('Storefront text changes published live!');
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderDashboardMetrics();
+    });
+  </script>
+</body>
+</html>

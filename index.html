@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Save &amp; Smile | Shop • Save • Smile | Wholesale Store Pakistan</title>
+  <meta name="description" content="Save &amp; Smile is Pakistan's leading wholesale portal for trending gadgets, kitchen organizers, smart watches and electronics at direct factory rates.">
+  <link rel="icon" type="image/png" href="images/save-and-smile-logo.png">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ==========================================
+       1. Top Announcement Bar / Marquee Ticker
+       ========================================== -->
+  <div class="ticker-bar" id="tickerSection">
+    <div class="site-container" style="overflow: hidden; width: 100%;">
+      <div class="ticker-track" id="tickerTrack">
+        <div class="ticker-item">
+          🚀 Welcome to <strong>Save &amp; Smile Wholesale Portal</strong> (Shop • Save • Smile)
+        </div>
+        <div class="ticker-item">
+          🔥 Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers
+        </div>
+        <div class="ticker-item">
+          🚚 Cash on Delivery (COD) Nationwide | Free Delivery Above Rs. 3,000
+        </div>
+        <div class="ticker-item">
+          📞 24/7 Helpline &amp; WhatsApp: <strong>0316-2323616</strong>
+        </div>
+        <!-- Loop Item -->
+        <div class="ticker-item">
+          🚀 Welcome to <strong>Save &amp; Smile Wholesale Portal</strong> (Shop • Save • Smile)
+        </div>
+        <div class="ticker-item">
+          🔥 Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers
+        </div>
+        <div class="ticker-item">
+          🚚 Cash on Delivery (COD) Nationwide | Free Delivery Above Rs. 3,000
+        </div>
+        <div class="ticker-item">
+          📞 24/7 Helpline &amp; WhatsApp: <strong>0316-2323616</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       2. Main Header & Dynamic Gradient Bar (Single Header)
+       ========================================== -->
+  <header class="header-wrapper" id="headerSection">
+    <div class="site-container">
+      <div class="header-inner">
+        
+        <!-- Left Side: 4-Dots Menu Trigger + Brand Logo -->
+        <div class="header-left-group">
+          <!-- 4-Dots Icon Menu Trigger Button -->
+          <button class="header-menu-btn" id="headerMenuBtn" onclick="toggleHeaderMenu()" title="Open Categories & Menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="6" cy="6" r="2.8"/>
+              <circle cx="18" cy="6" r="2.8"/>
+              <circle cx="6" cy="18" r="2.8"/>
+              <circle cx="18" cy="18" r="2.8"/>
+            </svg>
+          </button>
+
+          <!-- Brand Logo with Save & Smile Logo Image (SEO Structured H1) -->
+          <h1 class="brand-heading-seo" style="margin: 0; padding: 0; line-height: 1;">
+            <a href="index.html" class="brand-logo" title="Save & Smile - Shop • Save • Smile | Wholesale Store Pakistan">
+              <img src="images/save-and-smile-logo.png" alt="Save &amp; Smile - Wholesale Gadgets Pakistan" class="site-brand-logo">
+            </a>
+          </h1>
+        </div>
+
+        <!-- Desktop Center Navigation Menu (Pure Text Minimalist Elegance) -->
+        <nav class="desktop-center-nav">
+          <a href="index.html" class="desktop-nav-link active">Home</a>
+          <a href="#flashSale" class="desktop-nav-link">Deals</a>
+          <a href="javascript:void(0)" class="desktop-nav-link" onclick="openTrackOrderModal()">Track Order</a>
+          <a href="cart.html" class="desktop-nav-link">Cart</a>
+          <a href="https://wa.me/923162323616?text=Salam!%20I%20want%20to%20Buy%20in%20Wholesale" target="_blank" class="desktop-nav-link wholesale-pill">Wholesale</a>
+        </nav>
+
+        <!-- Header Actions (All as Icons on Right Side: Search, WhatsApp, Wishlist, Cart) -->
+        <div class="header-actions">
+          <!-- Search Icon Button (Toggles Search Bar) -->
+          <button class="action-icon-pill" id="searchToggleBtn" onclick="toggleSearchOverlay()" title="Search Products">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+
+          <!-- WhatsApp Hotline Icon -->
+          <a href="https://wa.me/923162323616" target="_blank" class="action-icon-pill hotline-icon-pill" title="WhatsApp Support: 0316-2323616">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </a>
+
+          <!-- Wishlist Icon -->
+          <button class="action-icon-pill" onclick="openWishlistModal()" title="View Wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span class="badge-counter" id="wishlistBadge">0</span>
+          </button>
+
+          <!-- Shopping Cart Trigger Icon -->
+          <button class="action-icon-pill" onclick="openCartDrawer()" title="View Shopping Cart">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span class="badge-counter" id="cartBadge">0</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Expandable Search Bar Overlay (Right below header inner) -->
+      <div class="expand-search-bar" id="expandSearchBar">
+        <form class="search-input-group" onsubmit="handleSearchSubmit(event)">
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search wholesale gadgets, smart watches, racks..." 
+            autocomplete="off"
+          >
+          <button type="submit" class="search-btn" title="Search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+          <button type="button" class="search-close-btn" onclick="toggleSearchOverlay()">✕</button>
+        </form>
+        <div class="search-results-dropdown" id="searchResultsDropdown"></div>
+      </div>
+    </div>
+
+    <!-- 2-Tab Interactive Header Dropdown Panel (Categories & Menu) -->
+    <div class="header-tabs-dropdown" id="headerTabsDropdown">
+      <div class="site-container">
+        <div class="dropdown-tabs-nav">
+          <button class="tab-nav-btn active" id="tabNavBtnCat" onclick="switchHeaderDropdownTab('categories')">
+            Categories
+          </button>
+          <button class="tab-nav-btn" id="tabNavBtnMenu" onclick="switchHeaderDropdownTab('menu')">
+            Menu
+          </button>
+        </div>
+
+        <!-- Tab 1: Categories Content -->
+        <div class="tab-pane-content active" id="tabPaneCategories">
+          <div class="header-cats-grid" id="headerCatsGrid"></div>
+        </div>
+
+        <!-- Tab 2: Menu Content (Pure Clean Text without Icons) -->
+        <div class="tab-pane-content" id="tabPaneMenu">
+          <div class="header-menu-links">
+            <a href="index.html" class="menu-item-link" onclick="toggleHeaderMenu()">
+              <span>Home</span>
+            </a>
+            <a href="#flashSale" class="menu-item-link" onclick="toggleHeaderMenu()">
+              <span>Deals &amp; Discounts</span>
+            </a>
+            <a href="javascript:void(0)" class="menu-item-link" onclick="openTrackOrderModal(); toggleHeaderMenu();">
+              <span>Track Order</span>
+            </a>
+            <a href="cart.html" class="menu-item-link">
+              <span>Shopping Cart</span>
+            </a>
+            <a href="https://wa.me/923162323616?text=Salam!%20I%20want%20to%20Buy%20in%20Wholesale" target="_blank" class="menu-item-link wholesale-highlight">
+              <span>Buy in Wholesale</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       4. Hero Main Banner Slider
+       ========================================== -->
+  <section class="hero-slider-section" id="heroSliderSection">
+    <div class="site-container">
+      <div class="slider-container" id="heroSliderContainer"></div>
+      <div class="slider-controls">
+        <button class="slider-arrow" onclick="prevSlide()" title="Previous Slide">‹</button>
+        <button class="slider-arrow" onclick="nextSlide()" title="Next Slide">›</button>
+      </div>
+      <div class="slider-dots" id="sliderDots"></div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       5. "Shop By Categories" Round Slider Strip
+       ========================================== -->
+  <section class="cat-strip-section" id="shopSliderSection">
+    <div class="site-container">
+      <h2 class="cat-section-title">Shop By Categories</h2>
+      <div class="cat-marquee-wrapper">
+        <div class="cat-marquee-track" id="categoryStrip"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       6. Trust Features Bar (HomePageFooterIcons)
+       ========================================== -->
+  <section class="trust-features-section" id="HomePageFooterIcons">
+    <div class="site-container">
+      <div class="trust-features-grid">
+        <div class="trust-feature-card support">
+          <div class="trust-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+              <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+            </svg>
+          </div>
+          <div class="trust-feature-text">
+            <h4>Support 24/7</h4>
+            <p>Direct WhatsApp & Call wholesale assistance</p>
+          </div>
+        </div>
+        <div class="trust-feature-card prices">
+          <div class="trust-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+              <line x1="7" y1="7" x2="7.01" y2="7"></line>
+            </svg>
+          </div>
+          <div class="trust-feature-text">
+            <h4>Best Prices</h4>
+            <p>Direct factory prices for bulk & retail</p>
+          </div>
+        </div>
+        <div class="trust-feature-card payment">
+          <div class="trust-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+              <line x1="2" y1="10" x2="22" y2="10"></line>
+            </svg>
+          </div>
+          <div class="trust-feature-text">
+            <h4>Secure Payment</h4>
+            <p>Cash on delivery & verified digital transfers</p>
+          </div>
+        </div>
+        <div class="trust-feature-card warranty">
+          <div class="trust-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+          </div>
+          <div class="trust-feature-text">
+            <h4>7 Days Replacement</h4>
+            <p>Hassle-free product verification & exchange</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       7. Front Categories Tabs Section (HomePageTabs)
+       ========================================== -->
+  <section class="front-cat-tabs-section" id="HomePageTabs">
+    <div class="site-container">
+      <div class="front-cat-nav-list" id="frontTabsNav"></div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       PORTION 1: 🔥 Hot Selling Products (Warm Sunset Background Theme)
+       ========================================== -->
+  <section class="store-portion-section portion-hot-selling" id="hotSelling">
+    <div class="site-container">
+      <div class="portion-header-bar">
+        <div class="portion-title-group">
+          <span class="portion-pill-tag">🔥 HOT SELLING</span>
+          <div>
+            <h2 class="portion-heading-text">Hot Selling Wholesale Gadgets</h2>
+            <p class="portion-subtitle-text">Fast moving products with highest reseller profit margins</p>
+          </div>
+        </div>
+        <a href="#products" class="portion-view-all" onclick="filterByCategory('all')">See All Hot Items →</a>
+      </div>
+      <div class="products-grid" id="hotSellingGrid"></div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       PORTION 2: ✨ New Arrivals (Fresh Olive Green Background Theme - Matches Logo)
+       ========================================== -->
+  <section class="store-portion-section portion-new-arrivals" id="newArrivals">
+    <div class="site-container">
+      <div class="portion-header-bar">
+        <div class="portion-title-group">
+          <span class="portion-pill-tag">✨ NEW ARRIVALS</span>
+          <div>
+            <h2 class="portion-heading-text">Latest New Arrivals</h2>
+            <p class="portion-subtitle-text">Fresh containers imported this week — First batch wholesale prices</p>
+          </div>
+        </div>
+        <a href="#products" class="portion-view-all" onclick="filterByCategory('all')">See All New Arrivals →</a>
+      </div>
+      <div class="products-grid" id="newArrivalsGrid"></div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       PORTION 3: ⚡ Today's Flash Sale with Live Countdown
+       ========================================== -->
+  <section class="flash-sale-section" id="flashSale">
+    <div class="site-container">
+      <div class="flash-sale-header">
+        <div class="flash-title-area">
+          <span style="font-size: 1.5rem;">⚡</span>
+          <div>
+            <h2>TODAY'S FLASH SALE</h2>
+            <p style="font-size: 0.8rem; opacity: 0.9;">Limited quantity left at discounted wholesale prices!</p>
+          </div>
+        </div>
+        <div class="countdown-timer">
+          <span style="font-size: 0.85rem; font-weight: 600; margin-right: 6px;">Ends In:</span>
+          <div class="timer-box" id="timerHours">14</div>
+          <span class="timer-sep">:</span>
+          <div class="timer-box" id="timerMinutes">42</div>
+          <span class="timer-sep">:</span>
+          <div class="timer-box" id="timerSeconds">19</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       PORTION 4: 🌟 Trending Wholesale Picks (Cool Teal Background Theme - Matches Logo)
+       ========================================== -->
+  <section class="store-portion-section portion-trending-gadgets" id="trendingPicks">
+    <div class="site-container">
+      <div class="portion-header-bar">
+        <div class="portion-title-group">
+          <span class="portion-pill-tag">🌟 TRENDING PICKS</span>
+          <div>
+            <h2 class="portion-heading-text">Trending Wholesale Picks</h2>
+            <p class="portion-subtitle-text">Most demanded smart watches, organizers & lifestyle essentials</p>
+          </div>
+        </div>
+        <a href="#products" class="portion-view-all" onclick="filterByCategory('all')">See All Trending →</a>
+      </div>
+      <div class="products-grid" id="trendingGrid"></div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       PORTION 5: 🛍️ Complete Product Catalog Section
+       ========================================== -->
+  <section class="catalog-section" id="products">
+    <div class="site-container">
+      
+      <!-- Catalog Header & Category Sub-Filters -->
+      <div class="catalog-header">
+        <div class="catalog-title">
+          <h2>All Wholesale Products</h2>
+        </div>
+        <div class="filter-tabs-list">
+          <button class="tab-btn active" data-cat="all" onclick="filterByCategory('all')">All Items</button>
+          <button class="tab-btn" data-cat="storage" onclick="filterByCategory('storage')">Storage & Racks</button>
+          <button class="tab-btn" data-cat="smartwatches" onclick="filterByCategory('smartwatches')">Smart Watches</button>
+          <button class="tab-btn" data-cat="bottles" onclick="filterByCategory('bottles')">Mugs & Bottles</button>
+          <button class="tab-btn" data-cat="insect-killers" onclick="filterByCategory('insect-killers')">Insect Killers</button>
+          <button class="tab-btn" data-cat="beauty" onclick="filterByCategory('beauty')">Beauty & Care</button>
+          <button class="tab-btn" data-cat="accessories" onclick="filterByCategory('accessories')">Accessories</button>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" id="productsGrid"></div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       10. Interactive Search Hero (HomePageBuilder)
+       ========================================== -->
+  <section class="search-hero-section" id="HomePageBuilder">
+    <div class="site-container">
+      <div class="search-hero-card">
+        <div class="search-hero-layout">
+          
+          <div class="search-hero-copy">
+            <span class="tag-label">QUICK FINDER</span>
+            <h2>Find Any Product Instantly</h2>
+            <p class="search-hero-subtitle">
+              Search through thousands of top-selling gadgets, home organizers, smart watches, and trending electronic items in Pakistan.
+            </p>
+            <div class="suggestion-pills">
+              <span class="suggestion-pill" onclick="applyQuickSearch('Storage')">🔍 Storage & Racks</span>
+              <span class="suggestion-pill" onclick="applyQuickSearch('Watch')">⌚ Smart Watch</span>
+              <span class="suggestion-pill" onclick="applyQuickSearch('Bag')">👜 Travel Bag</span>
+              <span class="suggestion-pill" onclick="applyQuickSearch('Bottle')">🍶 Water Bottle</span>
+              <span class="suggestion-pill" onclick="applyQuickSearch('Massager')">💆 Massage Gun</span>
+            </div>
+          </div>
+
+          <div class="search-mockup-wrap">
+            <div class="search-mockup">
+              <div class="search-mockup-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <form class="main-search-container" onsubmit="handleHeroSearchSubmit(event)">
+                <input 
+                  type="text" 
+                  id="heroSearchInput" 
+                  class="hero-search-input" 
+                  placeholder="Type product name (e.g. Organizer, Smart Watch)..."
+                >
+                <button type="submit" class="hero-search-btn">
+                  <span>Search</span> ➔
+                </button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       11. "Watch & Shop" Video Reels (HomePageReels)
+       ========================================== -->
+  <section class="reels-section" id="HomePageReels">
+    <div class="site-container">
+      <div class="qadri-reels-head">
+        <div>
+          <span class="qadri-reels-kicker">IN MOTION</span>
+          <h2 class="qadri-reels-title">Watch &amp; Shop</h2>
+        </div>
+        <div class="qadri-reels-nav">
+          <button type="button" onclick="scrollReels(-1)" aria-label="Previous videos">‹</button>
+          <button type="button" onclick="scrollReels(1)" aria-label="Next videos">›</button>
+        </div>
+      </div>
+
+      <!-- Video Reels Track -->
+      <div class="reels-track" id="reelsTrack"></div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       12. What Our Clients Say (HomePageClientTestimonials)
+       ========================================== -->
+  <section class="testimonials-section" id="testimonialsSection">
+    <div class="site-container">
+      <div class="section-head-center">
+        <span class="kicker-badge">FEEDBACK</span>
+        <h2>What Our Clients Say</h2>
+        <p>Real stories and verified reviews from our valued wholesale customers across Pakistan</p>
+      </div>
+
+      <!-- Reviews Track -->
+      <div class="reviews-marquee-lane">
+        <div class="reviews-track" id="reviewsTrack"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       13. Shopping Cart Offcanvas Drawer
+       ========================================== -->
+  <div class="cart-drawer-overlay" id="cartDrawerOverlay" onclick="closeCartDrawer()"></div>
+  <div class="cart-drawer" id="cartDrawer">
+    <div class="drawer-header">
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Shopping Cart
+      </h3>
+      <button class="drawer-close-btn" onclick="closeCartDrawer()">✕</button>
+    </div>
+
+    <!-- Free Shipping Progress Bar -->
+    <div class="free-shipping-progress">
+      <div id="freeShippingText">Add Rs. 3,000 for FREE Delivery</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="freeShippingBar"></div>
+      </div>
+    </div>
+
+    <!-- Items List -->
+    <div class="drawer-body" id="cartDrawerItems"></div>
+
+    <!-- Summary & Checkout Buttons -->
+    <div class="drawer-footer">
+      <div class="summary-line">
+        <span>Subtotal:</span>
+        <strong id="cartSubtotal">Rs. 0</strong>
+      </div>
+      <div class="summary-line">
+        <span>Standard Shipping:</span>
+        <strong id="cartShipping">Rs. 200</strong>
+      </div>
+      <div class="summary-line total">
+        <span>Total Payable:</span>
+        <span id="cartTotal">Rs. 0</span>
+      </div>
+
+      <div class="drawer-actions">
+        <button class="btn-checkout" onclick="window.location.href='checkout.html'">
+          💳 Proceed to Checkout
+        </button>
+        <button class="btn-checkout" onclick="window.location.href='cart.html'" style="background: #f1f5f9; color: #1e293b; border: 1.5px solid #cbd5e1; box-shadow: none;">
+          🛒 View Full Cart Page
+        </button>
+        <button class="btn-whatsapp-order" onclick="checkoutWhatsApp()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Quick Order via WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       14. Reusable Interactive Modal
+       ========================================== -->
+  <div class="modal-overlay" id="genericModal" onclick="if(event.target === this) closeModal()">
+    <div class="modal-content-card">
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+      <div id="genericModalContent"></div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       15. Mobile Fixed Bottom Navigation Bar
+       ========================================== -->
+  <div class="mbl-contact-fixed">
+    <div class="mbl-nav-item active" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Home</span>
+    </div>
+    <div class="mbl-nav-item" onclick="toggleMegaMenu()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span>Categories</span>
+    </div>
+    <div class="mbl-nav-item" onclick="window.open('https://wa.me/923162323616', '_blank')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <span>WhatsApp</span>
+    </div>
+    <div class="mbl-nav-item" onclick="openCartDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="mbl-badge" id="mblCartBadge">0</span>
+      <span>Cart</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       16. AI Store Assistant Robot (Auto Store Support)
+       ========================================== -->
+  <button type="button" class="floating-ai-robot" id="aiRobotToggleBtn" onclick="toggleAiChat()" title="Ask Save & Smile AI Assistant">
+    <span class="ai-robot-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="10" rx="3"></rect>
+        <circle cx="9" cy="16" r="1.5" fill="currentColor"></circle>
+        <circle cx="15" cy="16" r="1.5" fill="currentColor"></circle>
+        <path d="M8 7l4-4 4 4"></path>
+        <line x1="12" y1="3" x2="12" y2="11"></line>
+        <line x1="2" y1="16" x2="3" y2="16"></line>
+        <line x1="21" y1="16" x2="22" y2="16"></line>
+      </svg>
+    </span>
+    <span class="ai-status-pulse"></span>
+    <div class="floating-ai-tooltip">Need Help? Ask AI Robot!</div>
+  </button>
+
+  <!-- Interactive AI Assistant Modal / Popup -->
+  <div class="ai-chat-window" id="aiChatWindow">
+    <div class="ai-chat-header">
+      <div class="ai-header-info">
+        <div class="ai-header-avatar">🤖</div>
+        <div>
+          <div class="ai-header-title">Save &amp; Smile AI Assistant</div>
+          <div class="ai-header-status">● Online • 24/7 Store Support</div>
+        </div>
+      </div>
+      <button class="ai-close-btn" onclick="toggleAiChat()">✕</button>
+    </div>
+    <div class="ai-chat-messages" id="aiChatMessages">
+      <div class="ai-msg bot">
+        <div class="ai-msg-bubble">
+          Assalam-o-Alaikum! 👋 Main Save &amp; Smile ka AI Assistant hoon.<br>
+          Aap mujh se store delivery, wholesale rates, tracking ya kisi bhi gadget k baray mein pooch sakte hain!
+        </div>
+      </div>
+      <div class="ai-suggestions-quick">
+        <button onclick="sendQuickAiQuery('Delivery kitne din mein aati hai?')">🚚 Delivery time?</button>
+        <button onclick="sendQuickAiQuery('Wholesale bulk discounts?')">📦 Wholesale discounts?</button>
+        <button onclick="sendQuickAiQuery('Payment methods kon se hain?')">💳 Payment methods?</button>
+        <button onclick="sendQuickAiQuery('Order track kaise karein?')">📍 Track order?</button>
+      </div>
+    </div>
+    <form class="ai-chat-input-bar" onsubmit="handleAiMessageSubmit(event)">
+      <input type="text" id="aiUserInput" placeholder="Poochiye (e.g. delivery, watch, discount)..." autocomplete="off">
+      <button type="submit" class="ai-send-btn" title="Send message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </form>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-notice" id="toastNotice">Item added to cart!</div>
+
+  <!-- ==========================================
+       17. Footer
+       ========================================== -->
+  <footer class="site-footer">
+    <div class="site-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <a href="index.html" style="display: inline-block;">
+            <img src="images/save-and-smile-logo.png" alt="Save &amp; Smile" class="footer-brand-logo">
+          </a>
+          <p style="font-size: 0.88rem; line-height: 1.7; margin-bottom: 1rem;">
+            Pakistan's trusted online wholesale portal for trending gadgets, kitchen organizers, smart watches, and home solutions. Providing best reseller margins and doorstep Cash on Delivery across Pakistan.
+          </p>
+          <div style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 6px;">
+            <div>📞 <strong>Helpline &amp; WhatsApp:</strong> 0316-2323616</div>
+            <div>✉️ <strong>Email:</strong> info@saveandsmile.pk</div>
+            <div>📍 <strong>Dispatch Center:</strong> Karachi &amp; Lahore, Pakistan</div>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Popular Categories</h4>
+          <ul class="footer-links">
+            <li><a href="#products" onclick="filterByCategory('storage')">Storage &amp; Racks</a></li>
+            <li><a href="#products" onclick="filterByCategory('smartwatches')">Smart Watches</a></li>
+            <li><a href="#products" onclick="filterByCategory('bottles')">Mug &amp; Bottles</a></li>
+            <li><a href="#products" onclick="filterByCategory('insect-killers')">Insect Killers</a></li>
+            <li><a href="#products" onclick="filterByCategory('accessories')">Mobile Accessories</a></li>
+            <li><a href="#products" onclick="filterByCategory('massager')">Electric Massagers</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Customer Care</h4>
+          <ul class="footer-links">
+            <li><a href="javascript:void(0)" onclick="openTrackOrderModal()">Track Your Order</a></li>
+            <li><a href="https://wa.me/923162323616" target="_blank">Wholesale Bulk Inquiries</a></li>
+            <li><a href="#flashSale">Flash Deals</a></li>
+            <li><a href="javascript:void(0)" onclick="openWishlistModal()">My Wishlist</a></li>
+            <li><a href="https://wa.me/923162323616" target="_blank">Return &amp; Refund Policy</a></li>
+            <li><a href="https://wa.me/923162323616" target="_blank">Terms &amp; Conditions</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Wholesale Payment Methods</h4>
+          <p style="font-size: 0.85rem; margin-bottom: 1rem; line-height: 1.6;">
+            We accept Cash on Delivery (COD) across Pakistan, plus online direct transfers via JazzCash, EasyPaisa, and Bank Accounts.
+          </p>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <span style="background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 6px; font-size: 0.78rem;">Cash On Delivery</span>
+            <span style="background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 6px; font-size: 0.78rem;">JazzCash</span>
+            <span style="background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 6px; font-size: 0.78rem;">EasyPaisa</span>
+            <span style="background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 6px; font-size: 0.78rem;">Bank Transfer</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          © 2026 Save &amp; Smile (Shop • Save • Smile). All Rights Reserved.
+        </div>
+        <div>
+          Direct Wholesale Marketplace in Pakistan • 0316-2323616
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/products-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

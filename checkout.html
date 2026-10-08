@@ -194,8 +194,11 @@
         Our customer support team will send you dispatch details on WhatsApp before shipping.
       </p>
 
-      <div style="display: flex; gap: 10px; justify-content: center;">
-        <button class="btn-checkout" onclick="window.location.href='index.html'" style="padding: 12px 24px;">Continue Shopping</button>
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <button class="btn-checkout" onclick="window.location.href='index.html?track=' + encodeURIComponent(document.getElementById('receiptOrderId').textContent.replace('#',''))" style="padding: 12px 20px; background: #064C63; color: white; display: flex; align-items: center; gap: 6px;">
+          <span>📦</span> <span>Track Parcel Status</span>
+        </button>
+        <button class="btn-checkout" onclick="window.location.href='index.html'" style="padding: 12px 20px;">Continue Shopping</button>
         <button class="action-pill-btn" style="background: #e2e8f0; color: #1e293b;" onclick="window.print()">Print Receipt</button>
       </div>
     </div>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Parcel Tracking | Save &amp; Smile Pakistan</title>
+  <link rel="icon" type="image/png" href="images/save-and-smile-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .track-hero {
+      background: linear-gradient(135deg, #064C63 0%, #008FAF 100%);
+      color: white;
+      padding: 3.5rem 1rem 3rem 1rem;
+      text-align: center;
+      position: relative;
+    }
+    .track-search-box {
+      max-width: 650px;
+      margin: 1.5rem auto 0 auto;
+      background: white;
+      border-radius: 14px;
+      padding: 8px;
+      display: flex;
+      gap: 8px;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.18);
+    }
+    .track-input-large {
+      flex: 1;
+      border: none;
+      padding: 14px 18px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #0f172a;
+      outline: none;
+    }
+    .track-btn-large {
+      background: #064C63;
+      color: white;
+      font-weight: 800;
+      font-size: 0.95rem;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .track-btn-large:hover { background: #003647; }
+    .track-chips {
+      max-width: 650px;
+      margin: 1rem auto 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+    }
+    .track-chip-btn {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-size: 0.76rem;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .track-chip-btn:hover { background: rgba(255,255,255,0.3); }
+    .track-display-wrap {
+      max-width: 820px;
+      margin: 2rem auto 4rem auto;
+      padding: 0 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <aside class="top-announcement-bar">
+    <div class="site-container announcement-content">
+      <div class="announcement-item">
+        <span class="announce-icon">🚀</span>
+        <span>Welcome to <strong>Save &amp; Smile Wholesale Portal</strong></span>
+      </div>
+      <div class="announcement-item">
+        <span class="announce-icon">🔥</span>
+        <span>Direct Factory Rates &amp; High Reseller Profit Margins</span>
+      </div>
+      <div class="announcement-item">
+        <span class="announce-icon">🚚</span>
+        <span>Cash on Delivery (COD) Across Pakistan</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Header & Dynamic Gradient Bar -->
+  <header class="header-wrapper" id="headerSection">
+    <div class="site-container">
+      <div class="header-inner">
+        
+        <!-- Left Side: 4-Dots Menu Trigger + Brand Logo -->
+        <div class="header-left-group">
+          <button class="header-menu-btn" id="headerMenuBtn" onclick="toggleHeaderMenu()" title="Open Categories & Menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="6" cy="6" r="2.8"/>
+              <circle cx="18" cy="6" r="2.8"/>
+              <circle cx="6" cy="18" r="2.8"/>
+              <circle cx="18" cy="18" r="2.8"/>
+            </svg>
+          </button>
+          
+          <h1 class="brand-heading-seo" style="margin: 0; padding: 0; line-height: 1;">
+            <a href="index.html" class="brand-logo" title="Save & Smile - Shop • Save • Smile | Wholesale Store Pakistan">
+              <img src="images/save-and-smile-logo.png" alt="Save &amp; Smile - Wholesale Gadgets Pakistan" class="site-brand-logo">
+            </a>
+          </h1>
+        </div>
+
+        <!-- Desktop Center Navigation Menu -->
+        <nav class="desktop-center-nav">
+          <a href="index.html" class="desktop-nav-link">Home</a>
+          <a href="index.html#flashSale" class="desktop-nav-link">Deals</a>
+          <a href="track-order.html" class="desktop-nav-link active">Track Order</a>
+          <a href="cart.html" class="desktop-nav-link">Cart</a>
+          <a href="https://wa.me/923162323616?text=Salam!%20I%20want%20to%20Buy%20in%20Wholesale" target="_blank" class="desktop-nav-link wholesale-pill">Wholesale</a>
+        </nav>
+
+        <!-- Right Header Icons -->
+        <div class="header-actions">
+          <a href="https://wa.me/923162323616" target="_blank" class="action-icon-pill hotline-icon-pill" title="WhatsApp Support">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </a>
+          <a href="cart.html" class="action-icon-pill" title="View Cart">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span class="badge-counter" id="cartBadge">0</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="track-hero">
+    <div class="site-container">
+      <span style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+        Real-Time Courier &amp; Fulfillment
+      </span>
+      <h1 style="font-size: 2.2rem; font-weight: 900; margin: 10px 0 6px 0; letter-spacing: -0.5px;">
+        Track Your Order &amp; Parcel Status
+      </h1>
+      <p style="font-size: 0.95rem; opacity: 0.9; max-width: 520px; margin: 0 auto; line-height: 1.5;">
+        Check whether your parcel is in <strong>Pending</strong>, currently being <strong>Prepared in Warehouse</strong>, or <strong>Dispatched with Courier</strong>.
+      </p>
+
+      <div class="track-search-box">
+        <input 
+          type="text" 
+          id="pageTrackInput" 
+          class="track-input-large" 
+          placeholder="Enter Order ID (e.g. SNS-484209) or Mobile Number..."
+          onkeyup="if(event.key === 'Enter') handlePageTrackSearch()"
+        >
+        <button class="track-btn-large" onclick="handlePageTrackSearch()">
+          <span>Track Parcel</span>
+          <span>🔍</span>
+        </button>
+      </div>
+
+      <div class="track-chips">
+        <span style="opacity: 0.85;">Sample Orders:</span>
+        <button class="track-chip-btn" onclick="document.getElementById('pageTrackInput').value='SNS-484209'; handlePageTrackSearch();">#SNS-484209 (Preparing)</button>
+        <button class="track-chip-btn" onclick="document.getElementById('pageTrackInput').value='SNS-100201'; handlePageTrackSearch();">#SNS-100201 (Shipped)</button>
+        <button class="track-chip-btn" onclick="document.getElementById('pageTrackInput').value='SNS-204918'; handlePageTrackSearch();">#SNS-204918 (Pending)</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tracking Result Area -->
+  <main class="track-display-wrap">
+    <div id="pageTrackResultContainer">
+      <div style="background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 40px 20px; text-align: center; color: #64748b;">
+        <div style="font-size: 2.5rem; margin-bottom: 10px;">📦</div>
+        <h3 style="color: #0f172a; font-size: 1.2rem; font-weight: 800; margin-bottom: 6px;">Live Parcel Tracking Ready</h3>
+        <p style="font-size: 0.9rem; max-width: 440px; margin: 0 auto 16px auto; line-height: 1.6;">
+          Upar Order ID ya phone number likh kar <strong>"Track Parcel"</strong> par click karen. Aap ko parcel ki mukammal live status (Pending, Packing, Shipped, Delivered) nazar aayegi.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Reusable Generic Modal -->
+  <div class="modal-overlay" id="genericModal" onclick="if(event.target === this) closeModal()">
+    <div class="modal-content-card">
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+      <div id="genericModalContent"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/products-data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    function handlePageTrackSearch() {
+      const q = document.getElementById('pageTrackInput').value.trim();
+      if (!q) {
+        alert('Please enter an Order ID or Phone number.');
+        return;
+      }
+      const container = document.getElementById('pageTrackResultContainer');
+      const cleanQ = q.replace(/[#\s-]/g, '').toLowerCase();
+      const orders = getFallbackOrStoredOrders();
+
+      const matched = orders.filter(o => {
+        const oId = (o.orderId || '').replace(/[#\s-]/g, '').toLowerCase();
+        const tNum = (o.trackingNumber || '').replace(/[#\s-]/g, '').toLowerCase();
+        const phone = (o.phone || '').replace(/[^0-9]/g, '');
+        const cleanPhoneQ = q.replace(/[^0-9]/g, '');
+        const name = (o.name || '').toLowerCase();
+
+        return oId.includes(cleanQ) || cleanQ.includes(oId) || (tNum && tNum.includes(cleanQ)) || (cleanPhoneQ && phone.includes(cleanPhoneQ)) || name.includes(q.toLowerCase());
+      });
+
+      if (matched.length === 0) {
+        container.innerHTML = `
+          <div style="background: #fff; border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 36px 20px; text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 10px;">🔍</div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #1e293b; margin-bottom: 6px;">Koi Order Nahi Mila</h3>
+            <p style="color: #64748b; font-size: 0.88rem; max-width: 420px; margin: 0 auto 16px auto; line-height: 1.6;">
+              Aap ka darj kardah number <strong>"${q}"</strong> system mein match nahi hua. Barah-e-karam apna durust Order ID ya Phone number darj karen.
+            </p>
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+              <button onclick="document.getElementById('pageTrackInput').value='SNS-484209'; handlePageTrackSearch();" style="background: #f1f5f9; padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 700; font-size: 0.8rem; color: #064C63; cursor: pointer;">Test #SNS-484209</button>
+              <button onclick="document.getElementById('pageTrackInput').value='SNS-100201'; handlePageTrackSearch();" style="background: #f1f5f9; padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 700; font-size: 0.8rem; color: #064C63; cursor: pointer;">Test #SNS-100201</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      renderSingleOrderTrackingCard(matched[0], container);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const q = urlParams.get('track') || urlParams.get('orderId') || urlParams.get('id');
+      if (q) {
+        document.getElementById('pageTrackInput').value = q;
+        handlePageTrackSearch();
+      }
+    });
+  </script>
+</body>
+</html>

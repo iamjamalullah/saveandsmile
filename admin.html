@@ -34,6 +34,8 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
+      display: flex !important;
+      flex-direction: row !important;
       background-color: #f1f5f9;
       -webkit-font-smoothing: antialiased;
     }
@@ -59,8 +61,8 @@
     }
 
     /* Active view panel display */
-    .view-panel { display: none; }
-    .view-panel.active { display: block; }
+    .view-panel { display: none !important; }
+    .view-panel.active { display: block !important; }
 
     /* Product tab content */
     .prod-tab-pane { display: none; }
@@ -124,7 +126,7 @@
 
       <!-- 3. Delivery Control Room & ShipOps (Collapsible Group) -->
       <div class="pt-1">
-        <button onclick="toggleSidebarSub('operations-sub')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-amber-400/90 hover:text-amber-300 hover:bg-slate-900 transition text-left">
+        <button onclick="toggleSidebarSub('operations-sub', 'action-inbox')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-amber-400/90 hover:text-amber-300 hover:bg-slate-900 transition text-left">
           <div class="flex items-center space-x-2.5">
             <svg class="w-4 h-4 shrink-0 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             <span class="font-extrabold tracking-tight">Delivery Control Room</span>
@@ -161,7 +163,7 @@
 
       <!-- 4. Products (Collapsible Group - 10-Tab Editor) -->
       <div class="pt-1">
-        <button onclick="toggleSidebarSub('products-sub')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <button onclick="toggleSidebarSub('products-sub', 'products')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
           <div class="flex items-center space-x-2.5">
             <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             <span>Products</span>
@@ -290,10 +292,11 @@
       </div>
 
       <div class="flex items-center space-x-3">
-        <!-- Quick Global Search -->
-        <div class="relative hidden lg:block">
-          <input type="text" onkeyup="handleGlobalQuickSearch(event)" placeholder="Search orders, SKU, customer..." class="w-64 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 pl-8 text-xs focus:bg-white focus:ring-1 focus:ring-teal-700">
+        <!-- Quick Global Search with Ctrl+K trigger -->
+        <div class="relative hidden lg:block cursor-pointer" onclick="openCommandPalette()">
+          <input type="text" readonly placeholder="Quick Command Palette... (Ctrl+K)" class="w-72 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 pl-8 pr-16 text-xs cursor-pointer hover:bg-slate-100 focus:outline-none">
           <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <span class="absolute right-2 top-2 text-[10px] font-mono bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-bold">Ctrl+K</span>
         </div>
 
         <!-- Notification Bell -->
@@ -371,7 +374,7 @@
         <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
           
           <!-- Total Revenue -->
-          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between">
+          <div onclick="switchView('reports')" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between cursor-pointer hover:border-emerald-500 hover:shadow-md transition">
             <div class="flex items-center justify-between">
               <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">TOTAL REVENUE</span>
               <div class="p-1.5 rounded-lg border text-emerald-700 bg-emerald-50 border-emerald-200">
@@ -385,7 +388,7 @@
           </div>
 
           <!-- Today's Sales -->
-          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between">
+          <div onclick="switchView('reports')" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between cursor-pointer hover:border-teal-500 hover:shadow-md transition">
             <div class="flex items-center justify-between">
               <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">TODAY'S SALES</span>
               <div class="p-1.5 rounded-lg border text-teal-800 bg-teal-50 border-teal-200">
@@ -399,7 +402,7 @@
           </div>
 
           <!-- Total Orders -->
-          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between">
+          <div onclick="switchView('orders')" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between cursor-pointer hover:border-cyan-500 hover:shadow-md transition">
             <div class="flex items-center justify-between">
               <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">TOTAL ORDERS</span>
               <div class="p-1.5 rounded-lg border text-cyan-700 bg-cyan-50 border-cyan-200">
@@ -413,7 +416,7 @@
           </div>
 
           <!-- Pending Orders -->
-          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between">
+          <div onclick="switchView('orders')" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between cursor-pointer hover:border-amber-500 hover:shadow-md transition">
             <div class="flex items-center justify-between">
               <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">PENDING ORDERS</span>
               <div class="p-1.5 rounded-lg border text-amber-700 bg-amber-50 border-amber-200">
@@ -427,7 +430,7 @@
           </div>
 
           <!-- Total Customers -->
-          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between">
+          <div onclick="switchView('customers')" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between cursor-pointer hover:border-indigo-500 hover:shadow-md transition">
             <div class="flex items-center justify-between">
               <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">TOTAL CUSTOMERS</span>
               <div class="p-1.5 rounded-lg border text-indigo-700 bg-indigo-50 border-indigo-200">
@@ -441,7 +444,7 @@
           </div>
 
           <!-- Active Products -->
-          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between">
+          <div onclick="switchView('products')" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between cursor-pointer hover:border-slate-500 hover:shadow-md transition">
             <div class="flex items-center justify-between">
               <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">ACTIVE PRODUCTS</span>
               <div class="p-1.5 rounded-lg border text-slate-700 bg-slate-50 border-slate-200">
@@ -1444,22 +1447,73 @@
           </div>
         </div>
 
-        <!-- TAB 5: VARIANTS ENGINE (COLOR-SPECIFIC IMAGES) -->
-        <div id="prodTab-variants" class="prod-tab-pane space-y-3">
-          <p class="text-xs text-slate-500">Add color variants and bind distinct image URLs for each color.</p>
-          <div class="border rounded-2xl p-3 bg-slate-50 space-y-2">
-            <div class="grid grid-cols-3 gap-2 text-xs">
-              <div>
-                <label class="block font-bold mb-1">Variant Color</label>
-                <input type="text" id="varColor1" value="Red" class="w-full p-2 border rounded-xl bg-white text-xs">
+        <!-- TAB 5: VARIANTS MATRIX (COLOR × SWITCH × CONNECTION) -->
+        <div id="prodTab-variants" class="prod-tab-pane space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold text-slate-800">Multi-Option Variant Matrix</p>
+              <p class="text-[11px] text-slate-500">Configure combinations for Color, Switch Type, and Connection Mode with strict integer pricing.</p>
+            </div>
+            <button type="button" onclick="addVariantRow()" class="px-3 py-1.5 bg-teal-800 text-white font-bold rounded-xl text-xs hover:bg-teal-900">+ Add Variant Row</button>
+          </div>
+
+          <div id="variantRowsContainer" class="space-y-3">
+            <div class="border border-slate-200 rounded-2xl p-3 bg-slate-50 space-y-2">
+              <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Color / Finish</label>
+                  <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-medium" value="Deep Midnight">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Switch Type</label>
+                  <select class="w-full p-2 border rounded-xl bg-white text-xs font-medium">
+                    <option value="Hall-Effect Magnetic">Hall-Effect Magnetic</option>
+                    <option value="Tactile Brown">Tactile Brown</option>
+                    <option value="Linear Red">Linear Red</option>
+                    <option value="Speed Silver">Speed Silver</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">SKU</label>
+                  <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-mono" value="APX-HE-MID">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Price (Cents)</label>
+                  <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs font-bold" value="18999">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Stock Qty</label>
+                  <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs" value="75">
+                </div>
               </div>
-              <div>
-                <label class="block font-bold mb-1">Variant Price</label>
-                <input type="number" id="varPrice1" value="180" class="w-full p-2 border rounded-xl bg-white text-xs">
-              </div>
-              <div>
-                <label class="block font-bold mb-1">Color Specific Photo URL</label>
-                <input type="text" id="varImg1" placeholder="https://...red-photo.png" class="w-full p-2 border rounded-xl bg-white text-xs">
+            </div>
+
+            <div class="border border-slate-200 rounded-2xl p-3 bg-slate-50 space-y-2">
+              <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Color / Finish</label>
+                  <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-medium" value="Arctic Cyan">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Switch Type</label>
+                  <select class="w-full p-2 border rounded-xl bg-white text-xs font-medium">
+                    <option value="Tactile Brown">Tactile Brown</option>
+                    <option value="Hall-Effect Magnetic">Hall-Effect Magnetic</option>
+                    <option value="Linear Red">Linear Red</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">SKU</label>
+                  <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-mono" value="APX-TAC-CYN">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Price (Cents)</label>
+                  <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs font-bold" value="16999">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Stock Qty</label>
+                  <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs" value="50">
+                </div>
               </div>
             </div>
           </div>
@@ -1482,11 +1536,58 @@
           </div>
         </div>
 
-        <!-- TAB 7: SEO -->
-        <div id="prodTab-seo" class="prod-tab-pane space-y-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">SEO Meta Title</label>
-            <input type="text" id="pSeoTitle" placeholder="Buy Multipurpose Storage Rack in Pakistan" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+        <!-- TAB 7: SEO & SOCIAL GRAPH SUITE -->
+        <div id="prodTab-seo" class="prod-tab-pane space-y-4">
+          <div class="space-y-3">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-700">SEO Meta Title *</label>
+                <span id="seoTitleCounter" class="text-[10px] font-mono text-slate-500">0 / 60 chars</span>
+              </div>
+              <input type="text" id="pSeoTitle" oninput="updateSeoCounters()" placeholder="Apex Pro Hall-Effect Keyboard | High-Performance Gear" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-teal-700">
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-700">SEO URL Slug *</label>
+                <span class="text-[10px] text-emerald-600 font-bold">Valid format: a-z, 0-9, hyphens</span>
+              </div>
+              <div class="flex items-center space-x-1">
+                <span class="text-xs text-slate-400 font-mono bg-slate-100 p-2.5 rounded-l-xl border border-r-0 border-slate-200">https://techadvizer.com/p/</span>
+                <input type="text" id="pSlug" oninput="updateSeoCounters()" placeholder="apex-pro-hall-effect-keyboard" class="flex-1 text-xs p-2.5 border border-slate-200 rounded-r-xl font-mono focus:ring-1 focus:ring-teal-700">
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-700">SEO Meta Description</label>
+                <span id="seoDescCounter" class="text-[10px] font-mono text-slate-500">0 / 160 chars</span>
+              </div>
+              <textarea id="pSeoDesc" oninput="updateSeoCounters()" rows="2" placeholder="Engineered with analog hall-effect magnetic switches and zero rounding errors. Fast worldwide dispatch with 30-day warranty." class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-teal-700"></textarea>
+            </div>
+          </div>
+
+          <!-- Real-Time SERP & Social Previews -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+            <!-- Google SERP Snippet Preview -->
+            <div class="p-3 bg-white border border-slate-200 rounded-2xl space-y-1 shadow-2xs">
+              <span class="text-[10px] font-black uppercase text-slate-400 block tracking-wider">Google Search Snippet Preview</span>
+              <p class="text-xs text-[#1a0dab] hover:underline font-medium truncate cursor-pointer" id="serpPreviewTitle">Apex Pro Hall-Effect Keyboard | High-Performance Gear</p>
+              <p class="text-[10px] text-[#006621] font-mono truncate" id="serpPreviewUrl">https://techadvizer.com/p/apex-pro-hall-effect-keyboard</p>
+              <p class="text-[11px] text-[#545454] line-clamp-2 leading-relaxed" id="serpPreviewDesc">Engineered with analog hall-effect magnetic switches and zero rounding errors. Fast worldwide dispatch with 30-day warranty.</p>
+            </div>
+
+            <!-- Twitter / Discord OpenGraph Preview -->
+            <div class="p-3 bg-slate-900 text-white rounded-2xl space-y-2 border border-slate-800">
+              <span class="text-[10px] font-black uppercase text-cyan-400 block tracking-wider">Discord / Twitter Social Card</span>
+              <div class="h-20 bg-slate-800 rounded-xl flex items-center justify-center text-slate-500 text-xs font-mono overflow-hidden">
+                <img id="ogPreviewImage" src="images/product_gallery/md_1779101219_ChatGPT_Image_May_18,_2026,_03_46_14_PM.png" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <p class="text-xs font-bold text-white truncate" id="ogPreviewTitle">Apex Pro Hall-Effect Keyboard</p>
+                <p class="text-[10px] text-slate-400 line-clamp-1" id="ogPreviewDesc">Bespoke tactile engineering with calibrated analog switches.</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1587,67 +1688,179 @@
     </div>
   </div>
 
+  <!-- Command Palette Modal (Ctrl+K / Cmd+K) -->
+  <div id="commandPaletteModal" class="fixed inset-0 modal-backdrop hidden items-start justify-center z-50 p-4 pt-20">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-4 shadow-2xl relative border border-slate-200 space-y-3">
+      <div class="flex items-center space-x-2.5 pb-2 border-b border-slate-100">
+        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" id="paletteSearchInput" oninput="handlePaletteSearch(this.value)" placeholder="Type a command, module name, order ID, or product SKU..." class="flex-1 text-xs outline-none bg-transparent font-medium">
+        <kbd class="text-[10px] bg-slate-100 border border-slate-300 px-1.5 py-0.5 rounded font-mono text-slate-500">ESC to close</kbd>
+      </div>
+
+      <!-- Quick Command Results List -->
+      <div id="paletteResultsList" class="max-h-80 overflow-y-auto space-y-1 text-xs">
+        <!-- Default Popular Quick Links -->
+        <div class="px-2 py-1 text-[10px] font-black uppercase tracking-wider text-slate-400">Jump to Admin Module</div>
+        <div onclick="executePaletteNavigation('dashboard')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+          <span class="flex items-center space-x-2"><span>📊</span> <span>Executive Dashboard</span></span>
+          <span class="text-[10px] text-slate-400 font-mono">/admin</span>
+        </div>
+        <div onclick="executePaletteNavigation('orders')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+          <span class="flex items-center space-x-2"><span>📦</span> <span>Orders Engine</span></span>
+          <span class="text-[10px] text-slate-400 font-mono">/orders</span>
+        </div>
+        <div onclick="executePaletteNavigation('products')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+          <span class="flex items-center space-x-2"><span>🛍️</span> <span>Product Catalog &amp; Variants</span></span>
+          <span class="text-[10px] text-slate-400 font-mono">/products</span>
+        </div>
+        <div onclick="executePaletteNavigation('inventory')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+          <span class="flex items-center space-x-2"><span>🏷️</span> <span>Inventory &amp; Stock Levels</span></span>
+          <span class="text-[10px] text-slate-400 font-mono">/inventory</span>
+        </div>
+        <div onclick="executePaletteNavigation('couriers')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+          <span class="flex items-center space-x-2"><span>🚚</span> <span>Courier API &amp; Dispatches</span></span>
+          <span class="text-[10px] text-slate-400 font-mono">/couriers</span>
+        </div>
+        <div onclick="executePaletteNavigation('seo')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+          <span class="flex items-center space-x-2"><span>🌐</span> <span>SEO &amp; OpenGraph Suite</span></span>
+          <span class="text-[10px] text-slate-400 font-mono">/seo</span>
+        </div>
+        <div onclick="window.open('live-editor.html', '_blank'); closeModal('commandPaletteModal');" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-teal-800 bg-teal-50">
+          <span class="flex items-center space-x-2"><span>⚡</span> <span>Open Live Theme Visual Builder</span></span>
+          <span class="text-[10px] text-teal-600 font-mono">/live-editor</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toastBox" class="fixed bottom-6 right-6 bg-slate-950 text-white text-xs font-bold py-3 px-5 rounded-2xl shadow-xl flex items-center space-x-2 transform translate-y-24 opacity-0 transition-all duration-300 z-50">
     <span id="toastIcon">✅</span>
     <span id="toastMessage">Done</span>
   </div>
 
-  <!-- External Script Dependencies -->
+  <!-- External Script Dependencies (Only Product Data, No Storefront Scripts) -->
   <script src="js/products-data.js"></script>
-  <script src="js/app.js"></script>
 
   <!-- Complete Admin Engine Script -->
   <script>
     // -------------------------------------------------------------
+    // DATA SOURCE (SELF-CONTAINED FOR ADMIN)
+    // -------------------------------------------------------------
+    function getAllProducts() {
+      try {
+        const custom = JSON.parse(localStorage.getItem('qadri_custom_products')) || [];
+        const overrides = JSON.parse(localStorage.getItem('qadri_product_overrides')) || {};
+        const deleted = JSON.parse(localStorage.getItem('qadri_deleted_products')) || [];
+
+        const base = (typeof PRODUCTS !== 'undefined' && Array.isArray(PRODUCTS) ? PRODUCTS : [])
+          .filter(p => !deleted.includes(p.id) && !deleted.includes(String(p.id)))
+          .map(p => overrides[p.id] ? { ...p, ...overrides[p.id] } : p);
+
+        return [...custom, ...base];
+      } catch (err) {
+        console.warn('Error reading products:', err);
+        return typeof PRODUCTS !== 'undefined' && Array.isArray(PRODUCTS) ? PRODUCTS : [];
+      }
+    }
+
+    // -------------------------------------------------------------
     // NAVIGATION & VIEW SWITCHING (ALL 21 OPTIONS ACTIVE)
     // -------------------------------------------------------------
     function switchView(viewName, btnEl) {
-      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
-      const target = document.getElementById('view-' + viewName);
-      if (target) {
-        target.classList.add('active');
-      } else {
-        document.getElementById('view-dashboard').classList.add('active');
+      try {
+        // Hide all view panels
+        document.querySelectorAll('.view-panel').forEach(p => {
+          p.classList.remove('active');
+          p.style.display = 'none';
+        });
+
+        // Activate target view panel
+        const target = document.getElementById('view-' + viewName);
+        if (target) {
+          target.classList.add('active');
+          target.style.display = 'block';
+        } else {
+          const dash = document.getElementById('view-dashboard');
+          if (dash) {
+            dash.classList.add('active');
+            dash.style.display = 'block';
+          }
+        }
+
+        // Top Breadcrumb Update
+        const formattedTitle = viewName.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const breadcrumbEl = document.getElementById('topBreadcrumb');
+        if (breadcrumbEl) breadcrumbEl.textContent = formattedTitle;
+
+        // Reset all sidebar buttons active styling
+        document.querySelectorAll('.nav-item').forEach(i => {
+          i.classList.remove('bg-teal-900/60', 'text-cyan-300', 'border', 'border-teal-700/60', 'shadow-xs');
+          i.classList.add('text-slate-400');
+        });
+        document.querySelectorAll('.nav-sub-item').forEach(i => {
+          i.classList.remove('bg-teal-900/70', 'text-cyan-300', 'font-bold', 'border-l-2', 'border-cyan-400');
+          i.classList.add('text-slate-400');
+        });
+
+        // Auto-detect button if not provided
+        if (!btnEl) {
+          btnEl = document.querySelector(`button[onclick*="'${viewName}'"]`);
+        }
+
+        if (btnEl) {
+          if (btnEl.classList.contains('nav-item')) {
+            btnEl.classList.add('bg-teal-900/60', 'text-cyan-300', 'border', 'border-teal-700/60', 'shadow-xs');
+            btnEl.classList.remove('text-slate-400');
+          } else if (btnEl.classList.contains('nav-sub-item')) {
+            btnEl.classList.add('bg-teal-900/70', 'text-cyan-300', 'font-bold', 'border-l-2', 'border-cyan-400');
+            btnEl.classList.remove('text-slate-400');
+          }
+        }
+
+        // Open parent collapsible menu if target is inside operations or products
+        const opsSubViews = ['action-inbox', 'cod-control', 'fulfillment', 'settlements', 'couriers', 'returns'];
+        const prodSubViews = ['products', 'categories', 'inventory', 'variants-hub', 'reviews'];
+        if (opsSubViews.includes(viewName)) {
+          const opsSub = document.getElementById('operations-sub');
+          if (opsSub && opsSub.classList.contains('hidden')) opsSub.classList.remove('hidden');
+        }
+        if (prodSubViews.includes(viewName)) {
+          const prodSub = document.getElementById('products-sub');
+          if (prodSub && prodSub.classList.contains('hidden')) prodSub.classList.remove('hidden');
+        }
+
+        // Scroll main workspace to top
+        const scrollArea = document.getElementById('mainScrollArea');
+        if (scrollArea) scrollArea.scrollTop = 0;
+
+        // Close mobile drawer if open
+        const sidebar = document.getElementById('sidebarEl');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+          sidebar.classList.add('-translate-x-full');
+          if (backdrop) backdrop.classList.add('hidden');
+        }
+
+        // Refresh corresponding view data safely
+        try {
+          if (viewName === 'orders') renderOrdersTable();
+          else if (viewName === 'products') renderProductsTable();
+          else if (viewName === 'categories') renderCategoriesView();
+          else if (viewName === 'inventory') renderInventoryTable();
+          else if (viewName === 'customers') renderCustomersTable();
+          else if (viewName === 'media-library') renderMediaLibrary();
+          else if (viewName === 'audit-log') renderAuditTrail();
+          else if (viewName === 'dashboard') renderDashboardMetrics();
+        } catch (renderErr) {
+          console.warn('View render error:', renderErr);
+        }
+
+        recordAuditLog('Navigated View', `Admin opened section: ${formattedTitle}`);
+        showToast(`Switched to ${formattedTitle}`);
+      } catch (err) {
+        console.error('Error switching view:', err);
       }
-
-      // Top Breadcrumb Update
-      const formattedTitle = viewName.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
-      document.getElementById('topBreadcrumb').textContent = formattedTitle;
-
-      // Sidebar active styling
-      document.querySelectorAll('.nav-item').forEach(i => {
-        i.classList.remove('bg-teal-900/60', 'text-cyan-300', 'border', 'border-teal-700/60', 'shadow-xs');
-        i.classList.add('text-slate-400');
-      });
-
-      if (btnEl && btnEl.classList.contains('nav-item')) {
-        btnEl.classList.add('bg-teal-900/60', 'text-cyan-300', 'border', 'border-teal-700/60', 'shadow-xs');
-        btnEl.classList.remove('text-slate-400');
-      }
-
-      // Scroll to top
-      document.getElementById('mainScrollArea').scrollTop = 0;
-
-      // Close mobile drawer if open
-      const sidebar = document.getElementById('sidebarEl');
-      const backdrop = document.getElementById('sidebarBackdrop');
-      if (!sidebar.classList.contains('-translate-x-full')) {
-        sidebar.classList.add('-translate-x-full');
-        backdrop.classList.add('hidden');
-      }
-
-      // Refresh corresponding view data
-      if (viewName === 'orders') renderOrdersTable();
-      if (viewName === 'products') renderProductsTable();
-      if (viewName === 'categories') renderCategoriesView();
-      if (viewName === 'inventory') renderInventoryTable();
-      if (viewName === 'customers') renderCustomersTable();
-      if (viewName === 'media-library') renderMediaLibrary();
-      if (viewName === 'audit-log') renderAuditTrail();
-
-      recordAuditLog('Navigated View', `Admin viewed section: ${formattedTitle}`);
-      showToast(`Switched to ${formattedTitle}`);
     }
 
     function toggleMobileSidebar() {
@@ -1663,12 +1876,115 @@
       }
     }
 
-    function toggleSidebarSub(subId) {
+    function openCommandPalette() {
+      openModal('commandPaletteModal');
+      const input = document.getElementById('paletteSearchInput');
+      if (input) {
+        input.value = '';
+        input.focus();
+        handlePaletteSearch('');
+      }
+    }
+
+    function executePaletteNavigation(viewName) {
+      closeModal('commandPaletteModal');
+      switchView(viewName);
+    }
+
+    function handlePaletteSearch(q) {
+      const list = document.getElementById('paletteResultsList');
+      if (!list) return;
+      const query = (q || '').toLowerCase().trim();
+
+      const allModules = [
+        { id: 'dashboard', name: 'Executive Dashboard', icon: '📊', path: '/admin' },
+        { id: 'orders', name: 'Orders Engine & Fulfillment', icon: '📦', path: '/orders' },
+        { id: 'products', name: 'Product Catalog & Matrix', icon: '🛍️', path: '/products' },
+        { id: 'categories', name: 'Categories & Taxonomy', icon: '🗂️', path: '/categories' },
+        { id: 'inventory', name: 'Inventory & Stock Tiers', icon: '🏷️', path: '/inventory' },
+        { id: 'variants-hub', name: 'Variants & Color Matrix', icon: '🎨', path: '/variants' },
+        { id: 'customers', name: 'Customers & Profiles', icon: '👥', path: '/customers' },
+        { id: 'action-inbox', name: 'Action Inbox & Alerts', icon: '📥', path: '/inbox' },
+        { id: 'cod-control', name: 'Cash on Delivery Control', icon: '💵', path: '/cod' },
+        { id: 'fulfillment', name: 'Fulfillment & Dispatch Desk', icon: '🚚', path: '/fulfillment' },
+        { id: 'settlements', name: 'Courier Cash Settlements', icon: '💰', path: '/settlements' },
+        { id: 'couriers', name: 'Courier Integrations (TCS / Leopards)', icon: '🚛', path: '/couriers' },
+        { id: 'returns', name: 'Returns & Reverse Logistics', icon: '↩️', path: '/returns' },
+        { id: 'discounts', name: 'Marketing & Discount Coupons', icon: '🎟️', path: '/coupons' },
+        { id: 'media-library', name: 'Media Asset Library', icon: '🖼️', path: '/media' },
+        { id: 'reviews', name: 'Verified Customer Reviews', icon: '⭐', path: '/reviews' },
+        { id: 'seo', name: 'SEO & Social OpenGraph Engine', icon: '🌐', path: '/seo' },
+        { id: 'reports', name: 'Executive Analytics & Reports', icon: '📈', path: '/reports' },
+        { id: 'settings', name: 'Store Configuration & Policies', icon: '⚙️', path: '/settings' },
+        { id: 'users', name: 'Admin Users & RBAC Permissions', icon: '🛡️', path: '/users' },
+        { id: 'audit-log', name: 'Security & Audit Log Trail', icon: '📜', path: '/audit' },
+      ];
+
+      const prods = getAllProducts();
+      const filteredModules = allModules.filter(m => m.name.toLowerCase().includes(query) || m.id.includes(query));
+      const filteredProds = query.length >= 2 ? prods.filter(p => (p.title || '').toLowerCase().includes(query) || (p.code || '').toLowerCase().includes(query)).slice(0, 5) : [];
+
+      let html = '';
+      if (filteredModules.length > 0) {
+        html += `<div class="px-2 py-1 text-[10px] font-black uppercase tracking-wider text-slate-400">Admin Modules (${filteredModules.length})</div>`;
+        filteredModules.forEach(m => {
+          html += `
+            <div onclick="executePaletteNavigation('${m.id}')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+              <span class="flex items-center space-x-2"><span>${m.icon}</span> <span>${m.name}</span></span>
+              <span class="text-[10px] text-slate-400 font-mono">${m.path}</span>
+            </div>
+          `;
+        });
+      }
+
+      if (filteredProds.length > 0) {
+        html += `<div class="px-2 py-1 mt-2 text-[10px] font-black uppercase tracking-wider text-cyan-600">Matching Products (${filteredProds.length})</div>`;
+        filteredProds.forEach(p => {
+          html += `
+            <div onclick="executePaletteNavigation('products'); editProductPrompt(${p.id});" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+              <span class="flex items-center space-x-2 truncate"><img src="${p.image || ''}" class="w-6 h-6 rounded object-cover"> <span class="truncate">${p.title}</span></span>
+              <span class="text-[10px] text-teal-700 font-mono">Rs. ${p.price}</span>
+            </div>
+          `;
+        });
+      }
+
+      if (!html) {
+        html = `<div class="p-4 text-center text-slate-400 text-xs">No matching module or item found for "${query}"</div>`;
+      }
+
+      list.innerHTML = html;
+    }
+
+    // Global Key Listener for Ctrl+K
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const modal = document.getElementById('commandPaletteModal');
+        if (modal && modal.classList.contains('hidden')) {
+          openCommandPalette();
+        } else {
+          closeModal('commandPaletteModal');
+        }
+      }
+      if (e.key === 'Escape') {
+        closeModal('commandPaletteModal');
+      }
+    });
+
+    function toggleSidebarSub(subId, defaultView) {
       const el = document.getElementById(subId);
       const arr = document.getElementById('arr-' + subId);
       if (!el) return;
-      el.classList.toggle('hidden');
-      if (arr) arr.classList.toggle('rotate-180');
+      const isClosed = el.classList.contains('hidden');
+      if (isClosed) {
+        el.classList.remove('hidden');
+        if (arr) arr.classList.add('rotate-180');
+        if (defaultView) switchView(defaultView);
+      } else {
+        el.classList.add('hidden');
+        if (arr) arr.classList.remove('rotate-180');
+      }
     }
 
     function toggleNotificationsModal() {
@@ -1720,32 +2036,76 @@
     // DATA PERSISTENCE & STORED ORDERS
     // -------------------------------------------------------------
     function getStoredOrders() {
-      const orders = JSON.parse(localStorage.getItem('qadri_placed_orders')) || [
-        {
-          orderId: 'SNS-484209',
-          name: 'Ahmed Raza',
-          phone: '03001234567',
-          city: 'Karachi',
-          address: 'Gulshan-e-Iqbal Block 13',
-          grandTotal: 797,
-          status: 'Confirmed',
-          payment: 'COD',
-          items: [{ title: 'Multipurpose Kitchen Storage Rack', qty: 2, price: 180 }],
-          date: new Date().toISOString()
-        },
-        {
-          orderId: 'SNS-100201',
-          name: 'Ahmed Khan',
-          phone: '+92 311 8877665',
-          city: 'Lahore',
-          address: 'Model Town Block C',
-          grandTotal: 748,
-          status: 'Confirmed',
-          payment: 'COD',
-          items: [{ title: 'Premium Waterproof Bike Cover', qty: 1, price: 400 }],
-          date: new Date().toISOString()
-        }
-      ];
+      let orders = [];
+      try {
+        orders = JSON.parse(localStorage.getItem('qadri_placed_orders')) || [];
+      } catch (e) {
+        orders = [];
+      }
+
+      if (!orders || orders.length === 0) {
+        orders = [
+          {
+            orderId: 'SNS-484209',
+            name: 'Ahmed Raza',
+            phone: '03001234567',
+            city: 'Karachi',
+            address: 'Gulshan-e-Iqbal Block 13, Near Disco Bakery',
+            grandTotal: 797,
+            status: 'Preparing',
+            payment: 'COD',
+            courier: 'Leopards Courier',
+            trackingNumber: 'LEOP-882194',
+            items: [{ title: 'Multipurpose Kitchen Storage Rack', qty: 2, price: 180, image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150' }],
+            date: new Date(Date.now() - 3600000 * 6).toISOString()
+          },
+          {
+            orderId: 'SNS-100201',
+            name: 'Ahmed Khan',
+            phone: '+92 311 8877665',
+            city: 'Lahore',
+            address: 'Model Town Block C, House 42',
+            grandTotal: 748,
+            status: 'Shipped',
+            payment: 'COD',
+            courier: 'Trax Logistics',
+            trackingNumber: 'TRAX-449102',
+            items: [{ title: 'Premium Waterproof Bike Cover', qty: 1, price: 400, image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=150' }],
+            date: new Date(Date.now() - 86400000 * 1).toISOString()
+          },
+          {
+            orderId: 'SNS-204918',
+            name: 'Zainab Fatima',
+            phone: '03335544332',
+            city: 'Islamabad',
+            address: 'Sector F-10 Markaz, Street 14',
+            grandTotal: 1450,
+            status: 'Pending',
+            payment: 'COD',
+            courier: 'Awaiting Verification',
+            trackingNumber: 'PENDING',
+            items: [{ title: 'Cosmetic Organizer 360 Rotating', qty: 1, price: 850, image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=150' }],
+            date: new Date(Date.now() - 3600000 * 2).toISOString()
+          },
+          {
+            orderId: 'SNS-310892',
+            name: 'Muhammad Bilal',
+            phone: '03456789012',
+            city: 'Rawalpindi',
+            address: 'Satellite Town Block B, Commercial Market',
+            grandTotal: 2190,
+            status: 'Delivered',
+            payment: 'COD',
+            courier: 'TCS Express',
+            trackingNumber: 'TCS-991204',
+            items: [{ title: 'Electric Mosquito Killer Lamp', qty: 1, price: 1250, image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=150' }],
+            date: new Date(Date.now() - 86400000 * 3).toISOString()
+          }
+        ];
+        try {
+          localStorage.setItem('qadri_placed_orders', JSON.stringify(orders));
+        } catch (e) {}
+      }
       return orders;
     }
 
@@ -1831,12 +2191,12 @@
           <td class="py-3 font-black text-slate-900">Rs. ${(o.grandTotal || 0).toLocaleString()}</td>
           <td class="py-3">
             <select onchange="updateOrderStatus('${o.orderId}', this.value)" class="text-[11px] font-bold p-1.5 border rounded-xl bg-white focus:ring-1 focus:ring-teal-700">
-              <option value="Confirmed" ${o.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
-              <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Pending</option>
-              <option value="Processing" ${o.status === 'Processing' ? 'selected' : ''}>Processing</option>
-              <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
-              <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
-              <option value="Cancelled" ${o.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+              <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>🕒 Pending (Verification)</option>
+              <option value="Confirmed" ${o.status === 'Confirmed' ? 'selected' : ''}>✍️ Confirmed</option>
+              <option value="Preparing" ${o.status === 'Preparing' || o.status === 'Processing' ? 'selected' : ''}>📦 Preparing (Packaging)</option>
+              <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>🚚 Shipped (In Transit)</option>
+              <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>✅ Delivered</option>
+              <option value="Cancelled" ${o.status === 'Cancelled' ? 'selected' : ''}>❌ Cancelled</option>
             </select>
           </td>
           <td class="py-3 text-right space-x-1">
@@ -1859,9 +2219,32 @@
       const idx = orders.findIndex(o => o.orderId === orderId);
       if (idx >= 0) {
         orders[idx].status = newStatus;
+        if ((newStatus === 'Shipped' || newStatus === 'Preparing') && (!orders[idx].trackingNumber || orders[idx].trackingNumber === 'PENDING')) {
+          orders[idx].trackingNumber = 'LEOP-' + Math.floor(100000 + Math.random() * 900000);
+          orders[idx].courier = 'Leopards Courier';
+        }
         localStorage.setItem('qadri_placed_orders', JSON.stringify(orders));
         recordAuditLog('Order Status Updated', `Order #${orderId} set to ${newStatus}`);
         showToast(`Order #${orderId} marked as ${newStatus}`);
+        renderDashboardMetrics();
+      }
+    }
+
+    function saveOrderTrackingDetails(orderId) {
+      const orders = getStoredOrders();
+      const idx = orders.findIndex(o => o.orderId === orderId);
+      if (idx >= 0) {
+        const cn = document.getElementById('editTrackingCn').value.trim();
+        const courier = document.getElementById('editCourierPartner').value.trim();
+        const status = document.getElementById('editOrderStatusModal').value;
+        orders[idx].trackingNumber = cn || orders[idx].trackingNumber || ('LEOP-' + Math.floor(100000 + Math.random() * 900000));
+        orders[idx].courier = courier || orders[idx].courier || 'Leopards Courier';
+        orders[idx].status = status || orders[idx].status;
+        localStorage.setItem('qadri_placed_orders', JSON.stringify(orders));
+        recordAuditLog('Tracking Assigned', `CN ${orders[idx].trackingNumber} for #${orderId}`);
+        showToast(`Tracking saved for #${orderId}`);
+        closeModal('orderDetailModal');
+        renderOrdersTable();
         renderDashboardMetrics();
       }
     }
@@ -1879,7 +2262,7 @@
       const o = orders.find(item => item.orderId === orderId) || orders[0];
       if (!o) return;
 
-      document.getElementById('lblTracking').textContent = 'LEOP-' + Math.floor(1000000 + Math.random() * 9000000);
+      document.getElementById('lblTracking').textContent = o.trackingNumber || ('LEOP-' + Math.floor(1000000 + Math.random() * 9000000));
       document.getElementById('lblOrder').textContent = '#' + o.orderId;
       document.getElementById('lblCustomer').textContent = o.name;
       document.getElementById('lblPhone').textContent = o.phone;
@@ -1901,15 +2284,43 @@
           <div class="flex justify-between"><strong>Customer:</strong> <span>${o.name} (${o.phone})</span></div>
           <div class="flex justify-between"><strong>Destination:</strong> <span>${o.address}, ${o.city}</span></div>
           <div class="flex justify-between"><strong>Payment Mode:</strong> <span>${o.payment || 'COD'}</span></div>
-          <div class="flex justify-between"><strong>Fulfillment:</strong> <span class="font-bold text-teal-800">${o.status}</span></div>
+          <div class="flex justify-between items-center">
+            <strong>Fulfillment Status:</strong> 
+            <select id="editOrderStatusModal" class="text-xs font-bold p-1 border rounded-lg bg-white">
+              <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>🕒 Pending</option>
+              <option value="Confirmed" ${o.status === 'Confirmed' ? 'selected' : ''}>✍️ Confirmed</option>
+              <option value="Preparing" ${o.status === 'Preparing' || o.status === 'Processing' ? 'selected' : ''}>📦 Preparing (Packaging)</option>
+              <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>🚚 Shipped (In Transit)</option>
+              <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>✅ Delivered</option>
+              <option value="Cancelled" ${o.status === 'Cancelled' ? 'selected' : ''}>❌ Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Courier & Tracking Assignment -->
+        <div class="p-3 bg-teal-50/60 border border-teal-200/80 rounded-2xl space-y-2">
+          <h4 class="font-bold text-xs text-teal-900 uppercase">Courier Dispatch &amp; Tracking ID:</h4>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Courier Partner</label>
+              <input type="text" id="editCourierPartner" value="${o.courier || 'Leopards Courier'}" class="w-full p-1.5 border rounded-lg bg-white text-xs font-semibold">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Airway Tracking Number</label>
+              <input type="text" id="editTrackingCn" value="${o.trackingNumber || ('LEOP-' + Math.floor(100000 + Math.random() * 900000))}" class="w-full p-1.5 border rounded-lg bg-white text-xs font-mono font-bold">
+            </div>
+          </div>
+          <button onclick="saveOrderTrackingDetails('${o.orderId}')" class="w-full py-1.5 bg-teal-800 hover:bg-teal-900 text-white font-bold rounded-lg text-xs transition">
+            Save Status &amp; Tracking Number
+          </button>
         </div>
 
         <div class="border rounded-2xl p-3 space-y-2">
-          <h4 class="font-bold text-slate-800">Order Items:</h4>
+          <h4 class="font-bold text-slate-800 text-xs">Order Items:</h4>
           ${(o.items || []).map(i => `
-            <div class="flex justify-between border-b pb-1">
-              <span>${i.title} (x${i.qty})</span>
-              <span class="font-bold">Rs. ${i.price * i.qty}</span>
+            <div class="flex justify-between border-b pb-1 text-xs">
+              <span>${i.title} (x${i.qty || 1})</span>
+              <span class="font-bold">Rs. ${(i.price || 0) * (i.qty || 1)}</span>
             </div>
           `).join('')}
           <div class="flex justify-between font-black text-sm pt-2 text-slate-900">
@@ -1918,20 +2329,11 @@
           </div>
         </div>
 
-        <!-- Order Audit Timeline -->
-        <div class="p-3 bg-slate-50 rounded-2xl border space-y-2">
-          <h4 class="font-bold text-slate-800">Fulfillment Audit Timeline:</h4>
-          <div class="space-y-1.5 pl-2 border-l-2 border-teal-700">
-            <div class="text-[11px]"><span class="font-bold text-teal-800">✓ Order Placed:</span> Checkout created on storefront</div>
-            <div class="text-[11px]"><span class="font-bold text-teal-800">✓ WhatsApp Desk:</span> Verification active</div>
-            <div class="text-[11px]"><span class="font-bold text-teal-800">✓ Dispatch:</span> Courier manifest ready</div>
-          </div>
-        </div>
-
         <div class="pt-2 flex justify-end space-x-2">
-          <button onclick="closeModal('orderDetailModal')" class="px-4 py-2 bg-slate-100 font-bold rounded-xl">Close</button>
-          <button onclick="printAirwayBill('${o.orderId}')" class="px-4 py-2 bg-slate-900 text-white font-bold rounded-xl">Print Label</button>
-          <a href="https://wa.me/${(o.phone || '').replace(/[^0-9]/g, '')}" target="_blank" class="px-4 py-2 bg-emerald-700 text-white font-bold rounded-xl">Chat WhatsApp</a>
+          <button onclick="closeModal('orderDetailModal')" class="px-3 py-1.5 bg-slate-100 font-bold rounded-xl text-xs">Close</button>
+          <button onclick="printAirwayBill('${o.orderId}')" class="px-3 py-1.5 bg-slate-900 text-white font-bold rounded-xl text-xs">Print Airway Bill</button>
+          <a href="index.html?track=${o.orderId}" target="_blank" class="px-3 py-1.5 bg-cyan-700 text-white font-bold rounded-xl text-xs">Customer Tracking View</a>
+          <a href="https://wa.me/${(o.phone || '').replace(/[^0-9]/g, '')}" target="_blank" class="px-3 py-1.5 bg-emerald-700 text-white font-bold rounded-xl text-xs">Chat WhatsApp</a>
         </div>
       `;
       openModal('orderDetailModal');
@@ -1997,6 +2399,90 @@
       const margin = price > 0 ? ((profit / price) * 100).toFixed(1) : 0;
       document.getElementById('calcProfitText').textContent = `Rs. ${profit.toLocaleString()}`;
       document.getElementById('calcMarginText').textContent = `${margin}%`;
+    }
+
+    function updateSeoCounters() {
+      const title = document.getElementById('pSeoTitle')?.value || document.getElementById('pTitle')?.value || '';
+      const desc = document.getElementById('pSeoDesc')?.value || '';
+      let slug = document.getElementById('pSlug')?.value || '';
+
+      if (!slug && title) {
+        slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        if (document.getElementById('pSlug')) document.getElementById('pSlug').value = slug;
+      }
+
+      // Title Counter
+      const titleCounter = document.getElementById('seoTitleCounter');
+      if (titleCounter) {
+        titleCounter.textContent = `${title.length} / 60 chars`;
+        titleCounter.className = title.length > 60 ? 'text-[10px] font-mono text-rose-500 font-bold' : 'text-[10px] font-mono text-slate-500';
+      }
+
+      // Desc Counter
+      const descCounter = document.getElementById('seoDescCounter');
+      if (descCounter) {
+        descCounter.textContent = `${desc.length} / 160 chars`;
+        descCounter.className = desc.length > 160 ? 'text-[10px] font-mono text-rose-500 font-bold' : 'text-[10px] font-mono text-slate-500';
+      }
+
+      // SERP Live Snippet
+      const serpTitle = document.getElementById('serpPreviewTitle');
+      if (serpTitle) serpTitle.textContent = title || 'Product Title | Tech Advizer High-Performance Gear';
+
+      const serpUrl = document.getElementById('serpPreviewUrl');
+      if (serpUrl) serpUrl.textContent = `https://techadvizer.com/p/${slug || 'product-slug'}`;
+
+      const serpDesc = document.getElementById('serpPreviewDesc');
+      if (serpDesc) serpDesc.textContent = desc || 'Engineered with analog hall-effect magnetic switches and zero rounding errors.';
+
+      // OpenGraph Card
+      const ogTitle = document.getElementById('ogPreviewTitle');
+      if (ogTitle) ogTitle.textContent = title || 'Product Title';
+
+      const ogDesc = document.getElementById('ogPreviewDesc');
+      if (ogDesc) ogDesc.textContent = desc || 'Bespoke tactile engineering with calibrated analog switches.';
+
+      const ogImg = document.getElementById('ogPreviewImage');
+      const pImgVal = document.getElementById('pImage')?.value;
+      if (ogImg && pImgVal) ogImg.src = pImgVal;
+    }
+
+    function addVariantRow() {
+      const container = document.getElementById('variantRowsContainer');
+      if (!container) return;
+      const div = document.createElement('div');
+      div.className = 'border border-slate-200 rounded-2xl p-3 bg-slate-50 space-y-2';
+      div.innerHTML = `
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Color / Finish</label>
+            <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-medium" placeholder="e.g. Electric Indigo">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Switch Type</label>
+            <select class="w-full p-2 border rounded-xl bg-white text-xs font-medium">
+              <option value="Hall-Effect Magnetic">Hall-Effect Magnetic</option>
+              <option value="Tactile Brown">Tactile Brown</option>
+              <option value="Linear Red">Linear Red</option>
+              <option value="Clicky Blue">Clicky Blue</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">SKU</label>
+            <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-mono" placeholder="APX-CUS-${Math.floor(100+Math.random()*900)}">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Price (Cents)</label>
+            <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs font-bold" value="17999">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Stock Qty</label>
+            <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs" value="25">
+          </div>
+        </div>
+      `;
+      container.appendChild(div);
+      showToast('Variant combination row added');
     }
 
     function handleProProductSubmit(e) {

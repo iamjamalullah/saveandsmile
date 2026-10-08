@@ -49,6 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCartBadge();
   updateWishlistBadge();
   initSearch();
+
+  // Auto open tracking modal if URL contains ?track=... or ?orderId=...
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const trackQ = urlParams.get('track') || urlParams.get('orderId');
+    if (trackQ) {
+      setTimeout(() => openTrackOrderModal(trackQ), 350);
+    }
+  } catch (e) {}
 });
 
 // -------------------------------------------------------------
@@ -960,49 +969,419 @@ function handleOrderSubmit(e, grandTotal) {
 }
 
 // -------------------------------------------------------------
-// Order Tracking Feature
+// Real-Time Parcel Tracking Engine (Full Lifecycle Stages)
 // -------------------------------------------------------------
-function openTrackOrderModal() {
+function getFallbackOrStoredOrders() {
+  let orders = [];
+  try {
+    orders = JSON.parse(localStorage.getItem('qadri_placed_orders')) || [];
+  } catch (e) {
+    orders = [];
+  }
+
+  if (!orders || orders.length === 0) {
+    orders = [
+      {
+        orderId: 'SNS-484209',
+        name: 'Ahmed Raza',
+        phone: '03001234567',
+        city: 'Karachi',
+        address: 'Gulshan-e-Iqbal Block 13, Near Disco Bakery',
+        grandTotal: 797,
+        status: 'Preparing',
+        payment: 'COD',
+        courier: 'Leopards Courier',
+        trackingNumber: 'LEOP-882194',
+        items: [{ title: 'Multipurpose Kitchen Storage Rack', qty: 2, price: 180, image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150' }],
+        date: new Date(Date.now() - 3600000 * 6).toISOString()
+      },
+      {
+        orderId: 'SNS-100201',
+        name: 'Ahmed Khan',
+        phone: '+92 311 8877665',
+        city: 'Lahore',
+        address: 'Model Town Block C, House 42',
+        grandTotal: 748,
+        status: 'Shipped',
+        payment: 'COD',
+        courier: 'Trax Logistics',
+        trackingNumber: 'TRAX-449102',
+        items: [{ title: 'Premium Waterproof Bike Cover', qty: 1, price: 400, image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=150' }],
+        date: new Date(Date.now() - 86400000 * 1).toISOString()
+      },
+      {
+        orderId: 'SNS-204918',
+        name: 'Zainab Fatima',
+        phone: '03335544332',
+        city: 'Islamabad',
+        address: 'Sector F-10 Markaz, Street 14',
+        grandTotal: 1450,
+        status: 'Pending',
+        payment: 'COD',
+        courier: 'Awaiting Verification',
+        trackingNumber: 'PENDING',
+        items: [{ title: 'Cosmetic Organizer 360 Rotating', qty: 1, price: 850, image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=150' }],
+        date: new Date(Date.now() - 3600000 * 2).toISOString()
+      },
+      {
+        orderId: 'SNS-310892',
+        name: 'Muhammad Bilal',
+        phone: '03456789012',
+        city: 'Rawalpindi',
+        address: 'Satellite Town Block B, Commercial Market',
+        grandTotal: 2190,
+        status: 'Delivered',
+        payment: 'COD',
+        courier: 'TCS Express',
+        trackingNumber: 'TCS-991204',
+        items: [{ title: 'Electric Mosquito Killer Lamp', qty: 1, price: 1250, image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=150' }],
+        date: new Date(Date.now() - 86400000 * 3).toISOString()
+      }
+    ];
+    try {
+      localStorage.setItem('qadri_placed_orders', JSON.stringify(orders));
+    } catch (e) {}
+  }
+  return orders;
+}
+
+function openTrackOrderModal(prefillQuery = '') {
   const modal = document.getElementById('genericModal');
   const content = document.getElementById('genericModalContent');
   if (!modal || !content) return;
 
   content.innerHTML = `
-    <div style="padding: 1.75rem;">
-      <h2 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Track Your Order</h2>
-      <p style="color: #64748b; font-size: 0.85rem;">Enter your Order ID (e.g. QG-100196) or Mobile Number</p>
-
-      <div style="display: flex; gap: 8px; margin-top: 1.25rem;">
-        <input type="text" id="trackInput" placeholder="Order ID or Phone number..." style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem;">
-        <button class="btn-checkout" onclick="trackOrderQuery()">Search</button>
+    <div style="padding: 1.5rem 1.75rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 38px; height: 38px; border-radius: 10px; background: #ecfdf5; color: #064C63; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+            📦
+          </div>
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0; line-height: 1.2;">Live Parcel Tracking</h2>
+            <p style="color: #64748b; font-size: 0.8rem; margin: 2px 0 0 0;">Save &amp; Smile Real-Time Order &amp; Delivery Status</p>
+          </div>
+        </div>
       </div>
 
-      <div id="trackResultContainer" style="margin-top: 1.5rem;"></div>
+      <p style="color: #475569; font-size: 0.84rem; margin-bottom: 10px;">
+        Apna <strong>Order ID</strong> (maslan: <code>SNS-484209</code> ya <code>SS-100201</code>), <strong>Courier Tracking Number</strong>, ya <strong>Phone Number</strong> darj karen:
+      </p>
+
+      <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+        <input 
+          type="text" 
+          id="trackInput" 
+          value="${prefillQuery}" 
+          placeholder="Enter Order ID (e.g. SNS-484209) or Mobile #..." 
+          style="flex: 1; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; font-weight: 600; color: #0f172a; outline: none; transition: border-color 0.2s;"
+          onfocus="this.style.borderColor='#064C63'"
+          onblur="this.style.borderColor='#cbd5e1'"
+          onkeyup="if(event.key === 'Enter') trackOrderQuery()"
+        >
+        <button class="btn-checkout" onclick="trackOrderQuery()" style="padding: 11px 22px; font-weight: 700; border-radius: 8px; background: #064C63; color: white; display: flex; align-items: center; gap: 6px;">
+          <span>Track</span>
+          <span>🔍</span>
+        </button>
+      </div>
+
+      <!-- Quick sample search tags for convenience -->
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 0.75rem; color: #64748b; margin-bottom: 14px;">
+        <span style="font-weight: 700;">Sample Orders:</span>
+        <button type="button" onclick="document.getElementById('trackInput').value='SNS-484209'; trackOrderQuery();" style="background: #f1f5f9; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 6px; cursor: pointer; color: #0284c7; font-weight: 600;">#SNS-484209 (Preparing)</button>
+        <button type="button" onclick="document.getElementById('trackInput').value='SNS-100201'; trackOrderQuery();" style="background: #f1f5f9; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 6px; cursor: pointer; color: #4338ca; font-weight: 600;">#SNS-100201 (Shipped)</button>
+        <button type="button" onclick="document.getElementById('trackInput').value='SNS-204918'; trackOrderQuery();" style="background: #f1f5f9; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 6px; cursor: pointer; color: #b45309; font-weight: 600;">#SNS-204918 (Pending)</button>
+      </div>
+
+      <div id="trackResultContainer"></div>
     </div>
   `;
 
   modal.classList.add('active');
+  const inputEl = document.getElementById('trackInput');
+  if (inputEl) {
+    inputEl.focus();
+    if (prefillQuery) trackOrderQuery();
+  }
 }
 
 function trackOrderQuery() {
-  const query = document.getElementById('trackInput').value.trim();
+  const queryEl = document.getElementById('trackInput');
   const res = document.getElementById('trackResultContainer');
-  if (!query) {
-    res.innerHTML = `<p style="color: #ef4444; font-size: 0.85rem;">Please enter an Order ID or Phone number.</p>`;
+  if (!queryEl || !res) return;
+
+  const rawQuery = queryEl.value.trim();
+  if (!rawQuery) {
+    res.innerHTML = `
+      <div style="padding: 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #b91c1c; font-size: 0.85rem; text-align: center;">
+        ⚠️ Barah-e-karam apna Order ID ya Mobile Number darj karen.
+      </div>
+    `;
     return;
   }
 
-  res.innerHTML = `
-    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 10px;">
-        <span style="font-weight: 700; color: #0f172a;">Tracking #${query}</span>
-        <span style="background: #dbeafe; color: #1d4ed8; font-weight: 700; font-size: 0.75rem; padding: 3px 8px; border-radius: 4px;">IN TRANSIT</span>
+  const cleanQuery = rawQuery.replace(/[#\s-]/g, '').toLowerCase();
+  const orders = getFallbackOrStoredOrders();
+
+  // Search logic: by orderId, by trackingNumber, by phone, or by name
+  const matched = orders.filter(o => {
+    const oId = (o.orderId || '').replace(/[#\s-]/g, '').toLowerCase();
+    const tNum = (o.trackingNumber || '').replace(/[#\s-]/g, '').toLowerCase();
+    const phone = (o.phone || '').replace(/[^0-9]/g, '');
+    const cleanPhoneQ = rawQuery.replace(/[^0-9]/g, '');
+    const name = (o.name || '').toLowerCase();
+
+    return oId.includes(cleanQuery) ||
+           cleanQuery.includes(oId) ||
+           (tNum && tNum.includes(cleanQuery)) ||
+           (cleanPhoneQ && phone.includes(cleanPhoneQ)) ||
+           name.includes(rawQuery.toLowerCase());
+  });
+
+  if (matched.length === 0) {
+    res.innerHTML = `
+      <div style="background: #fff; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 24px; text-align: center;">
+        <div style="font-size: 2.2rem; margin-bottom: 8px;">🔍</div>
+        <h3 style="font-size: 1.05rem; font-weight: 800; color: #1e293b; margin: 0 0 6px 0;">Koi Order Nahi Mila</h3>
+        <p style="color: #64748b; font-size: 0.84rem; max-width: 380px; margin: 0 auto 14px auto; line-height: 1.5;">
+          Aap ka darj kardah number <strong>"${rawQuery}"</strong> system mein match nahi hua. Barah-e-karam check karen ke Order ID ya phone number durust hai.
+        </p>
+        <div style="font-size: 0.8rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; display: inline-block;">
+          💡 Try sample IDs: 
+          <a href="javascript:void(0)" onclick="document.getElementById('trackInput').value='SNS-484209'; trackOrderQuery();" style="color:#064C63; font-weight:700;">#SNS-484209</a> or 
+          <a href="javascript:void(0)" onclick="document.getElementById('trackInput').value='SNS-100201'; trackOrderQuery();" style="color:#064C63; font-weight:700;">#SNS-100201</a>
+        </div>
+        <div style="margin-top: 14px;">
+          <a href="https://wa.me/923162323616?text=Salam!%20Mera%20Order%20track%20nahi%20ho%20raha,%20search:%20${encodeURIComponent(rawQuery)}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #25D366; color: white; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.82rem; text-decoration: none;">
+            <span>💬 Help on WhatsApp</span>
+          </a>
+        </div>
       </div>
-      <div style="font-size: 0.85rem; color: #475569; line-height: 1.8;">
-        <div>📍 <strong>Courier:</strong> Trax / Call Courier Pakistan</div>
-        <div>📦 <strong>Status:</strong> Dispatched from Karachi Central Warehouse</div>
-        <div>⏱️ <strong>Estimated Delivery:</strong> 2 to 3 Working Days</div>
+    `;
+    return;
+  }
+
+  // Display top matching order
+  const order = matched[0];
+  renderSingleOrderTrackingCard(order, res);
+}
+
+function renderSingleOrderTrackingCard(o, container) {
+  const normStatus = (o.status || 'Pending').toLowerCase().trim();
+
+  // Stage mapping:
+  // 1 = Pending (Order Placed / Verification Pending)
+  // 2 = Confirmed (Verified)
+  // 3 = Preparing / Processing (Packaging in warehouse)
+  // 4 = Shipped / Dispatched (Courier in transit)
+  // 5 = Delivered
+  let stageNumber = 1;
+  let statusBadgeBg = '#fef3c7';
+  let statusBadgeText = '#92400e';
+  let statusBadgeBorder = '#fde68a';
+  let statusTitle = '🕒 Order Masool / Pending Verification';
+  let statusUrduNotice = 'Aap ka order system mein masool ho chuka hai. Hamari support team jald verification ke liye call ya WhatsApp par rabta karegi.';
+  let stageSub = 'Verification desk par active';
+
+  if (normStatus.includes('confirm')) {
+    stageNumber = 2;
+    statusBadgeBg = '#ccfbf1';
+    statusBadgeText = '#0f766e';
+    statusBadgeBorder = '#99f6e4';
+    statusTitle = '✍️ Order Confirmed';
+    statusUrduNotice = 'Aap ka order kamyabi se confirm ho gaya hai aur packaging queue mein transfer kar diya gaya hai.';
+    stageSub = 'Order verified via WhatsApp/Call';
+  } else if (normStatus.includes('prepar') || normStatus.includes('process') || normStatus.includes('pack')) {
+    stageNumber = 3;
+    statusBadgeBg = '#e0f2fe';
+    statusBadgeText = '#0369a1';
+    statusBadgeBorder = '#bae6fd';
+    statusTitle = '📦 Parcel Prepare Ho Raha Hai (Warehouse Packaging)';
+    statusUrduNotice = '📦 Hamare central warehouse mein aap ke parcel ki quality inspection, testing aur protective bubble packaging jari hai. Jald courier van ko handover kiya jaega.';
+    stageSub = 'Packaging & QC inspection in progress';
+  } else if (normStatus.includes('ship') || normStatus.includes('dispatch') || normStatus.includes('transit')) {
+    stageNumber = 4;
+    statusBadgeBg = '#e0e7ff';
+    statusBadgeText = '#3730a3';
+    statusBadgeBorder = '#c7d2fe';
+    statusTitle = '🚚 Courier Handover / In Transit';
+    statusUrduNotice = `🚚 Aap ka parcel courier partner (${o.courier || 'Leopards / Trax'}) ko handover ho chuka hai aur transit mein rawana hai.`;
+    stageSub = 'In transit to your destination';
+  } else if (normStatus.includes('deliver') && !normStatus.includes('out')) {
+    stageNumber = 5;
+    statusBadgeBg = '#dcfce7';
+    statusBadgeText = '#15803d';
+    statusBadgeBorder = '#bbf7d0';
+    statusTitle = '✅ Parcel Successfully Delivered';
+    statusUrduNotice = '🎉 Mubarak ho! Parcel kamyabi se aap ke address par pohnch gaya hai. Save & Smile par shopping karne ka shukriya!';
+    stageSub = 'Order completed successfully';
+  } else if (normStatus.includes('cancel')) {
+    stageNumber = 0;
+    statusBadgeBg = '#ffe4e6';
+    statusBadgeText = '#be123c';
+    statusBadgeBorder = '#fecdd3';
+    statusTitle = '❌ Order Cancelled';
+    statusUrduNotice = 'Yeh order cancel ho chuka hai. Mazeed maloomat ke liye hamari helpline se rabta karen.';
+    stageSub = 'Cancelled';
+  }
+
+  const trackingCode = o.trackingNumber || ('LEOP-' + Math.floor(100000 + Math.random() * 900000));
+  const courierName = o.courier || 'Leopards Courier Pakistan';
+  const orderDate = o.date ? new Date(o.date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Today';
+
+  // Build the 5-step visual timeline
+  const steps = [
+    { num: 1, label: 'Order Placed', urdu: 'آرڈر موصول', desc: 'Pending' },
+    { num: 2, label: 'Confirmed', urdu: 'کنفرم', desc: 'Verified' },
+    { num: 3, label: 'Preparing', urdu: 'تیاری / پیکنگ', desc: 'Packaging' },
+    { num: 4, label: 'In Transit', urdu: 'روانہ کوریئر', desc: 'Dispatched' },
+    { num: 5, label: 'Delivered', urdu: 'ڈلیور', desc: 'Completed' }
+  ];
+
+  const stepperHtml = steps.map((s, idx) => {
+    const isCompleted = stageNumber >= s.num;
+    const isCurrent = stageNumber === s.num;
+
+    let circleBg = '#e2e8f0';
+    let circleColor = '#64748b';
+    let ringStyle = 'none';
+
+    if (isCompleted) {
+      circleBg = '#064C63';
+      circleColor = '#ffffff';
+    }
+    if (isCurrent) {
+      circleBg = '#008FAF';
+      circleColor = '#ffffff';
+      ringStyle = '0 0 0 4px rgba(0, 143, 175, 0.25)';
+    }
+
+    const lineActive = stageNumber > s.num;
+
+    return `
+      <div style="flex: 1; position: relative; text-align: center;">
+        ${idx > 0 ? `
+          <div style="position: absolute; top: 16px; left: -50%; width: 100%; height: 3px; background: ${lineActive ? '#064C63' : '#e2e8f0'}; z-index: 1;"></div>
+        ` : ''}
+        <div style="position: relative; z-index: 2; width: 34px; height: 34px; margin: 0 auto 6px; border-radius: 50%; background: ${circleBg}; color: ${circleColor}; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 800; box-shadow: ${ringStyle}; transition: all 0.3s;">
+          ${isCompleted && !isCurrent ? '✓' : (s.num === 3 ? '📦' : (s.num === 4 ? '🚚' : (s.num === 5 ? '🏠' : s.num)))}
+        </div>
+        <div style="font-size: 0.76rem; font-weight: ${isCurrent ? '800' : '600'}; color: ${isCurrent ? '#064C63' : (isCompleted ? '#0f172a' : '#94a3b8')}; line-height: 1.2;">
+          ${s.label}
+        </div>
+        <div style="font-size: 0.68rem; color: ${isCurrent ? '#008FAF' : '#94a3b8'}; margin-top: 2px;">
+          ${s.urdu}
+        </div>
       </div>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.04); margin-top: 10px;">
+      
+      <!-- Top Status Banner -->
+      <div style="background: ${statusBadgeBg}; border-bottom: 1.5px solid ${statusBadgeBorder}; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: gap: 8px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 800; font-size: 1rem; color: ${statusBadgeText};">
+              ${statusTitle}
+            </span>
+          </div>
+          <div style="font-size: 0.78rem; color: ${statusBadgeText}; opacity: 0.9; margin-top: 3px;">
+            ${stageSub} • Date: ${orderDate}
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">Order Tracking ID</div>
+          <div style="font-size: 1.05rem; font-weight: 900; font-family: monospace; color: #064C63;">#${o.orderId}</div>
+        </div>
+      </div>
+
+      <!-- Live Notice Bar (Urdu & English) -->
+      <div style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 12px 18px; font-size: 0.85rem; color: #334155; line-height: 1.6; display: flex; gap: 10px; align-items: flex-start;">
+        <span style="font-size: 1.1rem; flex-shrink: 0;">ℹ️</span>
+        <div style="flex: 1;">
+          <strong style="color: #0f172a;">Current Stage Update:</strong> ${statusUrduNotice}
+        </div>
+      </div>
+
+      <!-- 5-Step Visual Stepper -->
+      <div style="padding: 22px 14px 18px 14px; background: #ffffff; border-bottom: 1px solid #f1f5f9;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 580px; margin: 0 auto;">
+          ${stepperHtml}
+        </div>
+      </div>
+
+      <!-- Courier & Destination Details -->
+      <div style="padding: 16px 18px; background: #fafbfc; border-bottom: 1px solid #e2e8f0;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; font-size: 0.83rem;">
+          
+          <div style="background: #ffffff; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0;">
+            <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Courier Service</div>
+            <div style="font-weight: 800; color: #0f172a; font-size: 0.92rem; display: flex; align-items: center; gap: 6px;">
+              <span>🚚</span> <span>${courierName}</span>
+            </div>
+            <div style="margin-top: 4px; font-family: monospace; font-size: 0.8rem; color: #0284c7; font-weight: 700;">
+              Tracking CN: ${trackingCode}
+            </div>
+          </div>
+
+          <div style="background: #ffffff; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0;">
+            <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Delivery Destination</div>
+            <div style="font-weight: 800; color: #0f172a;">${o.name || 'Valued Customer'}</div>
+            <div style="color: #64748b; font-size: 0.78rem; margin-top: 2px;">
+              ${o.address || 'Address provided'}, ${o.city || 'Pakistan'}
+            </div>
+            <div style="font-family: monospace; font-size: 0.76rem; color: #64748b; margin-top: 2px;">
+              📞 ${o.phone || 'N/A'}
+            </div>
+          </div>
+
+          <div style="background: #ffffff; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0;">
+            <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Payment Summary</div>
+            <div style="font-weight: 900; color: #064C63; font-size: 1.05rem;">Rs. ${(o.grandTotal || 0).toLocaleString()}</div>
+            <div style="color: #059669; font-size: 0.78rem; font-weight: 700; margin-top: 2px;">
+              ✓ Mode: ${o.payment || 'Cash on Delivery (COD)'}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Items in Order -->
+      <div style="padding: 14px 18px; border-bottom: 1px solid #e2e8f0; font-size: 0.83rem;">
+        <div style="font-weight: 800; color: #0f172a; margin-bottom: 8px;">Order Items (${(o.items || []).length}):</div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          ${(o.items || []).map(i => `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #f1f5f9;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                ${i.image ? `<img src="${i.image}" style="width: 34px; height: 34px; object-fit: contain; border-radius: 6px; background: white; border: 1px solid #e2e8f0;">` : ''}
+                <div>
+                  <div style="font-weight: 700; color: #1e293b;">${i.title}</div>
+                  <div style="font-size: 0.74rem; color: #64748b;">Qty: ${i.qty || 1} unit(s)</div>
+                </div>
+              </div>
+              <div style="font-weight: 800; color: #0f172a;">Rs. ${((i.price || 0) * (i.qty || 1)).toLocaleString()}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Action Footer (WhatsApp Inquire & Track Another) -->
+      <div style="padding: 14px 18px; background: #ffffff; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <div style="font-size: 0.8rem; color: #64748b;">
+          Koi sawal ya issue hai? Hamari team se WhatsApp par fori rabta karen.
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <a href="https://wa.me/923162323616?text=${encodeURIComponent(`Salam! Mera Save & Smile Order #${o.orderId} (${stageSub}) k baray mein inquiry chahiye.`)}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #25D366; color: white; padding: 9px 16px; border-radius: 8px; font-weight: 800; font-size: 0.83rem; text-decoration: none; box-shadow: 0 2px 6px rgba(37,211,102,0.25);">
+            <span>WhatsApp Support</span>
+          </a>
+          <button onclick="document.getElementById('trackInput').value=''; document.getElementById('trackInput').focus();" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 9px 14px; border-radius: 8px; font-weight: 700; font-size: 0.83rem; cursor: pointer;">
+            Track Another Order
+          </button>
+        </div>
+      </div>
+
     </div>
   `;
 }

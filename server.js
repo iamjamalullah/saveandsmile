@@ -78,6 +78,7 @@ const server = http.createServer((req, res) => {
   if (reqPath === '/cart') reqPath = '/cart.html';
   if (reqPath === '/checkout') reqPath = '/checkout.html';
   if (reqPath === '/product-detail') reqPath = '/product-detail.html';
+  if (reqPath === '/track' || reqPath === '/track-order') reqPath = '/track-order.html';
   if (reqPath === '/admin') reqPath = '/admin.html';
   if (reqPath === '/admin/live-editor' || reqPath === '/live-editor') reqPath = '/live-editor.html';
 

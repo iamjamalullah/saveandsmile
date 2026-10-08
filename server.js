@@ -102,7 +102,11 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`🚀 Qadri Gadgets / Save & Smile is running at http://localhost:${PORT}`);
-  console.log(`📡 Neon API ready at: http://localhost:${PORT}/api/health`);
-});
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`🚀 Qadri Gadgets / Save & Smile is running at http://localhost:${PORT}`);
+    console.log(`📡 Neon API ready at: http://localhost:${PORT}/api/health`);
+  });
+}
+
+module.exports = server;

@@ -29,11 +29,16 @@ module.exports = async function handler(req, res) {
 
     // Fallback to static products.json
     try {
-      const fallbackPath = path.join(__dirname, '..', 'products.json');
-      const staticData = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
+      let staticData;
+      try {
+        staticData = require('../products.json');
+      } catch (e) {
+        const fallbackPath = path.join(__dirname, '..', 'products.json');
+        staticData = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
+      }
       return res.status(200).json({ source: 'fallback', count: staticData.length, products: staticData });
     } catch (err) {
-      return res.status(500).json({ error: 'Failed to read products' });
+      return res.status(500).json({ error: 'Failed to read products: ' + err.message });
     }
   }
 

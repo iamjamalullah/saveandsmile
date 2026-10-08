@@ -1,7 +1,7 @@
 {
-  "name": "qadri-gadgets-replica",
+  "name": "save-and-smile",
   "version": "1.0.0",
-  "description": "Full-featured replica of https://www.qadrigadgets.pk/ wholesale e-commerce store",
+  "description": "Save & Smile wholesale e-commerce store with live tracking and serverless backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

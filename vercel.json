@@ -3,10 +3,14 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/admin/live-editor", "destination": "/live-editor.html" },
+    { "source": "/live-editor", "destination": "/live-editor.html" },
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/cart", "destination": "/cart.html" },
     { "source": "/checkout", "destination": "/checkout.html" },
-    { "source": "/product-detail", "destination": "/product-detail.html" }
+    { "source": "/product-detail", "destination": "/product-detail.html" },
+    { "source": "/track-order", "destination": "/track-order.html" },
+    { "source": "/track", "destination": "/track-order.html" }
   ],
   "headers": [
     {

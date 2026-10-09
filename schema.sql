@@ -43,8 +43,11 @@ CREATE TABLE IF NOT EXISTS orders (
   shipping_fee NUMERIC(10, 2) DEFAULT 0,
   grand_total NUMERIC(10, 2) NOT NULL,
   status VARCHAR(50) DEFAULT 'Pending',
+  courier VARCHAR(100) DEFAULT 'Leopards Courier Service',
+  tracking_number VARCHAR(100),
   notes TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 4. Order Items Table
@@ -56,6 +59,16 @@ CREATE TABLE IF NOT EXISTS order_items (
   price NUMERIC(10, 2) NOT NULL,
   qty INT NOT NULL,
   total NUMERIC(10, 2) NOT NULL
+);
+
+-- 5. Admins Table
+CREATE TABLE IF NOT EXISTS admins (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(100) UNIQUE NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  role VARCHAR(50) DEFAULT 'Admin',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Indices for rapid querying

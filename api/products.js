@@ -1,12 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 const { getDb } = require('./db');
+const { verifyAuthToken } = require('./auth');
 
 module.exports = async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -14,7 +15,7 @@ module.exports = async function handler(req, res) {
 
   const sql = getDb();
 
-  // GET: Retrieve all products
+  // GET: Retrieve all products (Public)
   if (req.method === 'GET') {
     try {
       if (sql) {
@@ -42,31 +43,36 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // POST: Add new product
+  // POST: Add new product (Protected: Requires Admin Auth)
   if (req.method === 'POST') {
+    const adminUser = verifyAuthToken(req);
+    if (!adminUser) {
+      return res.status(401).json({ success: false, error: 'Unauthorized: Admin authentication required to create or modify products.' });
+    }
+
     try {
       let body = req.body;
       if (typeof body === 'string') {
         body = JSON.parse(body);
       }
 
-      const { title, description, code, category, tab, price, originalPrice, badge, image, stock } = body;
-      if (!title || !price || !image) {
-        return res.status(400).json({ error: 'title, price, and image are required fields' });
+      const { title, description, code, category, tab, price, originalPrice, badge, image, stock } = body || {};
+      if (!title || price === undefined || price === null || !image) {
+        return res.status(400).json({ success: false, error: 'title, price, and image are required fields.' });
       }
 
-      if (sql) {
-        const result = await sql`
-          INSERT INTO products (title, description, code, category, tab, price, original_price, badge, image, stock)
-          VALUES (${title}, ${description || ''}, ${code || ''}, ${category || 'storage'}, ${tab || 'storage'}, ${price}, ${originalPrice || null}, ${badge || 'NEW'}, ${image}, ${stock || 100})
-          RETURNING *
-        `;
-        return res.status(201).json({ success: true, product: result[0] });
-      } else {
-        return res.status(200).json({ success: true, message: 'Saved locally (Neon DATABASE_URL not yet configured)', product: body });
+      if (!sql) {
+        return res.status(503).json({ success: false, error: 'Database service is currently unavailable. Cannot create product.' });
       }
+
+      const result = await sql`
+        INSERT INTO products (title, description, code, category, tab, price, original_price, badge, image, stock)
+        VALUES (${title}, ${description || ''}, ${code || ''}, ${category || 'storage'}, ${tab || 'storage'}, ${parseFloat(price) || 0}, ${originalPrice ? parseFloat(originalPrice) : null}, ${badge || 'NEW'}, ${image}, ${parseInt(stock, 10) || 100})
+        RETURNING *
+      `;
+      return res.status(201).json({ success: true, product: result[0] });
     } catch (err) {
-      return res.status(500).json({ error: err.message });
+      return res.status(500).json({ success: false, error: err.message });
     }
   }
 

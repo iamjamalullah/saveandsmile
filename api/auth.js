@@ -2,10 +2,14 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { getDb } = require('./db');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'saveandsmile_secure_jwt_secret_2026_production';
+const isProd = process.env.NODE_ENV === 'production';
+const JWT_SECRET = process.env.JWT_SECRET || (isProd ? null : 'saveandsmile_dev_jwt_secret_2026');
 
 // Helper to verify JWT token from Authorization header
 function verifyAuthToken(req) {
+  if (!JWT_SECRET) {
+    return null;
+  }
   const authHeader = req.headers['authorization'] || req.headers['Authorization'];
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return null;
@@ -51,6 +55,11 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ success: false, error: 'Username/Email and password are required.' });
       }
 
+      const effectiveSecret = JWT_SECRET || process.env.JWT_SECRET;
+      if (!effectiveSecret) {
+        return res.status(500).json({ success: false, error: 'Server misconfiguration: JWT_SECRET must be set in production.' });
+      }
+
       const sql = getDb();
       let authenticated = false;
       let userProfile = null;
@@ -72,14 +81,25 @@ module.exports = async function handler(req, res) {
         }
       }
 
-      // 2. Check environment / fallback secure admin
+      // 2. Check environment credentials
       if (!authenticated) {
-        const envAdminUser = process.env.ADMIN_USERNAME || 'admin';
-        const envAdminPass = process.env.ADMIN_PASSWORD || 'admin123';
+        const envAdminUser = process.env.ADMIN_USERNAME;
+        const envAdminPass = process.env.ADMIN_PASSWORD;
 
-        if (loginId === envAdminUser && password === envAdminPass) {
-          authenticated = true;
-          userProfile = { id: 1, username: envAdminUser, email: 'admin@saveandsmile.pk', role: 'Admin' };
+        if (isProd) {
+          // In production: STRICT check, no default fallback allowed
+          if (envAdminUser && envAdminPass && loginId === envAdminUser && password === envAdminPass) {
+            authenticated = true;
+            userProfile = { id: 1, username: envAdminUser, email: 'admin@saveandsmile.pk', role: 'Admin' };
+          }
+        } else {
+          // In local/development: allow configured env vars or dev defaults
+          const devUser = envAdminUser || 'admin';
+          const devPass = envAdminPass || 'admin123';
+          if (loginId === devUser && password === devPass) {
+            authenticated = true;
+            userProfile = { id: 1, username: devUser, email: 'admin@saveandsmile.pk', role: 'Admin' };
+          }
         }
       }
 
@@ -90,7 +110,7 @@ module.exports = async function handler(req, res) {
       // Sign JWT Token
       const token = jwt.sign(
         { id: userProfile.id, username: userProfile.username, role: userProfile.role },
-        JWT_SECRET,
+        effectiveSecret,
         { expiresIn: '7d' }
       );
 

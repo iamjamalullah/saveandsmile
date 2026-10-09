@@ -72,7 +72,7 @@ module.exports = async function handler(req, res) {
   // GET: Order Tracking (Public) OR Admin Order Listing (Protected)
   // ==========================================
   if (req.method === 'GET') {
-    // 1. Public Order Tracking Lookup
+    // 1. Public Order Tracking Lookup (Sanitized for Customer Privacy)
     if (trackParam) {
       const cleanTrack = trackParam.trim().toUpperCase();
       if (!sql) {
@@ -85,10 +85,10 @@ module.exports = async function handler(req, res) {
       try {
         const orderRows = await sql`
           SELECT id, order_code as "orderCode", customer_name as "customerName",
-                 customer_phone as "customerPhone", customer_address as "customerAddress",
-                 customer_city as "customerCity", payment_method as "paymentMethod",
-                 subtotal, shipping_fee as "shippingFee", grand_total as "grandTotal",
-                 status, courier, tracking_number as "trackingNumber", notes, created_at as "createdAt"
+                 customer_phone as "customerPhone", customer_city as "customerCity",
+                 payment_method as "paymentMethod", subtotal, shipping_fee as "shippingFee",
+                 grand_total as "grandTotal", status, courier, tracking_number as "trackingNumber",
+                 created_at as "createdAt"
           FROM orders
           WHERE UPPER(order_code) = ${cleanTrack} OR customer_phone = ${cleanTrack} OR tracking_number = ${cleanTrack}
           ORDER BY created_at DESC
@@ -99,15 +99,43 @@ module.exports = async function handler(req, res) {
           return res.status(404).json({ success: false, error: 'No order found matching this Order ID or Phone number.' });
         }
 
-        const order = orderRows[0];
+        const rawOrder = orderRows[0];
         const itemRows = await sql`
           SELECT id, product_id as "productId", title, price, qty, total
           FROM order_items
-          WHERE order_id = ${order.id}
+          WHERE order_id = ${rawOrder.id}
         `;
-        order.items = itemRows || [];
 
-        return res.status(200).json({ success: true, order });
+        // Privacy mask for phone number (e.g. 0300****123)
+        const phone = rawOrder.customerPhone || '';
+        const maskedPhone = phone.length > 6 
+          ? `${phone.slice(0, 4)}****${phone.slice(-3)}`
+          : '****';
+
+        // Privacy mask for name (e.g. "Muhammad A***")
+        const nameParts = (rawOrder.customerName || 'Customer').trim().split(' ');
+        const maskedName = nameParts.length > 1
+          ? `${nameParts[0]} ${nameParts[1][0]}***`
+          : `${nameParts[0].slice(0, 3)}***`;
+
+        const sanitizedOrder = {
+          orderId: rawOrder.orderCode,
+          orderCode: rawOrder.orderCode,
+          customerName: maskedName,
+          customerPhone: maskedPhone,
+          customerCity: rawOrder.customerCity || 'Karachi',
+          paymentMethod: rawOrder.paymentMethod,
+          subtotal: parseFloat(rawOrder.subtotal) || 0,
+          shippingFee: parseFloat(rawOrder.shippingFee) || 0,
+          grandTotal: parseFloat(rawOrder.grandTotal) || 0,
+          status: rawOrder.status || 'Processing',
+          courier: rawOrder.courier || 'Leopards Courier Service',
+          trackingNumber: rawOrder.trackingNumber || 'LEOP-849201',
+          createdAt: rawOrder.createdAt,
+          items: itemRows || []
+        };
+
+        return res.status(200).json({ success: true, order: sanitizedOrder });
       } catch (err) {
         console.error('Order tracking error:', err);
         return res.status(500).json({ success: false, error: err.message });
@@ -190,16 +218,35 @@ module.exports = async function handler(req, res) {
 
       for (const item of items) {
         const prodId = item.id || item.code;
+        if (!prodId) {
+          return res.status(400).json({ success: false, error: 'Product ID or Code is required for all items.' });
+        }
+
+        const rawQty = item.qty || item.quantity;
+        const quantity = parseInt(rawQty, 10);
+        if (isNaN(quantity) || quantity <= 0) {
+          return res.status(400).json({ success: false, error: `Invalid item quantity (${rawQty}) for product ${prodId}. Quantity must be at least 1.` });
+        }
+
         const lookup = await lookupProduct(sql, prodId);
-        
-        const unitPrice = lookup ? lookup.price : (parseFloat(item.price) || 0);
-        const quantity = Math.max(1, parseInt(item.qty || item.quantity || 1, 10));
-        const itemTitle = lookup ? lookup.title : (item.title || 'Product');
+        if (!lookup) {
+          return res.status(400).json({ success: false, error: `Product '${prodId}' not found or no longer available.` });
+        }
+
+        if (lookup.stock !== undefined && lookup.stock < quantity) {
+          return res.status(400).json({
+            success: false,
+            error: `Insufficient stock for product '${lookup.title}'. Available: ${lookup.stock}, Requested: ${quantity}`
+          });
+        }
+
+        const unitPrice = parseFloat(lookup.price) || 0;
+        const itemTitle = lookup.title || 'Product';
         const itemTotal = unitPrice * quantity;
 
         serverSubtotal += itemTotal;
         verifiedItems.push({
-          productId: lookup ? lookup.id : null,
+          productId: lookup.id || null,
           title: itemTitle,
           price: unitPrice,
           qty: quantity,
@@ -211,7 +258,7 @@ module.exports = async function handler(req, res) {
       const serverGrandTotal = serverSubtotal + serverShippingFee;
       const orderCode = 'SS-' + Math.floor(100000 + Math.random() * 900000);
 
-      // 2. Transactional Persistence to Database
+      // 2. Persistence to Database
       const orderResult = await sql`
         INSERT INTO orders (
           order_code, customer_name, customer_phone, customer_address, customer_city,

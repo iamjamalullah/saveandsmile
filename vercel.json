@@ -7,6 +7,12 @@
   },
   "rewrites": [
     { "source": "/admin/live-editor", "destination": "/live-editor.html" },
+    { "source": "/live-editor", "destination": "/live-editor.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/cart", "destination": "/cart.html" },
+    { "source": "/checkout", "destination": "/checkout.html" },
+    { "source": "/product-detail", "destination": "/product-detail.html" },
+    { "source": "/track-order", "destination": "/track-order.html" },
     { "source": "/track", "destination": "/track-order.html" }
   ],
   "headers": [
@@ -19,7 +25,19 @@
       ]
     },
     {
-      "source": "/(css|js|images)/(.*)",
+      "source": "/css/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
+      ]
+    },
+    {
+      "source": "/js/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
+      ]
+    },
+    {
+      "source": "/images/:path*",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
       ]

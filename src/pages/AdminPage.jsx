@@ -13,49 +13,103 @@ export default function AdminPage() {
   const [statusInput, setStatusInput] = useState('Pending');
   const [productSearch, setProductSearch] = useState('');
 
-  // Load orders from localStorage / API
-  useEffect(() => {
+  // Authentication State
+  const [adminToken, setAdminToken] = useState(() => sessionStorage.getItem('saveandsmile_admin_token') || '');
+  const [adminUser, setAdminUser] = useState(() => {
     try {
-      const stored = JSON.parse(localStorage.getItem('qadri_placed_orders')) || [
-        {
-          orderId: 'SS-948201',
-          customerName: 'Muhammad Bilal',
-          customerPhone: '0300-8472910',
-          customerAddress: 'House 42, Street 7, Gulshan-e-Iqbal',
-          customerCity: 'Karachi',
-          paymentMethod: 'COD',
-          subtotal: 1450,
-          shippingFee: 200,
-          grandTotal: 1650,
-          status: 'Pending',
-          courier: 'Leopards Courier',
-          trackingNumber: 'LEOP-194820',
-          createdAt: new Date(Date.now() - 3600000).toISOString(),
-          items: [{ title: 'Ultra 8 Smart Watch with Wireless Charger', qty: 1, price: 1450 }]
-        },
-        {
-          orderId: 'SS-104928',
-          customerName: 'Usman Ali',
-          customerPhone: '0321-4920194',
-          customerAddress: 'Shop 12, Main Market, Gulberg III',
-          customerCity: 'Lahore',
-          paymentMethod: 'COD',
-          subtotal: 3600,
-          shippingFee: 0,
-          grandTotal: 3600,
-          status: 'Shipped',
-          courier: 'TCS Express',
-          trackingNumber: 'TCS-928104',
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-          items: [{ title: 'Multipurpose Kitchen Bathroom Shelf', qty: 20, price: 180 }]
-        }
-      ];
-      setOrders(stored);
-      localStorage.setItem('qadri_placed_orders', JSON.stringify(stored));
-    } catch (e) {}
-  }, []);
+      return JSON.parse(sessionStorage.getItem('saveandsmile_admin_user')) || null;
+    } catch (e) {
+      return null;
+    }
+  });
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [loginError, setLoginError] = useState(null);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(false);
 
-  const totalRevenue = orders.reduce((sum, o) => sum + (o.grandTotal || 0), 0);
+  // Load orders from API when authenticated
+  const fetchOrdersFromApi = async (token) => {
+    if (!token) return;
+    setIsLoadingOrders(true);
+    try {
+      const res = await fetch('/api/orders', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      if (res.ok && data.success && Array.isArray(data.orders)) {
+        setOrders(data.orders);
+        localStorage.setItem('qadri_placed_orders', JSON.stringify(data.orders));
+      } else if (res.status === 401) {
+        // Token expired
+        handleLogout();
+        showToast('Admin session expired. Please log in again.');
+      } else {
+        // Fallback to local storage if DB is empty
+        const stored = JSON.parse(localStorage.getItem('qadri_placed_orders')) || [];
+        setOrders(stored);
+      }
+    } catch (e) {
+      console.warn('Could not fetch orders from API:', e.message);
+      const stored = JSON.parse(localStorage.getItem('qadri_placed_orders')) || [];
+      setOrders(stored);
+    } finally {
+      setIsLoadingOrders(false);
+    }
+  };
+
+  useEffect(() => {
+    if (adminToken) {
+      fetchOrdersFromApi(adminToken);
+    }
+  }, [adminToken]);
+
+  // Handle Login Submit
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    if (!loginForm.username.trim() || !loginForm.password.trim()) {
+      setLoginError('Please enter both username and password.');
+      return;
+    }
+
+    setIsLoggingIn(true);
+    setLoginError(null);
+
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(loginForm)
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success && data.token) {
+        sessionStorage.setItem('saveandsmile_admin_token', data.token);
+        sessionStorage.setItem('saveandsmile_admin_user', JSON.stringify(data.user || { username: loginForm.username }));
+        setAdminToken(data.token);
+        setAdminUser(data.user || { username: loginForm.username });
+        showToast('Admin authentication successful! 🔐');
+      } else {
+        setLoginError(data.error || 'Invalid admin credentials.');
+      }
+    } catch (err) {
+      setLoginError(`Connection error: ${err.message}`);
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  // Handle Logout
+  const handleLogout = () => {
+    sessionStorage.removeItem('saveandsmile_admin_token');
+    sessionStorage.removeItem('saveandsmile_admin_user');
+    setAdminToken('');
+    setAdminUser(null);
+    showToast('Logged out successfully.');
+  };
+
+  const totalRevenue = orders.reduce((sum, o) => sum + (parseFloat(o.grandTotal) || 0), 0);
   const pendingOrders = orders.filter(o => (o.status || '').toLowerCase() === 'pending').length;
   const completedOrders = orders.filter(o => (o.status || '').toLowerCase() === 'delivered').length;
 
@@ -64,15 +118,35 @@ export default function AdminPage() {
     return (o.status || '').toLowerCase() === orderFilter.toLowerCase();
   });
 
-  const handleUpdateStatus = (orderId, newStatus) => {
+  const handleUpdateStatus = async (orderId, newStatus) => {
+    const trackingNo = (newStatus === 'Shipped') ? 'LEOP-' + Math.floor(100000 + Math.random() * 900000) : null;
+    
+    // 1. Send update to API
+    if (adminToken) {
+      try {
+        await fetch('/api/orders', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({
+            orderId,
+            status: newStatus,
+            courier: 'Leopards Courier',
+            trackingNumber: trackingNo
+          })
+        });
+      } catch (e) {}
+    }
+
+    // 2. Update local state
     const updated = orders.map(o => {
-      if (o.orderId === orderId) {
+      if (o.orderId === orderId || o.orderCode === orderId) {
         return {
           ...o,
           status: newStatus,
-          trackingNumber: (newStatus === 'Shipped' && (!o.trackingNumber || o.trackingNumber === 'PENDING')) 
-            ? 'LEOP-' + Math.floor(100000 + Math.random() * 900000) 
-            : o.trackingNumber
+          trackingNumber: trackingNo || o.trackingNumber
         };
       }
       return o;
@@ -82,17 +156,35 @@ export default function AdminPage() {
     showToast(`Order #${orderId} status updated to ${newStatus}`);
   };
 
-  const handleSaveTrackingModal = (e) => {
+  const handleSaveTrackingModal = async (e) => {
     e.preventDefault();
     if (!selectedOrder) return;
 
+    if (adminToken) {
+      try {
+        await fetch('/api/orders', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({
+            orderId: selectedOrder.orderId || selectedOrder.orderCode,
+            status: statusInput,
+            courier: courierInput,
+            trackingNumber: trackingInput
+          })
+        });
+      } catch (e) {}
+    }
+
     const updated = orders.map(o => {
-      if (o.orderId === selectedOrder.orderId) {
+      if (o.orderId === selectedOrder.orderId || o.orderCode === selectedOrder.orderId) {
         return {
           ...o,
-          trackingNumber: trackingInput || o.trackingNumber,
-          courier: courierInput || o.courier,
-          status: statusInput || o.status
+          status: statusInput,
+          courier: courierInput,
+          trackingNumber: trackingInput
         };
       }
       return o;
@@ -100,265 +192,284 @@ export default function AdminPage() {
 
     setOrders(updated);
     localStorage.setItem('qadri_placed_orders', JSON.stringify(updated));
-    showToast(`Tracking saved for #${selectedOrder.orderId}!`);
     setSelectedOrder(null);
+    showToast(`Tracking saved for #${selectedOrder.orderId || selectedOrder.orderCode}`);
   };
 
-  const filteredProducts = products.filter(p => 
-    p.title.toLowerCase().includes(productSearch.toLowerCase()) ||
-    (p.code && p.code.toLowerCase().includes(productSearch.toLowerCase()))
-  );
+  const filteredProducts = products.filter(p => {
+    if (!productSearch) return true;
+    const q = productSearch.toLowerCase();
+    return (p.title && p.title.toLowerCase().includes(q)) || (p.code && p.code.toLowerCase().includes(q));
+  });
 
-  return (
-    <div style={{ display: 'flex', height: '100vh', width: '100vw', background: '#f8fafc', overflow: 'hidden', fontFamily: 'Inter, sans-serif' }}>
-      
-      {/* Left Sidebar */}
-      <aside style={{ width: '260px', background: '#0f172a', color: '#fff', display: 'flex', flexDirection: 'column', borderRight: '1px solid #1e293b' }}>
-        <div style={{ padding: '20px', borderBottom: '1px solid #1e293b', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src={storeConfig.logo || "images/save-and-smile-logo.png"} alt="Save & Smile" style={{ height: '36px', background: '#fff', padding: '4px', borderRadius: '8px' }} />
-          <div>
-            <div style={{ fontWeight: 800, fontSize: '0.95rem', color: '#f8fafc' }}>Save &amp; Smile</div>
-            <div style={{ fontSize: '0.72rem', color: '#008FAF', fontWeight: 700 }}>Executive OS 2.0</div>
-          </div>
-        </div>
+  // ==========================================
+  // Render: Secure Login Guard View
+  // ==========================================
+  if (!adminToken) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #064C63 0%, #008FAF 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <div style={{ background: '#ffffff', borderRadius: '16px', padding: '36px 30px', width: '100%', maxWidth: '420px', boxShadow: '0 20px 40px rgba(0,0,0,0.25)', textAlign: 'center' }}>
+          
+          <img src="/images/save-and-smile-logo.png" alt="Save & Smile" style={{ height: '48px', objectFit: 'contain', marginBottom: '16px' }} />
+          
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 900, color: '#0f172a', marginBottom: '6px' }}>
+            Admin Portal Authentication
+          </h2>
+          <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '24px' }}>
+            Please enter your administrator credentials to access store operations, orders, and inventory.
+          </p>
 
-        <nav style={{ flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <button 
-            onClick={() => setCurrentTab('dashboard')}
-            style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', borderRadius: '10px', background: currentTab === 'dashboard' ? '#064C63' : 'transparent', color: currentTab === 'dashboard' ? '#fff' : '#94a3b8', border: 'none', cursor: 'pointer', textAlign: 'left', fontWeight: 600, fontSize: '0.88rem' }}
-          >
-            📊 Dashboard Overview
-          </button>
-          <button 
-            onClick={() => setCurrentTab('orders')}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderRadius: '10px', background: currentTab === 'orders' ? '#064C63' : 'transparent', color: currentTab === 'orders' ? '#fff' : '#94a3b8', border: 'none', cursor: 'pointer', textAlign: 'left', fontWeight: 600, fontSize: '0.88rem' }}
-          >
-            <span>📦 Orders Manager</span>
-            <span style={{ background: '#ef4444', color: '#fff', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '99px' }}>{pendingOrders}</span>
-          </button>
-          <button 
-            onClick={() => setCurrentTab('products')}
-            style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', borderRadius: '10px', background: currentTab === 'products' ? '#064C63' : 'transparent', color: currentTab === 'products' ? '#fff' : '#94a3b8', border: 'none', cursor: 'pointer', textAlign: 'left', fontWeight: 600, fontSize: '0.88rem' }}
-          >
-            🏷️ Product Catalog ({products.length})
-          </button>
-          <Link 
-            to="/live-editor"
-            style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', borderRadius: '10px', color: '#38bdf8', textDecoration: 'none', fontWeight: 600, fontSize: '0.88rem' }}
-          >
-            🎨 Visual Page Builder ➔
-          </Link>
-          <Link 
-            to="/"
-            style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', borderRadius: '10px', color: '#10b981', textDecoration: 'none', fontWeight: 600, fontSize: '0.88rem', marginTop: 'auto' }}
-          >
-            🌐 View Live Storefront ➔
-          </Link>
-        </nav>
-      </aside>
+          {loginError && (
+            <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', color: '#b91c1c', padding: '10px 14px', borderRadius: '8px', fontSize: '0.85rem', marginBottom: '16px', fontWeight: 600 }}>
+              ⚠️ {loginError}
+            </div>
+          )}
 
-      {/* Main Content Area */}
-      <main style={{ flex: 1, overflowY: 'auto', padding: '2rem' }}>
-        
-        {/* Top bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-          <div>
-            <h1 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#0f172a', margin: '0 0 4px 0' }}>
-              {currentTab === 'dashboard' && 'Commerce Operations Hub'}
-              {currentTab === 'orders' && 'Order Fulfillment & Tracking'}
-              {currentTab === 'products' && 'Product & Inventory Manager'}
-            </h1>
-            <p style={{ color: '#64748b', fontSize: '0.88rem', margin: 0 }}>
-              Live wholesale data synced with local database and storage engine.
-            </p>
-          </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
+            <div>
+              <label style={{ fontSize: '0.82rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>
+                Username / Email
+              </label>
+              <input 
+                type="text" 
+                value={loginForm.username}
+                onChange={(e) => setLoginForm(prev => ({ ...prev, username: e.target.value }))}
+                placeholder="admin"
+                required
+                style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem', outline: 'none' }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.82rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>
+                Password
+              </label>
+              <input 
+                type="password" 
+                value={loginForm.password}
+                onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
+                placeholder="••••••••"
+                required
+                style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem', outline: 'none' }}
+              />
+            </div>
+
             <button 
-              onClick={() => showToast('Data refreshed!')}
-              style={{ background: '#fff', border: '1px solid #cbd5e1', padding: '8px 16px', borderRadius: '8px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}
+              type="submit" 
+              disabled={isLoggingIn}
+              style={{ background: '#064C63', color: '#ffffff', padding: '14px', borderRadius: '10px', border: 'none', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', marginTop: '8px', transition: '0.2s opacity' }}
             >
-              🔄 Refresh
+              {isLoggingIn ? 'Verifying Credentials...' : 'Secure Login 🔐'}
             </button>
+          </form>
+
+          <div style={{ marginTop: '24px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+            <Link to="/" style={{ color: '#008FAF', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700 }}>
+              ← Return to Storefront
+            </Link>
           </div>
         </div>
+      </div>
+    );
+  }
 
+  // ==========================================
+  // Render: Authenticated Admin Dashboard View
+  // ==========================================
+  return (
+    <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', display: 'flex', flexDirection: 'column' }}>
+      
+      {/* Admin Top Header */}
+      <header style={{ background: '#064C63', color: '#fff', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <Link to="/">
+            <img src="/images/save-and-smile-logo.png" alt="Save & Smile Logo" style={{ height: '36px', filter: 'brightness(0) invert(1)' }} />
+          </Link>
+          <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.5px' }}>
+            CONTROL PANEL (PROTECTED)
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <span style={{ fontSize: '0.85rem', opacity: 0.9 }}>
+            👤 {adminUser ? adminUser.username : 'Admin'}
+          </span>
+          <button 
+            onClick={() => fetchOrdersFromApi(adminToken)}
+            title="Refresh Live Orders"
+            style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
+          >
+            🔄 Sync
+          </button>
+          <button 
+            onClick={handleLogout}
+            style={{ background: '#e11d48', color: '#fff', border: 'none', padding: '6px 14px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
+          >
+            Logout
+          </button>
+        </div>
+      </header>
+
+      {/* Navigation Tabs */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '0 24px', display: 'flex', gap: '8px', overflowX: 'auto' }}>
+        <button 
+          onClick={() => setCurrentTab('dashboard')}
+          style={{ padding: '14px 18px', border: 'none', background: 'transparent', fontWeight: 700, fontSize: '0.9rem', color: currentTab === 'dashboard' ? '#064C63' : '#64748b', borderBottom: currentTab === 'dashboard' ? '3px solid #064C63' : '3px solid transparent', cursor: 'pointer' }}
+        >
+          📊 Dashboard Overview
+        </button>
+        <button 
+          onClick={() => setCurrentTab('orders')}
+          style={{ padding: '14px 18px', border: 'none', background: 'transparent', fontWeight: 700, fontSize: '0.9rem', color: currentTab === 'orders' ? '#064C63' : '#64748b', borderBottom: currentTab === 'orders' ? '3px solid #064C63' : '3px solid transparent', cursor: 'pointer' }}
+        >
+          📦 Orders ({orders.length})
+        </button>
+        <button 
+          onClick={() => setCurrentTab('products')}
+          style={{ padding: '14px 18px', border: 'none', background: 'transparent', fontWeight: 700, fontSize: '0.9rem', color: currentTab === 'products' ? '#064C63' : '#64748b', borderBottom: currentTab === 'products' ? '3px solid #064C63' : '3px solid transparent', cursor: 'pointer' }}
+        >
+          🛒 Products ({products.length})
+        </button>
+      </div>
+
+      {/* Main Container */}
+      <main style={{ flex: 1, padding: '24px', maxWidth: '1400px', width: '100%', margin: '0 auto' }}>
+        
         {/* Tab 1: Dashboard */}
         {currentTab === 'dashboard' && (
           <div>
-            {/* KPI Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '18px', marginBottom: '2rem' }}>
-              <div style={{ background: '#fff', padding: '20px', borderRadius: '14px', border: '1px solid #e2e8f0', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
-                <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>Total Revenue</div>
-                <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#064C63', marginTop: '6px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '24px' }}>
+              
+              <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Total Revenue</div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#064C63', marginTop: '6px' }}>
                   Rs. {totalRevenue.toLocaleString()}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#10b981', marginTop: '4px', fontWeight: 700 }}>● Active sales</div>
               </div>
 
-              <div style={{ background: '#fff', padding: '20px', borderRadius: '14px', border: '1px solid #e2e8f0', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
-                <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>Total Orders</div>
-                <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#0f172a', marginTop: '6px' }}>
+              <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Total Orders</div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#0284c7', marginTop: '6px' }}>
                   {orders.length}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>Across Pakistan</div>
               </div>
 
-              <div style={{ background: '#fff', padding: '20px', borderRadius: '14px', border: '1px solid #e2e8f0', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
-                <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>Pending Action</div>
-                <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#ef4444', marginTop: '6px' }}>
+              <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Pending Dispatch</div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#eab308', marginTop: '6px' }}>
                   {pendingOrders}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#ef4444', marginTop: '4px', fontWeight: 700 }}>Requires dispatch</div>
               </div>
 
-              <div style={{ background: '#fff', padding: '20px', borderRadius: '14px', border: '1px solid #e2e8f0', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
-                <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>Active Catalog</div>
-                <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#008FAF', marginTop: '6px' }}>
-                  {products.length} Products
+              <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Delivered</div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#16a34a', marginTop: '6px' }}>
+                  {completedOrders}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#008FAF', marginTop: '4px', fontWeight: 700 }}>Ready for wholesale</div>
-              </div>
-            </div>
-
-            {/* Recent Orders Overview */}
-            <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e2e8f0', padding: '20px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>Recent Orders</h3>
-                <button 
-                  onClick={() => setCurrentTab('orders')}
-                  style={{ color: '#064C63', background: 'none', border: 'none', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer' }}
-                >
-                  View All Orders →
-                </button>
               </div>
 
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
-                  <thead>
-                    <tr style={{ background: '#f8fafc', color: '#475569', textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>
-                      <th style={{ padding: '12px' }}>Order ID</th>
-                      <th style={{ padding: '12px' }}>Customer</th>
-                      <th style={{ padding: '12px' }}>City</th>
-                      <th style={{ padding: '12px' }}>Amount</th>
-                      <th style={{ padding: '12px' }}>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {orders.slice(0, 5).map(o => (
-                      <tr key={o.orderId} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                        <td style={{ padding: '12px', fontWeight: 700, color: '#064C63' }}>#{o.orderId}</td>
-                        <td style={{ padding: '12px' }}>{o.customerName}</td>
-                        <td style={{ padding: '12px' }}>{o.customerCity}</td>
-                        <td style={{ padding: '12px', fontWeight: 700 }}>Rs. {o.grandTotal.toLocaleString()}</td>
-                        <td style={{ padding: '12px' }}>
-                          <span style={{ 
-                            background: o.status === 'Delivered' ? '#dcfce7' : (o.status === 'Shipped' ? '#e0f2fe' : '#fef3c7'),
-                            color: o.status === 'Delivered' ? '#15803d' : (o.status === 'Shipped' ? '#0369a1' : '#b45309'),
-                            padding: '4px 10px', borderRadius: '99px', fontSize: '0.75rem', fontWeight: 800 
-                          }}>
-                            {o.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
             </div>
           </div>
         )}
 
-        {/* Tab 2: Orders Manager */}
+        {/* Tab 2: Orders List */}
         {currentTab === 'orders' && (
           <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e2e8f0', padding: '20px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
             
-            {/* Filter buttons */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
-              {['all', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'].map(st => (
-                <button
-                  key={st}
-                  onClick={() => setOrderFilter(st)}
-                  style={{
-                    padding: '8px 16px',
-                    borderRadius: '8px',
-                    border: '1px solid #cbd5e1',
-                    background: orderFilter === st ? '#064C63' : '#fff',
-                    color: orderFilter === st ? '#fff' : '#334155',
-                    fontWeight: 700,
-                    fontSize: '0.82rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {st.toUpperCase()}
-                </button>
-              ))}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800 }}>Orders List</h3>
+              
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {['all', 'Pending', 'Processing', 'Shipped', 'Delivered'].map(status => (
+                  <button 
+                    key={status}
+                    onClick={() => setOrderFilter(status)}
+                    style={{ background: orderFilter === status ? '#064C63' : '#f1f5f9', color: orderFilter === status ? '#fff' : '#475569', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
+                  >
+                    {status.toUpperCase()}
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {isLoadingOrders && (
+              <div style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>
+                🔄 Loading orders from database...
+              </div>
+            )}
 
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
                 <thead>
                   <tr style={{ background: '#f8fafc', color: '#475569', textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>
                     <th style={{ padding: '12px' }}>Order ID</th>
-                    <th style={{ padding: '12px' }}>Customer &amp; Phone</th>
-                    <th style={{ padding: '12px' }}>Delivery Address</th>
-                    <th style={{ padding: '12px' }}>Total</th>
+                    <th style={{ padding: '12px' }}>Customer</th>
+                    <th style={{ padding: '12px' }}>City &amp; Address</th>
+                    <th style={{ padding: '12px' }}>Total Amount</th>
                     <th style={{ padding: '12px' }}>Status</th>
-                    <th style={{ padding: '12px' }}>Tracking</th>
+                    <th style={{ padding: '12px' }}>Tracking #</th>
                     <th style={{ padding: '12px' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredOrders.map(o => (
-                    <tr key={o.orderId} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '12px', fontWeight: 800, color: '#064C63' }}>#{o.orderId}</td>
-                      <td style={{ padding: '12px' }}>
-                        <div style={{ fontWeight: 700 }}>{o.customerName}</div>
-                        <div style={{ fontSize: '0.78rem', color: '#64748b' }}>{o.customerPhone}</div>
-                      </td>
-                      <td style={{ padding: '12px', fontSize: '0.82rem', color: '#475569', maxWidth: '200px' }}>
-                        {o.customerAddress}, {o.customerCity}
-                      </td>
-                      <td style={{ padding: '12px', fontWeight: 800, color: '#0f172a' }}>
-                        Rs. {o.grandTotal.toLocaleString()}
-                      </td>
-                      <td style={{ padding: '12px' }}>
-                        <select 
-                          value={o.status || 'Pending'} 
-                          onChange={(e) => handleUpdateStatus(o.orderId, e.target.value)}
-                          style={{ padding: '6px 8px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', fontWeight: 700 }}
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="Processing">Processing</option>
-                          <option value="Shipped">Shipped</option>
-                          <option value="Delivered">Delivered</option>
-                          <option value="Cancelled">Cancelled</option>
-                        </select>
-                      </td>
-                      <td style={{ padding: '12px', fontSize: '0.8rem' }}>
-                        {o.trackingNumber ? (
-                          <div>
-                            <div style={{ fontWeight: 700, color: '#008FAF' }}>{o.trackingNumber}</div>
-                            <div style={{ color: '#64748b', fontSize: '0.72rem' }}>{o.courier}</div>
-                          </div>
-                        ) : (
-                          <span style={{ color: '#94a3b8' }}>Unassigned</span>
-                        )}
-                      </td>
-                      <td style={{ padding: '12px' }}>
-                        <button
-                          onClick={() => {
-                            setSelectedOrder(o);
-                            setTrackingInput(o.trackingNumber || '');
-                            setCourierInput(o.courier || 'Leopards Courier');
-                            setStatusInput(o.status || 'Pending');
-                          }}
-                          style={{ background: '#e0f2fe', color: '#0369a1', border: 'none', padding: '6px 12px', borderRadius: '8px', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer' }}
-                        >
-                          ✏️ Edit Tracking
-                        </button>
+                  {filteredOrders.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} style={{ padding: '24px', textAlign: 'center', color: '#94a3b8' }}>
+                        No orders found in this filter.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    filteredOrders.map(o => {
+                      const id = o.orderId || o.orderCode || o.id;
+                      return (
+                        <tr key={id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <td style={{ padding: '12px', fontWeight: 700, color: '#064C63' }}>
+                            #{id}
+                          </td>
+                          <td style={{ padding: '12px' }}>
+                            <div style={{ fontWeight: 700 }}>{o.customerName}</div>
+                            <div style={{ fontSize: '0.78rem', color: '#64748b' }}>{o.customerPhone}</div>
+                          </td>
+                          <td style={{ padding: '12px', maxWidth: '220px', fontSize: '0.82rem', color: '#475569' }}>
+                            <strong>{o.customerCity}</strong>: {o.customerAddress}
+                          </td>
+                          <td style={{ padding: '12px', fontWeight: 800 }}>
+                            Rs. {(parseFloat(o.grandTotal) || 0).toLocaleString()}
+                          </td>
+                          <td style={{ padding: '12px' }}>
+                            <span style={{ 
+                              padding: '4px 10px', 
+                              borderRadius: '9999px', 
+                              fontSize: '0.75rem', 
+                              fontWeight: 700,
+                              background: o.status === 'Delivered' ? '#dcfce7' : o.status === 'Shipped' ? '#e0f2fe' : '#fef9c3',
+                              color: o.status === 'Delivered' ? '#166534' : o.status === 'Shipped' ? '#0369a1' : '#854d0e'
+                            }}>
+                              {o.status || 'Pending'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px', fontSize: '0.8rem', color: '#0284c7', fontWeight: 600 }}>
+                            {o.trackingNumber || 'Pending'}
+                          </td>
+                          <td style={{ padding: '12px' }}>
+                            <div style={{ display: 'flex', gap: '6px' }}>
+                              <button 
+                                onClick={() => {
+                                  setSelectedOrder(o);
+                                  setTrackingInput(o.trackingNumber || '');
+                                  setCourierInput(o.courier || 'Leopards Courier');
+                                  setStatusInput(o.status || 'Pending');
+                                }}
+                                style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '6px 10px', borderRadius: '6px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}
+                              >
+                                Edit / Dispatch
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
@@ -430,7 +541,7 @@ export default function AdminPage() {
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
             <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', width: '90%', maxWidth: '480px' }}>
               <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '16px', color: '#0f172a' }}>
-                Assign Tracking for #{selectedOrder.orderId}
+                Assign Tracking for #{selectedOrder.orderId || selectedOrder.orderCode}
               </h3>
               
               <form onSubmit={handleSaveTrackingModal} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>

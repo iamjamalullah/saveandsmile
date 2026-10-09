@@ -66,26 +66,38 @@ export default function CheckoutPage() {
     };
 
     try {
-      // 1. Send to serverless API
-      try {
-        await fetch('/api/orders', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(orderPayload)
-        });
-      } catch (err) {
-        console.warn('API POST failed, saving to local store:', err);
+      // Send to authoritative serverless API
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderPayload)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to place order. Database service could not persist record.');
       }
 
-      // 2. Save in localStorage for admin panel and tracking
+      const finalOrderId = data.orderId || generatedOrderId;
+      const confirmedOrder = {
+        ...orderPayload,
+        orderId: finalOrderId,
+        subtotal: data.subtotal || orderPayload.subtotal,
+        shippingFee: data.shippingFee !== undefined ? data.shippingFee : orderPayload.shippingFee,
+        grandTotal: data.grandTotal || orderPayload.grandTotal,
+        items: data.order && data.order.items ? data.order.items : orderPayload.items
+      };
+
+      // Save confirmed copy in localStorage for local receipt history
       const existingOrders = JSON.parse(localStorage.getItem('qadri_placed_orders')) || [];
-      existingOrders.unshift(orderPayload);
+      existingOrders.unshift(confirmedOrder);
       localStorage.setItem('qadri_placed_orders', JSON.stringify(existingOrders));
 
-      // 3. Clear Cart and show Confirmation
+      // Clear Cart and show Confirmation
       clearCart();
-      setPlacedOrder(orderPayload);
-      showToast(`Order #${generatedOrderId} placed successfully! 🎉`);
+      setPlacedOrder(confirmedOrder);
+      showToast(`Order #${finalOrderId} placed successfully! 🎉`);
     } catch (error) {
       showToast(`Order submission error: ${error.message}`);
     } finally {

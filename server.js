@@ -49,8 +49,11 @@ async function handleApiRequest(req, res) {
       if (urlPath === '/api/products' || urlPath === '/api/products/') {
         const handler = require('./api/products');
         return await handler(req, res);
-      } else if (urlPath === '/api/orders' || urlPath === '/api/orders/') {
+      } else if (urlPath.startsWith('/api/orders')) {
         const handler = require('./api/orders');
+        return await handler(req, res);
+      } else if (urlPath.startsWith('/api/auth')) {
+        const handler = require('./api/auth');
         return await handler(req, res);
       } else if (urlPath === '/api/health' || urlPath === '/api/health/') {
         const handler = require('./api/health');

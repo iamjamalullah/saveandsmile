@@ -11,10 +11,31 @@ export default function TrackOrderPage() {
   const [trackedOrder, setTrackedOrder] = useState(null);
   const { storeConfig } = useStore();
 
-  const lookupOrder = (q) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchError, setSearchError] = useState(null);
+
+  const lookupOrder = async (q) => {
     const cleanQ = (q || '').trim().toUpperCase();
     if (!cleanQ) return;
 
+    setIsLoading(true);
+    setSearchError(null);
+
+    try {
+      // 1. Fetch live order tracking from authoritative backend API
+      const res = await fetch(`/api/orders?track=${encodeURIComponent(cleanQ)}`);
+      const data = await res.json();
+
+      if (res.ok && data.success && data.order) {
+        setTrackedOrder(data.order);
+        setIsLoading(false);
+        return;
+      }
+    } catch (e) {
+      console.warn('API tracking lookup notice:', e.message);
+    }
+
+    // 2. Check local receipt history fallback
     const placedOrders = JSON.parse(localStorage.getItem('qadri_placed_orders')) || [];
     const found = placedOrders.find(o => 
       (o.orderId && o.orderId.toUpperCase() === cleanQ) || 
@@ -25,24 +46,10 @@ export default function TrackOrderPage() {
     if (found) {
       setTrackedOrder(found);
     } else {
-      // Mock tracking state for valid demonstration
-      setTrackedOrder({
-        orderId: cleanQ.startsWith('SS-') ? cleanQ : `SS-${Math.floor(100000 + Math.random() * 900000)}`,
-        customerName: 'Valued Customer',
-        customerCity: 'Karachi / Lahore',
-        customerAddress: 'Registered Delivery Address, Pakistan',
-        paymentMethod: 'Cash on Delivery (COD)',
-        status: 'In Transit',
-        courier: 'Leopards Courier Service',
-        trackingNumber: 'LEOP-' + Math.floor(100000 + Math.random() * 900000),
-        createdAt: new Date().toISOString(),
-        grandTotal: 1850,
-        items: [
-          { title: 'Multipurpose Kitchen Bathroom Storage Rack', qty: 1, price: 180 },
-          { title: 'Ultra 8 Smart Watch with Wireless Charger', qty: 1, price: 1450 }
-        ]
-      });
+      setTrackedOrder(null);
+      setSearchError(`No order found matching "${cleanQ}". Please check your Order ID or phone number.`);
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -107,6 +114,19 @@ export default function TrackOrderPage() {
               #SS-829104
             </button>
           </div>
+
+          {/* Search Error Feedback */}
+          {searchError && (
+            <div style={{ maxWidth: '650px', margin: '1rem auto 0 auto', background: '#fee2e2', color: '#b91c1c', border: '1px solid #fca5a5', borderRadius: '10px', padding: '12px 16px', fontSize: '0.9rem', fontWeight: 600 }}>
+              ⚠️ {searchError}
+            </div>
+          )}
+
+          {isLoading && (
+            <div style={{ maxWidth: '650px', margin: '1rem auto 0 auto', background: 'rgba(255,255,255,0.2)', color: 'white', borderRadius: '10px', padding: '10px', fontSize: '0.9rem', fontWeight: 600 }}>
+              🔄 Fetching live order status...
+            </div>
+          )}
         </div>
       </section>
 

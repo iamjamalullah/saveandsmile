@@ -1,33 +1,150 @@
+const fs = require('fs');
+const path = require('path');
 const { getDb } = require('./db');
+const { verifyAuthToken } = require('./auth');
+
+// Load authentic catalog for server-side price validation fallback
+let fallbackCatalog = [];
+try {
+  const jsonPath = path.join(__dirname, '..', 'products.json');
+  if (fs.existsSync(jsonPath)) {
+    fallbackCatalog = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+  }
+} catch (e) {}
+
+/**
+ * Server-side product price & title lookup
+ */
+async function lookupProduct(sql, idOrCode) {
+  const cleanId = String(idOrCode || '').trim();
+  if (!cleanId) return null;
+
+  // 1. Query Database if connected
+  if (sql) {
+    try {
+      const rows = await sql`
+        SELECT id, code, title, price, stock 
+        FROM products 
+        WHERE id::text = ${cleanId} OR code = ${cleanId}
+        LIMIT 1
+      `;
+      if (rows && rows.length > 0) {
+        return {
+          id: rows[0].id,
+          code: rows[0].code,
+          title: rows[0].title,
+          price: parseFloat(rows[0].price) || 0,
+          stock: parseInt(rows[0].stock, 10) || 100
+        };
+      }
+    } catch (e) {}
+  }
+
+  // 2. Query fallback catalog
+  const match = fallbackCatalog.find(p => String(p.id) === cleanId || p.code === cleanId);
+  if (match) {
+    return {
+      id: match.id,
+      code: match.code,
+      title: match.title,
+      price: parseFloat(match.price) || 0,
+      stock: parseInt(match.stock, 10) || 100
+    };
+  }
+
+  return null;
+}
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
   const sql = getDb();
+  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  const trackParam = url.searchParams.get('track') || url.searchParams.get('id') || url.searchParams.get('orderCode');
 
-  // GET: Fetch recent orders (for admin dashboard)
+  // ==========================================
+  // GET: Order Tracking (Public) OR Admin Order Listing (Protected)
+  // ==========================================
   if (req.method === 'GET') {
-    try {
+    // 1. Public Order Tracking Lookup
+    if (trackParam) {
+      const cleanTrack = trackParam.trim().toUpperCase();
       if (!sql) {
-        return res.status(200).json({ source: 'local', orders: [], message: 'DATABASE_URL not set' });
+        return res.status(503).json({
+          success: false,
+          error: 'Database connection is currently unavailable for live tracking lookup.'
+        });
       }
 
+      try {
+        const orderRows = await sql`
+          SELECT id, order_code as "orderCode", customer_name as "customerName",
+                 customer_phone as "customerPhone", customer_address as "customerAddress",
+                 customer_city as "customerCity", payment_method as "paymentMethod",
+                 subtotal, shipping_fee as "shippingFee", grand_total as "grandTotal",
+                 status, courier, tracking_number as "trackingNumber", notes, created_at as "createdAt"
+          FROM orders
+          WHERE UPPER(order_code) = ${cleanTrack} OR customer_phone = ${cleanTrack} OR tracking_number = ${cleanTrack}
+          ORDER BY created_at DESC
+          LIMIT 1
+        `;
+
+        if (!orderRows || orderRows.length === 0) {
+          return res.status(404).json({ success: false, error: 'No order found matching this Order ID or Phone number.' });
+        }
+
+        const order = orderRows[0];
+        const itemRows = await sql`
+          SELECT id, product_id as "productId", title, price, qty, total
+          FROM order_items
+          WHERE order_id = ${order.id}
+        `;
+        order.items = itemRows || [];
+
+        return res.status(200).json({ success: true, order });
+      } catch (err) {
+        console.error('Order tracking error:', err);
+        return res.status(500).json({ success: false, error: err.message });
+      }
+    }
+
+    // 2. Admin Order Listing (Protected by JWT)
+    const adminUser = verifyAuthToken(req);
+    if (!adminUser) {
+      return res.status(401).json({ success: false, error: 'Unauthorized: Admin authentication required to list orders.' });
+    }
+
+    if (!sql) {
+      return res.status(503).json({ success: false, error: 'Database service is currently unconfigured.' });
+    }
+
+    try {
       const orders = await sql`
-        SELECT * FROM orders ORDER BY created_at DESC LIMIT 50
+        SELECT id, order_code as "orderCode", customer_name as "customerName",
+               customer_phone as "customerPhone", customer_address as "customerAddress",
+               customer_city as "customerCity", payment_method as "paymentMethod",
+               subtotal, shipping_fee as "shippingFee", grand_total as "grandTotal",
+               status, courier, tracking_number as "trackingNumber", notes, created_at as "createdAt"
+        FROM orders
+        ORDER BY created_at DESC
+        LIMIT 100
       `;
-      return res.status(200).json({ source: 'neon', count: orders.length, orders });
+
+      return res.status(200).json({ success: true, count: orders.length, orders });
     } catch (err) {
-      return res.status(500).json({ error: err.message });
+      return res.status(500).json({ success: false, error: err.message });
     }
   }
 
-  // POST: Create a new order
+  // ==========================================
+  // POST: Create Order (Customer Checkout with Server-side Price Recalculation)
+  // ==========================================
   if (req.method === 'POST') {
     try {
       let body = req.body;
@@ -36,68 +153,143 @@ module.exports = async function handler(req, res) {
       }
 
       const {
-        orderId,
         customerName,
         customerPhone,
         customerAddress,
         customerCity,
-        paymentMethod,
-        subtotal,
-        shippingFee,
-        grandTotal,
+        paymentMethod = 'COD',
         items,
-        notes
-      } = body;
+        notes = ''
+      } = body || {};
 
-      const orderCode = orderId || ('SS-' + Math.floor(100000 + Math.random() * 900000));
-
-      if (sql) {
-        // Insert main order record
-        const orderResult = await sql`
-          INSERT INTO orders (
-            order_code, customer_name, customer_phone, customer_address, customer_city,
-            payment_method, subtotal, shipping_fee, grand_total, status, notes
-          )
-          VALUES (
-            ${orderCode}, ${customerName || 'Customer'}, ${customerPhone || ''}, ${customerAddress || ''},
-            ${customerCity || 'Karachi'}, ${paymentMethod || 'COD'}, ${subtotal || 0}, ${shippingFee || 0},
-            ${grandTotal || 0}, 'Pending', ${notes || ''}
-          )
-          RETURNING *
-        `;
-
-        const createdOrder = orderResult[0];
-
-        // Insert order items if present
-        if (Array.isArray(items) && items.length > 0) {
-          for (const item of items) {
-            await sql`
-              INSERT INTO order_items (order_id, product_id, title, price, qty, total)
-              VALUES (
-                ${createdOrder.id}, ${item.id || null}, ${item.title || 'Item'},
-                ${item.price || 0}, ${item.qty || 1}, ${(item.price || 0) * (item.qty || 1)}
-              )
-            `;
-          }
-        }
-
-        return res.status(201).json({
-          success: true,
-          orderId: orderCode,
-          order: createdOrder,
-          message: 'Order saved successfully to Neon Database!'
-        });
-      } else {
-        // Fallback response when DATABASE_URL is not configured yet
-        return res.status(200).json({
-          success: true,
-          orderId: orderCode,
-          message: 'Order processed successfully (Offline / Local Mode).'
+      if (!customerName || !customerPhone || !customerAddress) {
+        return res.status(400).json({
+          success: false,
+          error: 'Customer name, phone number, and delivery address are required.'
         });
       }
+
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Cart items are required to place an order.'
+        });
+      }
+
+      // Check Database Connection FIRST — Do NOT return fake success if DB is missing
+      if (!sql) {
+        return res.status(503).json({
+          success: false,
+          error: 'Database service is currently unavailable. Order could not be saved.'
+        });
+      }
+
+      // 1. Authoritative Server-Side Price & Quantity Recalculation
+      let serverSubtotal = 0;
+      const verifiedItems = [];
+
+      for (const item of items) {
+        const prodId = item.id || item.code;
+        const lookup = await lookupProduct(sql, prodId);
+        
+        const unitPrice = lookup ? lookup.price : (parseFloat(item.price) || 0);
+        const quantity = Math.max(1, parseInt(item.qty || item.quantity || 1, 10));
+        const itemTitle = lookup ? lookup.title : (item.title || 'Product');
+        const itemTotal = unitPrice * quantity;
+
+        serverSubtotal += itemTotal;
+        verifiedItems.push({
+          productId: lookup ? lookup.id : null,
+          title: itemTitle,
+          price: unitPrice,
+          qty: quantity,
+          total: itemTotal
+        });
+      }
+
+      const serverShippingFee = serverSubtotal >= 3000 ? 0 : 200;
+      const serverGrandTotal = serverSubtotal + serverShippingFee;
+      const orderCode = 'SS-' + Math.floor(100000 + Math.random() * 900000);
+
+      // 2. Transactional Persistence to Database
+      const orderResult = await sql`
+        INSERT INTO orders (
+          order_code, customer_name, customer_phone, customer_address, customer_city,
+          payment_method, subtotal, shipping_fee, grand_total, status, notes
+        )
+        VALUES (
+          ${orderCode}, ${customerName.trim()}, ${customerPhone.trim()}, ${customerAddress.trim()},
+          ${customerCity || 'Karachi'}, ${paymentMethod}, ${serverSubtotal}, ${serverShippingFee},
+          ${serverGrandTotal}, 'Pending', ${notes}
+        )
+        RETURNING id, order_code as "orderCode", subtotal, shipping_fee as "shippingFee", grand_total as "grandTotal", status, created_at as "createdAt"
+      `;
+
+      const createdOrder = orderResult[0];
+
+      // 3. Insert Verified Order Items
+      for (const vItem of verifiedItems) {
+        await sql`
+          INSERT INTO order_items (order_id, product_id, title, price, qty, total)
+          VALUES (
+            ${createdOrder.id}, ${vItem.productId}, ${vItem.title},
+            ${vItem.price}, ${vItem.qty}, ${vItem.total}
+          )
+        `;
+      }
+
+      return res.status(201).json({
+        success: true,
+        orderId: orderCode,
+        subtotal: serverSubtotal,
+        shippingFee: serverShippingFee,
+        grandTotal: serverGrandTotal,
+        order: {
+          ...createdOrder,
+          items: verifiedItems
+        },
+        message: 'Order created and persisted successfully!'
+      });
     } catch (err) {
       console.error('Order creation error:', err);
-      return res.status(500).json({ error: err.message });
+      return res.status(500).json({ success: false, error: `Failed to save order: ${err.message}` });
+    }
+  }
+
+  // ==========================================
+  // PUT / PATCH: Update Order Status / Tracking (Protected by JWT)
+  // ==========================================
+  if (req.method === 'PUT' || req.method === 'PATCH') {
+    const adminUser = verifyAuthToken(req);
+    if (!adminUser) {
+      return res.status(401).json({ success: false, error: 'Unauthorized: Admin authentication required to update orders.' });
+    }
+
+    if (!sql) {
+      return res.status(503).json({ success: false, error: 'Database service is currently unavailable.' });
+    }
+
+    try {
+      let body = req.body;
+      if (typeof body === 'string') body = JSON.parse(body);
+
+      const { orderId, status, courier, trackingNumber } = body || {};
+      if (!orderId) {
+        return res.status(400).json({ success: false, error: 'orderId is required.' });
+      }
+
+      await sql`
+        UPDATE orders
+        SET status = COALESCE(${status}, status),
+            courier = COALESCE(${courier}, courier),
+            tracking_number = COALESCE(${trackingNumber}, tracking_number),
+            updated_at = NOW()
+        WHERE order_code = ${orderId} OR id::text = ${orderId}
+      `;
+
+      return res.status(200).json({ success: true, message: `Order #${orderId} updated successfully.` });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
     }
   }
 

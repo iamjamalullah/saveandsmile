@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Save &amp; Smile — Visual Page Builder (Elementor/Divi Style)</title>
+  <link rel="icon" type="image/png" href="images/save-and-smile-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            brand: { teal: '#064C63', cyan: '#008FAF' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      background-color: #0f172a;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    .canvas-device-desktop { width: 100%; max-width: 100%; }
+    .canvas-device-tablet { width: 768px; max-width: 768px; margin: 0 auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+    .canvas-device-mobile { width: 375px; max-width: 375px; margin: 0 auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border-radius: 24px; border: 8px solid #1e293b; }
+
+    .editable-element:hover {
+      outline: 2px dashed #008FAF;
+      outline-offset: 2px;
+      cursor: pointer;
+    }
+    .editable-element.selected {
+      outline: 2px solid #008FAF !important;
+      outline-offset: 2px;
+      position: relative;
+    }
+    .editable-element.selected::after {
+      content: attr(data-widget-type);
+      position: absolute;
+      top: -18px;
+      left: 0;
+      background: #008FAF;
+      color: white;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .section-block {
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .section-block:hover .section-tools {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .section-tools {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 40;
+    }
+    [contenteditable="true"]:focus {
+      outline: 2px solid #38bdf8 !important;
+      background: rgba(56, 189, 248, 0.1);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex flex-col select-none text-slate-100 overflow-hidden">
+
+  <!-- ============================================================ -->
+  <!-- TOP BUILDER TOOLBAR -->
+  <!-- ============================================================ -->
+  <header class="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-50">
+    <div class="flex items-center space-x-3">
+      <!-- Back to Admin Dashboard -->
+      <a href="admin.html" class="flex items-center space-x-2 text-xs font-bold text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-xl border border-slate-700 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        <span>Exit to Admin</span>
+      </a>
+
+      <div class="h-5 w-px bg-slate-700"></div>
+
+      <!-- Page Target Selector -->
+      <div class="flex items-center space-x-2 text-xs">
+        <span class="text-slate-400 font-medium">Page:</span>
+        <select id="builderPageSelect" onchange="switchBuilderPage(this.value)" class="bg-slate-800 border border-slate-700 text-white rounded-lg px-2.5 py-1 font-semibold text-xs focus:ring-1 focus:ring-cyan-500">
+          <option value="homepage">Homepage (Storefront Main)</option>
+          <option value="product-page">Product Page Template</option>
+          <option value="mega-sale">Mega Wholesale Sale Landing</option>
+          <option value="announcement-bar">Global Header &amp; Top Bar</option>
+          <option value="footer-builder">Footer &amp; Trust Badges</option>
+        </select>
+        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">Live Sync</span>
+      </div>
+    </div>
+
+    <!-- Center: Viewport Devices & Undo/Redo -->
+    <div class="flex items-center space-x-2">
+      <!-- Device Switchers -->
+      <div class="bg-slate-800 p-1 rounded-xl border border-slate-700 flex items-center space-x-1 text-xs">
+        <button onclick="setCanvasDevice('desktop')" id="devBtn-desktop" class="p-1.5 rounded-lg bg-teal-800 text-cyan-300 font-bold shadow-xs flex items-center space-x-1" title="Desktop View (100%)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span class="text-[11px] hidden sm:inline">Desktop</span>
+        </button>
+        <button onclick="setCanvasDevice('tablet')" id="devBtn-tablet" class="p-1.5 rounded-lg text-slate-400 hover:text-white font-medium flex items-center space-x-1" title="Tablet View (768px)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          <span class="text-[11px] hidden sm:inline">Tablet</span>
+        </button>
+        <button onclick="setCanvasDevice('mobile')" id="devBtn-mobile" class="p-1.5 rounded-lg text-slate-400 hover:text-white font-medium flex items-center space-x-1" title="Mobile View (375px)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          <span class="text-[11px] hidden sm:inline">Mobile</span>
+        </button>
+      </div>
+
+      <div class="h-5 w-px bg-slate-700"></div>
+
+      <!-- Undo / Redo -->
+      <div class="flex items-center space-x-1">
+        <button onclick="builderUndo()" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 text-xs" title="Undo (Ctrl+Z)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2M3 10l6 6m-6-6l6-6"/></svg>
+        </button>
+        <button onclick="builderRedo()" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 text-xs" title="Redo (Ctrl+Y)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 10h-10a5 5 0 00-5 5v2m15-7l-6 6m6-6l-6-6"/></svg>
+        </button>
+      </div>
+
+      <!-- Navigator & History Drawer Toggles -->
+      <button onclick="toggleNavigatorModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-cyan-300 rounded-lg border border-slate-700 text-xs font-bold flex items-center space-x-1" title="Elementor Navigator Tree">
+        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h8m-8 6h16"/></svg>
+        <span>Navigator</span>
+      </button>
+    </div>
+
+    <!-- Right: Preview, Save Draft & Publish Live -->
+    <div class="flex items-center space-x-2">
+      <button onclick="togglePreviewMode()" id="previewBtn" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold border border-slate-700 flex items-center space-x-1.5 transition">
+        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+        <span>Preview</span>
+      </button>
+
+      <button onclick="saveBuilderDraft()" class="px-3.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-bold shadow-xs transition">
+        Save Draft
+      </button>
+
+      <button onclick="publishBuilderLive()" class="px-4 py-1.5 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white font-black rounded-xl text-xs flex items-center space-x-1.5 shadow-md transition">
+        <svg class="w-3.5 h-3.5 text-amber-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+        <span>Publish Live</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- MAIN WORKSPACE: WIDGETS (LEFT) + CANVAS (CENTER) + INSPECTOR (RIGHT) -->
+  <!-- ============================================================ -->
+  <div class="flex-1 flex min-h-0 overflow-hidden relative">
+
+    <!-- 1. LEFT PANEL: WIDGET LIBRARY DRAWER -->
+    <aside id="builderWidgetsPanel" class="w-72 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 z-20">
+      <!-- Search & Tabs -->
+      <div class="p-3 border-b border-slate-800 space-y-2">
+        <div class="relative">
+          <input type="text" id="widgetSearchInput" oninput="filterWidgetsList(this.value)" placeholder="Search widgets..." class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-1.5 pl-8 text-xs focus:ring-1 focus:ring-cyan-500">
+          <svg class="w-4 h-4 text-slate-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+      </div>
+
+      <!-- Scrollable Widgets Tree -->
+      <div class="flex-1 overflow-y-auto p-3 space-y-4 text-xs">
+        
+        <!-- Category: Layout -->
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-2">1. Layout &amp; Structure</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div onclick="addWidgetToCanvas('section')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-500 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-cyan-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Section</span>
+            </div>
+            <div onclick="addWidgetToCanvas('columns-2')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-500 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-cyan-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4v16m6-16v16M4 4h16v16H4z"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">2 Columns</span>
+            </div>
+            <div onclick="addWidgetToCanvas('spacer')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-500 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-slate-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Spacer</span>
+            </div>
+            <div onclick="addWidgetToCanvas('divider')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-500 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-slate-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Divider</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Basic Elements -->
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-2">2. Basic Elements</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div onclick="addWidgetToCanvas('heading')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-500 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-teal-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 4h10M12 4v16"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Heading</span>
+            </div>
+            <div onclick="addWidgetToCanvas('text')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-500 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-teal-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h10"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Rich Text</span>
+            </div>
+            <div onclick="addWidgetToCanvas('button')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-500 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-teal-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Button</span>
+            </div>
+            <div onclick="addWidgetToCanvas('image')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-500 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-teal-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Image</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: E-Commerce Widgets -->
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-2">3. E-Commerce Elements</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div onclick="addWidgetToCanvas('product-grid')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-emerald-500 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-emerald-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Product Grid</span>
+            </div>
+            <div onclick="addWidgetToCanvas('featured-deal')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-emerald-500 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-emerald-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Flash Deal</span>
+            </div>
+            <div onclick="addWidgetToCanvas('trust-badges')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-emerald-500 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-emerald-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Trust Badges</span>
+            </div>
+            <div onclick="addWidgetToCanvas('whatsapp-cta')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-emerald-500 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-emerald-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">WhatsApp Bar</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Marketing & Social -->
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-2">4. Marketing &amp; Reviews</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div onclick="addWidgetToCanvas('reviews-slider')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-amber-500 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-amber-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Reviews</span>
+            </div>
+            <div onclick="addWidgetToCanvas('faq-accordion')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-amber-500 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-amber-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">FAQ Accordion</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category: Enterprise Agency & Studio Sections (Tech Advizer Engine) -->
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider text-cyan-400 block mb-2">5. Enterprise Dynamic Sections</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div onclick="addWidgetToCanvas('hero_section')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-400 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-cyan-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM4 20h16"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Hero Section</span>
+            </div>
+            <div onclick="addWidgetToCanvas('featured_services')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-400 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-indigo-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Agency Services</span>
+            </div>
+            <div onclick="addWidgetToCanvas('category_grid')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-400 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-cyan-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Category Grid</span>
+            </div>
+            <div onclick="addWidgetToCanvas('featured_products')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-400 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-emerald-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Gear Catalog</span>
+            </div>
+            <div onclick="addWidgetToCanvas('promo_banner')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-400 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-rose-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Promo Banner</span>
+            </div>
+            <div onclick="addWidgetToCanvas('creator_spotlight')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-400 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-purple-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Creator Spotlight</span>
+            </div>
+            <div onclick="addWidgetToCanvas('trust_badges')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-400 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-teal-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Trust Badges</span>
+            </div>
+            <div onclick="addWidgetToCanvas('testimonials')" class="widget-card p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 hover:border-cyan-400 rounded-xl flex flex-col items-center text-center cursor-pointer transition">
+              <svg class="w-5 h-5 text-amber-400 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              <span class="font-bold text-slate-200 text-[11px]">Client Reviews</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- 2. CENTER: LIVE WEBPAGE CANVAS -->
+    <main id="builderCanvasArea" class="flex-1 bg-slate-950 overflow-y-auto p-4 sm:p-8 flex justify-center items-start">
+      <div id="canvasViewport" class="canvas-device-desktop bg-white text-slate-900 min-h-[90vh] shadow-2xl transition-all duration-300 relative">
+        
+        <!-- Canvas Container Wrapper -->
+        <div id="canvasElementsRoot" class="space-y-0">
+          
+          <!-- Sample Section 1: Top Announcement Bar -->
+          <div class="section-block bg-teal-900 text-teal-100 py-2.5 px-4 text-xs font-bold text-center flex items-center justify-between" id="sec-announcement">
+            <div class="editable-element flex-1 text-center" data-widget-type="announcement" onclick="selectElementForEdit(this, 'announcement')">
+              🔥 MEGA WHOLESALE SALE IS LIVE! FREE DELIVERY OVER RS. 3,000 | CASH ON DELIVERY ALL OVER PAKISTAN
+            </div>
+            <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+              <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white" title="Move Up">↑</button>
+              <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white" title="Move Down">↓</button>
+              <button onclick="duplicateSection(this)" class="p-1 hover:text-cyan-400 text-white" title="Duplicate">❐</button>
+              <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white" title="Delete">✕</button>
+            </div>
+          </div>
+
+          <!-- Sample Section 2: Store Header Visual -->
+          <div class="section-block bg-white border-b border-slate-200 py-4 px-6 flex items-center justify-between" id="sec-header">
+            <div class="editable-element flex items-center space-x-2" data-widget-type="branding" onclick="selectElementForEdit(this, 'branding')">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#064C63] to-[#008FAF] flex items-center justify-center text-white font-black text-xs shadow-md">S&amp;S</div>
+              <span class="font-black text-lg text-slate-900 tracking-tight">SAVE &amp; SMILE</span>
+            </div>
+            <div class="editable-element flex items-center space-x-4 text-xs font-bold text-slate-700" data-widget-type="nav" onclick="selectElementForEdit(this, 'nav')">
+              <a href="#" class="hover:text-teal-800">Home</a>
+              <a href="#" class="hover:text-teal-800">Shop Catalog</a>
+              <a href="#" class="hover:text-teal-800">Hot Deals</a>
+              <a href="#" class="hover:text-teal-800">Track Order</a>
+            </div>
+            <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+              <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+              <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+              <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+            </div>
+          </div>
+
+          <!-- Sample Section 3: Hero Banner -->
+          <div class="section-block bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 text-white py-14 px-6 sm:px-12 text-center" id="sec-hero">
+            <div class="max-w-2xl mx-auto space-y-4">
+              <span class="editable-element inline-block px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-xs font-black tracking-wider uppercase border border-cyan-500/30" data-widget-type="badge" onclick="selectElementForEdit(this, 'badge')">
+                Wholesale Direct Prices
+              </span>
+              <h1 class="editable-element text-3xl sm:text-4xl font-black tracking-tight leading-tight" data-widget-type="heading" onclick="selectElementForEdit(this, 'heading')">
+                Premium Everyday Essentials &amp; Gadgets in Pakistan
+              </h1>
+              <p class="editable-element text-xs sm:text-sm text-slate-300" data-widget-type="text" onclick="selectElementForEdit(this, 'text')">
+                Get up to 70% off on storage organizers, kitchen tools, smart accessories and home utilities. Fast COD delivery nationwide.
+              </p>
+              <div class="pt-2">
+                <button class="editable-element px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-slate-950 font-black rounded-xl text-xs shadow-lg hover:brightness-110 transition cursor-pointer" data-widget-type="button" onclick="selectElementForEdit(this, 'button')">
+                  Shop Best Sellers Now →
+                </button>
+              </div>
+            </div>
+            <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+              <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+              <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+              <button onclick="duplicateSection(this)" class="p-1 hover:text-cyan-400 text-white">❐</button>
+              <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+            </div>
+          </div>
+
+          <!-- Sample Section 4: Live Product Grid Widget -->
+          <div class="section-block py-10 px-6 sm:px-10 bg-slate-50" id="sec-products">
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <h2 class="editable-element text-xl font-black text-slate-900 tracking-tight" data-widget-type="heading" onclick="selectElementForEdit(this, 'heading')">
+                  Trending Best Sellers
+                </h2>
+                <p class="editable-element text-xs text-slate-500" data-widget-type="text" onclick="selectElementForEdit(this, 'text')">
+                  Top trending wholesale products on Save &amp; Smile store.
+                </p>
+              </div>
+              <span class="text-xs font-bold text-teal-800">View All Catalog →</span>
+            </div>
+
+            <!-- Dynamic Product Cards Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="canvasProductGrid">
+              <!-- Card 1 -->
+              <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+                <img src="https://www.qadrigadgets.pk/images/product_gallery/md_1779176038_May_19,_2026,_12_33_14_PM.png" class="w-full h-32 object-contain rounded-xl bg-slate-50">
+                <span class="px-2 py-0.5 bg-rose-100 text-rose-800 text-[10px] font-bold rounded">HOT SELLER</span>
+                <p class="text-xs font-bold text-slate-800 truncate">Multipurpose Kitchen Shelf Rack</p>
+                <div class="flex items-baseline space-x-1.5">
+                  <span class="text-sm font-black text-slate-900">Rs. 180</span>
+                  <span class="text-[10px] text-slate-400 line-through">Rs. 870</span>
+                </div>
+                <button class="w-full py-1.5 bg-teal-800 text-white text-[11px] font-bold rounded-lg">Add to Cart</button>
+              </div>
+              <!-- Card 2 -->
+              <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+                <img src="https://www.qadrigadgets.pk/images/product_gallery/md_1779102101_ChatGPT_Image_May_18,_2026,_04_01_02_PM.png" class="w-full h-32 object-contain rounded-xl bg-slate-50">
+                <span class="px-2 py-0.5 bg-teal-100 text-teal-800 text-[10px] font-bold rounded">TOP TRENDING</span>
+                <p class="text-xs font-bold text-slate-800 truncate">Universal Waterproof Bike Cover</p>
+                <div class="flex items-baseline space-x-1.5">
+                  <span class="text-sm font-black text-slate-900">Rs. 400</span>
+                  <span class="text-[10px] text-slate-400 line-through">Rs. 1,100</span>
+                </div>
+                <button class="w-full py-1.5 bg-teal-800 text-white text-[11px] font-bold rounded-lg">Add to Cart</button>
+              </div>
+              <!-- Card 3 -->
+              <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+                <img src="https://www.qadrigadgets.pk/images/product_gallery/md_1779101219_ChatGPT_Image_May_18,_2026,_03_46_14_PM.png" class="w-full h-32 object-contain rounded-xl bg-slate-50">
+                <span class="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded">ORGANIZER</span>
+                <p class="text-xs font-bold text-slate-800 truncate">Socks Wardrobe Divider Box</p>
+                <div class="flex items-baseline space-x-1.5">
+                  <span class="text-sm font-black text-slate-900">Rs. 180</span>
+                  <span class="text-[10px] text-slate-400 line-through">Rs. 450</span>
+                </div>
+                <button class="w-full py-1.5 bg-teal-800 text-white text-[11px] font-bold rounded-lg">Add to Cart</button>
+              </div>
+              <!-- Card 4 -->
+              <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+                <img src="https://www.qadrigadgets.pk/images/product_gallery/md_1779100539_ChatGPT_Image_May_18,_2026,_03_35_18_PM.png" class="w-full h-32 object-contain rounded-xl bg-slate-50">
+                <span class="px-2 py-0.5 bg-cyan-100 text-cyan-800 text-[10px] font-bold rounded">BEST SELLER</span>
+                <p class="text-xs font-bold text-slate-800 truncate">Pink Transparent Cosmetic Pouch</p>
+                <div class="flex items-baseline space-x-1.5">
+                  <span class="text-sm font-black text-slate-900">Rs. 80</span>
+                  <span class="text-[10px] text-slate-400 line-through">Rs. 250</span>
+                </div>
+                <button class="w-full py-1.5 bg-teal-800 text-white text-[11px] font-bold rounded-lg">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+              <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+              <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+              <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+            </div>
+          </div>
+
+          <!-- Sample Section 5: Trust & Guarantee Bar -->
+          <div class="section-block bg-teal-950 text-white py-8 px-6 sm:px-12 border-t border-teal-900" id="sec-trust">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+              <div class="editable-element flex items-center space-x-3 justify-center md:justify-start" data-widget-type="trust-item" onclick="selectElementForEdit(this, 'trust-item')">
+                <div class="w-10 h-10 rounded-xl bg-teal-900 flex items-center justify-center text-cyan-400 text-lg">🛡️</div>
+                <div>
+                  <h4 class="font-bold text-xs">7 Days Checking Warranty</h4>
+                  <p class="text-[11px] text-slate-400">Easy claim &amp; replacement support</p>
+                </div>
+              </div>
+              <div class="editable-element flex items-center space-x-3 justify-center md:justify-start" data-widget-type="trust-item" onclick="selectElementForEdit(this, 'trust-item')">
+                <div class="w-10 h-10 rounded-xl bg-teal-900 flex items-center justify-center text-cyan-400 text-lg">🚚</div>
+                <div>
+                  <h4 class="font-bold text-xs">Cash on Delivery Available</h4>
+                  <p class="text-[11px] text-slate-400">Pay cash upon delivery at your doorstep</p>
+                </div>
+              </div>
+              <div class="editable-element flex items-center space-x-3 justify-center md:justify-start" data-widget-type="trust-item" onclick="selectElementForEdit(this, 'trust-item')">
+                <div class="w-10 h-10 rounded-xl bg-teal-900 flex items-center justify-center text-cyan-400 text-lg">💬</div>
+                <div>
+                  <h4 class="font-bold text-xs">24/7 WhatsApp Support</h4>
+                  <p class="text-[11px] text-slate-400">Direct helpline: 0316-2323616</p>
+                </div>
+              </div>
+            </div>
+            <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+              <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+              <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+              <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Add Section Button Placeholder at Bottom -->
+        <div class="p-6 bg-slate-900/10 border-2 border-dashed border-slate-300 text-center m-4 rounded-2xl hover:border-cyan-500 transition cursor-pointer" onclick="openAddSectionPrompt()">
+          <span class="text-xs font-bold text-slate-600 hover:text-cyan-700">+ Click here to Add New Section / Block</span>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- 3. RIGHT PANEL: ELEMENTOR-STYLE INSPECTOR -->
+    <aside id="builderInspectorPanel" class="w-80 bg-slate-900 border-l border-slate-800 flex flex-col shrink-0 z-20">
+      
+      <!-- Inspector Tabs (Content / Style / Advanced / Responsive) -->
+      <div class="flex items-center border-b border-slate-800 text-xs font-bold bg-slate-950/60">
+        <button onclick="switchInspectorTab('content')" id="tabBtn-content" class="flex-1 py-3 text-center text-cyan-400 border-b-2 border-cyan-400">Content</button>
+        <button onclick="switchInspectorTab('style')" id="tabBtn-style" class="flex-1 py-3 text-center text-slate-400 hover:text-white">Style</button>
+        <button onclick="switchInspectorTab('advanced')" id="tabBtn-advanced" class="flex-1 py-3 text-center text-slate-400 hover:text-white">Advanced</button>
+        <button onclick="switchInspectorTab('responsive')" id="tabBtn-responsive" class="flex-1 py-3 text-center text-slate-400 hover:text-white">Device</button>
+      </div>
+
+      <!-- Inspector Body -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
+        
+        <!-- Active Selection Header -->
+        <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700/80 flex items-center justify-between">
+          <div>
+            <span class="text-[9px] font-black uppercase text-cyan-400 tracking-wider">Active Element:</span>
+            <p class="font-bold text-white text-xs truncate" id="inspectorActiveTitle">Heading / Title</p>
+          </div>
+          <button onclick="deselectElement()" class="text-slate-400 hover:text-white text-xs font-bold">✕</button>
+        </div>
+
+        <!-- TAB 1: CONTENT -->
+        <div id="inspectorTab-content" class="space-y-4">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 mb-1">Text Content</label>
+            <textarea id="inspectTextVal" oninput="applyInspectorChanges('text')" rows="3" class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl p-2.5 text-xs focus:ring-1 focus:ring-cyan-500"></textarea>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 mb-1">Target Link URL</label>
+            <input type="text" id="inspectLinkVal" oninput="applyInspectorChanges('link')" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl p-2 text-xs">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 mb-1">Text Alignment</label>
+            <div class="grid grid-cols-3 gap-1 bg-slate-800 p-1 rounded-xl border border-slate-700">
+              <button onclick="applyAlignment('text-left')" class="py-1 text-center font-bold text-slate-300 hover:text-white rounded hover:bg-slate-700">Left</button>
+              <button onclick="applyAlignment('text-center')" class="py-1 text-center font-bold text-slate-300 hover:text-white rounded hover:bg-slate-700">Center</button>
+              <button onclick="applyAlignment('text-right')" class="py-1 text-center font-bold text-slate-300 hover:text-white rounded hover:bg-slate-700">Right</button>
+            </div>
+          </div>
+
+          <!-- Media Asset Engine (Dual-Source & Video) -->
+          <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2.5">
+            <span class="text-[10px] font-black uppercase text-cyan-400 tracking-wider block">Media Engine (Desktop &amp; Mobile)</span>
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-400 mb-0.5">Desktop Image URL (1920×800)</label>
+              <input type="text" id="inspectMediaDesktop" oninput="applyInspectorChanges('mediaDesktop')" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg p-1.5 text-xs">
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-400 mb-0.5">Mobile Image URL (750×1000)</label>
+              <input type="text" id="inspectMediaMobile" oninput="applyInspectorChanges('mediaMobile')" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg p-1.5 text-xs">
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-400 mb-0.5">Video Embed URL (MP4 / YouTube)</label>
+              <input type="text" id="inspectMediaVideo" oninput="applyInspectorChanges('mediaVideo')" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg p-1.5 text-xs">
+            </div>
+            <div>
+              <div class="flex justify-between items-center text-[10px] text-slate-400 mb-1">
+                <span>Dark Overlay Opacity</span>
+                <span id="inspectOverlayVal" class="font-bold text-cyan-400">50%</span>
+              </div>
+              <input type="range" id="inspectOverlayRange" min="0" max="100" value="50" oninput="applyInspectorChanges('overlayOpacity')" class="w-full accent-cyan-400 cursor-pointer">
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: STYLE -->
+        <div id="inspectorTab-style" class="space-y-4 hidden">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 mb-1">Text Color</label>
+            <div class="flex items-center space-x-2">
+              <input type="color" id="inspectColorVal" onchange="applyInspectorChanges('color')" value="#0f172a" class="w-8 h-8 rounded-lg border-0 bg-transparent cursor-pointer">
+              <input type="text" id="inspectColorHex" oninput="applyInspectorChanges('colorHex')" value="#0f172a" class="flex-1 bg-slate-800 border border-slate-700 rounded-lg p-1.5 text-xs font-mono">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 mb-1">Font Size</label>
+            <select id="inspectFontSize" onchange="applyInspectorChanges('fontSize')" class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl p-2 text-xs">
+              <option value="text-xs">Small (12px)</option>
+              <option value="text-sm">Medium (14px)</option>
+              <option value="text-base">Regular (16px)</option>
+              <option value="text-xl">Large (20px)</option>
+              <option value="text-2xl">2X Large (24px)</option>
+              <option value="text-3xl">3X Large (30px)</option>
+              <option value="text-4xl">Hero Heading (36px)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 mb-1">Font Weight</label>
+            <select id="inspectFontWeight" onchange="applyInspectorChanges('fontWeight')" class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl p-2 text-xs">
+              <option value="font-normal">Regular (400)</option>
+              <option value="font-medium">Medium (500)</option>
+              <option value="font-bold">Bold (700)</option>
+              <option value="font-black">Black Extra Bold (900)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- TAB 3: ADVANCED -->
+        <div id="inspectorTab-advanced" class="space-y-4 hidden">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 mb-1">Entrance Animation</label>
+            <select id="inspectAnim" onchange="applyInspectorChanges('anim')" class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl p-2 text-xs">
+              <option value="none">None</option>
+              <option value="animate-pulse">Subtle Pulse</option>
+              <option value="animate-bounce">Attention Bounce</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 mb-1">Custom CSS Class</label>
+            <input type="text" id="inspectCssClass" placeholder="e.g. shadow-2xl rounded-3xl" class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl p-2 text-xs">
+          </div>
+        </div>
+
+        <!-- TAB 4: RESPONSIVE -->
+        <div id="inspectorTab-responsive" class="space-y-3 hidden">
+          <div class="flex items-center justify-between p-2.5 bg-slate-800 rounded-xl border border-slate-700">
+            <span class="text-xs font-semibold">Hide on Desktop</span>
+            <input type="checkbox" id="respHideDesktop" onchange="applyInspectorChanges('resp')" class="w-4 h-4 rounded text-teal-600 bg-slate-900 border-slate-600">
+          </div>
+          <div class="flex items-center justify-between p-2.5 bg-slate-800 rounded-xl border border-slate-700">
+            <span class="text-xs font-semibold">Hide on Tablet</span>
+            <input type="checkbox" id="respHideTablet" onchange="applyInspectorChanges('resp')" class="w-4 h-4 rounded text-teal-600 bg-slate-900 border-slate-600">
+          </div>
+          <div class="flex items-center justify-between p-2.5 bg-slate-800 rounded-xl border border-slate-700">
+            <span class="text-xs font-semibold">Hide on Mobile</span>
+            <input type="checkbox" id="respHideMobile" onchange="applyInspectorChanges('resp')" class="w-4 h-4 rounded text-teal-600 bg-slate-900 border-slate-600">
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- FLOATING ELEMENTOR NAVIGATOR TREE MODAL -->
+  <!-- ============================================================ -->
+  <div id="navigatorModal" class="fixed top-16 right-84 w-72 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl z-40 hidden flex flex-col text-xs max-h-96">
+    <div class="p-3 border-b border-slate-800 flex items-center justify-between font-bold bg-slate-950/80 rounded-t-2xl">
+      <div class="flex items-center space-x-1.5 text-cyan-400">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h8m-8 6h16"/></svg>
+        <span>Page Navigator</span>
+      </div>
+      <button onclick="toggleNavigatorModal()" class="text-slate-400 hover:text-white">✕</button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-2 space-y-1 font-mono text-[11px]" id="navigatorTreeList">
+      <div onclick="highlightSection('sec-announcement')" class="p-2 hover:bg-slate-800 rounded-lg cursor-pointer flex items-center space-x-2 text-slate-300">
+        <span>🔹</span> <span>Top Announcement Bar</span>
+      </div>
+      <div onclick="highlightSection('sec-header')" class="p-2 hover:bg-slate-800 rounded-lg cursor-pointer flex items-center space-x-2 text-slate-300">
+        <span>🔹</span> <span>Store Header &amp; Nav</span>
+      </div>
+      <div onclick="highlightSection('sec-hero')" class="p-2 hover:bg-slate-800 rounded-lg cursor-pointer flex items-center space-x-2 text-slate-300">
+        <span>🔹</span> <span>Hero Banner Section</span>
+      </div>
+      <div onclick="highlightSection('sec-products')" class="p-2 hover:bg-slate-800 rounded-lg cursor-pointer flex items-center space-x-2 text-slate-300">
+        <span>🔹</span> <span>Trending Best Sellers Grid</span>
+      </div>
+      <div onclick="highlightSection('sec-trust')" class="p-2 hover:bg-slate-800 rounded-lg cursor-pointer flex items-center space-x-2 text-slate-300">
+        <span>🔹</span> <span>Trust &amp; Guarantee Strip</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="builderToast" class="fixed bottom-6 right-6 bg-slate-950 text-white text-xs font-bold py-3 px-5 rounded-2xl shadow-2xl flex items-center space-x-2 transform translate-y-24 opacity-0 transition-all duration-300 z-50 border border-slate-800">
+    <span id="builderToastIcon">✅</span>
+    <span id="builderToastMessage">Saved</span>
+  </div>
+
+  <!-- Client Logic for Visual Page Builder -->
+  <script>
+    let activeElement = null;
+    let historyStack = [];
+    let redoStack = [];
+
+    function saveHistorySnapshot() {
+      const rootHtml = document.getElementById('canvasElementsRoot').innerHTML;
+      historyStack.push(rootHtml);
+      if (historyStack.length > 30) historyStack.shift();
+      redoStack = [];
+    }
+
+    function builderUndo() {
+      if (historyStack.length === 0) {
+        showBuilderToast('Nothing to undo');
+        return;
+      }
+      const current = document.getElementById('canvasElementsRoot').innerHTML;
+      redoStack.push(current);
+      const prev = historyStack.pop();
+      document.getElementById('canvasElementsRoot').innerHTML = prev;
+      showBuilderToast('Undo successful', '↩️');
+    }
+
+    function builderRedo() {
+      if (redoStack.length === 0) {
+        showBuilderToast('Nothing to redo');
+        return;
+      }
+      const current = document.getElementById('canvasElementsRoot').innerHTML;
+      historyStack.push(current);
+      const next = redoStack.pop();
+      document.getElementById('canvasElementsRoot').innerHTML = next;
+      showBuilderToast('Redo successful', '↪️');
+    }
+
+    function setCanvasDevice(device) {
+      const vp = document.getElementById('canvasViewport');
+      vp.className = `canvas-device-${device} bg-white text-slate-900 min-h-[90vh] shadow-2xl transition-all duration-300 relative`;
+      
+      ['desktop', 'tablet', 'mobile'].forEach(d => {
+        const btn = document.getElementById('devBtn-' + d);
+        if (d === device) {
+          btn.className = 'p-1.5 rounded-lg bg-teal-800 text-cyan-300 font-bold shadow-xs flex items-center space-x-1';
+        } else {
+          btn.className = 'p-1.5 rounded-lg text-slate-400 hover:text-white font-medium flex items-center space-x-1';
+        }
+      });
+      showBuilderToast(`Switched to ${device.toUpperCase()} view`);
+    }
+
+    function selectElementForEdit(el, type) {
+      if (activeElement) activeElement.classList.remove('selected');
+      activeElement = el;
+      el.classList.add('selected');
+
+      document.getElementById('inspectorActiveTitle').textContent = type.toUpperCase() + ': ' + (el.textContent.trim().substring(0, 20) || 'Element');
+      document.getElementById('inspectTextVal').value = el.innerText || '';
+
+      // Populate media engine if image or media block
+      const imgEl = el.tagName === 'IMG' ? el : el.querySelector('img');
+      if (imgEl) {
+        document.getElementById('inspectMediaDesktop').value = imgEl.src || '';
+        document.getElementById('inspectMediaMobile').value = imgEl.getAttribute('data-mobile-src') || '';
+      }
+      const overlayEl = el.querySelector('.builder-overlay');
+      if (overlayEl) {
+        const opVal = parseInt(overlayEl.getAttribute('data-opacity') || '50', 10);
+        document.getElementById('inspectOverlayRange').value = opVal;
+        document.getElementById('inspectOverlayVal').textContent = opVal + '%';
+      }
+      
+      // Make content inline editable
+      el.contentEditable = "true";
+      el.focus();
+
+      el.onblur = function() {
+        saveHistorySnapshot();
+      };
+    }
+
+    function deselectElement() {
+      if (activeElement) {
+        activeElement.classList.remove('selected');
+        activeElement.contentEditable = "false";
+        activeElement = null;
+      }
+      document.getElementById('inspectorActiveTitle').textContent = 'No element selected';
+      document.getElementById('inspectTextVal').value = '';
+    }
+
+    function switchInspectorTab(tabName) {
+      ['content', 'style', 'advanced', 'responsive'].forEach(t => {
+        const btn = document.getElementById('tabBtn-' + t);
+        const pane = document.getElementById('inspectorTab-' + t);
+        if (t === tabName) {
+          btn.className = 'flex-1 py-3 text-center text-cyan-400 border-b-2 border-cyan-400';
+          pane.classList.remove('hidden');
+        } else {
+          btn.className = 'flex-1 py-3 text-center text-slate-400 hover:text-white';
+          pane.classList.add('hidden');
+        }
+      });
+    }
+
+    function applyInspectorChanges(prop) {
+      if (!activeElement) return;
+      saveHistorySnapshot();
+
+      if (prop === 'text') {
+        activeElement.innerText = document.getElementById('inspectTextVal').value;
+      } else if (prop === 'link') {
+        const link = document.getElementById('inspectLinkVal').value;
+        if (activeElement.tagName === 'A') {
+          activeElement.href = link;
+        } else {
+          const a = activeElement.querySelector('a');
+          if (a) a.href = link;
+        }
+      } else if (prop === 'mediaDesktop') {
+        const url = document.getElementById('inspectMediaDesktop').value;
+        const img = activeElement.tagName === 'IMG' ? activeElement : activeElement.querySelector('img');
+        if (img) img.src = url;
+      } else if (prop === 'mediaMobile') {
+        const url = document.getElementById('inspectMediaMobile').value;
+        const img = activeElement.tagName === 'IMG' ? activeElement : activeElement.querySelector('img');
+        if (img) img.setAttribute('data-mobile-src', url);
+      } else if (prop === 'mediaVideo') {
+        const videoUrl = document.getElementById('inspectMediaVideo').value;
+        const iframe = activeElement.querySelector('iframe');
+        if (iframe) iframe.src = videoUrl;
+      } else if (prop === 'overlayOpacity') {
+        const val = document.getElementById('inspectOverlayRange').value;
+        document.getElementById('inspectOverlayVal').textContent = val + '%';
+        const overlay = activeElement.querySelector('.builder-overlay');
+        if (overlay) {
+          overlay.setAttribute('data-opacity', val);
+          overlay.style.backgroundColor = `rgba(11, 16, 32, ${val / 100})`;
+        }
+      } else if (prop === 'color') {
+        const c = document.getElementById('inspectColorVal').value;
+        activeElement.style.color = c;
+        document.getElementById('inspectColorHex').value = c;
+      } else if (prop === 'colorHex') {
+        const c = document.getElementById('inspectColorHex').value;
+        activeElement.style.color = c;
+      } else if (prop === 'fontSize') {
+        activeElement.className = activeElement.className.replace(/text-(xs|sm|base|lg|xl|2xl|3xl|4xl)/g, '');
+        activeElement.classList.add(document.getElementById('inspectFontSize').value);
+      } else if (prop === 'fontWeight') {
+        activeElement.className = activeElement.className.replace(/font-(normal|medium|bold|black)/g, '');
+        activeElement.classList.add(document.getElementById('inspectFontWeight').value);
+      }
+    }
+
+    function applyAlignment(alignClass) {
+      if (!activeElement) return;
+      saveHistorySnapshot();
+      activeElement.className = activeElement.className.replace(/text-(left|center|right)/g, '');
+      activeElement.classList.add(alignClass);
+    }
+
+    function addWidgetToCanvas(widgetType) {
+      saveHistorySnapshot();
+      const root = document.getElementById('canvasElementsRoot');
+      let newBlock = document.createElement('div');
+      newBlock.className = 'section-block bg-white border-b border-slate-200 relative';
+
+      if (widgetType === 'hero_section') {
+        newBlock.className = 'section-block relative bg-[#0B1020] text-white py-20 px-6 sm:px-12 overflow-hidden border-b border-slate-800';
+        newBlock.innerHTML = `
+          <div class="builder-overlay absolute inset-0 z-0 bg-[#0B1020]/75" data-opacity="75"></div>
+          <div class="relative z-10 max-w-5xl mx-auto text-center space-y-6">
+            <span class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#665CFF]/20 border border-[#665CFF]/40 text-[#39D5E8] text-xs font-black uppercase tracking-widest">
+              ⚡ NEXT-GEN CREATIVE &amp; GAMING STUDIO
+            </span>
+            <h1 class="editable-element text-4xl sm:text-6xl font-black text-[#F8F9FC] tracking-tight leading-none" data-widget-type="hero_headline" onclick="selectElementForEdit(this, 'hero_headline')">
+              Crafting High-Performance Digital Worlds &amp; Esports Hardware
+            </h1>
+            <p class="editable-element text-base sm:text-lg text-[#8490A5] max-w-3xl mx-auto leading-relaxed" data-widget-type="hero_subtitle" onclick="selectElementForEdit(this, 'hero_subtitle')">
+              From bespoke 3D VTuber avatars and broadcast-ready stream identity to engineered mechanical keyboards with zero rounding errors.
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-4 pt-4">
+              <a href="#" class="editable-element px-7 py-3.5 bg-[#665CFF] hover:bg-[#5649ff] text-white font-extrabold rounded-xl shadow-lg shadow-[#665CFF]/30 text-sm transition" data-widget-type="hero_cta" onclick="selectElementForEdit(this, 'hero_cta')">
+                Explore Studio Services
+              </a>
+              <a href="#" class="editable-element px-7 py-3.5 bg-[#141B30] hover:bg-slate-800 text-[#39D5E8] border border-[#39D5E8]/40 font-extrabold rounded-xl text-sm transition" data-widget-type="hero_cta_sec" onclick="selectElementForEdit(this, 'hero_cta_sec')">
+                View Hardware Catalog
+              </a>
+            </div>
+          </div>
+          <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+            <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white" title="Move Up">↑</button>
+            <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white" title="Move Down">↓</button>
+            <button onclick="duplicateSection(this)" class="p-1 hover:text-cyan-400 text-white" title="Duplicate">❐</button>
+            <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white" title="Delete">✕</button>
+          </div>
+        `;
+      } else if (widgetType === 'featured_services') {
+        newBlock.className = 'section-block py-14 px-6 sm:px-12 bg-[#0B1020] text-slate-100 border-b border-slate-800';
+        newBlock.innerHTML = `
+          <div class="max-w-6xl mx-auto space-y-10">
+            <div class="text-center space-y-2">
+              <span class="text-xs font-black uppercase text-[#39D5E8] tracking-widest">CREATIVE STUDIO SOLUTIONS</span>
+              <h2 class="editable-element text-3xl font-black text-white" data-widget-type="heading" onclick="selectElementForEdit(this, 'heading')">Full-Spectrum Agency Services</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="p-6 bg-[#141B30] rounded-2xl border border-slate-800 hover:border-[#665CFF] transition space-y-3">
+                <div class="w-12 h-12 rounded-xl bg-[#665CFF]/20 flex items-center justify-center text-[#39D5E8] text-2xl font-bold">🎭</div>
+                <h3 class="editable-element text-lg font-bold text-white" data-widget-type="service_title" onclick="selectElementForEdit(this, 'service_title')">VTuber &amp; 3D Avatar Modeling</h3>
+                <p class="editable-element text-xs text-[#8490A5] leading-relaxed" data-widget-type="service_desc" onclick="selectElementForEdit(this, 'service_desc')">Bespoke Live2D and 3D VRChat rigs with facial motion capture, expression sets, and stream integration.</p>
+              </div>
+              <div class="p-6 bg-[#141B30] rounded-2xl border border-slate-800 hover:border-[#665CFF] transition space-y-3">
+                <div class="w-12 h-12 rounded-xl bg-[#665CFF]/20 flex items-center justify-center text-[#39D5E8] text-2xl font-bold">🎮</div>
+                <h3 class="editable-element text-lg font-bold text-white" data-widget-type="service_title" onclick="selectElementForEdit(this, 'service_title')">Streamer Branding &amp; Overlays</h3>
+                <p class="editable-element text-xs text-[#8490A5] leading-relaxed" data-widget-type="service_desc" onclick="selectElementForEdit(this, 'service_desc')">Broadcast packages, reactive audio visuals, Twitch panels, stinger transitions, and animated alerts.</p>
+              </div>
+              <div class="p-6 bg-[#141B30] rounded-2xl border border-slate-800 hover:border-[#665CFF] transition space-y-3">
+                <div class="w-12 h-12 rounded-xl bg-[#665CFF]/20 flex items-center justify-center text-[#39D5E8] text-2xl font-bold">⚡</div>
+                <h3 class="editable-element text-lg font-bold text-white" data-widget-type="service_title" onclick="selectElementForEdit(this, 'service_title')">Esports Hardware Engineering</h3>
+                <p class="editable-element text-xs text-[#8490A5] leading-relaxed" data-widget-type="service_desc" onclick="selectElementForEdit(this, 'service_desc')">Ultra-low-latency mechanical keyboards, calibrated analog hall-effect switches, and custom audio rigs.</p>
+              </div>
+            </div>
+          </div>
+          <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+            <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+            <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+            <button onclick="duplicateSection(this)" class="p-1 hover:text-cyan-400 text-white">❐</button>
+            <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+          </div>
+        `;
+      } else if (widgetType === 'category_grid') {
+        newBlock.className = 'section-block py-12 px-6 sm:px-12 bg-slate-900 text-white border-b border-slate-800';
+        newBlock.innerHTML = `
+          <div class="max-w-6xl mx-auto space-y-8">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-black uppercase text-cyan-400 tracking-wider">HARDWARE ECOSYSTEM</span>
+                <h2 class="text-2xl font-black text-white">Featured Gear Categories</h2>
+              </div>
+              <a href="#" class="text-xs font-bold text-cyan-400 hover:underline">View All &rarr;</a>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="p-5 bg-slate-800/80 rounded-2xl border border-slate-700 text-center hover:border-cyan-400 transition cursor-pointer">
+                <span class="text-3xl block mb-2">⌨️</span>
+                <h4 class="font-bold text-sm text-white">Keyboards &amp; Switches</h4>
+                <p class="text-[10px] text-slate-400 mt-1">18 Products</p>
+              </div>
+              <div class="p-5 bg-slate-800/80 rounded-2xl border border-slate-700 text-center hover:border-cyan-400 transition cursor-pointer">
+                <span class="text-3xl block mb-2">🎙️</span>
+                <h4 class="font-bold text-sm text-white">Broadcast Audio</h4>
+                <p class="text-[10px] text-slate-400 mt-1">12 Products</p>
+              </div>
+              <div class="p-5 bg-slate-800/80 rounded-2xl border border-slate-700 text-center hover:border-cyan-400 transition cursor-pointer">
+                <span class="text-3xl block mb-2">🖱️</span>
+                <h4 class="font-bold text-sm text-white">Wireless Mice</h4>
+                <p class="text-[10px] text-slate-400 mt-1">14 Products</p>
+              </div>
+              <div class="p-5 bg-slate-800/80 rounded-2xl border border-slate-700 text-center hover:border-cyan-400 transition cursor-pointer">
+                <span class="text-3xl block mb-2">💡</span>
+                <h4 class="font-bold text-sm text-white">Studio Lighting</h4>
+                <p class="text-[10px] text-slate-400 mt-1">9 Products</p>
+              </div>
+            </div>
+          </div>
+          <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+            <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+            <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+            <button onclick="duplicateSection(this)" class="p-1 hover:text-cyan-400 text-white">❐</button>
+            <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+          </div>
+        `;
+      } else if (widgetType === 'featured_products') {
+        newBlock.className = 'section-block py-14 px-6 sm:px-12 bg-[#0B1020] border-b border-slate-800 text-white';
+        newBlock.innerHTML = `
+          <div class="max-w-6xl mx-auto space-y-8">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-black uppercase text-[#FF8068] tracking-wider">SHOPIFY-GRADE PERFORMANCE</span>
+                <h2 class="text-3xl font-black text-white">High-Performance Catalog</h2>
+              </div>
+              <span class="text-xs font-bold text-emerald-400 bg-emerald-950/80 px-3 py-1 rounded-full border border-emerald-800">In Stock &amp; Ready</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+              <div class="bg-[#141B30] p-4 rounded-2xl border border-slate-800 space-y-3">
+                <div class="w-full h-36 rounded-xl bg-slate-900 flex items-center justify-center text-4xl">⌨️</div>
+                <span class="px-2 py-0.5 bg-[#665CFF]/30 text-[#39D5E8] text-[10px] font-black rounded uppercase">HOT RELEASE</span>
+                <h4 class="font-bold text-sm text-[#F8F9FC] truncate">Apex Pro Hall-Effect Keyboard</h4>
+                <div class="flex items-baseline space-x-2">
+                  <span class="text-base font-black text-[#FF8068]">$189.99</span>
+                  <span class="text-xs text-slate-500 line-through">$229.99</span>
+                </div>
+                <button class="w-full py-2 bg-[#665CFF] text-white font-bold text-xs rounded-xl hover:bg-[#5649ff]">Add to Cart</button>
+              </div>
+              <div class="bg-[#141B30] p-4 rounded-2xl border border-slate-800 space-y-3">
+                <div class="w-full h-36 rounded-xl bg-slate-900 flex items-center justify-center text-4xl">🎙️</div>
+                <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-[10px] font-black rounded uppercase">STUDIO GRADE</span>
+                <h4 class="font-bold text-sm text-[#F8F9FC] truncate">VocalPulse XLR Studio Mic</h4>
+                <div class="flex items-baseline space-x-2">
+                  <span class="text-base font-black text-[#FF8068]">$149.00</span>
+                  <span class="text-xs text-slate-500 line-through">$180.00</span>
+                </div>
+                <button class="w-full py-2 bg-[#665CFF] text-white font-bold text-xs rounded-xl hover:bg-[#5649ff]">Add to Cart</button>
+              </div>
+              <div class="bg-[#141B30] p-4 rounded-2xl border border-slate-800 space-y-3">
+                <div class="w-full h-36 rounded-xl bg-slate-900 flex items-center justify-center text-4xl">🖱️</div>
+                <span class="px-2 py-0.5 bg-[#39D5E8]/20 text-[#39D5E8] text-[10px] font-black rounded uppercase">4K POLLING</span>
+                <h4 class="font-bold text-sm text-[#F8F9FC] truncate">ViperUltralight Wireless Mouse</h4>
+                <div class="flex items-baseline space-x-2">
+                  <span class="text-base font-black text-[#FF8068]">$99.99</span>
+                  <span class="text-xs text-slate-500 line-through">$129.99</span>
+                </div>
+                <button class="w-full py-2 bg-[#665CFF] text-white font-bold text-xs rounded-xl hover:bg-[#5649ff]">Add to Cart</button>
+              </div>
+              <div class="bg-[#141B30] p-4 rounded-2xl border border-slate-800 space-y-3">
+                <div class="w-full h-36 rounded-xl bg-slate-900 flex items-center justify-center text-4xl">🎧</div>
+                <span class="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-[10px] font-black rounded uppercase">SPATIAL 7.1</span>
+                <h4 class="font-bold text-sm text-[#F8F9FC] truncate">SoundStage Pro Spatial Headset</h4>
+                <div class="flex items-baseline space-x-2">
+                  <span class="text-base font-black text-[#FF8068]">$129.50</span>
+                  <span class="text-xs text-slate-500 line-through">$159.00</span>
+                </div>
+                <button class="w-full py-2 bg-[#665CFF] text-white font-bold text-xs rounded-xl hover:bg-[#5649ff]">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+            <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+            <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+            <button onclick="duplicateSection(this)" class="p-1 hover:text-cyan-400 text-white">❐</button>
+            <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+          </div>
+        `;
+      } else if (widgetType === 'promo_banner') {
+        newBlock.className = 'section-block py-10 px-6 sm:px-12 bg-linear-to-r from-[#665CFF] to-[#FF8068] text-white';
+        newBlock.innerHTML = `
+          <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-1 text-center md:text-left">
+              <span class="px-3 py-1 bg-black/30 rounded-full text-xs font-black tracking-widest uppercase">LIMITED DROPS EVENT</span>
+              <h3 class="editable-element text-2xl sm:text-3xl font-black text-white" data-widget-type="promo_heading" onclick="selectElementForEdit(this, 'promo_heading')">
+                Save 15% on All Custom Stream Packages
+              </h3>
+              <p class="text-xs text-white/90">Use code <strong class="underline font-mono">TECH15</strong> at checkout. Free worldwide express shipping.</p>
+            </div>
+            <a href="#" class="editable-element px-6 py-3 bg-slate-950 hover:bg-black text-white font-black text-xs rounded-xl shadow-xl transition shrink-0" data-widget-type="promo_cta" onclick="selectElementForEdit(this, 'promo_cta')">
+              Claim Studio Discount &rarr;
+            </a>
+          </div>
+          <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+            <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+            <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+            <button onclick="duplicateSection(this)" class="p-1 hover:text-cyan-400 text-white">❐</button>
+            <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+          </div>
+        `;
+      } else if (widgetType === 'creator_spotlight') {
+        newBlock.className = 'section-block py-12 px-6 sm:px-12 bg-[#141B30] text-white border-b border-slate-800';
+        newBlock.innerHTML = `
+          <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-8">
+            <div class="w-32 h-32 md:w-44 md:h-44 rounded-3xl bg-linear-to-tr from-[#665CFF] to-[#39D5E8] p-1 shrink-0">
+              <div class="w-full h-full bg-[#0B1020] rounded-[22px] flex items-center justify-center text-5xl">✨</div>
+            </div>
+            <div class="space-y-3 flex-1 text-center md:text-left">
+              <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-500/20 text-[#39D5E8] text-xs font-bold">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>PARTNER CREATOR OF THE MONTH</span>
+              </div>
+              <h3 class="editable-element text-2xl font-black text-white" data-widget-type="creator_name" onclick="selectElementForEdit(this, 'creator_name')">
+                LunaStarlight (Live2D &amp; Esports Streamer)
+              </h3>
+              <p class="editable-element text-xs text-[#8490A5] leading-relaxed" data-widget-type="creator_bio" onclick="selectElementForEdit(this, 'creator_bio')">
+                "Tech Advizer designed my complete 3D rigging, soundstage layout, and configured our custom tactile mechanical switches. Unmatched precision."
+              </p>
+              <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
+                <span class="px-3 py-1 bg-[#0B1020] border border-slate-700 text-xs rounded-lg text-slate-300 font-mono">145K+ Followers</span>
+                <span class="px-3 py-1 bg-[#0B1020] border border-slate-700 text-xs rounded-lg text-slate-300 font-mono">Twitch Partner</span>
+              </div>
+            </div>
+          </div>
+          <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+            <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+            <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+            <button onclick="duplicateSection(this)" class="p-1 hover:text-cyan-400 text-white">❐</button>
+            <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+          </div>
+        `;
+      } else if (widgetType === 'trust_badges') {
+        newBlock.className = 'section-block py-10 px-6 sm:px-12 bg-[#0B1020] text-white border-b border-slate-800';
+        newBlock.innerHTML = `
+          <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div class="space-y-1">
+              <span class="text-3xl block mb-1">🛡️</span>
+              <h4 class="font-bold text-xs text-[#F8F9FC]">Zero-Loss Precision</h4>
+              <p class="text-[10px] text-[#8490A5]">Integer-cent calculations &amp; verified specs</p>
+            </div>
+            <div class="space-y-1">
+              <span class="text-3xl block mb-1">🚀</span>
+              <h4 class="font-bold text-xs text-[#F8F9FC]">Express Global Dispatch</h4>
+              <p class="text-[10px] text-[#8490A5]">Real-time tracking from pending to delivered</p>
+            </div>
+            <div class="space-y-1">
+              <span class="text-3xl block mb-1">💬</span>
+              <h4 class="font-bold text-xs text-[#F8F9FC]">24/7 VIP Support</h4>
+              <p class="text-[10px] text-[#8490A5]">Dedicated Discord &amp; WhatsApp engineers</p>
+            </div>
+            <div class="space-y-1">
+              <span class="text-3xl block mb-1">🔒</span>
+              <h4 class="font-bold text-xs text-[#F8F9FC]">30-Day Check Warranty</h4>
+              <p class="text-[10px] text-[#8490A5]">Hassle-free replacement guarantee</p>
+            </div>
+          </div>
+          <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+            <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+            <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+            <button onclick="duplicateSection(this)" class="p-1 hover:text-cyan-400 text-white">❐</button>
+            <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+          </div>
+        `;
+      } else if (widgetType === 'testimonials') {
+        newBlock.className = 'section-block py-14 px-6 sm:px-12 bg-[#141B30] text-white border-b border-slate-800';
+        newBlock.innerHTML = `
+          <div class="max-w-6xl mx-auto space-y-8">
+            <div class="text-center space-y-2">
+              <span class="text-xs font-black uppercase text-[#39D5E8] tracking-widest">VERIFIED CLIENT REVIEWS</span>
+              <h2 class="text-3xl font-black text-white">Endorsed by Top Creators &amp; Studios</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="p-6 bg-[#0B1020] rounded-2xl border border-slate-800 space-y-3">
+                <div class="text-[#FF8068] text-sm">★★★★★</div>
+                <p class="editable-element text-xs text-slate-300 leading-relaxed italic" data-widget-type="quote" onclick="selectElementForEdit(this, 'quote')">
+                  "Our entire esports team switched to their custom hall-effect keyboards. Latency dropped noticeably, build quality is extraordinary."
+                </p>
+                <div class="pt-2 border-t border-slate-800">
+                  <h4 class="font-bold text-xs text-white">Marcus Vance</h4>
+                  <span class="text-[10px] text-slate-500">Director, Apex Synergy Gaming</span>
+                </div>
+              </div>
+              <div class="p-6 bg-[#0B1020] rounded-2xl border border-slate-800 space-y-3">
+                <div class="text-[#FF8068] text-sm">★★★★★</div>
+                <p class="editable-element text-xs text-slate-300 leading-relaxed italic" data-widget-type="quote" onclick="selectElementForEdit(this, 'quote')">
+                  "The VTuber avatar they crafted with custom facial blendshapes looks indistinguishable from high-end anime film productions."
+                </p>
+                <div class="pt-2 border-t border-slate-800">
+                  <h4 class="font-bold text-xs text-white">Aoi Hikari</h4>
+                  <span class="text-[10px] text-slate-500">Content Creator &amp; VTuber</span>
+                </div>
+              </div>
+              <div class="p-6 bg-[#0B1020] rounded-2xl border border-slate-800 space-y-3">
+                <div class="text-[#FF8068] text-sm">★★★★★</div>
+                <p class="editable-element text-xs text-slate-300 leading-relaxed italic" data-widget-type="quote" onclick="selectElementForEdit(this, 'quote')">
+                  "The live section builder and dynamic catalog make managing inventory in cents effortless with 100% precision."
+                </p>
+                <div class="pt-2 border-t border-slate-800">
+                  <h4 class="font-bold text-xs text-white">Sarah Jenkins</h4>
+                  <span class="text-[10px] text-slate-500">E-Commerce Operations Lead</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+            <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+            <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+            <button onclick="duplicateSection(this)" class="p-1 hover:text-cyan-400 text-white">❐</button>
+            <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+          </div>
+        `;
+      } else if (widgetType === 'heading') {
+        newBlock.innerHTML = `
+          <h2 class="editable-element text-2xl font-black text-slate-900" data-widget-type="heading" onclick="selectElementForEdit(this, 'heading')">
+            New Custom Section Heading
+          </h2>
+          <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+            <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+            <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+            <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+          </div>
+        `;
+      } else if (widgetType === 'button') {
+        newBlock.innerHTML = `
+          <div class="text-center py-4">
+            <button class="editable-element px-6 py-2.5 bg-teal-800 text-white font-bold rounded-xl text-xs hover:bg-teal-900" data-widget-type="button" onclick="selectElementForEdit(this, 'button')">
+              Click Here to Buy Now
+            </button>
+          </div>
+          <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+            <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+            <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+            <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+          </div>
+        `;
+      } else if (widgetType === 'spacer') {
+        newBlock.className = 'section-block h-12 bg-transparent';
+        newBlock.innerHTML = `
+          <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+            <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+            <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+            <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+          </div>
+        `;
+      } else {
+        newBlock.innerHTML = `
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-center">
+            <h4 class="editable-element font-bold text-slate-800" data-widget-type="${widgetType}" onclick="selectElementForEdit(this, '${widgetType}')">
+              ${widgetType.toUpperCase()} Element
+            </h4>
+          </div>
+          <div class="section-tools flex items-center space-x-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+            <button onclick="moveSectionUp(this)" class="p-1 hover:text-cyan-400 text-white">↑</button>
+            <button onclick="moveSectionDown(this)" class="p-1 hover:text-cyan-400 text-white">↓</button>
+            <button onclick="deleteSection(this)" class="p-1 hover:text-rose-400 text-white">✕</button>
+          </div>
+        `;
+      }
+
+      root.appendChild(newBlock);
+      newBlock.scrollIntoView({ behavior: 'smooth' });
+      showBuilderToast(`Added ${widgetType.replace('_', ' ')} section`, '⚡');
+    }
+
+    function moveSectionUp(btn) {
+      saveHistorySnapshot();
+      const sec = btn.closest('.section-block');
+      if (sec.previousElementSibling) {
+        sec.parentNode.insertBefore(sec, sec.previousElementSibling);
+        showBuilderToast('Moved Section Up');
+      }
+    }
+
+    function moveSectionDown(btn) {
+      saveHistorySnapshot();
+      const sec = btn.closest('.section-block');
+      if (sec.nextElementSibling) {
+        sec.parentNode.insertBefore(sec.nextElementSibling, sec);
+        showBuilderToast('Moved Section Down');
+      }
+    }
+
+    function duplicateSection(btn) {
+      saveHistorySnapshot();
+      const sec = btn.closest('.section-block');
+      const clone = sec.cloneNode(true);
+      sec.parentNode.insertBefore(clone, sec.nextSibling);
+      showBuilderToast('Duplicated Section');
+    }
+
+    function deleteSection(btn) {
+      if (!confirm('Delete this section?')) return;
+      saveHistorySnapshot();
+      const sec = btn.closest('.section-block');
+      sec.remove();
+      showBuilderToast('Deleted Section', '🗑️');
+    }
+
+    function toggleNavigatorModal() {
+      const modal = document.getElementById('navigatorModal');
+      modal.classList.toggle('hidden');
+    }
+
+    function highlightSection(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        el.classList.add('ring-4', 'ring-cyan-500');
+        setTimeout(() => el.classList.remove('ring-4', 'ring-cyan-500'), 1500);
+      }
+    }
+
+    function togglePreviewMode() {
+      const widgets = document.getElementById('builderWidgetsPanel');
+      const inspector = document.getElementById('builderInspectorPanel');
+      const isHidden = widgets.classList.contains('hidden');
+      if (isHidden) {
+        widgets.classList.remove('hidden');
+        inspector.classList.remove('hidden');
+        document.getElementById('previewBtn').classList.remove('bg-teal-800', 'text-cyan-300');
+      } else {
+        widgets.classList.add('hidden');
+        inspector.classList.add('hidden');
+        document.getElementById('previewBtn').classList.add('bg-teal-800', 'text-cyan-300');
+        showBuilderToast('Preview Mode: Editor controls hidden');
+      }
+    }
+
+    function saveBuilderDraft() {
+      const data = document.getElementById('canvasElementsRoot').innerHTML;
+      localStorage.setItem('save_and_smile_builder_draft', data);
+      showBuilderToast('Draft saved successfully to localStorage');
+    }
+
+    function publishBuilderLive() {
+      const data = document.getElementById('canvasElementsRoot').innerHTML;
+      localStorage.setItem('save_and_smile_builder_published', data);
+      showBuilderToast('Page published live to storefront!', '🚀');
+    }
+
+    function showBuilderToast(msg, icon = '✅') {
+      const box = document.getElementById('builderToast');
+      document.getElementById('builderToastMessage').textContent = msg;
+      document.getElementById('builderToastIcon').textContent = icon;
+      box.classList.remove('translate-y-24', 'opacity-0');
+      box.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        box.classList.remove('translate-y-0', 'opacity-100');
+        box.classList.add('translate-y-24', 'opacity-0');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

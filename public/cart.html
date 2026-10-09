@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Shopping Cart | Save &amp; Smile Wholesale</title>
+  <link rel="icon" type="image/png" href="images/save-and-smile-logo.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body style="background-color: #f8fafc;">
+
+  <!-- Header -->
+  <header class="header-wrapper">
+    <div class="site-container">
+      <div class="header-inner">
+        <a href="index.html" class="brand-logo" title="Save &amp; Smile">
+          <img src="images/save-and-smile-logo.png" alt="Save &amp; Smile" class="site-brand-logo">
+        </a>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <a href="index.html" class="action-pill-btn">
+            🏠 Continue Shopping
+          </a>
+          <a href="checkout.html" class="action-pill-btn" style="background: rgba(255,255,255,0.35);">
+            💳 Checkout
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Breadcrumbs -->
+  <div class="site-container">
+    <div class="breadcrumb-bar">
+      <a href="index.html">Home</a>
+      <span>/</span>
+      <strong style="color: #0f172a;">Shopping Cart</strong>
+    </div>
+  </div>
+
+  <main class="site-container">
+    <div class="cart-page-layout">
+      
+      <!-- Left: Full Cart Table -->
+      <div style="background: #ffffff; border-radius: var(--radius-lg); padding: 2rem; border: 1px solid #e2e8f0; box-shadow: var(--card-shadow);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 12px;">
+          <h1 style="font-size: 1.5rem; font-weight: 800; color: #0f172a;">Your Cart Items</h1>
+          <button class="action-pill-btn" style="background: #fee2e2; color: #b91c1c; border: none; font-size: 0.82rem;" onclick="clearCartFromPage()">
+            🗑️ Clear Cart
+          </button>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="cart-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="cartTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: gap: 10px;">
+          <a href="index.html#products" class="tab-btn" style="display: inline-flex; align-items: center; gap: 6px;">
+            ← Continue Browsing Gadgets
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: Summary Card -->
+      <div style="background: #ffffff; border-radius: var(--radius-lg); padding: 2rem; border: 1px solid #e2e8f0; box-shadow: var(--card-shadow); height: fit-content;">
+        <h2 style="font-size: 1.3rem; font-weight: 800; color: #0f172a; margin-bottom: 1.25rem; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 10px;">
+          Cart Summary
+        </h2>
+
+        <!-- Free shipping alert -->
+        <div class="free-shipping-progress" style="border-radius: 8px; margin-bottom: 1.25rem;">
+          <div id="cartPageShippingText" style="font-weight: 700;">Add Rs. 3,000 for FREE Delivery</div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="cartPageShippingBar"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="summary-line">
+            <span>Subtotal:</span>
+            <strong id="cartPageSubtotal">Rs. 0</strong>
+          </div>
+          <div class="summary-line">
+            <span>Shipping:</span>
+            <strong id="cartPageShipping">Rs. 200</strong>
+          </div>
+          <div class="summary-line total">
+            <span>Grand Total:</span>
+            <span id="cartPageTotal">Rs. 0</span>
+          </div>
+        </div>
+
+        <div class="cart-action-buttons-group">
+          <!-- Amny Samny: Checkout and WhatsApp -->
+          <div class="cart-buttons-row">
+            <button class="cart-btn-pill btn-primary-pill" onclick="window.location.href='checkout.html'">
+              <span>💳 Checkout</span>
+            </button>
+            <button class="cart-btn-pill btn-whatsapp-pill" onclick="checkoutWhatsApp()">
+              <span>💬 WhatsApp</span>
+            </button>
+          </div>
+
+          <!-- Nechy: Continue Shopping -->
+          <a href="index.html#products" class="cart-btn-pill btn-secondary-pill">
+            <span>🛍️ Continue Shopping</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="js/products-data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCartTable();
+      updateCartBadge();
+    });
+
+    function renderCartTable() {
+      const tbody = document.getElementById('cartTableBody');
+      const subtotalEl = document.getElementById('cartPageSubtotal');
+      const shippingEl = document.getElementById('cartPageShipping');
+      const totalEl = document.getElementById('cartPageTotal');
+      const shipBar = document.getElementById('cartPageShippingBar');
+      const shipText = document.getElementById('cartPageShippingText');
+
+      if (!AppState.cart || AppState.cart.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 3rem 1rem; color: #94a3b8;">
+              <h3>Your cart is empty</h3>
+              <p style="margin-top: 6px;">Add exciting gadgets to begin.</p>
+              <a href="index.html" class="tab-btn active" style="margin-top: 14px; display: inline-block;">Browse Products</a>
+            </td>
+          </tr>
+        `;
+        subtotalEl.textContent = 'Rs. 0';
+        shippingEl.textContent = 'Rs. 0';
+        totalEl.textContent = 'Rs. 0';
+        shipBar.style.width = '0%';
+        shipText.textContent = 'Add Rs. 3,000 for FREE Delivery';
+        return;
+      }
+
+      const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const isFree = subtotal >= STORE_CONFIG.freeShippingThreshold;
+      const shippingFee = isFree ? 0 : STORE_CONFIG.shippingFee;
+      const grandTotal = subtotal + shippingFee;
+
+      const progressPercent = Math.min(100, Math.round((subtotal / STORE_CONFIG.freeShippingThreshold) * 100));
+      shipBar.style.width = `${progressPercent}%`;
+      shipText.innerHTML = isFree ? `🎉 <strong>Congratulations!</strong> You get FREE delivery!` : `Add <strong>Rs. ${(STORE_CONFIG.freeShippingThreshold - subtotal).toLocaleString()}</strong> more for <strong>FREE Delivery</strong>`;
+
+      tbody.innerHTML = AppState.cart.map(item => `
+        <tr>
+          <td>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <img src="${item.image}" style="width: 55px; height: 55px; object-fit: contain; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff;">
+              <a href="product-detail.html?id=${item.id}" style="font-weight: 700; color: #1e293b; max-width: 280px; display: block;">
+                ${item.title}
+              </a>
+            </div>
+          </td>
+          <td><strong>Rs. ${item.price.toLocaleString()}</strong></td>
+          <td>
+            <div class="qty-control">
+              <button class="qty-btn" onclick="updateItemQty(${item.id}, -1); renderCartTable();">−</button>
+              <span class="qty-number">${item.qty}</span>
+              <button class="qty-btn" onclick="updateItemQty(${item.id}, 1); renderCartTable();">+</button>
+            </div>
+          </td>
+          <td><strong style="color: var(--primary-color);">Rs. ${(item.price * item.qty).toLocaleString()}</strong></td>
+          <td>
+            <button style="background: none; border: none; color: #ef4444; font-size: 1.1rem; cursor: pointer;" onclick="removeFromCart(${item.id}); renderCartTable();" title="Remove">✕</button>
+          </td>
+        </tr>
+      `).join('');
+
+      subtotalEl.textContent = `Rs. ${subtotal.toLocaleString()}`;
+      shippingEl.textContent = isFree ? 'FREE' : `Rs. ${shippingFee}`;
+      totalEl.textContent = `Rs. ${grandTotal.toLocaleString()}`;
+    }
+
+    function clearCartFromPage() {
+      if (!confirm('Are you sure you want to clear your cart?')) return;
+      AppState.cart = [];
+      saveCart();
+      updateCartBadge();
+      renderCartTable();
+    }
+  </script>
+</body>
+</html>

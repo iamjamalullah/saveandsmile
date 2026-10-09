@@ -1,0 +1,2842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Executive Admin OS | SAVE &amp; SMILE Commerce Operating System</title>
+  <link rel="icon" type="image/png" href="images/save-and-smile-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              teal: '#064C63',
+              cyan: '#008FAF',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body {
+      height: 100%;
+      min-height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display: flex !important;
+      flex-direction: row !important;
+      background-color: #f1f5f9;
+      -webkit-font-smoothing: antialiased;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+
+    /* Custom scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f8fafc; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: #020617; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+
+    .bg-linear-to-br { background-image: linear-gradient(to bottom right, #064C63, #008FAF); }
+    .bg-linear-to-t { background-image: linear-gradient(to top, #064C63, #008FAF); }
+    .bg-linear-to-r { background-image: linear-gradient(to right, #064C63, #008FAF); }
+
+    .modal-backdrop {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(4px);
+    }
+
+    /* Active view panel display */
+    .view-panel { display: none !important; }
+    .view-panel.active { display: block !important; }
+
+    /* Product tab content */
+    .prod-tab-pane { display: none; }
+    .prod-tab-pane.active { display: block; }
+
+    /* Printable Airway bill */
+    @media print {
+      body * { visibility: hidden; }
+      #printableShippingLabel, #printableShippingLabel * { visibility: visible; }
+      #printableShippingLabel { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900 font-sans antialiased h-full w-full flex overflow-hidden selection:bg-teal-500 selection:text-white">
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="sidebarBackdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden transition-opacity"></div>
+
+  <!-- ============================================================ -->
+  <!-- 1. LEFT SIDEBAR (PROFESSIONAL WOOCOMMERCE / SHOPIFY TREE) -->
+  <!-- ============================================================ -->
+  <aside id="sidebarEl" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-slate-950 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 select-none transition-transform duration-300 transform -translate-x-full md:translate-x-0 h-full overflow-hidden">
+    
+    <!-- Brand Header -->
+    <div class="p-4 border-b border-slate-800/80 flex items-center justify-between shrink-0">
+      <a href="admin.html" class="flex items-center space-x-2.5">
+        <div class="w-8 h-8 rounded-lg bg-linear-to-br flex items-center justify-center text-white font-black text-xs shadow-md">
+          S&amp;S
+        </div>
+        <div>
+          <span class="font-black text-sm text-white tracking-tight leading-none block">
+            SAVE &amp; SMILE
+          </span>
+          <span class="text-[9px] text-cyan-400 font-bold uppercase tracking-wider block mt-0.5">
+            COMMERCE OPERATING SYSTEM
+          </span>
+        </div>
+      </a>
+      <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white p-1">✕</button>
+    </div>
+
+    <!-- Scrollable Navigation Tree -->
+    <div class="flex-1 overflow-y-auto px-3 py-4 space-y-1 sidebar-scroll text-xs">
+      
+      <!-- 1. Home (Dashboard Overview) -->
+      <button onclick="switchView('dashboard', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold bg-teal-900/60 text-cyan-300 border border-teal-700/60 shadow-xs transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span>Executive Dashboard</span>
+      </button>
+
+      <!-- 2. Orders (WooCommerce Order Engine) -->
+      <button onclick="switchView('orders', this)" class="nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <div class="flex items-center space-x-2.5">
+          <svg class="w-4 h-4 shrink-0 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          <span>Orders</span>
+        </div>
+        <span class="text-[10px] bg-teal-800 text-teal-100 px-1.5 py-0.5 rounded-full font-bold" id="sidebarOrderCount">
+          2 Live
+        </span>
+      </button>
+
+      <!-- 3. Delivery Control Room & ShipOps (Collapsible Group) -->
+      <div class="pt-1">
+        <button onclick="toggleSidebarSub('operations-sub', 'action-inbox')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-amber-400/90 hover:text-amber-300 hover:bg-slate-900 transition text-left">
+          <div class="flex items-center space-x-2.5">
+            <svg class="w-4 h-4 shrink-0 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span class="font-extrabold tracking-tight">Delivery Control Room</span>
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <span class="bg-amber-500/20 text-amber-300 text-[9px] px-1.5 py-0.5 rounded font-black tracking-wider uppercase border border-amber-500/30">
+              CONTROL
+            </span>
+            <svg id="arr-operations-sub" class="w-3.5 h-3.5 text-slate-500 transform transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </button>
+        <div id="operations-sub" class="pl-6 pr-1 py-1 space-y-0.5 border-l border-amber-800/40 ml-4 my-1">
+          <button onclick="switchView('action-inbox', this)" class="nav-sub-item w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white transition text-left">
+            <span>Action Inbox (ShipOps)</span>
+            <span class="bg-rose-500/20 text-rose-300 text-[9px] px-1 rounded font-bold">Tasks</span>
+          </button>
+          <button onclick="switchView('cod-control', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            COD WhatsApp Verification
+          </button>
+          <button onclick="switchView('fulfillment', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Airway Bills &amp; Manifests
+          </button>
+          <button onclick="switchView('settlements', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Settlements &amp; COD Payouts
+          </button>
+          <button onclick="switchView('couriers', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Courier Integration Hub (TCS, Trax...)
+          </button>
+          <button onclick="switchView('returns', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Returns &amp; Restocking (RTO)
+          </button>
+        </div>
+      </div>
+
+      <!-- 4. Products (Collapsible Group - 10-Tab Editor) -->
+      <div class="pt-1">
+        <button onclick="toggleSidebarSub('products-sub', 'products')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+          <div class="flex items-center space-x-2.5">
+            <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            <span>Products</span>
+          </div>
+          <svg id="arr-products-sub" class="w-3.5 h-3.5 text-slate-500 transform transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="products-sub" class="pl-6 pr-1 py-1 space-y-0.5 border-l border-slate-800 ml-4 my-1">
+          <button onclick="switchView('products', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            All Products
+          </button>
+          <button onclick="openProfessionalAddProductModal()" class="w-full block px-2.5 py-1.5 rounded-lg text-xs font-bold text-cyan-300 bg-teal-950/60 hover:text-white transition text-left">
+            + Add Product (Pro 10-Tabs)
+          </button>
+          <button onclick="switchView('categories', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Categories &amp; Subcategories
+          </button>
+          <button onclick="switchView('inventory', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Inventory &amp; Hubs
+          </button>
+          <button onclick="switchView('variants-hub', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Attributes &amp; Color Variants
+          </button>
+          <button onclick="switchView('reviews', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+            Product Reviews
+          </button>
+        </div>
+      </div>
+
+      <!-- 5. Customers CRM -->
+      <button onclick="switchView('customers', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <span>Customers CRM</span>
+      </button>
+
+      <!-- 6. Marketing & Coupons -->
+      <button onclick="switchView('discounts', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+        <span>Discounts &amp; Coupons</span>
+      </button>
+
+      <!-- 7. Content & Media Library -->
+      <button onclick="switchView('media-library', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <span>WordPress Media Library</span>
+      </button>
+
+      <!-- 8. Live Visual Page Builder (Elementor/Divi Style) -->
+      <div class="pt-1">
+        <a href="live-editor.html" target="_blank" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-cyan-300 bg-teal-950/80 border border-teal-700/60 hover:bg-teal-900 transition text-left">
+          <div class="flex items-center space-x-2.5">
+            <svg class="w-4 h-4 shrink-0 text-amber-400 animate-pulse" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+            <span>Live Visual Page Builder</span>
+          </div>
+          <span class="text-[9px] bg-cyan-500/20 text-cyan-300 px-1.5 py-0.5 rounded font-black">DIVI</span>
+        </a>
+      </div>
+
+      <!-- 9. SEO & Pixels -->
+      <button onclick="switchView('seo', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-yellow-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <span>SEO &amp; Meta Center</span>
+      </button>
+
+      <!-- 10. Analytics & Business Reports -->
+      <button onclick="switchView('reports', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        <span>Analytics &amp; GMV Reports</span>
+      </button>
+
+      <!-- 11. Settings & Store Config -->
+      <button onclick="switchView('settings', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span>Store Settings &amp; Rules</span>
+      </button>
+
+      <!-- 12. Roles & Permissions -->
+      <button onclick="switchView('users', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <span>Roles &amp; Access (RBAC)</span>
+      </button>
+
+      <!-- 13. Audit Log -->
+      <button onclick="switchView('audit-log', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Audit Trail &amp; Logs</span>
+      </button>
+
+    </div>
+
+    <!-- Sidebar Bottom Profile & Storefront Exit -->
+    <div class="p-3 border-t border-slate-800 bg-slate-950 shrink-0 space-y-2">
+      <a href="index.html" target="_blank" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold text-cyan-300 bg-slate-900 hover:bg-teal-950 border border-slate-800 transition">
+        <span>Live Storefront</span>
+        <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+      </a>
+      <div class="flex items-center justify-between pt-1 border-t border-slate-900">
+        <div class="flex items-center space-x-2">
+          <div class="w-7 h-7 rounded-full bg-teal-800 text-teal-100 flex items-center justify-center font-bold text-xs">S</div>
+          <div class="leading-none">
+            <span class="text-xs font-bold text-white block">Administrator</span>
+            <span class="text-[10px] text-teal-400 font-medium">Super Admin</span>
+          </div>
+        </div>
+        <a href="index.html" title="Exit to store" class="text-slate-500 hover:text-rose-400 transition p-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============================================================ -->
+  <!-- 2. MAIN WORKSPACE CONTENT (FULL-WIDTH SCREEN FIT) -->
+  <!-- ============================================================ -->
+  <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-slate-100">
+
+    <!-- Top Admin Bar -->
+    <header class="h-16 bg-white border-b border-slate-200/90 px-4 sm:px-8 flex items-center justify-between shrink-0 z-30">
+      <div class="flex items-center space-x-3">
+        <!-- Mobile Toggle Hamburger Button -->
+        <button onclick="toggleMobileSidebar()" class="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <span class="text-xs font-semibold text-slate-400">Admin</span>
+        <span class="text-xs text-slate-300">/</span>
+        <span class="text-xs font-bold text-slate-700" id="topBreadcrumb">Dashboard</span>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <!-- Quick Global Search with Ctrl+K trigger -->
+        <div class="relative hidden lg:block cursor-pointer" onclick="openCommandPalette()">
+          <input type="text" readonly placeholder="Quick Command Palette... (Ctrl+K)" class="w-72 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 pl-8 pr-16 text-xs cursor-pointer hover:bg-slate-100 focus:outline-none">
+          <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <span class="absolute right-2 top-2 text-[10px] font-mono bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-bold">Ctrl+K</span>
+        </div>
+
+        <!-- Notification Bell -->
+        <button onclick="toggleNotificationsModal()" class="p-2 text-slate-400 hover:text-slate-600 relative rounded-xl hover:bg-slate-50 transition" title="Notifications">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span class="w-2 h-2 rounded-full bg-rose-500 absolute top-1.5 right-1.5 ring-2 ring-white"></span>
+        </button>
+
+        <!-- Live Visual Editor Link -->
+        <a href="live-editor.html" target="_blank" class="text-xs font-bold text-teal-800 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 flex items-center space-x-1.5 py-1.5 px-3 rounded-xl border border-teal-200 transition">
+          <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          <span>Live Editor</span>
+        </a>
+
+        <!-- Storefront Link -->
+        <a href="index.html" target="_blank" class="text-xs font-bold text-slate-600 hover:text-teal-800 flex items-center space-x-1.5 py-1.5 px-3 rounded-xl border border-slate-200/80 hover:bg-slate-50 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          <span class="hidden sm:inline">Storefront</span>
+        </a>
+
+        <!-- Profile -->
+        <div class="flex items-center space-x-2 pl-2 border-l border-slate-200">
+          <div class="w-8 h-8 rounded-full bg-teal-800 text-teal-100 flex items-center justify-center font-bold text-xs shadow-xs">S</div>
+          <span class="text-xs font-bold text-slate-800 hidden sm:inline">Store Administrator</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Scrollable Area (Fits 100% Screen Seamlessly) -->
+    <div id="mainScrollArea" class="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-6 w-full custom-scrollbar">
+
+      <!-- ============================================================ -->
+      <!-- VIEW 1: EXECUTIVE DASHBOARD (SCREENSHOT EXACT MATCH) -->
+      <!-- ============================================================ -->
+      <section id="view-dashboard" class="view-panel active space-y-6">
+        
+        <!-- Welcome Header & Quick Action Buttons -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Executive Dashboard
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+              Real-time operational metrics for SAVE &amp; SMILE Pakistan.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Download Sales CSV Button -->
+            <button onclick="downloadCsvExport('sales')" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs flex items-center space-x-1.5 transition shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>Download Sales CSV</span>
+            </button>
+
+            <!-- All Reports Button -->
+            <button onclick="switchView('reports')" class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs transition shadow-2xs flex items-center space-x-1">
+              <svg class="w-3.5 h-3.5 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span>All Reports</span>
+            </button>
+
+            <!-- Launch Live Page Builder Button -->
+            <a href="live-editor.html" target="_blank" class="px-4 py-2 bg-gradient-to-r from-teal-700 to-cyan-700 hover:from-teal-600 hover:to-cyan-600 text-white font-black rounded-xl text-xs flex items-center space-x-1.5 transition shadow-md">
+              <svg class="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+              <span>Launch Live Page Builder</span>
+            </a>
+
+            <!-- Pro Add Product Button -->
+            <button onclick="openProfessionalAddProductModal()" class="px-4 py-2 bg-teal-800 hover:bg-teal-900 text-white font-bold rounded-xl text-xs transition shadow-sm">
+              + Add Product
+            </button>
+          </div>
+        </div>
+
+        <!-- 6 Metrics Cards Grid (Seamless full-width response) -->
+        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+          
+          <!-- Total Revenue -->
+          <div onclick="switchView('reports')" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between cursor-pointer hover:border-emerald-500 hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">TOTAL REVENUE</span>
+              <div class="p-1.5 rounded-lg border text-emerald-700 bg-emerald-50 border-emerald-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+            </div>
+            <div>
+              <div class="text-lg sm:text-xl font-black text-slate-900" id="cardRevenue">Rs. 1,545</div>
+              <span class="text-[11px] font-semibold text-slate-400 block mt-0.5">+18.4% this month</span>
+            </div>
+          </div>
+
+          <!-- Today's Sales -->
+          <div onclick="switchView('reports')" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between cursor-pointer hover:border-teal-500 hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">TODAY'S SALES</span>
+              <div class="p-1.5 rounded-lg border text-teal-800 bg-teal-50 border-teal-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+              </div>
+            </div>
+            <div>
+              <div class="text-lg sm:text-xl font-black text-slate-900" id="cardTodaySales">Rs. 797</div>
+              <span class="text-[11px] font-semibold text-slate-400 block mt-0.5">Live today</span>
+            </div>
+          </div>
+
+          <!-- Total Orders -->
+          <div onclick="switchView('orders')" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between cursor-pointer hover:border-cyan-500 hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">TOTAL ORDERS</span>
+              <div class="p-1.5 rounded-lg border text-cyan-700 bg-cyan-50 border-cyan-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+              </div>
+            </div>
+            <div>
+              <div class="text-lg sm:text-xl font-black text-slate-900" id="cardTotalOrders">2</div>
+              <span class="text-[11px] font-semibold text-slate-400 block mt-0.5" id="cardOrdersSub">0 pending action</span>
+            </div>
+          </div>
+
+          <!-- Pending Orders -->
+          <div onclick="switchView('orders')" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between cursor-pointer hover:border-amber-500 hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">PENDING ORDERS</span>
+              <div class="p-1.5 rounded-lg border text-amber-700 bg-amber-50 border-amber-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+            </div>
+            <div>
+              <div class="text-lg sm:text-xl font-black text-slate-900" id="cardPendingOrders">0</div>
+              <span class="text-[11px] font-semibold text-slate-400 block mt-0.5">Requires dispatch</span>
+            </div>
+          </div>
+
+          <!-- Total Customers -->
+          <div onclick="switchView('customers')" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between cursor-pointer hover:border-indigo-500 hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">TOTAL CUSTOMERS</span>
+              <div class="p-1.5 rounded-lg border text-indigo-700 bg-indigo-50 border-indigo-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              </div>
+            </div>
+            <div>
+              <div class="text-lg sm:text-xl font-black text-slate-900" id="cardTotalCustomers">1</div>
+              <span class="text-[11px] font-semibold text-slate-400 block mt-0.5">Active shoppers</span>
+            </div>
+          </div>
+
+          <!-- Active Products -->
+          <div onclick="switchView('products')" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2 flex flex-col justify-between cursor-pointer hover:border-slate-500 hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">ACTIVE PRODUCTS</span>
+              <div class="p-1.5 rounded-lg border text-slate-700 bg-slate-50 border-slate-200">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+              </div>
+            </div>
+            <div>
+              <div class="text-lg sm:text-xl font-black text-slate-900" id="cardActiveProducts">8</div>
+              <span class="text-[11px] font-semibold text-slate-400 block mt-0.5" id="cardLowStockSub">0 low stock items</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Real-Time Business Reports & Export Box -->
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-xs space-y-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div>
+              <div class="flex items-center space-x-2">
+                <svg class="w-4 h-4 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <h3 class="font-bold text-slate-900 text-sm">Real-Time Business Reports &amp; Export</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">
+                Download operational sheets with single-click direct exports.
+              </p>
+            </div>
+            <button onclick="switchView('reports')" class="text-xs font-bold text-teal-800 hover:underline flex items-center space-x-1">
+              <span>View Report Center</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
+            <!-- Sales & GMV -->
+            <div onclick="downloadCsvExport('sales')" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/80 hover:border-teal-200 text-slate-700 hover:text-teal-900 transition flex flex-col justify-between group cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="p-1.5 rounded-lg bg-white border border-slate-200 group-hover:border-teal-300 shadow-2xs">
+                  <svg class="w-3.5 h-3.5 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </span>
+                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold leading-tight">Sales &amp; GMV</p>
+                <span class="text-[10px] text-teal-700 font-semibold block mt-0.5">Download CSV &gt;</span>
+              </div>
+            </div>
+
+            <!-- Fulfillment Orders -->
+            <div onclick="downloadCsvExport('orders')" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/80 hover:border-teal-200 text-slate-700 hover:text-teal-900 transition flex flex-col justify-between group cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="p-1.5 rounded-lg bg-white border border-slate-200 group-hover:border-teal-300 shadow-2xs">
+                  <svg class="w-3.5 h-3.5 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                </span>
+                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold leading-tight">Fulfillment Orders</p>
+                <span class="text-[10px] text-teal-700 font-semibold block mt-0.5">Download CSV &gt;</span>
+              </div>
+            </div>
+
+            <!-- Catalog & Pricing -->
+            <div onclick="downloadCsvExport('products')" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/80 hover:border-teal-200 text-slate-700 hover:text-teal-900 transition flex flex-col justify-between group cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="p-1.5 rounded-lg bg-white border border-slate-200 group-hover:border-teal-300 shadow-2xs">
+                  <svg class="w-3.5 h-3.5 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                </span>
+                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold leading-tight">Catalog &amp; Pricing</p>
+                <span class="text-[10px] text-teal-700 font-semibold block mt-0.5">Download CSV &gt;</span>
+              </div>
+            </div>
+
+            <!-- Inventory Stock -->
+            <div onclick="downloadCsvExport('inventory')" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/80 hover:border-teal-200 text-slate-700 hover:text-teal-900 transition flex flex-col justify-between group cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="p-1.5 rounded-lg bg-white border border-slate-200 group-hover:border-teal-300 shadow-2xs">
+                  <svg class="w-3.5 h-3.5 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </span>
+                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold leading-tight">Inventory Stock</p>
+                <span class="text-[10px] text-teal-700 font-semibold block mt-0.5">Download CSV &gt;</span>
+              </div>
+            </div>
+
+            <!-- Customer CRM -->
+            <div onclick="downloadCsvExport('customers')" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/80 hover:border-teal-200 text-slate-700 hover:text-teal-900 transition flex flex-col justify-between group cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="p-1.5 rounded-lg bg-white border border-slate-200 group-hover:border-teal-300 shadow-2xs">
+                  <svg class="w-3.5 h-3.5 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </span>
+                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold leading-tight">Customer CRM</p>
+                <span class="text-[10px] text-teal-700 font-semibold block mt-0.5">Download CSV &gt;</span>
+              </div>
+            </div>
+
+            <!-- Marketing UTM -->
+            <div onclick="downloadCsvExport('sales')" class="p-3.5 rounded-2xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/80 hover:border-teal-200 text-slate-700 hover:text-teal-900 transition flex flex-col justify-between group cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="p-1.5 rounded-lg bg-white border border-slate-200 group-hover:border-teal-300 shadow-2xs">
+                  <svg class="w-3.5 h-3.5 text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                </span>
+                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold leading-tight">Marketing UTM</p>
+                <span class="text-[10px] text-teal-700 font-semibold block mt-0.5">Download CSV &gt;</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Weekly Sales & Orders Velocity Chart (Interactive Teal/Cyan Bars Exact Match) -->
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-xs space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Weekly Sales &amp; Orders Velocity</h3>
+              <p class="text-xs text-slate-400">Monitored revenue trends and volume spikes</p>
+            </div>
+            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg">
+              ↑ 24% Growth Rate
+            </span>
+          </div>
+
+          <!-- Interactive Bar Chart matching screenshot proportions -->
+          <div class="h-44 w-full flex items-end justify-between gap-3 sm:gap-4 pt-6 px-2 border-b border-slate-100">
+            <div class="flex-1 flex flex-col items-center gap-2 group h-full justify-end cursor-pointer">
+              <div class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-slate-700 transition">Rs. 2,400</div>
+              <div class="w-full bg-linear-to-t rounded-t-lg transition-all duration-300 group-hover:brightness-110" style="height: 20%;"></div>
+              <span class="text-[10px] font-bold text-slate-400">Mon</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2 group h-full justify-end cursor-pointer">
+              <div class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-slate-700 transition">Rs. 3,100</div>
+              <div class="w-full bg-linear-to-t rounded-t-lg transition-all duration-300 group-hover:brightness-110" style="height: 22%;"></div>
+              <span class="text-[10px] font-bold text-slate-400">Tue</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2 group h-full justify-end cursor-pointer">
+              <div class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-slate-700 transition">Rs. 5,600</div>
+              <div class="w-full bg-linear-to-t rounded-t-lg transition-all duration-300 group-hover:brightness-110" style="height: 38%;"></div>
+              <span class="text-[10px] font-bold text-slate-400">Wed</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2 group h-full justify-end cursor-pointer">
+              <div class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-slate-700 transition">Rs. 10,800</div>
+              <div class="w-full bg-linear-to-t rounded-t-lg transition-all duration-300 group-hover:brightness-110" style="height: 62%;"></div>
+              <span class="text-[10px] font-bold text-slate-400">Thu</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2 group h-full justify-end cursor-pointer">
+              <div class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-slate-700 transition">Rs. 16,500</div>
+              <div class="w-full bg-linear-to-t rounded-t-lg transition-all duration-300 group-hover:brightness-110" style="height: 82%;"></div>
+              <span class="text-[10px] font-bold text-slate-400">Fri</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2 group h-full justify-end cursor-pointer">
+              <div class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-slate-700 transition">Rs. 18,200</div>
+              <div class="w-full bg-linear-to-t rounded-t-lg transition-all duration-300 group-hover:brightness-110" style="height: 82%;"></div>
+              <span class="text-[10px] font-bold text-slate-400">Sat</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2 group h-full justify-end cursor-pointer">
+              <div class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-slate-700 transition">Rs. 17,900</div>
+              <div class="w-full bg-linear-to-t rounded-t-lg transition-all duration-300 group-hover:brightness-110" style="height: 82%;"></div>
+              <span class="text-[10px] font-bold text-slate-400">Sun</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lower Grid: Recent Orders & Alerts (8 cols + 4 cols) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Recent Orders (8 cols) -->
+          <div class="lg:col-span-8 bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 class="font-bold text-slate-900 text-sm">Recent Store Orders</h3>
+              <button onclick="switchView('orders')" class="text-xs font-bold text-teal-800 hover:underline flex items-center space-x-1">
+                <span>View All Orders</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">
+                    <th class="pb-3">ORDER ID</th>
+                    <th class="pb-3">CUSTOMER</th>
+                    <th class="pb-3">TOTAL</th>
+                    <th class="pb-3">STATUS</th>
+                    <th class="pb-3">PAYMENT</th>
+                    <th class="pb-3 text-right">ACTION</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100" id="dashRecentOrdersBody">
+                  <!-- Dynamically populated from placed orders -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right Column (4 cols) -->
+          <div class="lg:col-span-4 space-y-6">
+            
+            <!-- Low Stock Alerts -->
+            <div class="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                  <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">
+                    LOW STOCK ALERTS
+                  </h4>
+                </div>
+                <button onclick="switchView('inventory')" class="text-[11px] font-bold text-teal-800 hover:underline">
+                  Manage
+                </button>
+              </div>
+              <p class="text-xs text-slate-400 py-2">All stock levels are healthy.</p>
+            </div>
+
+            <!-- Top Selling Products -->
+            <div class="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs space-y-3">
+              <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">
+                TOP SELLING PRODUCTS
+              </h4>
+              <div class="divide-y divide-slate-100 text-xs" id="topSellingList">
+                <div class="py-2.5 flex items-center justify-between">
+                  <div class="min-w-0 pr-2">
+                    <p class="font-bold text-slate-800 truncate">Multipurpose Kitchen &amp; Bathroom Corner Storage Rack...</p>
+                    <p class="text-[10px] text-slate-400">Rs. 180</p>
+                  </div>
+                  <span class="font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md shrink-0">
+                    2 sold
+                  </span>
+                </div>
+                <div class="py-2.5 flex items-center justify-between">
+                  <div class="min-w-0 pr-2">
+                    <p class="font-bold text-slate-800 truncate">Heavy-Duty All-Weather Universal Waterproof Bike Cover...</p>
+                    <p class="text-[10px] text-slate-400">Rs. 400</p>
+                  </div>
+                  <span class="font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md shrink-0">
+                    0 sold
+                  </span>
+                </div>
+                <div class="py-2.5 flex items-center justify-between">
+                  <div class="min-w-0 pr-2">
+                    <p class="font-bold text-slate-800 truncate">360° Rotatable Dashboard &amp; Windshield Car Phone Mount...</p>
+                    <p class="text-[10px] text-slate-400">Rs. 350</p>
+                  </div>
+                  <span class="font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md shrink-0">
+                    0 sold
+                  </span>
+                </div>
+                <div class="py-2.5 flex items-center justify-between">
+                  <div class="min-w-0 pr-2">
+                    <p class="font-bold text-slate-800 truncate">Automatic Electric Drinking Water Gallon Dispenser...</p>
+                    <p class="text-[10px] text-slate-400">Rs. 890</p>
+                  </div>
+                  <span class="font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md shrink-0">
+                    0 sold
+                  </span>
+                </div>
+                <div class="py-2.5 flex items-center justify-between">
+                  <div class="min-w-0 pr-2">
+                    <p class="font-bold text-slate-800 truncate">Multi-Blade Stainless Steel Kitchen Herb &amp; Vegetable...</p>
+                    <p class="text-[10px] text-slate-400">Rs. 250</p>
+                  </div>
+                  <span class="font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md shrink-0">
+                    0 sold
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 2: ORDERS (WOOCOMMERCE FULFILLMENT & TIMELINE) -->
+      <!-- ============================================================ -->
+      <section id="view-orders" class="view-panel space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Order Fulfillment Engine</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Manage statuses, trigger WhatsApp confirmations, and generate courier airway bills.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="downloadCsvExport('orders')" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs flex items-center space-x-1.5 shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>Export Orders CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <!-- Filter Tabs -->
+          <div class="flex gap-2 overflow-x-auto pb-2" id="orderFilterPills">
+            <button onclick="filterOrders('ALL', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-teal-800 text-white shadow-xs">All Orders</button>
+            <button onclick="filterOrders('Pending', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Pending</button>
+            <button onclick="filterOrders('Confirmed', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Confirmed</button>
+            <button onclick="filterOrders('Processing', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Processing</button>
+            <button onclick="filterOrders('Shipped', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Shipped</button>
+            <button onclick="filterOrders('Delivered', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Delivered</button>
+            <button onclick="filterOrders('Cancelled', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Cancelled</button>
+          </div>
+
+          <!-- Orders Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">
+                  <th class="pb-3">Order Code</th>
+                  <th class="pb-3">Customer</th>
+                  <th class="pb-3">Destination</th>
+                  <th class="pb-3">Items</th>
+                  <th class="pb-3">Total</th>
+                  <th class="pb-3">Fulfillment Status</th>
+                  <th class="pb-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="fullOrdersTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 3: PRODUCTS CATALOG (CRUD & MANAGEMENT) -->
+      <!-- ============================================================ -->
+      <section id="view-products" class="view-panel space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Products Catalog</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Manage WooCommerce-level catalog, price tiers, stock levels, and variants.</p>
+          </div>
+          <button onclick="openProfessionalAddProductModal()" class="px-4 py-2 bg-teal-800 hover:bg-teal-900 text-white font-bold rounded-xl text-xs shadow-sm flex items-center space-x-1.5">
+            <span>+ Add New Product</span>
+            <span class="bg-cyan-500 text-slate-950 text-[10px] px-1 rounded font-black">10 TABS</span>
+          </button>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <!-- Search & Filter Bar -->
+          <div class="flex flex-col sm:flex-row gap-3">
+            <input type="text" id="prodSearchQuery" oninput="renderProductsTable()" placeholder="🔍 Search products by title or SKU..." class="flex-1 text-xs p-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-teal-700">
+            <select id="prodCategorySelect" onchange="renderProductsTable()" class="text-xs p-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-teal-700">
+              <option value="all">All Categories</option>
+              <option value="storage">Storage &amp; Organization</option>
+              <option value="kitchen">Kitchen Tools &amp; Gadgets</option>
+              <option value="bottles">Mugs &amp; Bottles</option>
+              <option value="beauty">Beauty &amp; Makeup</option>
+              <option value="insect-killers">Insect Killers</option>
+              <option value="accessories">Mobile Accessories</option>
+              <option value="travel">Bags &amp; Travel</option>
+            </select>
+          </div>
+
+          <!-- Products Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">
+                  <th class="pb-3">Image</th>
+                  <th class="pb-3">Product Name &amp; SKU</th>
+                  <th class="pb-3">Category</th>
+                  <th class="pb-3">Price</th>
+                  <th class="pb-3">Inventory</th>
+                  <th class="pb-3">Badge</th>
+                  <th class="pb-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="fullProductsTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 4: CATEGORIES & SUBCATEGORIES -->
+      <!-- ============================================================ -->
+      <section id="view-categories" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Categories &amp; Hierarchy</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Manage parent categories, subcategories, banners, and icons.</p>
+          </div>
+          <button onclick="promptAddCategory()" class="px-4 py-2 bg-teal-800 text-white font-bold rounded-xl text-xs">+ Add Category</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="categoriesCardGrid">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 5: INVENTORY & STOCK HUBS -->
+      <!-- ============================================================ -->
+      <section id="view-inventory" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Inventory &amp; Stock Hubs</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Central warehouse stock control, low-stock threshold triggers, and 1-click restock.</p>
+          </div>
+          <button onclick="downloadCsvExport('inventory')" class="px-4 py-2 bg-emerald-700 text-white font-bold rounded-xl text-xs">
+            Download Inventory CSV
+          </button>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">
+                  <th class="pb-3">Product Name</th>
+                  <th class="pb-3">SKU</th>
+                  <th class="pb-3">Selling Price</th>
+                  <th class="pb-3">Stock Units</th>
+                  <th class="pb-3">Threshold Status</th>
+                  <th class="pb-3 text-right">Quick Restock</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="inventoryTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 6: ATTRIBUTES & COLOR VARIANTS HUB -->
+      <!-- ============================================================ -->
+      <section id="view-variants-hub" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Attributes &amp; Color Variants Engine</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Assign images to color variants (e.g. Red purse → Red image, Green purse → Green image).</p>
+          </div>
+          <button onclick="openProfessionalAddProductModal('variants')" class="px-4 py-2 bg-teal-800 text-white font-bold rounded-xl text-xs">+ Configure Variants</button>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div class="p-4 bg-teal-50 border border-teal-200 rounded-2xl flex items-start space-x-3">
+            <div class="text-teal-800 text-xl font-bold">🎨</div>
+            <div class="text-xs text-teal-900">
+              <p class="font-bold">Color-Specific Image Mapping Active</p>
+              <p class="mt-0.5 text-slate-600">When a customer selects a color variant on the product page, the gallery automatically switches to display that exact color's photograph.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-800 text-xs">Color Attribute</span>
+                <span class="text-[10px] bg-slate-200 px-2 py-0.5 rounded font-bold">5 Colors</span>
+              </div>
+              <p class="text-xs text-slate-500">Values: Red, Green, Black, Blue, Brown</p>
+            </div>
+            <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-800 text-xs">Size Attribute</span>
+                <span class="text-[10px] bg-slate-200 px-2 py-0.5 rounded font-bold">3 Sizes</span>
+              </div>
+              <p class="text-xs text-slate-500">Values: Small, Medium, Large</p>
+            </div>
+            <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-800 text-xs">Material Attribute</span>
+                <span class="text-[10px] bg-slate-200 px-2 py-0.5 rounded font-bold">4 Types</span>
+              </div>
+              <p class="text-xs text-slate-500">Values: ABS Plastic, Stainless Steel, Linen, Silicone</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 7: CUSTOMERS CRM -->
+      <!-- ============================================================ -->
+      <section id="view-customers" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Customers CRM Directory</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Wholesale and retail client ledger with direct WhatsApp chat and order history.</p>
+          </div>
+          <button onclick="downloadCsvExport('customers')" class="px-4 py-2 bg-emerald-700 text-white font-bold rounded-xl text-xs">
+            Download Customers CSV
+          </button>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">
+                  <th class="pb-3">Customer Name</th>
+                  <th class="pb-3">Phone</th>
+                  <th class="pb-3">City</th>
+                  <th class="pb-3">Orders</th>
+                  <th class="pb-3">Total Spent</th>
+                  <th class="pb-3 text-right">Direct WhatsApp</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="customersTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 8: ACTION INBOX (SHIPOPS DESK) -->
+      <!-- ============================================================ -->
+      <section id="view-action-inbox" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">ShipOps Action Inbox</h1>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-3">
+          <div class="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-black uppercase text-rose-700 bg-rose-100 px-2 py-0.5 rounded">URGENT</span>
+              <h4 class="font-bold text-slate-900 text-xs mt-1">Pending COD Confirmation #SNS-484209</h4>
+              <p class="text-[11px] text-slate-500">Customer Ahmed Raza requires automated WhatsApp confirmation message before rider dispatch.</p>
+            </div>
+            <button onclick="triggerWhatsappCodConfirm('SNS-484209', 'Ahmed Raza', '03001234567', 797)" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold">Confirm on WhatsApp</button>
+          </div>
+          <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-black uppercase text-amber-700 bg-amber-100 px-2 py-0.5 rounded">COURIER DISPATCH</span>
+              <h4 class="font-bold text-slate-900 text-xs mt-1">Leopards Courier Pickup Manifest</h4>
+              <p class="text-[11px] text-slate-500">2 parcel shipments ready for rider pickup scan at Karachi central hub.</p>
+            </div>
+            <button onclick="printAirwayBill('SNS-484209')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold">Print Airway Bill</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 9: COD WHATSAPP CONFIRMATION DESK -->
+      <!-- ============================================================ -->
+      <section id="view-cod-control" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Automated COD WhatsApp Confirmation</h1>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <p class="text-xs text-slate-500">Anti-fraud COD verification desk. Trigger automated WhatsApp templates to buyer for instant YES/NO confirmation.</p>
+          
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+            <h4 class="font-bold text-xs text-slate-800">Standard Urdu COD Confirmation Template:</h4>
+            <div class="p-3 bg-white border rounded-xl font-mono text-xs text-slate-700 whitespace-pre-line">
+              Assalam-o-Alaikum {{customer_name}},
+
+              Aap ne Save &amp; Smile se order place kiya hai:
+              Order: {{order_number}}
+              Amount: Rs. {{total}}
+              Payment: Cash on Delivery
+
+              Kya aap apna order confirm karna chahte hain?
+              Reply YES to Confirm / Reply NO to Cancel.
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="showToast('Template updated and saved!')" class="px-3.5 py-1.5 bg-teal-800 text-white font-bold rounded-xl text-xs">Save Template</button>
+              <button onclick="triggerWhatsappCodConfirm('SNS-484209', 'Ahmed Raza', '03001234567', 797)" class="px-3.5 py-1.5 bg-emerald-700 text-white font-bold rounded-xl text-xs">Test Send to WhatsApp</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 10: AIRWAY BILLS & MANIFESTS -->
+      <!-- ============================================================ -->
+      <section id="view-fulfillment" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Fulfillment Airway Bills &amp; Manifests</h1>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-3">
+          <p class="text-xs text-slate-500">Generate 4x6 inch thermal shipping labels with barcodes for Leopards, TCS, and Trax.</p>
+          <div class="flex items-center space-x-2 pt-2">
+            <button onclick="printAirwayBill('SNS-484209')" class="px-4 py-2 bg-teal-800 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5">
+              <span>🖨️ Print Label for #SNS-484209</span>
+            </button>
+            <button onclick="printAirwayBill('SNS-100201')" class="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5">
+              <span>🖨️ Print Label for #SNS-100201</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 11: SETTLEMENTS & COD PAYOUTS -->
+      <!-- ============================================================ -->
+      <section id="view-settlements" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Settlements &amp; Courier Cash Payouts</h1>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-3">
+          <p class="text-xs text-slate-500">Reconcile cash collected by delivery riders against bank transfers.</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+              <span class="text-[10px] font-bold text-emerald-800 uppercase">Received Payouts</span>
+              <p class="text-lg font-black text-slate-900">Rs. 1,545</p>
+            </div>
+            <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl">
+              <span class="text-[10px] font-bold text-amber-800 uppercase">Pending Courier Remittance</span>
+              <p class="text-lg font-black text-slate-900">Rs. 0</p>
+            </div>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+              <span class="text-[10px] font-bold text-slate-600 uppercase">Courier Shipping Fees</span>
+              <p class="text-lg font-black text-slate-900">Rs. 400</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 12: COURIER INTEGRATION HUB -->
+      <!-- ============================================================ -->
+      <section id="view-couriers" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Courier Integration Hub (API Providers)</h1>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Leopards -->
+          <div class="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-sm text-slate-900">🐆 Leopards Courier</h4>
+              <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">Connected</span>
+            </div>
+            <p class="text-xs text-slate-500">API Key: LEOP-PK-981248 | Account: #09218</p>
+            <button onclick="testCourierConnection('Leopards')" class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl text-xs">Test API Connection</button>
+          </div>
+          <!-- TCS -->
+          <div class="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-sm text-slate-900">📦 TCS Express</h4>
+              <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">Connected</span>
+            </div>
+            <p class="text-xs text-slate-500">API Key: TCS-EXP-77210 | Account: #55120</p>
+            <button onclick="testCourierConnection('TCS')" class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl text-xs">Test API Connection</button>
+          </div>
+          <!-- Trax -->
+          <div class="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-sm text-slate-900">🚚 Trax Logistics</h4>
+              <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">Connected</span>
+            </div>
+            <p class="text-xs text-slate-500">API Key: TRX-API-10294 | Account: #88912</p>
+            <button onclick="testCourierConnection('Trax')" class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl text-xs">Test API Connection</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 13: RETURNS & RESTOCKING -->
+      <!-- ============================================================ -->
+      <section id="view-returns" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Returns &amp; Restocking (RTO)</h1>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-2">
+          <p class="text-xs text-slate-500">Log customer reverse pickups and audit restocked inventory.</p>
+          <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 font-bold">
+            All return claims resolved. Current RTO rate is 0.0%.
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 14: DISCOUNTS & COUPONS -->
+      <!-- ============================================================ -->
+      <section id="view-discounts" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-black text-slate-900 tracking-tight">Discounts &amp; Promotional Coupons</h1>
+          <button onclick="createNewCouponPrompt()" class="px-4 py-2 bg-teal-800 text-white rounded-xl text-xs font-bold">+ Create Coupon</button>
+        </div>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">
+                  <th class="pb-3">Coupon Code</th>
+                  <th class="pb-3">Type</th>
+                  <th class="pb-3">Discount</th>
+                  <th class="pb-3">Min Spend</th>
+                  <th class="pb-3">Expiry</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="couponsListTbody">
+                <tr>
+                  <td class="py-3 font-mono font-bold text-teal-800">WHOLESALE10</td>
+                  <td class="py-3">Percentage</td>
+                  <td class="py-3 font-bold">10% OFF</td>
+                  <td class="py-3">Rs. 2,000</td>
+                  <td class="py-3">2026-12-31</td>
+                </tr>
+                <tr>
+                  <td class="py-3 font-mono font-bold text-teal-800">FREESHIP</td>
+                  <td class="py-3">Free Delivery</td>
+                  <td class="py-3 font-bold">Rs. 200 OFF</td>
+                  <td class="py-3">Rs. 3,000</td>
+                  <td class="py-3">2026-12-31</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 15: WORDPRESS MEDIA LIBRARY -->
+      <!-- ============================================================ -->
+      <section id="view-media-library" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">WordPress Media Library</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Drag-and-drop image uploads, webp optimization, alt text and media URLs.</p>
+          </div>
+          <button onclick="triggerSimulatedMediaUpload()" class="px-4 py-2 bg-teal-800 text-white font-bold rounded-xl text-xs">+ Upload New File</button>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3" id="mediaLibraryGrid">
+            <!-- Dynamically populated from product images -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 16: PRODUCT REVIEWS AUDIT -->
+      <!-- ============================================================ -->
+      <section id="view-reviews" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Product Customer Reviews</h1>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-3">
+          <div class="p-3.5 bg-slate-50 border rounded-2xl flex items-center justify-between">
+            <div>
+              <span class="text-amber-500 font-bold">★★★★★</span>
+              <h4 class="font-bold text-xs text-slate-800">Tariq Mehmood on "Universal Waterproof Bike Cover"</h4>
+              <p class="text-xs text-slate-500">"Bohat achi quality hai, paani se bilkul bachata hai. Recommended!"</p>
+            </div>
+            <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">Approved</span>
+          </div>
+          <div class="p-3.5 bg-slate-50 border rounded-2xl flex items-center justify-between">
+            <div>
+              <span class="text-amber-500 font-bold">★★★★★</span>
+              <h4 class="font-bold text-xs text-slate-800">Zubair Khan on "Multipurpose Kitchen Shelf Rack"</h4>
+              <p class="text-xs text-slate-500">"Suction cup boht strong hai, easily stick ho gaya."</p>
+            </div>
+            <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">Approved</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 17: SEO & PIXELS CENTER -->
+      <!-- ============================================================ -->
+      <section id="view-seo" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-black text-slate-900 tracking-tight">SEO Center &amp; Meta Previews</h1>
+          <button onclick="showToast('SEO Settings saved to meta!')" class="px-4 py-2 bg-teal-800 text-white rounded-xl text-xs font-bold">Save SEO Configuration</button>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+            <h3 class="font-bold text-slate-900 text-sm">Store Meta Tags Configuration</h3>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Global Meta Title (Max 60 chars)</label>
+              <input type="text" id="seoInputTitle" oninput="updateSeoPreview()" value="Save &amp; Smile | Wholesale Gadgets &amp; Organizers Pakistan" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Meta Description (Max 160 chars)</label>
+              <textarea id="seoInputDesc" oninput="updateSeoPreview()" rows="3" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">Buy wholesale gadgets, bathroom storage racks, bike covers and daily utilities at factory rates with cash on delivery across Pakistan.</textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Facebook Pixel ID</label>
+              <input type="text" value="FB-1928374829" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+          </div>
+
+          <!-- Google SERP Live Snippet Preview -->
+          <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+            <h3 class="font-bold text-slate-900 text-sm">Live Google SERP Search Snippet Preview</h3>
+            <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
+              <span class="text-xs text-slate-500 font-mono block">https://saveandsmile.pk/</span>
+              <h4 class="text-base text-blue-700 hover:underline font-medium cursor-pointer" id="seoPrevTitle">Save &amp; Smile | Wholesale Gadgets &amp; Organizers Pakistan</h4>
+              <p class="text-xs text-slate-600 leading-relaxed" id="seoPrevDesc">Buy wholesale gadgets, bathroom storage racks, bike covers and daily utilities at factory rates with cash on delivery across Pakistan.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 18: REPORTS & MERCHANDISING ANALYTICS -->
+      <!-- ============================================================ -->
+      <section id="view-reports" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-black text-slate-900 tracking-tight">Merchandising &amp; Sales Reports</h1>
+          <button onclick="downloadCsvExport('sales')" class="px-4 py-2 bg-emerald-700 text-white font-bold rounded-xl text-xs">Download Full Ledger CSV</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-2">
+            <h4 class="font-bold text-xs uppercase text-slate-400">Total Merchandising Value (GMV)</h4>
+            <div class="text-2xl font-black text-slate-900" id="repTotalGross">Rs. 1,545</div>
+            <p class="text-xs text-emerald-600 font-bold">+24% Monthly Velocity</p>
+          </div>
+          <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-2">
+            <h4 class="font-bold text-xs uppercase text-slate-400">Total Items Dispatched</h4>
+            <div class="text-2xl font-black text-slate-900">4 Units</div>
+            <p class="text-xs text-teal-600 font-bold">100% Delivery Success Rate</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 19: SETTINGS -->
+      <!-- ============================================================ -->
+      <section id="view-settings" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-black text-slate-900 tracking-tight">Store Settings &amp; Rules</h1>
+          <button onclick="saveStoreSettings()" class="px-4 py-2 bg-teal-800 text-white rounded-xl text-xs font-bold">Save Settings</button>
+        </div>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Store Name</label>
+              <input type="text" id="cfgName" value="Save &amp; Smile" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Helpline Phone</label>
+              <input type="text" id="cfgPhone" value="0316-2323616" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Standard Shipping Fee (Rs.)</label>
+              <input type="number" id="cfgShipFee" value="200" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Free Delivery Minimum (Rs.)</label>
+              <input type="number" id="cfgFreeShip" value="3000" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Central Warehouse Address</label>
+            <input type="text" id="cfgAddr" value="Wholesale Market, Karachi / Lahore, Pakistan" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 20: ROLES & ACCESS CONTROL -->
+      <!-- ============================================================ -->
+      <section id="view-users" class="view-panel space-y-6">
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Roles &amp; Role-Based Access (RBAC)</h1>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-3">
+          <div class="flex items-center justify-between p-3 border rounded-xl text-xs">
+            <div>
+              <div class="font-bold text-slate-800">Super Administrator (admin@saveandsmile.pk)</div>
+              <div class="text-[11px] text-slate-400">Full System Permissions across Store, Catalog &amp; Finances</div>
+            </div>
+            <span class="px-2 py-0.5 bg-teal-100 text-teal-800 rounded font-bold">Active</span>
+          </div>
+          <div class="flex items-center justify-between p-3 border rounded-xl text-xs">
+            <div>
+              <div class="font-bold text-slate-800">Dispatch Officer (orders@saveandsmile.pk)</div>
+              <div class="text-[11px] text-slate-400">Order Management &amp; Courier Fulfillment Desk</div>
+            </div>
+            <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded font-bold">Active</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 21: AUDIT TRAIL LOG -->
+      <!-- ============================================================ -->
+      <section id="view-audit-log" class="view-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-black text-slate-900 tracking-tight">Audit Trail &amp; Security Log</h1>
+          <button onclick="clearAuditLog()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold">Clear Log</button>
+        </div>
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">
+                  <th class="pb-3">Timestamp</th>
+                  <th class="pb-3">Admin User</th>
+                  <th class="pb-3">Action</th>
+                  <th class="pb-3">Target Entity</th>
+                  <th class="pb-3 text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="auditTrailTbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- ============================================================ -->
+  <!-- MODALS: PRO 10-TAB PRODUCT EDITOR (WOOCOMMERCE / SHOPIFY LEVEL) -->
+  <!-- ============================================================ -->
+  <div id="proProductModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl max-w-4xl w-full p-6 space-y-4 shadow-2xl relative max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div>
+          <h3 class="text-lg font-black text-slate-900" id="proModalHeading">Add Product (WooCommerce &amp; Shopify Standard)</h3>
+          <p class="text-xs text-slate-500">Configure catalog information, pricing, stock, attributes, and color variant photos.</p>
+        </div>
+        <button onclick="closeModal('proProductModal')" class="text-slate-400 hover:text-slate-600 font-bold text-lg p-1">✕</button>
+      </div>
+
+      <!-- 10 Navigation Tabs Strip -->
+      <div class="flex items-center space-x-1 overflow-x-auto pb-2 border-b border-slate-100 text-xs font-bold">
+        <button onclick="switchProdEditorTab('general', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-teal-800 text-white shrink-0">1. General</button>
+        <button onclick="switchProdEditorTab('pricing', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">2. Pricing</button>
+        <button onclick="switchProdEditorTab('inventory', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">3. Inventory</button>
+        <button onclick="switchProdEditorTab('images', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">4. Images</button>
+        <button onclick="switchProdEditorTab('variants', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">5. Variants Engine</button>
+        <button onclick="switchProdEditorTab('shipping', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">6. Shipping</button>
+        <button onclick="switchProdEditorTab('seo', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">7. SEO</button>
+        <button onclick="switchProdEditorTab('attributes', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">8. Attributes</button>
+        <button onclick="switchProdEditorTab('related', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">9. Related</button>
+        <button onclick="switchProdEditorTab('advanced', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">10. Advanced</button>
+      </div>
+
+      <form id="proProductForm" onsubmit="handleProProductSubmit(event)" class="space-y-4">
+        
+        <!-- TAB 1: GENERAL -->
+        <div id="prodTab-general" class="prod-tab-pane active space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Product Title *</label>
+            <input type="text" id="pTitle" required placeholder="e.g. Multipurpose Corner Storage Rack Organizer" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">SKU Code</label>
+              <input type="text" id="pSku" placeholder="QGW-10099" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Category</label>
+              <select id="pCat" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+                <option value="storage">Storage &amp; Organization</option>
+                <option value="kitchen">Kitchen Tools &amp; Gadgets</option>
+                <option value="bottles">Mugs &amp; Bottles</option>
+                <option value="beauty">Beauty &amp; Makeup</option>
+                <option value="insect-killers">Insect Killers</option>
+                <option value="accessories">Mobile Accessories</option>
+                <option value="travel">Bags &amp; Travel</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Full Description</label>
+            <textarea id="pDesc" rows="3" placeholder="Enter detailed product description..." class="w-full text-xs p-2.5 border border-slate-200 rounded-xl"></textarea>
+          </div>
+        </div>
+
+        <!-- TAB 2: PRICING -->
+        <div id="prodTab-pricing" class="prod-tab-pane space-y-3">
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Cost Price (Rs.)</label>
+              <input type="number" id="pCost" oninput="calcProfitMargin()" placeholder="100" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Selling / Sale Price (Rs.) *</label>
+              <input type="number" id="pPrice" required oninput="calcProfitMargin()" placeholder="180" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Compare-At / MRP (Rs.)</label>
+              <input type="number" id="pOrigPrice" placeholder="450" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+          </div>
+          <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between text-xs">
+            <span class="font-bold text-emerald-900">Profit: <span id="calcProfitText">Rs. 80</span></span>
+            <span class="font-bold text-emerald-900">Margin: <span id="calcMarginText">44.4%</span></span>
+          </div>
+        </div>
+
+        <!-- TAB 3: INVENTORY -->
+        <div id="prodTab-inventory" class="prod-tab-pane space-y-3">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Stock Quantity *</label>
+              <input type="number" id="pStock" value="100" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Low Stock Warning Threshold</label>
+              <input type="number" id="pThreshold" value="15" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: IMAGES -->
+        <div id="prodTab-images" class="prod-tab-pane space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Main Featured Image URL *</label>
+            <input type="url" id="pImage" required placeholder="https://..." class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+          </div>
+        </div>
+
+        <!-- TAB 5: VARIANTS MATRIX (COLOR × SWITCH × CONNECTION) -->
+        <div id="prodTab-variants" class="prod-tab-pane space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold text-slate-800">Multi-Option Variant Matrix</p>
+              <p class="text-[11px] text-slate-500">Configure combinations for Color, Switch Type, and Connection Mode with strict integer pricing.</p>
+            </div>
+            <button type="button" onclick="addVariantRow()" class="px-3 py-1.5 bg-teal-800 text-white font-bold rounded-xl text-xs hover:bg-teal-900">+ Add Variant Row</button>
+          </div>
+
+          <div id="variantRowsContainer" class="space-y-3">
+            <div class="border border-slate-200 rounded-2xl p-3 bg-slate-50 space-y-2">
+              <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Color / Finish</label>
+                  <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-medium" value="Deep Midnight">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Switch Type</label>
+                  <select class="w-full p-2 border rounded-xl bg-white text-xs font-medium">
+                    <option value="Hall-Effect Magnetic">Hall-Effect Magnetic</option>
+                    <option value="Tactile Brown">Tactile Brown</option>
+                    <option value="Linear Red">Linear Red</option>
+                    <option value="Speed Silver">Speed Silver</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">SKU</label>
+                  <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-mono" value="APX-HE-MID">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Price (Cents)</label>
+                  <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs font-bold" value="18999">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Stock Qty</label>
+                  <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs" value="75">
+                </div>
+              </div>
+            </div>
+
+            <div class="border border-slate-200 rounded-2xl p-3 bg-slate-50 space-y-2">
+              <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Color / Finish</label>
+                  <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-medium" value="Arctic Cyan">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Switch Type</label>
+                  <select class="w-full p-2 border rounded-xl bg-white text-xs font-medium">
+                    <option value="Tactile Brown">Tactile Brown</option>
+                    <option value="Hall-Effect Magnetic">Hall-Effect Magnetic</option>
+                    <option value="Linear Red">Linear Red</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">SKU</label>
+                  <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-mono" value="APX-TAC-CYN">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Price (Cents)</label>
+                  <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs font-bold" value="16999">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Stock Qty</label>
+                  <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs" value="50">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 6: SHIPPING -->
+        <div id="prodTab-shipping" class="prod-tab-pane space-y-3">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Weight (kg)</label>
+              <input type="number" step="0.1" value="0.5" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Free Shipping</label>
+              <select class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+                <option value="no">Standard Shipping</option>
+                <option value="yes">Free Delivery</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 7: SEO & SOCIAL GRAPH SUITE -->
+        <div id="prodTab-seo" class="prod-tab-pane space-y-4">
+          <div class="space-y-3">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-700">SEO Meta Title *</label>
+                <span id="seoTitleCounter" class="text-[10px] font-mono text-slate-500">0 / 60 chars</span>
+              </div>
+              <input type="text" id="pSeoTitle" oninput="updateSeoCounters()" placeholder="Apex Pro Hall-Effect Keyboard | High-Performance Gear" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-teal-700">
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-700">SEO URL Slug *</label>
+                <span class="text-[10px] text-emerald-600 font-bold">Valid format: a-z, 0-9, hyphens</span>
+              </div>
+              <div class="flex items-center space-x-1">
+                <span class="text-xs text-slate-400 font-mono bg-slate-100 p-2.5 rounded-l-xl border border-r-0 border-slate-200">https://techadvizer.com/p/</span>
+                <input type="text" id="pSlug" oninput="updateSeoCounters()" placeholder="apex-pro-hall-effect-keyboard" class="flex-1 text-xs p-2.5 border border-slate-200 rounded-r-xl font-mono focus:ring-1 focus:ring-teal-700">
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-700">SEO Meta Description</label>
+                <span id="seoDescCounter" class="text-[10px] font-mono text-slate-500">0 / 160 chars</span>
+              </div>
+              <textarea id="pSeoDesc" oninput="updateSeoCounters()" rows="2" placeholder="Engineered with analog hall-effect magnetic switches and zero rounding errors. Fast worldwide dispatch with 30-day warranty." class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-teal-700"></textarea>
+            </div>
+          </div>
+
+          <!-- Real-Time SERP & Social Previews -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+            <!-- Google SERP Snippet Preview -->
+            <div class="p-3 bg-white border border-slate-200 rounded-2xl space-y-1 shadow-2xs">
+              <span class="text-[10px] font-black uppercase text-slate-400 block tracking-wider">Google Search Snippet Preview</span>
+              <p class="text-xs text-[#1a0dab] hover:underline font-medium truncate cursor-pointer" id="serpPreviewTitle">Apex Pro Hall-Effect Keyboard | High-Performance Gear</p>
+              <p class="text-[10px] text-[#006621] font-mono truncate" id="serpPreviewUrl">https://techadvizer.com/p/apex-pro-hall-effect-keyboard</p>
+              <p class="text-[11px] text-[#545454] line-clamp-2 leading-relaxed" id="serpPreviewDesc">Engineered with analog hall-effect magnetic switches and zero rounding errors. Fast worldwide dispatch with 30-day warranty.</p>
+            </div>
+
+            <!-- Twitter / Discord OpenGraph Preview -->
+            <div class="p-3 bg-slate-900 text-white rounded-2xl space-y-2 border border-slate-800">
+              <span class="text-[10px] font-black uppercase text-cyan-400 block tracking-wider">Discord / Twitter Social Card</span>
+              <div class="h-20 bg-slate-800 rounded-xl flex items-center justify-center text-slate-500 text-xs font-mono overflow-hidden">
+                <img id="ogPreviewImage" src="images/product_gallery/md_1779101219_ChatGPT_Image_May_18,_2026,_03_46_14_PM.png" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <p class="text-xs font-bold text-white truncate" id="ogPreviewTitle">Apex Pro Hall-Effect Keyboard</p>
+                <p class="text-[10px] text-slate-400 line-clamp-1" id="ogPreviewDesc">Bespoke tactile engineering with calibrated analog switches.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 8: ATTRIBUTES -->
+        <div id="prodTab-attributes" class="prod-tab-pane space-y-3">
+          <div class="p-3 bg-slate-50 border rounded-xl text-xs space-y-1">
+            <p class="font-bold">Active Attributes: Color, Size, Material</p>
+          </div>
+        </div>
+
+        <!-- TAB 9: RELATED -->
+        <div id="prodTab-related" class="prod-tab-pane space-y-3">
+          <p class="text-xs text-slate-500">Cross-sell and Upsell suggestions automatically curated from Category.</p>
+        </div>
+
+        <!-- TAB 10: ADVANCED -->
+        <div id="prodTab-advanced" class="prod-tab-pane space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Promotional Badge</label>
+            <input type="text" id="pBadge" value="HOT SELLER" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+          </div>
+        </div>
+
+        <!-- Modal Bottom Actions -->
+        <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('proProductModal')" class="px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 rounded-xl">Cancel</button>
+          <button type="submit" class="px-5 py-2 text-xs font-black text-white bg-teal-800 hover:bg-teal-900 rounded-xl shadow-sm">Save &amp; Publish Product</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Order Detail & Timeline Modal -->
+  <div id="orderDetailModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-2 border-b">
+        <h3 class="text-lg font-black text-slate-900" id="orderModalTitle">Order Details</h3>
+        <button onclick="closeModal('orderDetailModal')" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+      </div>
+      <div id="orderModalBody" class="space-y-3 text-xs">
+        <!-- Content injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Printable Shipping Airway Bill Modal -->
+  <div id="shippingLabelModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+      <div class="flex justify-between pb-3 border-b">
+        <span class="font-bold text-xs uppercase tracking-wider text-slate-500">Courier Shipping Label</span>
+        <button onclick="closeModal('shippingLabelModal')" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+      </div>
+      <div id="printableShippingLabel" class="p-4 border-2 border-dashed border-slate-800 rounded-xl mt-3 space-y-3 font-mono text-xs">
+        <div class="flex justify-between items-center border-b pb-2">
+          <strong class="text-sm">SAVE &amp; SMILE</strong>
+          <span class="bg-slate-900 text-white px-2 py-0.5 rounded text-[10px] font-bold">LEOPARDS COD</span>
+        </div>
+        <div>
+          <p><strong>Tracking No:</strong> <span id="lblTracking">LEOP-9921827</span></p>
+          <p><strong>Order ID:</strong> <span id="lblOrder">#SNS-484209</span></p>
+        </div>
+        <div class="border-t border-b py-2 space-y-1">
+          <p><strong>To:</strong> <span id="lblCustomer">Ahmed Raza</span></p>
+          <p><strong>Phone:</strong> <span id="lblPhone">03001234567</span></p>
+          <p><strong>Address:</strong> <span id="lblAddress">Gulshan-e-Iqbal Block 13, Karachi</span></p>
+        </div>
+        <div class="flex justify-between items-center text-sm font-black pt-1">
+          <span>COD CASH TO COLLECT:</span>
+          <span id="lblAmount">Rs. 797</span>
+        </div>
+      </div>
+      <div class="pt-4 flex justify-end space-x-2">
+        <button onclick="closeModal('shippingLabelModal')" class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold">Close</button>
+        <button onclick="window.print()" class="px-4 py-1.5 bg-teal-800 text-white rounded-xl text-xs font-bold">🖨️ Print Label</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Drawer Modal -->
+  <div id="notificationsModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-2 border-b">
+        <h3 class="text-base font-black text-slate-900">System Alerts &amp; Notifications</h3>
+        <button onclick="closeModal('notificationsModal')" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+      </div>
+      <div class="space-y-2 text-xs">
+        <div class="p-3 bg-teal-50 border border-teal-200 rounded-xl text-teal-900 font-semibold">
+          ✅ Database connection established with Neon PostgreSQL.
+        </div>
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 font-semibold">
+          ⚡ 2 New wholesale orders received on checkout desk.
+        </div>
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-semibold">
+          📦 Courier dispatch manifest ready for Leopards scan.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Command Palette Modal (Ctrl+K / Cmd+K) -->
+  <div id="commandPaletteModal" class="fixed inset-0 modal-backdrop hidden items-start justify-center z-50 p-4 pt-20">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-4 shadow-2xl relative border border-slate-200 space-y-3">
+      <div class="flex items-center space-x-2.5 pb-2 border-b border-slate-100">
+        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" id="paletteSearchInput" oninput="handlePaletteSearch(this.value)" placeholder="Type a command, module name, order ID, or product SKU..." class="flex-1 text-xs outline-none bg-transparent font-medium">
+        <kbd class="text-[10px] bg-slate-100 border border-slate-300 px-1.5 py-0.5 rounded font-mono text-slate-500">ESC to close</kbd>
+      </div>
+
+      <!-- Quick Command Results List -->
+      <div id="paletteResultsList" class="max-h-80 overflow-y-auto space-y-1 text-xs">
+        <!-- Default Popular Quick Links -->
+        <div class="px-2 py-1 text-[10px] font-black uppercase tracking-wider text-slate-400">Jump to Admin Module</div>
+        <div onclick="executePaletteNavigation('dashboard')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+          <span class="flex items-center space-x-2"><span>📊</span> <span>Executive Dashboard</span></span>
+          <span class="text-[10px] text-slate-400 font-mono">/admin</span>
+        </div>
+        <div onclick="executePaletteNavigation('orders')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+          <span class="flex items-center space-x-2"><span>📦</span> <span>Orders Engine</span></span>
+          <span class="text-[10px] text-slate-400 font-mono">/orders</span>
+        </div>
+        <div onclick="executePaletteNavigation('products')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+          <span class="flex items-center space-x-2"><span>🛍️</span> <span>Product Catalog &amp; Variants</span></span>
+          <span class="text-[10px] text-slate-400 font-mono">/products</span>
+        </div>
+        <div onclick="executePaletteNavigation('inventory')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+          <span class="flex items-center space-x-2"><span>🏷️</span> <span>Inventory &amp; Stock Levels</span></span>
+          <span class="text-[10px] text-slate-400 font-mono">/inventory</span>
+        </div>
+        <div onclick="executePaletteNavigation('couriers')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+          <span class="flex items-center space-x-2"><span>🚚</span> <span>Courier API &amp; Dispatches</span></span>
+          <span class="text-[10px] text-slate-400 font-mono">/couriers</span>
+        </div>
+        <div onclick="executePaletteNavigation('seo')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+          <span class="flex items-center space-x-2"><span>🌐</span> <span>SEO &amp; OpenGraph Suite</span></span>
+          <span class="text-[10px] text-slate-400 font-mono">/seo</span>
+        </div>
+        <div onclick="window.open('live-editor.html', '_blank'); closeModal('commandPaletteModal');" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-teal-800 bg-teal-50">
+          <span class="flex items-center space-x-2"><span>⚡</span> <span>Open Live Theme Visual Builder</span></span>
+          <span class="text-[10px] text-teal-600 font-mono">/live-editor</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBox" class="fixed bottom-6 right-6 bg-slate-950 text-white text-xs font-bold py-3 px-5 rounded-2xl shadow-xl flex items-center space-x-2 transform translate-y-24 opacity-0 transition-all duration-300 z-50">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage">Done</span>
+  </div>
+
+  <!-- External Script Dependencies (Only Product Data, No Storefront Scripts) -->
+  <script src="js/products-data.js"></script>
+
+  <!-- Complete Admin Engine Script -->
+  <script>
+    // -------------------------------------------------------------
+    // DATA SOURCE (SELF-CONTAINED FOR ADMIN)
+    // -------------------------------------------------------------
+    function getAllProducts() {
+      try {
+        const custom = JSON.parse(localStorage.getItem('qadri_custom_products')) || [];
+        const overrides = JSON.parse(localStorage.getItem('qadri_product_overrides')) || {};
+        const deleted = JSON.parse(localStorage.getItem('qadri_deleted_products')) || [];
+
+        const base = (typeof PRODUCTS !== 'undefined' && Array.isArray(PRODUCTS) ? PRODUCTS : [])
+          .filter(p => !deleted.includes(p.id) && !deleted.includes(String(p.id)))
+          .map(p => overrides[p.id] ? { ...p, ...overrides[p.id] } : p);
+
+        return [...custom, ...base];
+      } catch (err) {
+        console.warn('Error reading products:', err);
+        return typeof PRODUCTS !== 'undefined' && Array.isArray(PRODUCTS) ? PRODUCTS : [];
+      }
+    }
+
+    // -------------------------------------------------------------
+    // NAVIGATION & VIEW SWITCHING (ALL 21 OPTIONS ACTIVE)
+    // -------------------------------------------------------------
+    function switchView(viewName, btnEl) {
+      try {
+        // Hide all view panels
+        document.querySelectorAll('.view-panel').forEach(p => {
+          p.classList.remove('active');
+          p.style.display = 'none';
+        });
+
+        // Activate target view panel
+        const target = document.getElementById('view-' + viewName);
+        if (target) {
+          target.classList.add('active');
+          target.style.display = 'block';
+        } else {
+          const dash = document.getElementById('view-dashboard');
+          if (dash) {
+            dash.classList.add('active');
+            dash.style.display = 'block';
+          }
+        }
+
+        // Top Breadcrumb Update
+        const formattedTitle = viewName.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const breadcrumbEl = document.getElementById('topBreadcrumb');
+        if (breadcrumbEl) breadcrumbEl.textContent = formattedTitle;
+
+        // Reset all sidebar buttons active styling
+        document.querySelectorAll('.nav-item').forEach(i => {
+          i.classList.remove('bg-teal-900/60', 'text-cyan-300', 'border', 'border-teal-700/60', 'shadow-xs');
+          i.classList.add('text-slate-400');
+        });
+        document.querySelectorAll('.nav-sub-item').forEach(i => {
+          i.classList.remove('bg-teal-900/70', 'text-cyan-300', 'font-bold', 'border-l-2', 'border-cyan-400');
+          i.classList.add('text-slate-400');
+        });
+
+        // Auto-detect button if not provided
+        if (!btnEl) {
+          btnEl = document.querySelector(`button[onclick*="'${viewName}'"]`);
+        }
+
+        if (btnEl) {
+          if (btnEl.classList.contains('nav-item')) {
+            btnEl.classList.add('bg-teal-900/60', 'text-cyan-300', 'border', 'border-teal-700/60', 'shadow-xs');
+            btnEl.classList.remove('text-slate-400');
+          } else if (btnEl.classList.contains('nav-sub-item')) {
+            btnEl.classList.add('bg-teal-900/70', 'text-cyan-300', 'font-bold', 'border-l-2', 'border-cyan-400');
+            btnEl.classList.remove('text-slate-400');
+          }
+        }
+
+        // Open parent collapsible menu if target is inside operations or products
+        const opsSubViews = ['action-inbox', 'cod-control', 'fulfillment', 'settlements', 'couriers', 'returns'];
+        const prodSubViews = ['products', 'categories', 'inventory', 'variants-hub', 'reviews'];
+        if (opsSubViews.includes(viewName)) {
+          const opsSub = document.getElementById('operations-sub');
+          if (opsSub && opsSub.classList.contains('hidden')) opsSub.classList.remove('hidden');
+        }
+        if (prodSubViews.includes(viewName)) {
+          const prodSub = document.getElementById('products-sub');
+          if (prodSub && prodSub.classList.contains('hidden')) prodSub.classList.remove('hidden');
+        }
+
+        // Scroll main workspace to top
+        const scrollArea = document.getElementById('mainScrollArea');
+        if (scrollArea) scrollArea.scrollTop = 0;
+
+        // Close mobile drawer if open
+        const sidebar = document.getElementById('sidebarEl');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+          sidebar.classList.add('-translate-x-full');
+          if (backdrop) backdrop.classList.add('hidden');
+        }
+
+        // Refresh corresponding view data safely
+        try {
+          if (viewName === 'orders') renderOrdersTable();
+          else if (viewName === 'products') renderProductsTable();
+          else if (viewName === 'categories') renderCategoriesView();
+          else if (viewName === 'inventory') renderInventoryTable();
+          else if (viewName === 'customers') renderCustomersTable();
+          else if (viewName === 'media-library') renderMediaLibrary();
+          else if (viewName === 'audit-log') renderAuditTrail();
+          else if (viewName === 'dashboard') renderDashboardMetrics();
+        } catch (renderErr) {
+          console.warn('View render error:', renderErr);
+        }
+
+        recordAuditLog('Navigated View', `Admin opened section: ${formattedTitle}`);
+        showToast(`Switched to ${formattedTitle}`);
+      } catch (err) {
+        console.error('Error switching view:', err);
+      }
+    }
+
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebarEl');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      const isOpen = !sidebar.classList.contains('-translate-x-full');
+      if (isOpen) {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      } else {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      }
+    }
+
+    function openCommandPalette() {
+      openModal('commandPaletteModal');
+      const input = document.getElementById('paletteSearchInput');
+      if (input) {
+        input.value = '';
+        input.focus();
+        handlePaletteSearch('');
+      }
+    }
+
+    function executePaletteNavigation(viewName) {
+      closeModal('commandPaletteModal');
+      switchView(viewName);
+    }
+
+    function handlePaletteSearch(q) {
+      const list = document.getElementById('paletteResultsList');
+      if (!list) return;
+      const query = (q || '').toLowerCase().trim();
+
+      const allModules = [
+        { id: 'dashboard', name: 'Executive Dashboard', icon: '📊', path: '/admin' },
+        { id: 'orders', name: 'Orders Engine & Fulfillment', icon: '📦', path: '/orders' },
+        { id: 'products', name: 'Product Catalog & Matrix', icon: '🛍️', path: '/products' },
+        { id: 'categories', name: 'Categories & Taxonomy', icon: '🗂️', path: '/categories' },
+        { id: 'inventory', name: 'Inventory & Stock Tiers', icon: '🏷️', path: '/inventory' },
+        { id: 'variants-hub', name: 'Variants & Color Matrix', icon: '🎨', path: '/variants' },
+        { id: 'customers', name: 'Customers & Profiles', icon: '👥', path: '/customers' },
+        { id: 'action-inbox', name: 'Action Inbox & Alerts', icon: '📥', path: '/inbox' },
+        { id: 'cod-control', name: 'Cash on Delivery Control', icon: '💵', path: '/cod' },
+        { id: 'fulfillment', name: 'Fulfillment & Dispatch Desk', icon: '🚚', path: '/fulfillment' },
+        { id: 'settlements', name: 'Courier Cash Settlements', icon: '💰', path: '/settlements' },
+        { id: 'couriers', name: 'Courier Integrations (TCS / Leopards)', icon: '🚛', path: '/couriers' },
+        { id: 'returns', name: 'Returns & Reverse Logistics', icon: '↩️', path: '/returns' },
+        { id: 'discounts', name: 'Marketing & Discount Coupons', icon: '🎟️', path: '/coupons' },
+        { id: 'media-library', name: 'Media Asset Library', icon: '🖼️', path: '/media' },
+        { id: 'reviews', name: 'Verified Customer Reviews', icon: '⭐', path: '/reviews' },
+        { id: 'seo', name: 'SEO & Social OpenGraph Engine', icon: '🌐', path: '/seo' },
+        { id: 'reports', name: 'Executive Analytics & Reports', icon: '📈', path: '/reports' },
+        { id: 'settings', name: 'Store Configuration & Policies', icon: '⚙️', path: '/settings' },
+        { id: 'users', name: 'Admin Users & RBAC Permissions', icon: '🛡️', path: '/users' },
+        { id: 'audit-log', name: 'Security & Audit Log Trail', icon: '📜', path: '/audit' },
+      ];
+
+      const prods = getAllProducts();
+      const filteredModules = allModules.filter(m => m.name.toLowerCase().includes(query) || m.id.includes(query));
+      const filteredProds = query.length >= 2 ? prods.filter(p => (p.title || '').toLowerCase().includes(query) || (p.code || '').toLowerCase().includes(query)).slice(0, 5) : [];
+
+      let html = '';
+      if (filteredModules.length > 0) {
+        html += `<div class="px-2 py-1 text-[10px] font-black uppercase tracking-wider text-slate-400">Admin Modules (${filteredModules.length})</div>`;
+        filteredModules.forEach(m => {
+          html += `
+            <div onclick="executePaletteNavigation('${m.id}')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+              <span class="flex items-center space-x-2"><span>${m.icon}</span> <span>${m.name}</span></span>
+              <span class="text-[10px] text-slate-400 font-mono">${m.path}</span>
+            </div>
+          `;
+        });
+      }
+
+      if (filteredProds.length > 0) {
+        html += `<div class="px-2 py-1 mt-2 text-[10px] font-black uppercase tracking-wider text-cyan-600">Matching Products (${filteredProds.length})</div>`;
+        filteredProds.forEach(p => {
+          html += `
+            <div onclick="executePaletteNavigation('products'); editProductPrompt(${p.id});" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-slate-700">
+              <span class="flex items-center space-x-2 truncate"><img src="${p.image || ''}" class="w-6 h-6 rounded object-cover"> <span class="truncate">${p.title}</span></span>
+              <span class="text-[10px] text-teal-700 font-mono">Rs. ${p.price}</span>
+            </div>
+          `;
+        });
+      }
+
+      if (!html) {
+        html = `<div class="p-4 text-center text-slate-400 text-xs">No matching module or item found for "${query}"</div>`;
+      }
+
+      list.innerHTML = html;
+    }
+
+    // Global Key Listener for Ctrl+K
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const modal = document.getElementById('commandPaletteModal');
+        if (modal && modal.classList.contains('hidden')) {
+          openCommandPalette();
+        } else {
+          closeModal('commandPaletteModal');
+        }
+      }
+      if (e.key === 'Escape') {
+        closeModal('commandPaletteModal');
+      }
+    });
+
+    function toggleSidebarSub(subId, defaultView) {
+      const el = document.getElementById(subId);
+      const arr = document.getElementById('arr-' + subId);
+      if (!el) return;
+      const isClosed = el.classList.contains('hidden');
+      if (isClosed) {
+        el.classList.remove('hidden');
+        if (arr) arr.classList.add('rotate-180');
+        if (defaultView) switchView(defaultView);
+      } else {
+        el.classList.add('hidden');
+        if (arr) arr.classList.remove('rotate-180');
+      }
+    }
+
+    function toggleNotificationsModal() {
+      openModal('notificationsModal');
+    }
+
+    // -------------------------------------------------------------
+    // AUDIT LOG SYSTEM
+    // -------------------------------------------------------------
+    function recordAuditLog(action, entity) {
+      const logs = JSON.parse(localStorage.getItem('save_and_smile_audit_log')) || [];
+      logs.unshift({
+        id: Date.now(),
+        timestamp: new Date().toLocaleTimeString(),
+        user: 'Store Administrator',
+        action,
+        entity
+      });
+      if (logs.length > 50) logs.pop();
+      localStorage.setItem('save_and_smile_audit_log', JSON.stringify(logs));
+    }
+
+    function renderAuditTrail() {
+      const tbody = document.getElementById('auditTrailTbody');
+      if (!tbody) return;
+      const logs = JSON.parse(localStorage.getItem('save_and_smile_audit_log')) || [
+        { id: 1, timestamp: '12:00:15 PM', user: 'Administrator', action: 'Order Verified', entity: '#SNS-484209' },
+        { id: 2, timestamp: '11:45:20 AM', user: 'Administrator', action: 'Inventory Synced', entity: 'Warehouse Central' }
+      ];
+
+      tbody.innerHTML = logs.map(l => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="py-2.5 font-mono text-slate-500">${l.timestamp}</td>
+          <td class="py-2.5 font-bold text-slate-800">${l.user}</td>
+          <td class="py-2.5 font-bold text-teal-800">${l.action}</td>
+          <td class="py-2.5 text-slate-600">${l.entity}</td>
+          <td class="py-2.5 text-right"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">SUCCESS</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function clearAuditLog() {
+      localStorage.removeItem('save_and_smile_audit_log');
+      renderAuditTrail();
+      showToast('Audit log cleared');
+    }
+
+    // -------------------------------------------------------------
+    // DATA PERSISTENCE & STORED ORDERS
+    // -------------------------------------------------------------
+    function getStoredOrders() {
+      let orders = [];
+      try {
+        orders = JSON.parse(localStorage.getItem('qadri_placed_orders')) || [];
+      } catch (e) {
+        orders = [];
+      }
+
+      if (!orders || orders.length === 0) {
+        orders = [
+          {
+            orderId: 'SNS-484209',
+            name: 'Ahmed Raza',
+            phone: '03001234567',
+            city: 'Karachi',
+            address: 'Gulshan-e-Iqbal Block 13, Near Disco Bakery',
+            grandTotal: 797,
+            status: 'Preparing',
+            payment: 'COD',
+            courier: 'Leopards Courier',
+            trackingNumber: 'LEOP-882194',
+            items: [{ title: 'Multipurpose Kitchen Storage Rack', qty: 2, price: 180, image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=150' }],
+            date: new Date(Date.now() - 3600000 * 6).toISOString()
+          },
+          {
+            orderId: 'SNS-100201',
+            name: 'Ahmed Khan',
+            phone: '+92 311 8877665',
+            city: 'Lahore',
+            address: 'Model Town Block C, House 42',
+            grandTotal: 748,
+            status: 'Shipped',
+            payment: 'COD',
+            courier: 'Trax Logistics',
+            trackingNumber: 'TRAX-449102',
+            items: [{ title: 'Premium Waterproof Bike Cover', qty: 1, price: 400, image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=150' }],
+            date: new Date(Date.now() - 86400000 * 1).toISOString()
+          },
+          {
+            orderId: 'SNS-204918',
+            name: 'Zainab Fatima',
+            phone: '03335544332',
+            city: 'Islamabad',
+            address: 'Sector F-10 Markaz, Street 14',
+            grandTotal: 1450,
+            status: 'Pending',
+            payment: 'COD',
+            courier: 'Awaiting Verification',
+            trackingNumber: 'PENDING',
+            items: [{ title: 'Cosmetic Organizer 360 Rotating', qty: 1, price: 850, image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=150' }],
+            date: new Date(Date.now() - 3600000 * 2).toISOString()
+          },
+          {
+            orderId: 'SNS-310892',
+            name: 'Muhammad Bilal',
+            phone: '03456789012',
+            city: 'Rawalpindi',
+            address: 'Satellite Town Block B, Commercial Market',
+            grandTotal: 2190,
+            status: 'Delivered',
+            payment: 'COD',
+            courier: 'TCS Express',
+            trackingNumber: 'TCS-991204',
+            items: [{ title: 'Electric Mosquito Killer Lamp', qty: 1, price: 1250, image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=150' }],
+            date: new Date(Date.now() - 86400000 * 3).toISOString()
+          }
+        ];
+        try {
+          localStorage.setItem('qadri_placed_orders', JSON.stringify(orders));
+        } catch (e) {}
+      }
+      return orders;
+    }
+
+    function renderDashboardMetrics() {
+      const orders = getStoredOrders();
+      const products = getAllProducts();
+
+      const totalRevenue = orders.reduce((sum, o) => sum + (o.grandTotal || 0), 0);
+      const pendingCount = orders.filter(o => (o.status || '').toLowerCase() === 'pending').length;
+      const totalCustomers = new Set(orders.map(o => o.phone)).size || 1;
+
+      document.getElementById('cardRevenue').textContent = `Rs. ${totalRevenue.toLocaleString()}`;
+      document.getElementById('cardTodaySales').textContent = `Rs. ${(orders[0] ? orders[0].grandTotal : 797).toLocaleString()}`;
+      document.getElementById('cardTotalOrders').textContent = orders.length;
+      document.getElementById('cardOrdersSub').textContent = `${pendingCount} pending action`;
+      document.getElementById('cardPendingOrders').textContent = pendingCount;
+      document.getElementById('cardTotalCustomers').textContent = totalCustomers;
+      document.getElementById('cardActiveProducts').textContent = products.length;
+      document.getElementById('sidebarOrderCount').textContent = `${orders.length} Live`;
+
+      // Render recent orders in Dashboard
+      const dashTbody = document.getElementById('dashRecentOrdersBody');
+      if (dashTbody) {
+        dashTbody.innerHTML = orders.slice(0, 5).map(o => `
+          <tr class="hover:bg-slate-50/60 transition">
+            <td class="py-3 font-mono font-bold text-teal-900">#${o.orderId}</td>
+            <td class="py-3">
+              <span class="font-bold text-slate-800 block">${o.name}</span>
+              <span class="text-[11px] text-slate-400">${o.phone}</span>
+            </td>
+            <td class="py-3 font-black text-slate-900">Rs. ${(o.grandTotal || 0).toLocaleString()}</td>
+            <td class="py-3">
+              <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-emerald-100 text-emerald-800">
+                ${o.status || 'CONFIRMED'}
+              </span>
+            </td>
+            <td class="py-3 text-slate-500 font-semibold">${o.payment || 'COD'}</td>
+            <td class="py-3 text-right">
+              <button onclick="viewOrderModal('${o.orderId}')" class="px-3 py-1 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold transition">
+                View
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // ORDERS TABLE & TIMELINE
+    // -------------------------------------------------------------
+    let currentOrderFilter = 'ALL';
+
+    function filterOrders(status, btn) {
+      currentOrderFilter = status;
+      document.querySelectorAll('#orderFilterPills button').forEach(b => {
+        b.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200';
+      });
+      if (btn) btn.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold bg-teal-800 text-white shadow-xs';
+      renderOrdersTable();
+    }
+
+    function renderOrdersTable() {
+      const tbody = document.getElementById('fullOrdersTableBody');
+      if (!tbody) return;
+      let orders = getStoredOrders();
+
+      if (currentOrderFilter !== 'ALL') {
+        orders = orders.filter(o => (o.status || '').toLowerCase() === currentOrderFilter.toLowerCase());
+      }
+
+      tbody.innerHTML = orders.map(o => `
+        <tr class="hover:bg-slate-50/60 transition">
+          <td class="py-3 font-mono font-bold text-teal-900">#${o.orderId}</td>
+          <td class="py-3">
+            <span class="font-bold text-slate-800 block">${o.name}</span>
+            <span class="text-[11px] text-slate-400 font-mono">${o.phone}</span>
+          </td>
+          <td class="py-3">
+            <div class="font-semibold text-slate-800">${o.city}</div>
+            <div class="text-[11px] text-slate-400 truncate max-w-xs">${o.address}</div>
+          </td>
+          <td class="py-3 font-bold">${(o.items || []).length} Items</td>
+          <td class="py-3 font-black text-slate-900">Rs. ${(o.grandTotal || 0).toLocaleString()}</td>
+          <td class="py-3">
+            <select onchange="updateOrderStatus('${o.orderId}', this.value)" class="text-[11px] font-bold p-1.5 border rounded-xl bg-white focus:ring-1 focus:ring-teal-700">
+              <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>🕒 Pending (Verification)</option>
+              <option value="Confirmed" ${o.status === 'Confirmed' ? 'selected' : ''}>✍️ Confirmed</option>
+              <option value="Preparing" ${o.status === 'Preparing' || o.status === 'Processing' ? 'selected' : ''}>📦 Preparing (Packaging)</option>
+              <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>🚚 Shipped (In Transit)</option>
+              <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>✅ Delivered</option>
+              <option value="Cancelled" ${o.status === 'Cancelled' ? 'selected' : ''}>❌ Cancelled</option>
+            </select>
+          </td>
+          <td class="py-3 text-right space-x-1">
+            <button onclick="triggerWhatsappCodConfirm('${o.orderId}', '${o.name}', '${o.phone}', ${o.grandTotal})" class="px-2 py-1 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 rounded-lg text-[11px] font-bold" title="Send WhatsApp Confirmation">
+              WhatsApp
+            </button>
+            <button onclick="printAirwayBill('${o.orderId}')" class="px-2 py-1 bg-cyan-100 text-cyan-800 hover:bg-cyan-200 rounded-lg text-[11px] font-bold" title="Print Shipping Label">
+              Label
+            </button>
+            <button onclick="viewOrderModal('${o.orderId}')" class="px-2 py-1 bg-slate-900 hover:bg-black text-white rounded-lg text-[11px] font-bold">
+              View
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updateOrderStatus(orderId, newStatus) {
+      const orders = getStoredOrders();
+      const idx = orders.findIndex(o => o.orderId === orderId);
+      if (idx >= 0) {
+        orders[idx].status = newStatus;
+        if ((newStatus === 'Shipped' || newStatus === 'Preparing') && (!orders[idx].trackingNumber || orders[idx].trackingNumber === 'PENDING')) {
+          orders[idx].trackingNumber = 'LEOP-' + Math.floor(100000 + Math.random() * 900000);
+          orders[idx].courier = 'Leopards Courier';
+        }
+        localStorage.setItem('qadri_placed_orders', JSON.stringify(orders));
+        recordAuditLog('Order Status Updated', `Order #${orderId} set to ${newStatus}`);
+        showToast(`Order #${orderId} marked as ${newStatus}`);
+        renderDashboardMetrics();
+      }
+    }
+
+    function saveOrderTrackingDetails(orderId) {
+      const orders = getStoredOrders();
+      const idx = orders.findIndex(o => o.orderId === orderId);
+      if (idx >= 0) {
+        const cn = document.getElementById('editTrackingCn').value.trim();
+        const courier = document.getElementById('editCourierPartner').value.trim();
+        const status = document.getElementById('editOrderStatusModal').value;
+        orders[idx].trackingNumber = cn || orders[idx].trackingNumber || ('LEOP-' + Math.floor(100000 + Math.random() * 900000));
+        orders[idx].courier = courier || orders[idx].courier || 'Leopards Courier';
+        orders[idx].status = status || orders[idx].status;
+        localStorage.setItem('qadri_placed_orders', JSON.stringify(orders));
+        recordAuditLog('Tracking Assigned', `CN ${orders[idx].trackingNumber} for #${orderId}`);
+        showToast(`Tracking saved for #${orderId}`);
+        closeModal('orderDetailModal');
+        renderOrdersTable();
+        renderDashboardMetrics();
+      }
+    }
+
+    function triggerWhatsappCodConfirm(orderId, name, phone, amount) {
+      const cleanPhone = phone.replace(/[^0-9]/g, '');
+      const msg = encodeURIComponent(`Assalam-o-Alaikum ${name}! Aap ka Save & Smile order #${orderId} (Rs. ${amount.toLocaleString()}) COD confirm karne k liye reply YES karen.`);
+      window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+      recordAuditLog('WhatsApp Triggered', `Confirmation sent for #${orderId}`);
+      showToast('Opening WhatsApp with order details...');
+    }
+
+    function printAirwayBill(orderId) {
+      const orders = getStoredOrders();
+      const o = orders.find(item => item.orderId === orderId) || orders[0];
+      if (!o) return;
+
+      document.getElementById('lblTracking').textContent = o.trackingNumber || ('LEOP-' + Math.floor(1000000 + Math.random() * 9000000));
+      document.getElementById('lblOrder').textContent = '#' + o.orderId;
+      document.getElementById('lblCustomer').textContent = o.name;
+      document.getElementById('lblPhone').textContent = o.phone;
+      document.getElementById('lblAddress').textContent = `${o.address}, ${o.city}`;
+      document.getElementById('lblAmount').textContent = `Rs. ${(o.grandTotal || 0).toLocaleString()}`;
+
+      openModal('shippingLabelModal');
+      recordAuditLog('Airway Bill Generated', `Label for #${o.orderId}`);
+    }
+
+    function viewOrderModal(orderId) {
+      const orders = getStoredOrders();
+      const o = orders.find(item => item.orderId === orderId) || orders[0];
+      if (!o) return;
+
+      document.getElementById('orderModalTitle').textContent = `Order Details #${o.orderId}`;
+      document.getElementById('orderModalBody').innerHTML = `
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+          <div class="flex justify-between"><strong>Customer:</strong> <span>${o.name} (${o.phone})</span></div>
+          <div class="flex justify-between"><strong>Destination:</strong> <span>${o.address}, ${o.city}</span></div>
+          <div class="flex justify-between"><strong>Payment Mode:</strong> <span>${o.payment || 'COD'}</span></div>
+          <div class="flex justify-between items-center">
+            <strong>Fulfillment Status:</strong> 
+            <select id="editOrderStatusModal" class="text-xs font-bold p-1 border rounded-lg bg-white">
+              <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>🕒 Pending</option>
+              <option value="Confirmed" ${o.status === 'Confirmed' ? 'selected' : ''}>✍️ Confirmed</option>
+              <option value="Preparing" ${o.status === 'Preparing' || o.status === 'Processing' ? 'selected' : ''}>📦 Preparing (Packaging)</option>
+              <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>🚚 Shipped (In Transit)</option>
+              <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>✅ Delivered</option>
+              <option value="Cancelled" ${o.status === 'Cancelled' ? 'selected' : ''}>❌ Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Courier & Tracking Assignment -->
+        <div class="p-3 bg-teal-50/60 border border-teal-200/80 rounded-2xl space-y-2">
+          <h4 class="font-bold text-xs text-teal-900 uppercase">Courier Dispatch &amp; Tracking ID:</h4>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Courier Partner</label>
+              <input type="text" id="editCourierPartner" value="${o.courier || 'Leopards Courier'}" class="w-full p-1.5 border rounded-lg bg-white text-xs font-semibold">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Airway Tracking Number</label>
+              <input type="text" id="editTrackingCn" value="${o.trackingNumber || ('LEOP-' + Math.floor(100000 + Math.random() * 900000))}" class="w-full p-1.5 border rounded-lg bg-white text-xs font-mono font-bold">
+            </div>
+          </div>
+          <button onclick="saveOrderTrackingDetails('${o.orderId}')" class="w-full py-1.5 bg-teal-800 hover:bg-teal-900 text-white font-bold rounded-lg text-xs transition">
+            Save Status &amp; Tracking Number
+          </button>
+        </div>
+
+        <div class="border rounded-2xl p-3 space-y-2">
+          <h4 class="font-bold text-slate-800 text-xs">Order Items:</h4>
+          ${(o.items || []).map(i => `
+            <div class="flex justify-between border-b pb-1 text-xs">
+              <span>${i.title} (x${i.qty || 1})</span>
+              <span class="font-bold">Rs. ${(i.price || 0) * (i.qty || 1)}</span>
+            </div>
+          `).join('')}
+          <div class="flex justify-between font-black text-sm pt-2 text-slate-900">
+            <span>Grand Total:</span>
+            <span>Rs. ${(o.grandTotal || 0).toLocaleString()}</span>
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end space-x-2">
+          <button onclick="closeModal('orderDetailModal')" class="px-3 py-1.5 bg-slate-100 font-bold rounded-xl text-xs">Close</button>
+          <button onclick="printAirwayBill('${o.orderId}')" class="px-3 py-1.5 bg-slate-900 text-white font-bold rounded-xl text-xs">Print Airway Bill</button>
+          <a href="index.html?track=${o.orderId}" target="_blank" class="px-3 py-1.5 bg-cyan-700 text-white font-bold rounded-xl text-xs">Customer Tracking View</a>
+          <a href="https://wa.me/${(o.phone || '').replace(/[^0-9]/g, '')}" target="_blank" class="px-3 py-1.5 bg-emerald-700 text-white font-bold rounded-xl text-xs">Chat WhatsApp</a>
+        </div>
+      `;
+      openModal('orderDetailModal');
+    }
+
+    // -------------------------------------------------------------
+    // PRODUCTS TABLE & 10-TAB PRODUCT ENGINE
+    // -------------------------------------------------------------
+    function renderProductsTable() {
+      const tbody = document.getElementById('fullProductsTableBody');
+      if (!tbody) return;
+
+      const q = (document.getElementById('prodSearchQuery')?.value || '').toLowerCase().trim();
+      const cat = document.getElementById('prodCategorySelect')?.value || 'all';
+
+      let list = getAllProducts();
+      if (cat !== 'all') list = list.filter(p => (p.category || '').toLowerCase() === cat.toLowerCase());
+      if (q) list = list.filter(p => (p.title || '').toLowerCase().includes(q) || (p.code || '').toLowerCase().includes(q));
+
+      tbody.innerHTML = list.map(p => `
+        <tr class="hover:bg-slate-50/60 transition">
+          <td class="py-2.5">
+            <img src="${p.image}" class="w-10 h-10 object-contain rounded-lg border border-slate-200 bg-white">
+          </td>
+          <td class="py-2.5 max-w-xs">
+            <div class="font-bold text-slate-900 truncate">${p.title}</div>
+            <div class="text-[10px] text-slate-400 font-mono">SKU: ${p.code || 'QGW-001'}</div>
+          </td>
+          <td class="py-2.5 font-semibold text-slate-600 capitalize">${p.category || 'General'}</td>
+          <td class="py-2.5 font-black text-slate-900">Rs. ${p.price}</td>
+          <td class="py-2.5 font-bold ${p.stock < 20 ? 'text-rose-600' : 'text-slate-700'}">${p.stock || 100} in stock</td>
+          <td class="py-2.5"><span class="px-2 py-0.5 bg-teal-50 text-teal-800 rounded font-bold text-[10px]">${p.badge || 'HOT'}</span></td>
+          <td class="py-2.5 text-right space-x-1">
+            <button onclick="editProductPrompt(${p.id})" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg font-bold">Edit</button>
+            <button onclick="deleteProductById(${p.id})" class="px-2 py-1 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-lg font-bold">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openProfessionalAddProductModal(defaultTab = 'general') {
+      document.getElementById('proModalHeading').textContent = 'Add Product (10-Tab Pro Standard)';
+      document.getElementById('proProductForm').reset();
+      switchProdEditorTab(defaultTab);
+      openModal('proProductModal');
+    }
+
+    function switchProdEditorTab(tabName, btnEl) {
+      document.querySelectorAll('.prod-tab-pane').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.prod-tab-btn').forEach(b => {
+        b.className = 'prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0';
+      });
+
+      const pane = document.getElementById('prodTab-' + tabName);
+      if (pane) pane.classList.add('active');
+      if (btnEl) btnEl.className = 'prod-tab-btn px-3 py-1.5 rounded-xl bg-teal-800 text-white shrink-0';
+    }
+
+    function calcProfitMargin() {
+      const cost = parseFloat(document.getElementById('pCost')?.value) || 0;
+      const price = parseFloat(document.getElementById('pPrice')?.value) || 0;
+      const profit = price - cost;
+      const margin = price > 0 ? ((profit / price) * 100).toFixed(1) : 0;
+      document.getElementById('calcProfitText').textContent = `Rs. ${profit.toLocaleString()}`;
+      document.getElementById('calcMarginText').textContent = `${margin}%`;
+    }
+
+    function updateSeoCounters() {
+      const title = document.getElementById('pSeoTitle')?.value || document.getElementById('pTitle')?.value || '';
+      const desc = document.getElementById('pSeoDesc')?.value || '';
+      let slug = document.getElementById('pSlug')?.value || '';
+
+      if (!slug && title) {
+        slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        if (document.getElementById('pSlug')) document.getElementById('pSlug').value = slug;
+      }
+
+      // Title Counter
+      const titleCounter = document.getElementById('seoTitleCounter');
+      if (titleCounter) {
+        titleCounter.textContent = `${title.length} / 60 chars`;
+        titleCounter.className = title.length > 60 ? 'text-[10px] font-mono text-rose-500 font-bold' : 'text-[10px] font-mono text-slate-500';
+      }
+
+      // Desc Counter
+      const descCounter = document.getElementById('seoDescCounter');
+      if (descCounter) {
+        descCounter.textContent = `${desc.length} / 160 chars`;
+        descCounter.className = desc.length > 160 ? 'text-[10px] font-mono text-rose-500 font-bold' : 'text-[10px] font-mono text-slate-500';
+      }
+
+      // SERP Live Snippet
+      const serpTitle = document.getElementById('serpPreviewTitle');
+      if (serpTitle) serpTitle.textContent = title || 'Product Title | Tech Advizer High-Performance Gear';
+
+      const serpUrl = document.getElementById('serpPreviewUrl');
+      if (serpUrl) serpUrl.textContent = `https://techadvizer.com/p/${slug || 'product-slug'}`;
+
+      const serpDesc = document.getElementById('serpPreviewDesc');
+      if (serpDesc) serpDesc.textContent = desc || 'Engineered with analog hall-effect magnetic switches and zero rounding errors.';
+
+      // OpenGraph Card
+      const ogTitle = document.getElementById('ogPreviewTitle');
+      if (ogTitle) ogTitle.textContent = title || 'Product Title';
+
+      const ogDesc = document.getElementById('ogPreviewDesc');
+      if (ogDesc) ogDesc.textContent = desc || 'Bespoke tactile engineering with calibrated analog switches.';
+
+      const ogImg = document.getElementById('ogPreviewImage');
+      const pImgVal = document.getElementById('pImage')?.value;
+      if (ogImg && pImgVal) ogImg.src = pImgVal;
+    }
+
+    function addVariantRow() {
+      const container = document.getElementById('variantRowsContainer');
+      if (!container) return;
+      const div = document.createElement('div');
+      div.className = 'border border-slate-200 rounded-2xl p-3 bg-slate-50 space-y-2';
+      div.innerHTML = `
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Color / Finish</label>
+            <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-medium" placeholder="e.g. Electric Indigo">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Switch Type</label>
+            <select class="w-full p-2 border rounded-xl bg-white text-xs font-medium">
+              <option value="Hall-Effect Magnetic">Hall-Effect Magnetic</option>
+              <option value="Tactile Brown">Tactile Brown</option>
+              <option value="Linear Red">Linear Red</option>
+              <option value="Clicky Blue">Clicky Blue</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">SKU</label>
+            <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-mono" placeholder="APX-CUS-${Math.floor(100+Math.random()*900)}">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Price (Cents)</label>
+            <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs font-bold" value="17999">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Stock Qty</label>
+            <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs" value="25">
+          </div>
+        </div>
+      `;
+      container.appendChild(div);
+      showToast('Variant combination row added');
+    }
+
+    function handleProProductSubmit(e) {
+      e.preventDefault();
+      const title = document.getElementById('pTitle').value.trim();
+      const price = parseFloat(document.getElementById('pPrice').value);
+      const stock = parseInt(document.getElementById('pStock').value, 10) || 100;
+      const image = document.getElementById('pImage').value.trim();
+      const category = document.getElementById('pCat').value;
+      const badge = document.getElementById('pBadge').value || 'NEW';
+
+      const newProd = {
+        id: Date.now(),
+        title, price, stock, image, category, badge,
+        code: document.getElementById('pSku').value || ('QGW-' + Math.floor(100000 + Math.random() * 900000)),
+        rating: 4.9,
+        reviews: 24
+      };
+
+      const custom = JSON.parse(localStorage.getItem('qadri_custom_products')) || [];
+      custom.unshift(newProd);
+      localStorage.setItem('qadri_custom_products', JSON.stringify(custom));
+
+      recordAuditLog('Product Created', `Added product: ${title}`);
+      closeModal('proProductModal');
+      showToast(`Product "${title.substring(0, 16)}..." saved!`);
+      renderDashboardMetrics();
+      renderProductsTable();
+    }
+
+    function editProductPrompt(id) {
+      const all = getAllProducts();
+      const p = all.find(item => item.id === id);
+      if (!p) return;
+
+      openProfessionalAddProductModal('general');
+      document.getElementById('proModalHeading').textContent = `Edit Product #${p.code || p.id}`;
+      document.getElementById('pTitle').value = p.title || '';
+      document.getElementById('pPrice').value = p.price || '';
+      document.getElementById('pStock').value = p.stock || 100;
+      document.getElementById('pImage').value = p.image || '';
+      document.getElementById('pCat').value = p.category || 'storage';
+      document.getElementById('pBadge').value = p.badge || 'HOT';
+      document.getElementById('pSku').value = p.code || '';
+      calcProfitMargin();
+    }
+
+    function deleteProductById(id) {
+      if (!confirm('Are you sure you want to delete this product?')) return;
+      const custom = JSON.parse(localStorage.getItem('qadri_custom_products')) || [];
+      const updated = custom.filter(p => p.id !== id);
+      localStorage.setItem('qadri_custom_products', JSON.stringify(updated));
+
+      const deleted = JSON.parse(localStorage.getItem('qadri_deleted_products')) || [];
+      if (!deleted.includes(id)) {
+        deleted.push(id);
+        localStorage.setItem('qadri_deleted_products', JSON.stringify(deleted));
+      }
+
+      recordAuditLog('Product Deleted', `Removed product ID #${id}`);
+      showToast('Product deleted');
+      renderDashboardMetrics();
+      renderProductsTable();
+    }
+
+    // -------------------------------------------------------------
+    // CATEGORIES VIEW
+    // -------------------------------------------------------------
+    function renderCategoriesView() {
+      const grid = document.getElementById('categoriesCardGrid');
+      if (!grid) return;
+      const categories = [
+        { id: 'storage', name: 'Storage & Organization', count: 45, icon: '🗄️' },
+        { id: 'kitchen', name: 'Kitchen Tools & Gadgets', count: 110, icon: '🍳' },
+        { id: 'bottles', name: 'Mugs & Bottles', count: 76, icon: '🍶' },
+        { id: 'beauty', name: 'Beauty & Makeup', count: 85, icon: '💄' },
+        { id: 'accessories', name: 'Mobile Accessories', count: 120, icon: '📱' },
+        { id: 'travel', name: 'Bags & Travel', count: 64, icon: '🎒' },
+        { id: 'cleaning', name: 'Wipers & Cleaning', count: 53, icon: '🧹' },
+        { id: 'massager', name: 'Electric Massagers', count: 29, icon: '⚡' }
+      ];
+
+      grid.innerHTML = categories.map(c => `
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs space-y-2">
+          <div class="text-2xl">${c.icon}</div>
+          <h4 class="font-bold text-sm text-slate-800">${c.name}</h4>
+          <div class="flex justify-between items-center text-xs text-slate-500">
+            <span>${c.count} Active Products</span>
+            <button onclick="showToast('Category updated')" class="text-teal-800 font-bold hover:underline">Edit</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function promptAddCategory() {
+      const name = prompt('Enter new category name:');
+      if (name) {
+        recordAuditLog('Category Created', name);
+        showToast(`Category "${name}" created!`);
+        renderCategoriesView();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // INVENTORY TABLE & RESTOCK
+    // -------------------------------------------------------------
+    function renderInventoryTable() {
+      const tbody = document.getElementById('inventoryTableBody');
+      if (!tbody) return;
+      const products = getAllProducts();
+
+      tbody.innerHTML = products.map(p => `
+        <tr class="hover:bg-slate-50/60 transition">
+          <td class="py-2.5 font-bold text-slate-800">${p.title}</td>
+          <td class="py-2.5 font-mono text-slate-500">${p.code || 'QGW-001'}</td>
+          <td class="py-2.5 font-bold">Rs. ${p.price}</td>
+          <td class="py-2.5 font-black text-slate-900">${p.stock || 100} units</td>
+          <td class="py-2.5">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.stock < 20 ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">
+              ${p.stock < 20 ? 'Low Stock Threshold' : 'Optimal Healthy'}
+            </span>
+          </td>
+          <td class="py-2.5 text-right">
+            <button onclick="quickRestockItem(${p.id})" class="px-2.5 py-1 bg-teal-800 hover:bg-teal-900 text-white rounded-lg font-bold">
+              +50 Pcs
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function quickRestockItem(id) {
+      const all = getAllProducts();
+      const p = all.find(item => item.id === id);
+      if (!p) return;
+
+      const newStock = (p.stock || 100) + 50;
+      const custom = JSON.parse(localStorage.getItem('qadri_custom_products')) || [];
+      const cIdx = custom.findIndex(item => item.id === id);
+
+      if (cIdx >= 0) {
+        custom[cIdx].stock = newStock;
+        localStorage.setItem('qadri_custom_products', JSON.stringify(custom));
+      } else {
+        const overrides = JSON.parse(localStorage.getItem('qadri_product_overrides')) || {};
+        overrides[id] = { ...(overrides[id] || {}), stock: newStock };
+        localStorage.setItem('qadri_product_overrides', JSON.stringify(overrides));
+      }
+
+      recordAuditLog('Inventory Restocked', `+50 units to #${p.code || id}`);
+      showToast(`Added 50 units to stock!`);
+      renderInventoryTable();
+    }
+
+    // -------------------------------------------------------------
+    // CUSTOMERS CRM
+    // -------------------------------------------------------------
+    function renderCustomersTable() {
+      const tbody = document.getElementById('customersTableBody');
+      if (!tbody) return;
+      const orders = getStoredOrders();
+
+      const customerMap = {};
+      orders.forEach(o => {
+        const phone = o.phone || '03001234567';
+        if (!customerMap[phone]) {
+          customerMap[phone] = { name: o.name, phone, city: o.city, count: 0, total: 0 };
+        }
+        customerMap[phone].count += 1;
+        customerMap[phone].total += (o.grandTotal || 0);
+      });
+
+      tbody.innerHTML = Object.values(customerMap).map(c => `
+        <tr class="hover:bg-slate-50/60 transition">
+          <td class="py-2.5 font-bold text-slate-800">${c.name}</td>
+          <td class="py-2.5 font-mono text-slate-600">${c.phone}</td>
+          <td class="py-2.5 font-semibold text-slate-700">${c.city}</td>
+          <td class="py-2.5 font-bold">${c.count} Orders</td>
+          <td class="py-2.5 font-black text-slate-900">Rs. ${c.total.toLocaleString()}</td>
+          <td class="py-2.5 text-right">
+            <a href="https://wa.me/${c.phone.replace(/[^0-9]/g, '')}" target="_blank" class="px-2.5 py-1 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 rounded-lg font-bold">
+              Chat WhatsApp
+            </a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // -------------------------------------------------------------
+    // WORDPRESS MEDIA LIBRARY
+    // -------------------------------------------------------------
+    function renderMediaLibrary() {
+      const grid = document.getElementById('mediaLibraryGrid');
+      if (!grid) return;
+      const prods = getAllProducts();
+      
+      grid.innerHTML = prods.map(p => `
+        <div class="p-2 bg-slate-50 rounded-2xl border border-slate-200 space-y-1.5 group relative">
+          <img src="${p.image}" class="w-full h-24 object-contain rounded-xl bg-white">
+          <p class="text-[10px] font-bold text-slate-700 truncate">${p.title}</p>
+          <button onclick="navigator.clipboard.writeText('${p.image}'); showToast('Media URL copied!');" class="w-full py-1 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold rounded-lg text-[10px]">
+            Copy URL
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function triggerSimulatedMediaUpload() {
+      const url = prompt('Enter image URL to register in Media Library:');
+      if (url) {
+        recordAuditLog('Media Uploaded', url);
+        showToast('Image registered in Media Library!');
+        renderMediaLibrary();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // COURIERS & SEO
+    // -------------------------------------------------------------
+    function testCourierConnection(provider) {
+      showToast(`Pinging ${provider} API gateway...`);
+      setTimeout(() => {
+        recordAuditLog('Courier Tested', `${provider} API Gateway Ping: 200 OK`);
+        showToast(`${provider} API Gateway Active & Connected!`, '✅');
+      }, 700);
+    }
+
+    function createNewCouponPrompt() {
+      const code = prompt('Enter new Coupon Code (e.g. SAVE20):');
+      if (code) {
+        const tbody = document.getElementById('couponsListTbody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-3 font-mono font-bold text-teal-800">${code.toUpperCase()}</td>
+          <td class="py-3">Promotional</td>
+          <td class="py-3 font-bold">15% OFF</td>
+          <td class="py-3">Rs. 1,500</td>
+          <td class="py-3">2026-12-31</td>
+        `;
+        tbody.prepend(tr);
+        recordAuditLog('Coupon Created', code.toUpperCase());
+        showToast(`Coupon ${code.toUpperCase()} activated!`);
+      }
+    }
+
+    function updateSeoPreview() {
+      const t = document.getElementById('seoInputTitle').value;
+      const d = document.getElementById('seoInputDesc').value;
+      document.getElementById('seoPrevTitle').textContent = t;
+      document.getElementById('seoPrevDesc').textContent = d;
+    }
+
+    function saveStoreSettings() {
+      const name = document.getElementById('cfgName').value;
+      const phone = document.getElementById('cfgPhone').value;
+      const fee = document.getElementById('cfgShipFee').value;
+      localStorage.setItem('save_and_smile_settings', JSON.stringify({ name, phone, fee }));
+      recordAuditLog('Settings Updated', `Store config saved`);
+      showToast('Store settings saved successfully!');
+    }
+
+    function handleGlobalQuickSearch(e) {
+      if (e.key === 'Enter') {
+        const q = e.target.value.toLowerCase().trim();
+        if (q) {
+          switchView('products');
+          document.getElementById('prodSearchQuery').value = q;
+          renderProductsTable();
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // CSV EXPORT GENERATOR
+    // -------------------------------------------------------------
+    function downloadCsvExport(type) {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      let filename = `Save_And_Smile_${type}_${new Date().toISOString().slice(0,10)}.csv`;
+
+      if (type === 'sales' || type === 'orders') {
+        const orders = getStoredOrders();
+        csvContent += "OrderID,CustomerName,Phone,City,Address,TotalAmount,Status,PaymentMode,Date\n";
+        orders.forEach(o => {
+          csvContent += `"${o.orderId}","${o.name}","${o.phone}","${o.city}","${o.address.replace(/"/g, '""')}","${o.grandTotal}","${o.status}","${o.payment || 'COD'}","${o.date || ''}"\n`;
+        });
+      } else if (type === 'inventory' || type === 'products') {
+        const prods = getAllProducts();
+        csvContent += "ID,SKU,Title,Category,Price,StockUnits,Badge\n";
+        prods.forEach(p => {
+          csvContent += `"${p.id}","${p.code || ''}","${p.title.replace(/"/g, '""')}","${p.category}","${p.price}","${p.stock || 100}","${p.badge || ''}"\n`;
+        });
+      } else if (type === 'customers') {
+        const orders = getStoredOrders();
+        csvContent += "CustomerName,Phone,City,OrderCount,TotalSpend\n";
+        const map = {};
+        orders.forEach(o => {
+          if (!map[o.phone]) map[o.phone] = { name: o.name, phone: o.phone, city: o.city, count: 0, total: 0 };
+          map[o.phone].count += 1;
+          map[o.phone].total += (o.grandTotal || 0);
+        });
+        Object.values(map).forEach(c => {
+          csvContent += `"${c.name}","${c.phone}","${c.city}","${c.count}","${c.total}"\n`;
+        });
+      }
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      recordAuditLog('CSV Exported', `${type.toUpperCase()} file generated`);
+      showToast(`Exported ${filename}`, '📥');
+    }
+
+    // -------------------------------------------------------------
+    // TOAST & MODAL CONTROLLERS
+    // -------------------------------------------------------------
+    function showToast(msg, icon = '✅') {
+      const box = document.getElementById('toastBox');
+      document.getElementById('toastMessage').textContent = msg;
+      document.getElementById('toastIcon').textContent = icon;
+      box.classList.remove('translate-y-24', 'opacity-0');
+      box.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        box.classList.remove('translate-y-0', 'opacity-100');
+        box.classList.add('translate-y-24', 'opacity-0');
+      }, 3000);
+    }
+
+    function openModal(id) {
+      const m = document.getElementById(id);
+      if (m) {
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+      }
+    }
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      if (m) {
+        m.classList.add('hidden');
+        m.classList.remove('flex');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // INITIALIZATION ON LOAD
+    // -------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      renderDashboardMetrics();
+      renderAuditTrail();
+    });
+  </script>
+</body>
+</html>

@@ -425,10 +425,10 @@ async function runTestSuite() {
   // PHASE 7: DATABASE UNAVAILABILITY BEHAVIOR
   // ----------------------------------------------------
   console.log('\n--- Phase 7: Database Unavailability Behavior ---');
-  // Restore DB module to real (unconfigured in test env)
-  dbModule.getDb = originalGetDb;
+  // Explicitly simulate database outage / offline adapter
+  dbModule.getDb = () => null;
   delete require.cache[require.resolve('./api/orders')];
-  const realOrdersHandler = require('./api/orders');
+  const offlineOrdersHandler = require('./api/orders');
 
   const reqDbDown = {
     method: 'POST',
@@ -441,13 +441,16 @@ async function runTestSuite() {
     }
   };
   const resDbDown = mockRes();
-  await realOrdersHandler(reqDbDown, resDbDown);
+  await offlineOrdersHandler(reqDbDown, resDbDown);
   const outDbDown = resDbDown._getResult();
   if (outDbDown.statusCode === 503) {
     recordTest('Phase 7', 'Database Unavailability Safe Failover (503)', 'Status 503 with error message (No fake success)', 'Status 503 Service Unavailable returned', 'PASS', outDbDown.data?.error);
   } else {
     recordTest('Phase 7', 'Database Unavailability Safe Failover (503)', 'Status 503', `Status ${outDbDown.statusCode}`, 'FAIL', JSON.stringify(outDbDown.data));
   }
+
+  // Restore DB adapter
+  dbModule.getDb = originalGetDb;
 
   console.log('\n====================================================');
   console.log(`TOTAL TESTS: ${testResults.length} | PASSED: ${testResults.filter(t => t.status === 'PASS').length} | FAILED: ${testResults.filter(t => t.status === 'FAIL').length}`);

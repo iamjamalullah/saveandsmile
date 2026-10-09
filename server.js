@@ -82,9 +82,18 @@ const server = http.createServer((req, res) => {
   if (reqPath === '/admin') reqPath = '/admin.html';
   if (reqPath === '/admin/live-editor' || reqPath === '/live-editor') reqPath = '/live-editor.html';
 
-  let filePath = path.join(__dirname, 'public', reqPath);
+  let filePath = path.join(__dirname, 'dist', reqPath);
+  if (!fs.existsSync(filePath)) {
+    filePath = path.join(__dirname, 'public', reqPath);
+  }
   if (!fs.existsSync(filePath)) {
     filePath = path.join(__dirname, reqPath);
+  }
+  if (!fs.existsSync(filePath) && !path.extname(reqPath)) {
+    const distIndex = path.join(__dirname, 'dist', 'index.html');
+    if (fs.existsSync(distIndex)) {
+      filePath = distIndex;
+    }
   }
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';

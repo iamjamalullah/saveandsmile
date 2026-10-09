@@ -4,6 +4,9 @@
   "description": "Save & Smile wholesale e-commerce store with live tracking and serverless backend",
   "main": "server.js",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "start": "node server.js",
     "db:seed": "node scripts/seed-neon.js"
   },
@@ -17,6 +20,13 @@
   "license": "ISC",
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
-    "dotenv": "^18.0.6"
+    "dotenv": "^18.0.6",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
+    "vite": "^8.3.4"
   }
 }

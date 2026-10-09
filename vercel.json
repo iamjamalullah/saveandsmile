@@ -6,7 +6,7 @@
     }
   },
   "rewrites": [
-    { "source": "/admin/live-editor", "destination": "/live-editor.html" },
-    { "source": "/track", "destination": "/track-order.html" }
+    { "source": "/admin/live-editor", "destination": "/live-editor" },
+    { "source": "/track", "destination": "/track-order" }
   ]
 }

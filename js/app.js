@@ -58,7 +58,120 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => openTrackOrderModal(trackQ), 350);
     }
   } catch (e) {}
+
+  // Live Backend Sync: Fetch dynamic products and home customization
+  syncLiveStorefrontData();
 });
+
+// -------------------------------------------------------------
+// Live Real-Time Storefront Backend Synchronization
+// -------------------------------------------------------------
+function syncLiveStorefrontData() {
+  // 1. Sync live products from backend API
+  fetch('/api/products')
+    .then(res => res.json())
+    .then(data => {
+      if (data && Array.isArray(data.products) && data.products.length > 0) {
+        const overrides = JSON.parse(localStorage.getItem('qadri_product_overrides')) || {};
+        const custom = JSON.parse(localStorage.getItem('qadri_custom_products')) || [];
+
+        data.products.forEach(sp => {
+          if (!sp.id) return;
+          const foundInCustom = custom.find(c => String(c.id) === String(sp.id));
+          if (foundInCustom) {
+            Object.assign(foundInCustom, sp);
+          } else {
+            overrides[sp.id] = { ...(overrides[sp.id] || {}), ...sp };
+          }
+        });
+
+        localStorage.setItem('qadri_product_overrides', JSON.stringify(overrides));
+        localStorage.setItem('qadri_custom_products', JSON.stringify(custom));
+        renderAllSections();
+      }
+    })
+    .catch(err => console.debug('Live products sync fallback:', err));
+
+  // 2. Sync live homepage & hero banner customization
+  fetch('/api/home-customization')
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.config) {
+        applyHomeCustomization(data.config);
+      }
+    })
+    .catch(err => console.debug('Live home customization sync fallback:', err));
+}
+
+function applyHomeCustomization(cfg) {
+  if (!cfg) return;
+
+  // Apply Hero Slides
+  if (Array.isArray(cfg.hero_slides) && cfg.hero_slides.length > 0) {
+    localStorage.setItem('qadri_custom_banners', JSON.stringify(cfg.hero_slides));
+    initSlider();
+  }
+
+  // Apply Announcement Ticker
+  if (cfg.announcement_ticker) {
+    const tickerTrack = document.querySelector('.ticker-track');
+    const tickerBar = document.querySelector('.ticker-bar');
+    if (tickerBar && cfg.announcement_ticker.enabled === false) {
+      tickerBar.style.display = 'none';
+    } else if (tickerTrack && Array.isArray(cfg.announcement_ticker.items) && cfg.announcement_ticker.items.length > 0) {
+      if (tickerBar) tickerBar.style.display = 'flex';
+      const itemsHtml = cfg.announcement_ticker.items.map(it => `<div class="ticker-item">${it}</div>`).join('');
+      // Double the items for seamless infinite scroll
+      tickerTrack.innerHTML = itemsHtml + itemsHtml;
+      if (cfg.announcement_ticker.speed) {
+        tickerTrack.style.animationDuration = `${cfg.announcement_ticker.speed}s`;
+      }
+    }
+  }
+
+  // Apply Section Visibility Toggles
+  if (cfg.sections_visibility) {
+    const secMap = {
+      hero_slider: 'heroSliderSection',
+      categories_strip: 'shopSliderSection',
+      trust_badges: 'HomePageFooterIcons',
+      front_tabs: 'HomePageTabs',
+      hot_selling: 'hotSelling',
+      new_arrivals: 'newArrivals',
+      flash_sale: 'flashSale',
+      trending_picks: 'trendingPicks',
+      main_catalog: 'products',
+      search_hero: 'HomePageBuilder',
+      video_reels: 'reelsSection',
+      testimonials: 'testimonialsSection'
+    };
+
+    Object.keys(cfg.sections_visibility).forEach(k => {
+      const elId = secMap[k];
+      const el = elId ? document.getElementById(elId) : null;
+      if (el) {
+        el.style.display = cfg.sections_visibility[k] === false ? 'none' : '';
+      }
+    });
+  }
+
+  // Apply Promo Banners / Strips text
+  if (Array.isArray(cfg.promo_banners)) {
+    cfg.promo_banners.forEach(pb => {
+      if (pb.id === 'flash_deal_strip') {
+        const titleEl = document.querySelector('#flashSale .flash-title-area h2');
+        const subEl = document.querySelector('#flashSale .flash-title-area p');
+        if (titleEl && pb.title) titleEl.textContent = pb.title;
+        if (subEl && pb.subtitle) subEl.textContent = pb.subtitle;
+      } else if (pb.id === 'quick_finder') {
+        const titleEl = document.querySelector('#HomePageBuilder .search-hero-copy h2');
+        const subEl = document.querySelector('#HomePageBuilder .search-hero-subtitle');
+        if (titleEl && pb.title) titleEl.textContent = pb.title;
+        if (subEl && pb.subtitle) subEl.textContent = pb.subtitle;
+      }
+    });
+  }
+}
 
 // -------------------------------------------------------------
 // Theme Switcher
@@ -121,12 +234,16 @@ function updateSliderUI() {
 }
 
 function nextSlide() {
-  AppState.currentSlide = (AppState.currentSlide + 1) % BANNERS.length;
+  const activeBanners = JSON.parse(localStorage.getItem('qadri_custom_banners')) || (typeof BANNERS !== 'undefined' ? BANNERS : []);
+  const len = activeBanners.length || 1;
+  AppState.currentSlide = (AppState.currentSlide + 1) % len;
   updateSliderUI();
 }
 
 function prevSlide() {
-  AppState.currentSlide = (AppState.currentSlide - 1 + BANNERS.length) % BANNERS.length;
+  const activeBanners = JSON.parse(localStorage.getItem('qadri_custom_banners')) || (typeof BANNERS !== 'undefined' ? BANNERS : []);
+  const len = activeBanners.length || 1;
+  AppState.currentSlide = (AppState.currentSlide - 1 + len) % len;
   updateSliderUI();
   startSliderTimer();
 }

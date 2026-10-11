@@ -173,5 +173,45 @@ module.exports = async function handler(req, res) {
     }
   }
 
+  // DELETE: Remove product (Protected)
+  if (req.method === 'DELETE') {
+    const adminUser = verifyAuthToken(req);
+    if (!adminUser) {
+      return res.status(401).json({ success: false, error: 'Unauthorized: Admin authentication required to delete products.' });
+    }
+
+    try {
+      let body = req.body;
+      if (typeof body === 'string') {
+        try { body = JSON.parse(body); } catch (e) {}
+      }
+      const id = (body && body.id) || (req.query && req.query.id);
+      if (!id) {
+        return res.status(400).json({ success: false, error: 'Product id is required for deletion.' });
+      }
+
+      if (sql) {
+        try {
+          await sql`DELETE FROM products WHERE id = ${String(id)}`;
+        } catch (dbErr) {
+          console.warn('Neon DELETE failed:', dbErr.message);
+        }
+      }
+
+      const fallbackPath = path.join(__dirname, '..', 'products.json');
+      try {
+        let productsList = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
+        productsList = productsList.filter(p => String(p.id) !== String(id));
+        fs.writeFileSync(fallbackPath, JSON.stringify(productsList, null, 2), 'utf8');
+      } catch (fileErr) {
+        console.warn('Fallback file delete warning:', fileErr.message);
+      }
+
+      return res.status(200).json({ success: true, message: 'Product deleted successfully', id });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
   return res.status(405).json({ error: 'Method Not Allowed' });
 };

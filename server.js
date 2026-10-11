@@ -21,7 +21,9 @@ const MIME_TYPES = {
 
 // Route API requests to serverless handlers
 async function handleApiRequest(req, res) {
-  const urlPath = req.url.split('?')[0];
+  const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  const urlPath = parsedUrl.pathname;
+  req.query = Object.fromEntries(parsedUrl.searchParams);
 
   // Helper methods to emulate Vercel/Express response
   res.status = (code) => {
@@ -60,6 +62,9 @@ async function handleApiRequest(req, res) {
         return await handler(req, res);
       } else if (urlPath.startsWith('/api/seo')) {
         const handler = require('./api/seo');
+        return await handler(req, res);
+      } else if (urlPath.startsWith('/api/home-customization')) {
+        const handler = require('./api/home-customization');
         return await handler(req, res);
       } else {
         res.writeHead(404, { 'Content-Type': 'application/json' });

@@ -209,6 +209,13 @@
           </div>
           <span class="text-[9px] bg-teal-500/20 text-teal-300 px-1.5 py-0.5 rounded font-black">LIVE</span>
         </a>
+        <button onclick="switchView('home-customizer', this)" class="nav-item w-full flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
+          <div class="flex items-center space-x-2.5">
+            <svg class="w-4 h-4 shrink-0 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+            <span>Home &amp; Hero Customizer</span>
+          </div>
+          <span class="text-[9px] bg-cyan-500/20 text-cyan-300 px-1.5 py-0.5 rounded font-black">HERO</span>
+        </button>
         <button onclick="switchView('pages', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
           <svg class="w-4 h-4 shrink-0 text-yellow-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
           <span>Pages (SEO &amp; Content)</span>
@@ -1214,6 +1221,146 @@
               <p class="text-xs text-slate-500">"Suction cup boht strong hai, easily stick ho gaya."</p>
             </div>
             <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">Approved</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- VIEW 16B: HOME & HERO CUSTOMIZER -->
+      <!-- ============================================================ -->
+      <section id="view-home-customizer" class="view-panel space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <span>🎨 Homepage &amp; Hero Customizer</span>
+              <span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-cyan-100 text-cyan-800">LIVE SYNC</span>
+            </h1>
+            <p class="text-xs text-slate-500 mt-0.5">Customize hero main banners, add/remove slides, edit top announcement ticker, and toggle homepage sections in real-time.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="index.html" target="_blank" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-1.5 transition">
+              <span>View Storefront</span> ↗
+            </a>
+            <button onclick="saveHomeCustomizerSettings()" class="px-4 py-2 bg-[#008060] hover:bg-[#006e52] text-white font-bold rounded-xl text-xs shadow-sm flex items-center gap-1.5 transition">
+              <span>💾 Save &amp; Publish to Store</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. Hero Main Slider Banners (Upload, Reorder, Add, Delete) -->
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-5">
+          <div class="flex items-center justify-between border-b pb-3">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <span>🖼️ Hero Main Slider Banners</span>
+                <span id="heroSlidesCountBadge" class="text-[10px] px-2 py-0.5 rounded font-bold bg-slate-100 text-slate-700">6 Slides Active</span>
+              </h3>
+              <p class="text-xs text-slate-500">Each slide automatically rotates on the live homepage hero slider with smooth animations.</p>
+            </div>
+            <button type="button" onclick="openAddHeroBannerModal()" class="px-3 py-1.5 bg-teal-800 hover:bg-teal-900 text-white rounded-xl text-xs font-bold flex items-center gap-1">
+              <span>+ Add New Banner Slide</span>
+            </button>
+          </div>
+
+          <!-- Hero Banners Grid / List -->
+          <div id="heroBannersListContainer" class="space-y-3">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- 2. Top Announcement Marquee Ticker -->
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div class="flex items-center justify-between border-b pb-3">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <span>📢 Top Announcement Marquee Bar</span>
+              </h3>
+              <p class="text-xs text-slate-500">The scrolling ticker at the very top of the storefront header.</p>
+            </div>
+            <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+              <input type="checkbox" id="hcTickerEnabled" checked class="rounded text-[#008060] focus:ring-[#008060]">
+              <span>Enable Ticker Bar</span>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-2 space-y-2">
+              <label class="block text-xs font-bold text-slate-700">Announcement Messages (One per line)</label>
+              <textarea id="hcTickerItemsText" rows="4" class="w-full text-xs p-3 border border-slate-200 rounded-xl font-sans" placeholder="One message per line..."></textarea>
+              <span class="text-[10px] text-slate-400">Supports emojis and HTML formatting (e.g. &lt;strong&gt;text&lt;/strong&gt;).</span>
+            </div>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Scroll Speed (Seconds)</label>
+                <input type="number" id="hcTickerSpeed" value="32" min="15" max="60" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+                <span class="text-[10px] text-slate-400">Lower = faster marquee scroll speed.</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-600 space-y-1">
+                <span class="font-bold block text-slate-800">💡 Pro Tip</span>
+                <span>Highlight free shipping, WhatsApp helpline, or current seasonal mega promotions.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Homepage Sections Visibility & Layout Controls -->
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div class="border-b pb-3">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <span>🧩 Homepage Portions &amp; Sections Layout</span>
+            </h3>
+            <p class="text-xs text-slate-500">Easily show or hide sections on the homepage without touching code.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 text-xs" id="hcSectionTogglesGrid">
+            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
+              <span class="font-bold text-slate-800">Hero Main Slider</span>
+              <input type="checkbox" id="sec_hero_slider" checked class="rounded text-[#008060]">
+            </label>
+            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
+              <span class="font-bold text-slate-800">Categories Round Strip</span>
+              <input type="checkbox" id="sec_categories_strip" checked class="rounded text-[#008060]">
+            </label>
+            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
+              <span class="font-bold text-slate-800">24/7 Trust Badges Bar</span>
+              <input type="checkbox" id="sec_trust_badges" checked class="rounded text-[#008060]">
+            </label>
+            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
+              <span class="font-bold text-slate-800">Front Category Tabs</span>
+              <input type="checkbox" id="sec_front_tabs" checked class="rounded text-[#008060]">
+            </label>
+            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
+              <span class="font-bold text-slate-800">🔥 Hot Selling Grid</span>
+              <input type="checkbox" id="sec_hot_selling" checked class="rounded text-[#008060]">
+            </label>
+            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
+              <span class="font-bold text-slate-800">✨ New Arrivals Grid</span>
+              <input type="checkbox" id="sec_new_arrivals" checked class="rounded text-[#008060]">
+            </label>
+            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
+              <span class="font-bold text-slate-800">⚡ Flash Sale &amp; Countdown</span>
+              <input type="checkbox" id="sec_flash_sale" checked class="rounded text-[#008060]">
+            </label>
+            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
+              <span class="font-bold text-slate-800">🌟 Trending Picks Grid</span>
+              <input type="checkbox" id="sec_trending_picks" checked class="rounded text-[#008060]">
+            </label>
+            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
+              <span class="font-bold text-slate-800">🛍️ All Products Catalog</span>
+              <input type="checkbox" id="sec_main_catalog" checked class="rounded text-[#008060]">
+            </label>
+            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
+              <span class="font-bold text-slate-800">🔍 Quick Finder Hero Search</span>
+              <input type="checkbox" id="sec_search_hero" checked class="rounded text-[#008060]">
+            </label>
+            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
+              <span class="font-bold text-slate-800">🎬 Watch &amp; Shop Reels</span>
+              <input type="checkbox" id="sec_video_reels" checked class="rounded text-[#008060]">
+            </label>
+            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
+              <span class="font-bold text-slate-800">💬 Client Testimonials</span>
+              <input type="checkbox" id="sec_testimonials" checked class="rounded text-[#008060]">
+            </label>
           </div>
         </div>
       </section>
@@ -2498,6 +2645,69 @@
     </div>
   </div>
 
+  <!-- ============================================================ -->
+  <!-- MODAL: ADD / EDIT HERO BANNER SLIDE -->
+  <!-- ============================================================ -->
+  <div id="heroBannerModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative border border-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b">
+        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+          <span>🖼️</span>
+          <span id="heroBannerModalTitle">Add Hero Banner Slide</span>
+        </h3>
+        <button onclick="closeModal('heroBannerModal')" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+      </div>
+
+      <form id="heroBannerForm" onsubmit="handleHeroBannerSubmit(event)" class="space-y-4 pt-4 text-xs">
+        <input type="hidden" id="hbEditSlideId" value="">
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Slide Title / Headline <span class="text-rose-500">*</span></label>
+          <input type="text" id="hbTitle" placeholder="e.g. Mega Summer Gadgets Sale" required class="w-full p-2.5 bg-white border border-[#c9cccf] rounded-xl font-medium">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Subtitle / Marketing Description</label>
+          <input type="text" id="hbSubtitle" placeholder="e.g. Up to 40% OFF with direct factory cash on delivery" class="w-full p-2.5 bg-white border border-[#c9cccf] rounded-xl font-medium">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Banner Image URL / R2 WebP <span class="text-rose-500">*</span></label>
+          <div class="space-y-2">
+            <input type="url" id="hbImage" placeholder="https://pub-8bcbaae497aa4994a6c3852932093ce1.r2.dev/banner.webp" required oninput="previewHeroBannerModalImage(this.value)" class="w-full p-2.5 bg-white border border-[#c9cccf] rounded-xl font-mono text-[11px]">
+            <div class="flex items-center gap-2">
+              <input type="file" id="hbFileInput" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" onchange="handleHeroBannerFileUpload(event)">
+              <button type="button" onclick="document.getElementById('hbFileInput').click()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-bold flex items-center gap-1.5 transition">
+                <span>📁 Upload Image (Auto-Convert to WebP)</span>
+              </button>
+            </div>
+          </div>
+          <!-- Preview Frame -->
+          <div id="hbPreviewFrame" class="mt-2 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 aspect-[21/7] max-h-32 flex items-center justify-center">
+            <img id="hbPreviewImg" src="" class="w-full h-full object-cover hidden">
+            <span id="hbPreviewPlaceholder" class="text-slate-400 text-[11px]">Banner Image Preview (2117x743 recommended)</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Target Link</label>
+            <input type="text" id="hbLink" value="#products" placeholder="#products or /product-detail?id=203" class="w-full p-2.5 bg-white border border-[#c9cccf] rounded-xl font-mono text-[11px]">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Promotional Badge Tag</label>
+            <input type="text" id="hbBadge" placeholder="e.g. FLASH SALE" class="w-full p-2.5 bg-white border border-[#c9cccf] rounded-xl font-medium">
+          </div>
+        </div>
+
+        <div class="pt-3 border-t flex items-center justify-end space-x-2">
+          <button type="button" onclick="closeModal('heroBannerModal')" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg">Cancel</button>
+          <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-[#008060] hover:bg-[#006e52] rounded-lg shadow-sm">Save Banner Slide</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toastBox" class="fixed bottom-6 right-6 bg-slate-950 text-white text-xs font-bold py-3 px-5 rounded-2xl shadow-xl flex items-center space-x-2 transform translate-y-24 opacity-0 transition-all duration-300 z-50">
     <span id="toastIcon">✅</span>
@@ -2612,6 +2822,7 @@
           if (viewName === 'orders') renderOrdersTable();
           else if (viewName === 'products') renderProductsTable();
           else if (viewName === 'categories') renderCategoriesView();
+          else if (viewName === 'home-customizer') renderHomeCustomizerView();
           else if (viewName === 'pages') renderPagesView();
           else if (viewName === 'settings') { loadGlobalSeoSettings(); loadRedirectsTable(); }
           else if (viewName === 'inventory') renderInventoryTable();
@@ -2682,6 +2893,7 @@
         { id: 'media-library', name: 'Media Asset Library', icon: '🖼️', path: '/media' },
         { id: 'reviews', name: 'Verified Customer Reviews', icon: '⭐', path: '/reviews' },
         { id: 'seo', name: 'SEO & Social OpenGraph Engine', icon: '🌐', path: '/seo' },
+        { id: 'home-customizer', name: 'Home & Hero Customizer', icon: '🎨', path: '/home-customizer' },
         { id: 'reports', name: 'Executive Analytics & Reports', icon: '📈', path: '/reports' },
         { id: 'settings', name: 'Store Configuration & Policies', icon: '⚙️', path: '/settings' },
         { id: 'users', name: 'Admin Users & RBAC Permissions', icon: '🛡️', path: '/users' },
@@ -3847,9 +4059,13 @@
         }
 
         // Asynchronous API sync to backend/Neon database
+        const adminToken = localStorage.getItem('save_and_smile_admin_token') || '';
         fetch('/api/products', {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(adminToken ? { 'Authorization': `Bearer ${adminToken}` } : {})
+          },
           body: JSON.stringify({ id: numId, ...seoPayload })
         }).catch(err => console.warn('Product PUT API sync:', err));
 
@@ -3870,9 +4086,13 @@
         localStorage.setItem('qadri_custom_products', JSON.stringify(custom));
 
         // Asynchronous API sync to backend/Neon database
+        const adminToken = localStorage.getItem('save_and_smile_admin_token') || '';
         fetch('/api/products', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(adminToken ? { 'Authorization': `Bearer ${adminToken}` } : {})
+          },
           body: JSON.stringify(newProd)
         }).catch(err => console.warn('Product POST API sync:', err));
 
@@ -3952,6 +4172,17 @@
         deleted.push(id);
         localStorage.setItem('qadri_deleted_products', JSON.stringify(deleted));
       }
+
+      // Asynchronous API sync to backend/Neon database
+      const adminToken = localStorage.getItem('save_and_smile_admin_token') || '';
+      fetch(`/api/products?id=${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(adminToken ? { 'Authorization': `Bearer ${adminToken}` } : {})
+        },
+        body: JSON.stringify({ id })
+      }).catch(err => console.warn('Product DELETE API sync:', err));
 
       recordAuditLog('Product Deleted', `Removed product ID #${id}`);
       showToast('Product deleted');
@@ -4768,6 +4999,306 @@
           renderProductsTable();
         }
       }
+    }
+
+    // -------------------------------------------------------------
+    // HOMEPAGE & HERO CUSTOMIZER CONTROLLER
+    // -------------------------------------------------------------
+    let currentHomeConfig = null;
+
+    function renderHomeCustomizerView() {
+      // Fetch current config from server or fallback
+      fetch('/api/home-customization')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.config) {
+            currentHomeConfig = data.config;
+          } else {
+            currentHomeConfig = getDefaultHomeConfigLocal();
+          }
+          populateHomeCustomizerForm();
+        })
+        .catch(err => {
+          console.warn('Home config fetch fallback:', err);
+          currentHomeConfig = getDefaultHomeConfigLocal();
+          populateHomeCustomizerForm();
+        });
+    }
+
+    function getDefaultHomeConfigLocal() {
+      const localBanners = JSON.parse(localStorage.getItem('qadri_custom_banners')) || (typeof BANNERS !== 'undefined' ? BANNERS : []);
+      return {
+        hero_slides: localBanners,
+        announcement_ticker: {
+          enabled: true,
+          speed: 32,
+          items: [
+            "🚀 Welcome to <strong>Save & Smile Wholesale Portal</strong> (Shop • Save • Smile)",
+            "🔥 Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers",
+            "🚚 Cash on Delivery (COD) Nationwide | Free Delivery Above Rs. 3,000",
+            "📞 24/7 Helpline & WhatsApp: <strong>0316-2323616</strong>"
+          ]
+        },
+        sections_visibility: {
+          hero_slider: true,
+          categories_strip: true,
+          trust_badges: true,
+          front_tabs: true,
+          hot_selling: true,
+          new_arrivals: true,
+          flash_sale: true,
+          trending_picks: true,
+          main_catalog: true,
+          search_hero: true,
+          video_reels: true,
+          testimonials: true
+        }
+      };
+    }
+
+    function populateHomeCustomizerForm() {
+      if (!currentHomeConfig) return;
+
+      // 1. Render Hero Slides List
+      renderHeroBannersList();
+
+      // 2. Ticker
+      const ticker = currentHomeConfig.announcement_ticker || {};
+      const chk = document.getElementById('hcTickerEnabled');
+      if (chk) chk.checked = ticker.enabled !== false;
+
+      const itemsText = document.getElementById('hcTickerItemsText');
+      if (itemsText && Array.isArray(ticker.items)) {
+        itemsText.value = ticker.items.join('\n');
+      }
+
+      const speedInput = document.getElementById('hcTickerSpeed');
+      if (speedInput) speedInput.value = ticker.speed || 32;
+
+      // 3. Sections Toggles
+      const secVis = currentHomeConfig.sections_visibility || {};
+      Object.keys(secVis).forEach(key => {
+        const toggle = document.getElementById(`sec_${key}`);
+        if (toggle) toggle.checked = secVis[key] !== false;
+      });
+    }
+
+    function renderHeroBannersList() {
+      const container = document.getElementById('heroBannersListContainer');
+      const badge = document.getElementById('heroSlidesCountBadge');
+      if (!container || !currentHomeConfig) return;
+
+      const slides = currentHomeConfig.hero_slides || [];
+      if (badge) badge.textContent = `${slides.length} Slides Active`;
+
+      if (slides.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center bg-slate-50 border border-slate-200 rounded-2xl text-slate-400 text-xs">
+            No slides configured. Click "+ Add New Banner Slide" above to create one.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = slides.map((slide, idx) => `
+        <div class="p-3.5 bg-slate-50 hover:bg-slate-100/90 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition">
+          <div class="flex items-center space-x-3 min-w-0">
+            <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-[11px] shrink-0">${idx + 1}</span>
+            <div class="w-24 h-12 rounded-xl overflow-hidden border border-slate-200 bg-white shrink-0">
+              <img src="${slide.image}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=120'">
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-slate-900 text-xs truncate">${slide.title}</div>
+              <div class="text-[11px] text-slate-500 truncate max-w-sm">${slide.subtitle || 'No subtitle'}</div>
+              <div class="flex items-center gap-2 mt-0.5 text-[10px]">
+                <span class="font-mono text-teal-800">${slide.link || '#products'}</span>
+                ${slide.badge ? `<span class="bg-cyan-100 text-cyan-800 px-1.5 py-0.2 rounded font-bold">${slide.badge}</span>` : ''}
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-1.5 self-end sm:self-center shrink-0">
+            ${idx > 0 ? `<button type="button" onclick="moveHeroSlide(${idx}, -1)" title="Move Up" class="p-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-xs">▲</button>` : ''}
+            ${idx < slides.length - 1 ? `<button type="button" onclick="moveHeroSlide(${idx}, 1)" title="Move Down" class="p-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-xs">▼</button>` : ''}
+            <button type="button" onclick="openEditHeroBannerModal(${slide.id || idx})" class="px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-lg text-xs">Edit</button>
+            <button type="button" onclick="deleteHeroSlide(${slide.id || idx})" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-lg text-xs">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openAddHeroBannerModal() {
+      document.getElementById('heroBannerModalTitle').textContent = 'Add Hero Banner Slide';
+      document.getElementById('heroBannerForm').reset();
+      document.getElementById('hbEditSlideId').value = '';
+      previewHeroBannerModalImage('');
+      openModal('heroBannerModal');
+    }
+
+    function openEditHeroBannerModal(slideId) {
+      if (!currentHomeConfig) return;
+      const slides = currentHomeConfig.hero_slides || [];
+      const slide = slides.find(s => s.id == slideId) || slides[slideId];
+      if (!slide) return;
+
+      document.getElementById('heroBannerModalTitle').textContent = `Edit Slide: ${slide.title.substring(0, 20)}...`;
+      document.getElementById('hbEditSlideId').value = slide.id || slideId;
+      document.getElementById('hbTitle').value = slide.title || '';
+      document.getElementById('hbSubtitle').value = slide.subtitle || '';
+      document.getElementById('hbImage').value = slide.image || '';
+      document.getElementById('hbLink').value = slide.link || '#products';
+      document.getElementById('hbBadge').value = slide.badge || '';
+      previewHeroBannerModalImage(slide.image || '');
+      openModal('heroBannerModal');
+    }
+
+    function previewHeroBannerModalImage(url) {
+      const img = document.getElementById('hbPreviewImg');
+      const placeholder = document.getElementById('hbPreviewPlaceholder');
+      if (!img || !placeholder) return;
+
+      if (url && url.trim().length > 5) {
+        img.src = url.trim();
+        img.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+      } else {
+        img.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+      }
+    }
+
+    async function handleHeroBannerFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      showToast('Converting banner to WebP...', '⚡');
+      try {
+        const webpResult = await convertImageFileToWebP(file);
+        document.getElementById('hbImage').value = webpResult.dataUrl;
+        previewHeroBannerModalImage(webpResult.dataUrl);
+        showToast(`Banner converted to WebP (${webpResult.origSizeKB}KB → ${webpResult.webpSizeKB}KB, -${webpResult.percentReduced}%)`, '🎉');
+      } catch (err) {
+        alert('Image conversion error: ' + err.message);
+      }
+    }
+
+    function handleHeroBannerSubmit(e) {
+      e.preventDefault();
+      if (!currentHomeConfig) currentHomeConfig = getDefaultHomeConfigLocal();
+
+      const editId = document.getElementById('hbEditSlideId').value;
+      const title = document.getElementById('hbTitle').value.trim();
+      const subtitle = document.getElementById('hbSubtitle').value.trim();
+      const image = document.getElementById('hbImage').value.trim();
+      const link = document.getElementById('hbLink').value.trim() || '#products';
+      const badge = document.getElementById('hbBadge').value.trim() || '';
+
+      if (!image) {
+        alert('Please provide or upload a banner image.');
+        return;
+      }
+
+      if (editId) {
+        const slides = currentHomeConfig.hero_slides || [];
+        const idx = slides.findIndex(s => s.id == editId || s == editId);
+        if (idx >= 0) {
+          slides[idx] = { ...slides[idx], title, subtitle, image, link, badge };
+        } else {
+          slides.push({ id: Number(editId) || Date.now(), title, subtitle, image, link, badge });
+        }
+        showToast(`Slide "${title.substring(0, 16)}..." updated!`, '✅');
+      } else {
+        const newSlide = {
+          id: Date.now(),
+          title, subtitle, image, link, badge,
+          btn_text: "Shop Wholesale Now"
+        };
+        currentHomeConfig.hero_slides = currentHomeConfig.hero_slides || [];
+        currentHomeConfig.hero_slides.unshift(newSlide);
+        showToast(`New slide added!`, '🎉');
+      }
+
+      closeModal('heroBannerModal');
+      renderHeroBannersList();
+    }
+
+    function moveHeroSlide(idx, delta) {
+      if (!currentHomeConfig || !currentHomeConfig.hero_slides) return;
+      const slides = currentHomeConfig.hero_slides;
+      const newIdx = idx + delta;
+      if (newIdx < 0 || newIdx >= slides.length) return;
+
+      const temp = slides[idx];
+      slides[idx] = slides[newIdx];
+      slides[newIdx] = temp;
+      renderHeroBannersList();
+    }
+
+    function deleteHeroSlide(slideId) {
+      if (!confirm('Are you sure you want to remove this hero banner slide?')) return;
+      if (!currentHomeConfig || !currentHomeConfig.hero_slides) return;
+      currentHomeConfig.hero_slides = currentHomeConfig.hero_slides.filter(s => s.id != slideId && s != slideId);
+      renderHeroBannersList();
+      showToast('Hero slide deleted', '🗑️');
+    }
+
+    function saveHomeCustomizerSettings() {
+      if (!currentHomeConfig) currentHomeConfig = getDefaultHomeConfigLocal();
+
+      // Read ticker
+      const tickerEnabled = document.getElementById('hcTickerEnabled')?.checked !== false;
+      const tickerLines = (document.getElementById('hcTickerItemsText')?.value || '')
+        .split('\n')
+        .map(l => l.trim())
+        .filter(Boolean);
+      const tickerSpeed = parseInt(document.getElementById('hcTickerSpeed')?.value, 10) || 32;
+
+      currentHomeConfig.announcement_ticker = {
+        enabled: tickerEnabled,
+        speed: tickerSpeed,
+        items: tickerLines.length > 0 ? tickerLines : currentHomeConfig.announcement_ticker.items
+      };
+
+      // Read sections visibility
+      const secKeys = [
+        'hero_slider', 'categories_strip', 'trust_badges', 'front_tabs',
+        'hot_selling', 'new_arrivals', 'flash_sale', 'trending_picks',
+        'main_catalog', 'search_hero', 'video_reels', 'testimonials'
+      ];
+      currentHomeConfig.sections_visibility = {};
+      secKeys.forEach(k => {
+        const toggle = document.getElementById(`sec_${k}`);
+        currentHomeConfig.sections_visibility[k] = toggle ? toggle.checked : true;
+      });
+
+      // Save locally to immediate localStorage cache for zero delay
+      localStorage.setItem('qadri_custom_banners', JSON.stringify(currentHomeConfig.hero_slides));
+      localStorage.setItem('save_and_smile_home_config', JSON.stringify(currentHomeConfig));
+
+      // Save to server API backend for live visitor synchronization
+      const token = localStorage.getItem('save_and_smile_admin_token') || '';
+      fetch('/api/home-customization', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
+        body: JSON.stringify({ config: currentHomeConfig })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          showToast('Live Homepage & Hero published to storefront!', '🎉');
+        } else {
+          showToast('Homepage settings saved locally!', '✅');
+        }
+      })
+      .catch(err => {
+        console.warn('Home publish API fallback:', err);
+        showToast('Homepage settings saved locally!', '✅');
+      });
+
+      recordAuditLog('Homepage Customization Saved', 'Updated hero banners, ticker and layout');
     }
 
     // -------------------------------------------------------------

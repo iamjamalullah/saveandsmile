@@ -51,7 +51,9 @@ export async function POST(req: NextRequest): Promise<Response> {
     });
     if (res.status >= 200 && res.status < 300) {
       try {
+        revalidatePath('/', 'layout');
         revalidatePath('/');
+        revalidatePath('/product-detail');
       } catch (e) {}
     }
     return res;

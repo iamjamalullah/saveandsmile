@@ -123,7 +123,23 @@ function syncLiveStorefrontData() {
     .then(res => res.json())
     .then(data => {
       if (data && data.config) {
-        applyHomeCustomization(data.config);
+        let cachedHome = null;
+        try {
+          cachedHome = JSON.parse(localStorage.getItem('save_and_smile_home_config'));
+        } catch (e) {}
+
+        const localTime = cachedHome && cachedHome.updated_at ? new Date(cachedHome.updated_at).getTime() : 0;
+        const serverTime = data.config && data.config.updated_at ? new Date(data.config.updated_at).getTime() : 0;
+
+        // If user made newer edits locally, preserve them and don't overwrite with stale server defaults
+        if (cachedHome && localTime > serverTime) {
+          applyHomeCustomization(cachedHome);
+        } else {
+          try {
+            localStorage.setItem('save_and_smile_home_config', JSON.stringify(data.config));
+          } catch (e) {}
+          applyHomeCustomization(data.config);
+        }
       }
     })
     .catch(err => console.debug('Live home customization sync fallback:', err));
@@ -134,7 +150,9 @@ function applyHomeCustomization(cfg) {
 
   // Apply Hero Slides
   if (Array.isArray(cfg.hero_slides) && cfg.hero_slides.length > 0) {
-    localStorage.setItem('qadri_custom_banners', JSON.stringify(cfg.hero_slides));
+    try {
+      localStorage.setItem('qadri_custom_banners', JSON.stringify(cfg.hero_slides));
+    } catch (e) {}
     initSlider();
   }
 

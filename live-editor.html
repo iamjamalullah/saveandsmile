@@ -465,8 +465,8 @@
       if (iframe) iframe.src = 'index.html?t=' + Date.now();
     }
 
-    // Auto-WebP conversion function
-    function convertImageFileToWebP(file, quality = 0.85) {
+    // Auto-WebP conversion function with high-compression & quota protection
+    function convertImageFileToWebP(file, quality = 0.75) {
       return new Promise((resolve, reject) => {
         if (!file || !file.type.startsWith('image/')) {
           return reject(new Error('Selected file is not an image.'));
@@ -479,7 +479,7 @@
             const canvas = document.createElement('canvas');
             let w = img.naturalWidth || img.width;
             let h = img.naturalHeight || img.height;
-            const maxW = 1600;
+            const maxW = 1200;
             if (w > maxW) {
               h = Math.round((h * maxW) / w);
               w = maxW;
@@ -491,7 +491,7 @@
 
             canvas.toBlob((blob) => {
               if (!blob) {
-                return resolve({ dataUrl: e.target.result, origSizeKB, webpSizeKB: origSizeKB, percentReduced: 0 });
+                return resolve({ dataUrl: e.target.result, origSizeKB, webpSizeKB: origSizeKB, percentReduced: 0, width: w, height: h });
               }
               const webpSizeKB = Math.round(blob.size / 1024);
               const percentReduced = Math.max(0, Math.round(((file.size - blob.size) / file.size) * 100));
@@ -518,35 +518,45 @@
     }
 
     // -------------------------------------------------------------
-    // LOAD & INITIALIZE CONFIG
+    // LOAD & INITIALIZE CONFIG (Timestamp-prioritized to avoid reverts)
     // -------------------------------------------------------------
     async function loadHomeConfig() {
+      let localConfig = null;
+      try {
+        const cached = localStorage.getItem('save_and_smile_home_config');
+        if (cached) localConfig = JSON.parse(cached);
+      } catch (e) {}
+
+      let serverConfig = null;
       try {
         const res = await fetch('/api/home-customization');
         const data = await res.json();
         if (data && data.config) {
-          homeConfig = data.config;
+          serverConfig = data.config;
         }
       } catch (err) {
         console.warn('API load fallback:', err);
       }
 
-      if (!homeConfig) {
-        try {
-          const cached = localStorage.getItem('save_and_smile_home_config');
-          if (cached) homeConfig = JSON.parse(cached);
-        } catch (e) {}
-      }
+      const localTime = localConfig && localConfig.updated_at ? new Date(localConfig.updated_at).getTime() : 0;
+      const serverTime = serverConfig && serverConfig.updated_at ? new Date(serverConfig.updated_at).getTime() : 0;
 
-      if (!homeConfig) {
+      // Prefer whichever is newer; never blindly overwrite newer user edits with stale server defaults
+      if (localConfig && localTime >= serverTime) {
+        homeConfig = localConfig;
+      } else if (serverConfig) {
+        homeConfig = serverConfig;
+      } else if (localConfig) {
+        homeConfig = localConfig;
+      } else {
         homeConfig = {
           hero_slides: [
-            { id: 1, title: "Wholesale Online Mega Sale", subtitle: "Get unbeatable prices on trending gadgets & home organizers", image: "https://www.qadrigadgets.pk/images/banners/6a91c696b7d39.webp", link: "#products", badge: "MEGA SALE" },
-            { id: 2, title: "Electric Insect Killers & Summer Gadgets", subtitle: "Premium mosquito killers and rechargeable lamps at direct wholesale rates", image: "https://www.qadrigadgets.pk/images/banners/6a7af65669503.webp", link: "#products", badge: "HOT SUMMER" },
-            { id: 3, title: "Trending Water Bottles & Sippers", subtitle: "Modern aesthetic mugs and gym motivational bottles", image: "https://www.qadrigadgets.pk/images/banners/6a7af65669d26.webp", link: "#products", badge: "POPULAR" },
-            { id: 4, title: "Store it Beautifully - Storage & Racks", subtitle: "Kitchen, Bathroom & Wardrobe organization solutions", image: "https://www.qadrigadgets.pk/images/banners/6a7af6566a0fa.webp", link: "#products", badge: "ORGANIZERS" },
-            { id: 5, title: "Toys & Kids Collection", subtitle: "Exciting flying planes, remote control cars and educational toys", image: "https://www.qadrigadgets.pk/images/banners/6a6e1db8c4ccd.webp", link: "#products", badge: "KIDS SPECIAL" },
-            { id: 6, title: "Fashion Mobile Accessories & Tech", subtitle: "Earbuds, Smart Watches, Cables & Fast Chargers", image: "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp", link: "#products", badge: "GADGETS" }
+            { id: "slide_1", title: "Wholesale Online Mega Sale", subtitle: "Get unbeatable prices on trending gadgets & home organizers", image: "https://www.qadrigadgets.pk/images/banners/6a91c696b7d39.webp", link: "#products", badge: "MEGA SALE" },
+            { id: "slide_2", title: "Electric Insect Killers & Summer Gadgets", subtitle: "Premium mosquito killers and rechargeable lamps at direct wholesale rates", image: "https://www.qadrigadgets.pk/images/banners/6a7af65669503.webp", link: "#products", badge: "HOT SUMMER" },
+            { id: "slide_3", title: "Trending Water Bottles & Sippers", subtitle: "Modern aesthetic mugs and gym motivational bottles", image: "https://www.qadrigadgets.pk/images/banners/6a7af65669d26.webp", link: "#products", badge: "POPULAR" },
+            { id: "slide_4", title: "Store it Beautifully - Storage & Racks", subtitle: "Kitchen, Bathroom & Wardrobe organization solutions", image: "https://www.qadrigadgets.pk/images/banners/6a7af6566a0fa.webp", link: "#products", badge: "ORGANIZERS" },
+            { id: "slide_5", title: "Toys & Kids Collection", subtitle: "Exciting flying planes, remote control cars and educational toys", image: "https://www.qadrigadgets.pk/images/banners/6a6e1db8c4ccd.webp", link: "#products", badge: "KIDS SPECIAL" },
+            { id: "slide_6", title: "Fashion Mobile Accessories & Tech", subtitle: "Earbuds, Smart Watches, Cables & Fast Chargers", image: "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp", link: "#products", badge: "GADGETS" }
           ],
           announcement_ticker: {
             enabled: true,
@@ -561,6 +571,14 @@
           sections_order: [...DEFAULT_SECTIONS_ORDER],
           sections_visibility: {}
         };
+      }
+
+      // Ensure stable string IDs on all slides
+      if (Array.isArray(homeConfig.hero_slides)) {
+        homeConfig.hero_slides.forEach((s, idx) => {
+          if (!s.id) s.id = 'slide_' + (idx + 1);
+          else s.id = String(s.id);
+        });
       }
 
       if (!Array.isArray(homeConfig.sections_order) || homeConfig.sections_order.length === 0) {
@@ -679,8 +697,8 @@
 
             ${idx > 0 ? `<button type="button" onclick="moveSlide(${idx}, -1)" title="Move Up" class="p-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold">▲</button>` : ''}
             ${idx < slides.length - 1 ? `<button type="button" onclick="moveSlide(${idx}, 1)" title="Move Down" class="p-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold">▼</button>` : ''}
-            <button type="button" onclick="openEditBannerModal(${slide.id || idx})" class="px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold rounded-lg text-xs">Edit</button>
-            <button type="button" onclick="deleteSlide(${slide.id || idx})" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-lg text-xs">Delete</button>
+            <button type="button" onclick="openEditBannerModal('${slide.id}')" class="px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold rounded-lg text-xs">Edit</button>
+            <button type="button" onclick="deleteSlide('${slide.id}')" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-lg text-xs">Delete</button>
           </div>
         </div>
       `).join('');
@@ -694,9 +712,13 @@
         const webpResult = await convertImageFileToWebP(file);
         if (homeConfig && homeConfig.hero_slides && homeConfig.hero_slides[idx]) {
           homeConfig.hero_slides[idx].image = webpResult.dataUrl;
+          if (!homeConfig.hero_slides[idx].id) {
+            homeConfig.hero_slides[idx].id = 'slide_' + Date.now() + '_' + idx;
+          }
+          homeConfig.updated_at = new Date().toISOString();
           renderHeroBannersList();
           markUnsavedChanges();
-          showToast(`Picture converted to WebP (${webpResult.width}×${webpResult.height}px, -${webpResult.percentReduced}%)! Click Save to publish.`, '🎉');
+          showToast(`Picture converted to WebP (${webpResult.width}×${webpResult.height}px, -${webpResult.percentReduced}%)! Click "Save & Publish" to store.`, '🎉');
         }
       } catch (err) {
         alert('Image error: ' + err.message);
@@ -711,13 +733,15 @@
       const temp = slides[idx];
       slides[idx] = slides[newIdx];
       slides[newIdx] = temp;
+      homeConfig.updated_at = new Date().toISOString();
       renderHeroBannersList();
       markUnsavedChanges();
     }
 
     function deleteSlide(slideId) {
       if (!confirm('Are you sure you want to remove this slide?')) return;
-      homeConfig.hero_slides = homeConfig.hero_slides.filter(s => s.id != slideId && s != slideId);
+      homeConfig.hero_slides = (homeConfig.hero_slides || []).filter(s => String(s.id) !== String(slideId));
+      homeConfig.updated_at = new Date().toISOString();
       renderHeroBannersList();
       markUnsavedChanges();
       showToast('Slide removed', '🗑️');
@@ -737,11 +761,11 @@
 
     function openEditBannerModal(slideId) {
       const slides = homeConfig.hero_slides || [];
-      const slide = slides.find(s => s.id == slideId) || slides[slideId];
+      const slide = slides.find(s => String(s.id) === String(slideId));
       if (!slide) return;
 
-      document.getElementById('slideModalTitle').textContent = `Edit Slide: ${slide.title.substring(0, 20)}...`;
-      document.getElementById('modalSlideId').value = slide.id || slideId;
+      document.getElementById('slideModalTitle').textContent = `Edit Slide: ${(slide.title || 'Slide').substring(0, 20)}...`;
+      document.getElementById('modalSlideId').value = String(slide.id);
       document.getElementById('modalSlideTitle').value = slide.title || '';
       document.getElementById('modalSlideSubtitle').value = slide.subtitle || '';
       document.getElementById('modalSlideImage').value = slide.image || '';
@@ -820,16 +844,18 @@
         return;
       }
 
+      homeConfig.updated_at = new Date().toISOString();
+
       if (editId) {
         const slides = homeConfig.hero_slides || [];
-        const idx = slides.findIndex(s => s.id == editId || s == editId);
+        const idx = slides.findIndex(s => String(s.id) === String(editId));
         if (idx >= 0) {
           slides[idx] = { ...slides[idx], title, subtitle, image, link, badge };
         }
         showToast(`Slide "${title.substring(0, 16)}..." updated!`, '✅');
       } else {
         const newSlide = {
-          id: Date.now(),
+          id: 'slide_' + Date.now(),
           title, subtitle, image, link, badge,
           btn_text: "Shop Wholesale Now"
         };
@@ -1213,23 +1239,29 @@
         items: tickerLines.length > 0 ? tickerLines : (homeConfig.announcement_ticker?.items || [])
       };
 
+      homeConfig.updated_at = new Date().toISOString();
+
       // Save locally to immediate localStorage caches
-      localStorage.setItem('qadri_custom_banners', JSON.stringify(homeConfig.hero_slides));
-      localStorage.setItem('save_and_smile_home_config', JSON.stringify(homeConfig));
+      try {
+        localStorage.setItem('qadri_custom_banners', JSON.stringify(homeConfig.hero_slides));
+        localStorage.setItem('save_and_smile_home_config', JSON.stringify(homeConfig));
+      } catch (storageErr) {
+        console.warn('LocalStorage quota warning:', storageErr);
+      }
 
       // Post to backend API
       const token = localStorage.getItem('save_and_smile_admin_token') || '';
       try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
         const res = await fetch('/api/home-customization', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : ''
-          },
+          headers,
           body: JSON.stringify({ config: homeConfig })
         });
         const result = await res.json();
-        if (result.success) {
+        if (result && result.success) {
           showToast('Live Homepage & Hero published successfully!', '🎉');
         } else {
           showToast('Settings saved locally!', '✅');

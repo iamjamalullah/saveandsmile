@@ -186,12 +186,21 @@ const DEFAULT_HOME_CONFIG = {
   updated_at: new Date().toISOString()
 };
 
+const TMP_CUSTOMIZATION_FILE = '/tmp/home_customization.json';
+
 function readHomeConfig() {
+  try {
+    if (fs.existsSync(TMP_CUSTOMIZATION_FILE)) {
+      return JSON.parse(fs.readFileSync(TMP_CUSTOMIZATION_FILE, 'utf8'));
+    }
+  } catch (e) {}
+
   try {
     if (fs.existsSync(HOME_CUSTOMIZATION_FILE)) {
       return JSON.parse(fs.readFileSync(HOME_CUSTOMIZATION_FILE, 'utf8'));
     }
   } catch (e) {}
+
   return DEFAULT_HOME_CONFIG;
 }
 
@@ -199,9 +208,13 @@ function writeHomeConfig(data) {
   try {
     fs.writeFileSync(HOME_CUSTOMIZATION_FILE, JSON.stringify(data, null, 2), 'utf8');
   } catch (e) {}
+
+  try {
+    fs.writeFileSync(TMP_CUSTOMIZATION_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (e) {}
 }
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -278,4 +291,14 @@ module.exports = async function handler(req, res) {
   }
 
   return res.status(405).json({ error: 'Method Not Allowed' });
+}
+
+module.exports = handler;
+module.exports.config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb'
+    }
+  }
 };
+

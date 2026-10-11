@@ -5066,12 +5066,23 @@
     let currentHomeConfig = null;
 
     function renderHomeCustomizerView() {
-      // Fetch current config from server or fallback
+      let localCached = null;
+      try {
+        localCached = JSON.parse(localStorage.getItem('save_and_smile_home_config'));
+      } catch (e) {}
+
       fetch('/api/home-customization')
         .then(res => res.json())
         .then(data => {
-          if (data && data.config) {
+          const localTime = localCached && localCached.updated_at ? new Date(localCached.updated_at).getTime() : 0;
+          const serverTime = data && data.config && data.config.updated_at ? new Date(data.config.updated_at).getTime() : 0;
+
+          if (localCached && localTime > serverTime) {
+            currentHomeConfig = localCached;
+          } else if (data && data.config) {
             currentHomeConfig = data.config;
+          } else if (localCached) {
+            currentHomeConfig = localCached;
           } else {
             currentHomeConfig = getDefaultHomeConfigLocal();
           }
@@ -5079,7 +5090,7 @@
         })
         .catch(err => {
           console.warn('Home config fetch fallback:', err);
-          currentHomeConfig = getDefaultHomeConfigLocal();
+          currentHomeConfig = localCached || getDefaultHomeConfigLocal();
           populateHomeCustomizerForm();
         });
     }

@@ -44,7 +44,7 @@ for (const file of filesToCopy) {
 }
 
 // Folders to copy to dist
-const foldersToCopy = ['css', 'js', 'images'];
+const foldersToCopy = ['css', 'js', 'images', 'data'];
 for (const folder of foldersToCopy) {
   const src = path.join(rootDir, folder);
   const dest = path.join(distDir, folder);

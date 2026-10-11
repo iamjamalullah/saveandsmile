@@ -1,0 +1,99 @@
+{
+  "hero_slides": [
+    {
+      "id": "slide_1",
+      "title": "Wholesale Online Mega Sale",
+      "subtitle": "Get unbeatable prices on trending gadgets & home organizers",
+      "image": "https://www.qadrigadgets.pk/images/banners/6a91c696b7d39.webp",
+      "link": "#products",
+      "badge": "MEGA SALE",
+      "btn_text": "Shop Wholesale Now"
+    },
+    {
+      "id": "slide_2",
+      "title": "Electric Insect Killers & Summer Gadgets",
+      "subtitle": "Premium mosquito killers and rechargeable lamps at direct wholesale rates",
+      "image": "https://www.qadrigadgets.pk/images/banners/6a7af65669503.webp",
+      "link": "#products",
+      "badge": "HOT SUMMER",
+      "btn_text": "Explore Deals"
+    },
+    {
+      "id": "slide_3",
+      "title": "Trending Water Bottles & Sippers",
+      "subtitle": "Modern aesthetic mugs and gym motivational bottles",
+      "image": "https://www.qadrigadgets.pk/images/banners/6a7af65669d26.webp",
+      "link": "#products",
+      "badge": "POPULAR",
+      "btn_text": "View Collection"
+    },
+    {
+      "id": "slide_4",
+      "title": "Store it Beautifully - Storage & Racks",
+      "subtitle": "Kitchen, Bathroom & Wardrobe organization solutions",
+      "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566a0fa.webp",
+      "link": "#products",
+      "badge": "ORGANIZERS",
+      "btn_text": "Organize Now"
+    },
+    {
+      "id": "slide_5",
+      "title": "Toys & Kids Collection",
+      "subtitle": "Exciting flying planes, remote control cars and educational toys",
+      "image": "https://www.qadrigadgets.pk/images/banners/6a6e1db8c4ccd.webp",
+      "link": "#products",
+      "badge": "KIDS SPECIAL",
+      "btn_text": "See Toys"
+    },
+    {
+      "id": "slide_6",
+      "title": "Fashion Mobile Accessories & Tech",
+      "subtitle": "Earbuds, Smart Watches, Cables & Fast Chargers",
+      "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+      "link": "#products",
+      "badge": "GADGETS",
+      "btn_text": "Explore Tech"
+    }
+  ],
+  "announcement_ticker": {
+    "enabled": true,
+    "speed": 32,
+    "items": [
+      "🚀 Welcome to <strong>Save & Smile Wholesale Portal</strong> (Shop • Save • Smile)",
+      "🔥 Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers",
+      "🚚 Cash on Delivery (COD) Nationwide | Free Delivery Above Rs. 3,000",
+      "📞 24/7 Helpline & WhatsApp: <strong>0316-2323616</strong>"
+    ]
+  },
+  "sections_order": [
+    "hero_slider",
+    "categories_strip",
+    "trust_badges",
+    "front_tabs",
+    "flash_deals",
+    "featured_products",
+    "shop_by_category",
+    "video_reels",
+    "customer_reviews",
+    "wholesale_banner"
+  ],
+  "sections_visibility": {
+    "hero_slider": true,
+    "categories_strip": true,
+    "trust_badges": true,
+    "front_tabs": true,
+    "flash_deals": true,
+    "featured_products": true,
+    "shop_by_category": true,
+    "video_reels": true,
+    "customer_reviews": true,
+    "wholesale_banner": true
+  },
+  "sections_config": {},
+  "theme": {
+    "primary_color": "#008060",
+    "gradient_from": "#004d57",
+    "gradient_to": "#83a82b"
+  },
+  "updated_at": "2026-10-11T13:00:00.000Z"
+}

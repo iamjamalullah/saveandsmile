@@ -645,26 +645,27 @@ function filterByCategory(catId) {
 // Product Card HTML Generator (Rating Removed, No SKU, Pastel Categories)
 // -------------------------------------------------------------
 function createProductCardHtml(product) {
-  const isWishlisted = AppState.wishlist.includes(product.id);
+  const pIdStr = String(product.id);
+  const isWishlisted = AppState.wishlist.some(w => String(w) === pIdStr);
   return `
     <div class="product-card cat-${product.category}">
       <span class="product-badge">${product.badge}</span>
       
-      <div class="product-img-wrapper" onclick="window.location.href='product-detail.html?id=${product.id}'">
+      <div class="product-img-wrapper" onclick="window.location.href='product-detail.html?id=' + encodeURIComponent('${pIdStr}')">
         <img src="${product.image}" alt="${product.title}" loading="lazy">
       </div>
 
       <div class="card-quick-actions">
-        <button class="action-icon-circle ${isWishlisted ? 'favorited' : ''}" title="Add to Wishlist" onclick="toggleWishlist(${product.id})">
+        <button class="action-icon-circle ${isWishlisted ? 'favorited' : ''}" title="Add to Wishlist" onclick="toggleWishlist('${pIdStr}')">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="${isWishlisted ? '#ef4444' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </button>
-        <button class="action-icon-circle" title="Quick View" onclick="openQuickView(${product.id})">
+        <button class="action-icon-circle" title="View Product (Quick View)" onclick="openQuickView('${pIdStr}')">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
       </div>
 
       <div class="product-card-body">
-        <h3 class="product-title" onclick="window.location.href='product-detail.html?id=${product.id}'">${product.title}</h3>
+        <h3 class="product-title" onclick="window.location.href='product-detail.html?id=' + encodeURIComponent('${pIdStr}')">${product.title}</h3>
 
         <div class="product-pricing">
           <span class="original-price"><span class="currency-symbol">${STORE_CONFIG.currency}</span> ${product.originalPrice}</span>
@@ -672,12 +673,12 @@ function createProductCardHtml(product) {
         </div>
 
         <div class="product-card-actions">
-          <button class="btn-add-cart" onclick="addToCart(${product.id})" title="Add to Cart">
+          <button class="btn-add-cart" onclick="addToCart('${pIdStr}')" title="Add to Cart">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
             <span class="btn-cart-text">Add to Cart</span>
           </button>
-          <button class="btn-buy-now" onclick="buyNowSingle(${product.id})" title="Direct Checkout">
-            <span>Buy Now</span>
+          <button class="btn-buy-now" onclick="buyNowSingle('${pIdStr}')" title="Order Now - Direct Checkout">
+            <span>Order Now</span>
           </button>
         </div>
 
@@ -748,10 +749,11 @@ function renderProducts() {
 // Cart Logic & Drawer
 // -------------------------------------------------------------
 function addToCart(productId, qty = 1) {
-  const product = getAllProducts().find(p => p.id === productId);
+  const strId = String(productId);
+  const product = getAllProducts().find(p => String(p.id) === strId);
   if (!product) return;
 
-  const existing = AppState.cart.find(item => item.id === productId);
+  const existing = AppState.cart.find(item => String(item.id) === strId);
   if (existing) {
     existing.qty += qty;
   } else {
@@ -773,10 +775,11 @@ function addToCart(productId, qty = 1) {
 }
 
 function buyNowSingle(productId, qty = 1) {
-  const product = getAllProducts().find(p => p.id === productId);
+  const strId = String(productId);
+  const product = getAllProducts().find(p => String(p.id) === strId);
   if (!product) return;
 
-  const existing = AppState.cart.find(item => item.id === productId);
+  const existing = AppState.cart.find(item => String(item.id) === strId);
   if (existing) {
     existing.qty += qty;
   } else {
@@ -794,6 +797,14 @@ function buyNowSingle(productId, qty = 1) {
   updateCartBadge();
   window.location.href = 'checkout.html';
 }
+
+// Global aliases so any custom button or script can invoke them
+window.orderNow = function(productId, qty = 1) {
+  buyNowSingle(productId, qty);
+};
+window.viewProduct = function(productId) {
+  openQuickView(productId);
+};
 
 function addToCartByName(title, price, image, code) {
   const existing = AppState.cart.find(item => item.code === code);
@@ -828,12 +839,13 @@ function updateCartBadge() {
 }
 
 function updateItemQty(productId, change) {
-  const item = AppState.cart.find(i => i.id === productId);
+  const strId = String(productId);
+  const item = AppState.cart.find(i => String(i.id) === strId);
   if (!item) return;
 
   item.qty += change;
   if (item.qty <= 0) {
-    AppState.cart = AppState.cart.filter(i => i.id !== productId);
+    AppState.cart = AppState.cart.filter(i => String(i.id) !== strId);
   }
   saveCart();
   updateCartBadge();
@@ -841,7 +853,8 @@ function updateItemQty(productId, change) {
 }
 
 function removeFromCart(productId) {
-  AppState.cart = AppState.cart.filter(i => i.id !== productId);
+  const strId = String(productId);
+  AppState.cart = AppState.cart.filter(i => String(i.id) !== strId);
   saveCart();
   updateCartBadge();
   renderCartDrawer();
@@ -924,17 +937,18 @@ function closeCartDrawer() {
 // Wishlist Logic
 // -------------------------------------------------------------
 function toggleWishlist(productId) {
-  const index = AppState.wishlist.indexOf(productId);
+  const strId = String(productId);
+  const index = AppState.wishlist.findIndex(w => String(w) === strId);
   if (index > -1) {
     AppState.wishlist.splice(index, 1);
     showToast('Removed from wishlist');
   } else {
-    AppState.wishlist.push(productId);
+    AppState.wishlist.push(strId);
     showToast('Added to your wishlist!');
   }
   localStorage.setItem('qadri_wishlist', JSON.stringify(AppState.wishlist));
   updateWishlistBadge();
-  renderProducts();
+  renderAllSections();
 }
 
 function updateWishlistBadge() {
@@ -947,7 +961,7 @@ function openWishlistModal() {
   const content = document.getElementById('genericModalContent');
   if (!modal || !content) return;
 
-  const items = getAllProducts().filter(p => AppState.wishlist.includes(p.id));
+  const items = getAllProducts().filter(p => AppState.wishlist.some(w => String(w) === String(p.id)));
 
   content.innerHTML = `
     <div style="padding: 1.5rem;">
@@ -963,7 +977,7 @@ function openWishlistModal() {
                 <div style="font-size: 0.9rem; font-weight: 600;">${item.title}</div>
                 <div style="color: var(--primary-color); font-weight: 700;">${STORE_CONFIG.currency} ${item.price}</div>
               </div>
-              <button class="btn-add-cart" onclick="addToCart(${item.id}); closeModal();">Add to Cart</button>
+              <button class="btn-add-cart" onclick="addToCart('${item.id}'); closeModal();">Add to Cart</button>
             </div>
           `).join('')}
         </div>
@@ -978,7 +992,8 @@ function openWishlistModal() {
 // Quick View Modal
 // -------------------------------------------------------------
 function openQuickView(productId) {
-  const product = getAllProducts().find(p => p.id === productId);
+  const strId = String(productId);
+  const product = getAllProducts().find(p => String(p.id) === strId);
   if (!product) return;
 
   const modal = document.getElementById('genericModal');
@@ -991,12 +1006,12 @@ function openQuickView(productId) {
         <img src="${product.image}" alt="${product.title}">
       </div>
       <div class="modal-details">
-        <span class="product-sku">SKU: ${product.code}</span>
+        <span class="product-sku">SKU: ${product.code || ('QGW-' + product.id)}</span>
         <h2 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 4px 0 8px;">${product.title}</h2>
         <div class="product-rating" style="margin-bottom: 12px;">
-          <span>★ ${product.rating}</span>
-          <span class="count">(${product.reviews} customer reviews)</span>
-          <span style="margin-left: 10px; color: #10b981; font-weight: 600;">● In Stock (${product.stock} units)</span>
+          <span>★ ${product.rating || '4.9'}</span>
+          <span class="count">(${product.reviews || '42'} customer reviews)</span>
+          <span style="margin-left: 10px; color: #10b981; font-weight: 600;">● In Stock (${product.stock || 50} units)</span>
         </div>
         
         <div class="product-pricing" style="margin-bottom: 1rem;">
@@ -1006,7 +1021,7 @@ function openQuickView(productId) {
         </div>
 
         <p style="color: #475569; font-size: 0.88rem; line-height: 1.6; margin-bottom: 1.25rem;">
-          ${product.description}
+          ${product.description || ''}
         </p>
 
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem;">
@@ -1019,18 +1034,24 @@ function openQuickView(productId) {
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 10px;">
-          <button class="btn-checkout" onclick="addModalToCart(${product.id})">
-            Add to Cart
+          <button class="btn-checkout" onclick="addModalToCart('${product.id}')">
+            🛒 Add to Cart
           </button>
-          <button class="btn-whatsapp-order" onclick="orderSingleWhatsApp(${product.id}, getModalQty())">
-            Buy Now via WhatsApp
+          <button class="btn-checkout" style="background: #064c63; box-shadow: 0 4px 14px rgba(6,76,99,0.3);" onclick="buyNowSingle('${product.id}', getModalQty())">
+            ⚡ Order Now (Direct Checkout)
           </button>
+          <button class="btn-whatsapp-order" onclick="orderSingleWhatsApp('${product.id}', getModalQty())">
+            💬 Order via WhatsApp
+          </button>
+          <a href="product-detail.html?id=${encodeURIComponent(product.id)}" style="text-align: center; color: var(--primary-color); font-weight: 700; text-decoration: underline; margin-top: 4px; display: block; font-size: 0.88rem;">
+            View Full Product Page &amp; Customer Reviews →
+          </a>
         </div>
 
         <div style="margin-top: 1.25rem; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 0.82rem; color: #64748b; display: flex; flex-direction: column; gap: 4px;">
-          <div>✓ 7 Days Replacement Warranty</div>
-          <div>✓ Cash on Delivery (COD) Available All Over Pakistan</div>
-          <div>✓ Wholesale Guaranteed Best Rates</div>
+          <div>✓ 7 Days Checking &amp; Replacement Warranty</div>
+          <div>✓ Cash on Delivery (COD) Available Nationwide Across Pakistan</div>
+          <div>✓ Wholesale Guaranteed Factory Rates</div>
         </div>
       </div>
     </div>
@@ -1067,7 +1088,8 @@ function closeModal() {
 // WhatsApp Direct Checkout Generators
 // -------------------------------------------------------------
 function orderSingleWhatsApp(productId, qty = 1) {
-  const product = getAllProducts().find(p => p.id === productId);
+  const strId = String(productId);
+  const product = getAllProducts().find(p => String(p.id) === strId);
   if (!product) return;
 
   const total = product.price * qty;
@@ -1671,7 +1693,7 @@ function initSearch() {
       dropdown.innerHTML = `<div style="padding: 12px; font-size: 0.85rem; color: #64748b; text-align: center;">No matching gadgets found.</div>`;
     } else {
       dropdown.innerHTML = matched.slice(0, 6).map(p => `
-        <div class="search-result-item" onclick="openQuickView(${p.id}); document.getElementById('searchResultsDropdown').classList.remove('active');">
+        <div class="search-result-item" onclick="openQuickView('${p.id}'); document.getElementById('searchResultsDropdown').classList.remove('active');">
           <img src="${p.image}" alt="${p.title}">
           <div class="search-result-info">
             <div class="title">${p.title}</div>
@@ -1729,37 +1751,7 @@ function applyQuickSearch(query) {
       <h3>No products matched "${query}"</h3>
       <button class="tab-btn active" onclick="filterByCategory('all')" style="margin-top: 1rem;">View All Products</button>
     </div>
-  ` : matched.map(product => {
-    const isWishlisted = AppState.wishlist.includes(product.id);
-    return `
-      <div class="product-card">
-        <span class="product-badge">${product.badge}</span>
-        <div class="product-img-wrapper" onclick="openQuickView(${product.id})">
-          <img src="${product.image}" alt="${product.title}">
-        </div>
-        <div class="card-quick-actions">
-          <button class="action-icon-circle ${isWishlisted ? 'favorited' : ''}" onclick="toggleWishlist(${product.id})">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="${isWishlisted ? '#ef4444' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          </button>
-          <button class="action-icon-circle" onclick="openQuickView(${product.id})">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-        </div>
-        <div class="product-card-body">
-          <div class="product-sku">SKU: ${product.code}</div>
-          <h3 class="product-title" onclick="openQuickView(${product.id})">${product.title}</h3>
-          <div class="product-pricing">
-            <span class="original-price">${STORE_CONFIG.currency} ${product.originalPrice}</span>
-            <span class="wholesale-price">${STORE_CONFIG.currency} ${product.price}</span>
-          </div>
-          <div class="product-card-actions">
-            <button class="btn-add-cart" onclick="addToCart(${product.id})">Add to Cart</button>
-            <button class="btn-whatsapp-direct" onclick="orderSingleWhatsApp(${product.id})">📞</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
+  ` : matched.map(createProductCardHtml).join('');
 
   const dropdown = document.getElementById('searchResultsDropdown');
   if (dropdown) dropdown.classList.remove('active');

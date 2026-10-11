@@ -64,40 +64,58 @@
     </div>
   </div>
 
-  <!-- Header -->
-  <!-- Header -->
-  <header class="header-wrapper">
+  <!-- Main Header & Dynamic Navigation (Identical to Homepage Menu) -->
+  <header class="header-wrapper" id="headerSection">
     <div class="site-container">
       <div class="header-inner">
-        <a href="index.html" class="brand-logo" title="Save &amp; Smile">
-          <img src="images/save-and-smile-logo.png" alt="Save &amp; Smile" class="site-brand-logo">
-        </a>
-
-        <!-- Desktop Live Search Box -->
-        <div class="header-search">
-          <form class="search-input-group" onsubmit="handleSearchSubmit(event)">
-            <input type="text" id="searchInput" placeholder="Search gadgets, smart watches, organizers..." autocomplete="off">
-            <button type="submit" class="search-btn" title="Search">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            </button>
-          </form>
-          <div class="search-results-dropdown" id="searchResultsDropdown"></div>
-        </div>
-
-        <!-- Header Actions (On Mobile: Search Icon + WhatsApp Button Only) -->
-        <div class="header-actions">
-          <!-- Search Icon Button -->
-          <button class="action-icon-pill" id="detailSearchToggleBtn" onclick="toggleSearchOverlay()" title="Search Products">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        
+        <!-- Left Side: 4-Dots Menu Trigger + Brand Logo -->
+        <div class="header-left-group">
+          <!-- 4-Dots Icon Menu Trigger Button -->
+          <button class="header-menu-btn" id="headerMenuBtn" onclick="toggleHeaderMenu()" title="Open Categories & Menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="6" cy="6" r="2.8"/>
+              <circle cx="18" cy="6" r="2.8"/>
+              <circle cx="6" cy="18" r="2.8"/>
+              <circle cx="18" cy="18" r="2.8"/>
+            </svg>
           </button>
 
-          <!-- WhatsApp Button -->
+          <!-- Brand Logo with Save & Smile Logo Image -->
+          <a href="index.html" class="brand-logo" title="Save & Smile - Shop • Save • Smile | Wholesale Store Pakistan">
+            <img src="images/save-and-smile-logo.png" alt="Save &amp; Smile - Wholesale Gadgets Pakistan" class="site-brand-logo">
+          </a>
+        </div>
+
+        <!-- Desktop Center Navigation Menu (Pure Text Minimalist Elegance) -->
+        <nav class="desktop-center-nav">
+          <a href="index.html" class="desktop-nav-link">Home</a>
+          <a href="index.html#flashSale" class="desktop-nav-link">Deals</a>
+          <a href="track-order.html" class="desktop-nav-link">Track Order</a>
+          <a href="cart.html" class="desktop-nav-link">Cart</a>
+          <a href="https://wa.me/923162323616?text=Salam!%20I%20want%20to%20Buy%20in%20Wholesale" target="_blank" class="desktop-nav-link wholesale-pill">Wholesale</a>
+        </nav>
+
+        <!-- Header Actions (Icons: Search, WhatsApp, Wishlist, Cart) -->
+        <div class="header-actions">
+          <!-- Search Icon Button (Toggles Search Bar) -->
+          <button class="action-icon-pill" id="searchToggleBtn" onclick="toggleSearchOverlay()" title="Search Products">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+
+          <!-- WhatsApp Hotline Icon -->
           <a href="https://wa.me/923162323616" target="_blank" class="action-icon-pill hotline-icon-pill" title="WhatsApp Support: 0316-2323616">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           </a>
 
-          <!-- Cart Icon (Desktop visible) -->
-          <a href="cart.html" class="action-icon-pill detail-desktop-cart" title="View Cart">
+          <!-- Wishlist Icon -->
+          <button class="action-icon-pill" onclick="openWishlistModal()" title="View Wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span class="badge-counter" id="wishlistBadge">0</span>
+          </button>
+
+          <!-- Shopping Cart Trigger Icon -->
+          <a href="cart.html" class="action-icon-pill" title="View Cart">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
             <span class="badge-counter" id="cartBadge">0</span>
           </a>
@@ -107,12 +125,53 @@
       <!-- Expandable Search Overlay for Mobile & Desktop -->
       <div class="expand-search-bar" id="expandSearchBar">
         <form class="search-input-group" onsubmit="handleSearchSubmit(event)">
-          <input type="text" id="searchInputMbl" placeholder="Search gadgets, smart watches, organizers..." autocomplete="off">
+          <input type="text" id="searchInput" placeholder="Search wholesale gadgets, smart watches, organizers..." autocomplete="off">
           <button type="submit" class="search-btn" title="Search">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </button>
           <button type="button" class="search-close-btn" onclick="toggleSearchOverlay()">✕</button>
         </form>
+        <div class="search-results-dropdown" id="searchResultsDropdown"></div>
+      </div>
+    </div>
+
+    <!-- 2-Tab Interactive Header Dropdown Panel (Categories & Menu) -->
+    <div class="header-tabs-dropdown" id="headerTabsDropdown">
+      <div class="site-container">
+        <div class="dropdown-tabs-nav">
+          <button class="tab-nav-btn active" id="tabNavBtnCat" onclick="switchHeaderDropdownTab('categories')">
+            Categories
+          </button>
+          <button class="tab-nav-btn" id="tabNavBtnMenu" onclick="switchHeaderDropdownTab('menu')">
+            Menu
+          </button>
+        </div>
+
+        <!-- Tab 1: Categories Content -->
+        <div class="tab-pane-content active" id="tabPaneCategories">
+          <div class="header-cats-grid" id="headerCatsGrid"></div>
+        </div>
+
+        <!-- Tab 2: Menu Content -->
+        <div class="tab-pane-content" id="tabPaneMenu">
+          <div class="header-menu-links">
+            <a href="index.html" class="menu-item-link" onclick="toggleHeaderMenu()">
+              <span>Home</span>
+            </a>
+            <a href="index.html#flashSale" class="menu-item-link" onclick="toggleHeaderMenu()">
+              <span>Deals &amp; Discounts</span>
+            </a>
+            <a href="track-order.html" class="menu-item-link">
+              <span>Track Order</span>
+            </a>
+            <a href="cart.html" class="menu-item-link">
+              <span>Shopping Cart</span>
+            </a>
+            <a href="https://wa.me/923162323616?text=Salam!%20I%20want%20to%20Buy%20in%20Wholesale" target="_blank" class="menu-item-link">
+              <span>Wholesale Bulk Inquiries</span>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -368,10 +427,10 @@
 
     function loadProductFromUrl() {
       const urlParams = new URLSearchParams(window.location.search);
-      const prodId = parseInt(urlParams.get('id'), 10) || 203;
+      const rawId = urlParams.get('id');
 
       const all = getAllProducts();
-      currentProduct = all.find(p => p.id === prodId) || all[0];
+      currentProduct = (rawId ? all.find(p => String(p.id) === String(rawId)) : null) || all[0];
       if (!currentProduct) return;
 
       // Dynamic SEO Meta & Schema.org Synchronization
@@ -594,22 +653,22 @@
       container.innerHTML = related.map(p => `
         <div class="product-card cat-${p.category}">
           <span class="product-badge">${p.badge}</span>
-          <div class="product-img-wrapper" onclick="window.location.href='product-detail.html?id=${p.id}'">
+          <div class="product-img-wrapper" onclick="window.location.href='product-detail.html?id=' + encodeURIComponent('${p.id}')">
             <img src="${p.image}" alt="${p.title}">
           </div>
           <div class="product-card-body">
-            <h3 class="product-title" onclick="window.location.href='product-detail.html?id=${p.id}'">${p.title}</h3>
+            <h3 class="product-title" onclick="window.location.href='product-detail.html?id=' + encodeURIComponent('${p.id}')">${p.title}</h3>
             <div class="product-pricing">
               <span class="original-price">Rs. ${p.originalPrice}</span>
               <span class="wholesale-price">Rs. ${p.price}</span>
             </div>
             <div class="product-card-actions">
-              <button class="btn-add-cart" onclick="addToCart(${p.id})" title="Add to Cart">
+              <button class="btn-add-cart" onclick="addToCart('${p.id}')" title="Add to Cart">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                 <span class="btn-cart-text">Add to Cart</span>
               </button>
-              <button class="btn-buy-now" onclick="buyNowSingle(${p.id})" title="Direct Checkout">
-                <span>Buy Now</span>
+              <button class="btn-buy-now" onclick="buyNowSingle('${p.id}')" title="Order Now - Direct Checkout">
+                <span>Order Now</span>
               </button>
             </div>
             <a href="https://wa.me/923162323616?text=Salam!%20I%20want%20to%20buy%20*${encodeURIComponent(p.title)}*%20in%20Wholesale%20bulk%20quantity." target="_blank" class="card-wholesale-strip">

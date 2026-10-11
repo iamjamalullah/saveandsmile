@@ -1155,15 +1155,40 @@
       <!-- VIEW 15: WORDPRESS MEDIA LIBRARY -->
       <!-- ============================================================ -->
       <section id="view-media-library" class="view-panel space-y-6">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight">WordPress Media Library</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Drag-and-drop image uploads, webp optimization, alt text and media URLs.</p>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Cloudflare R2 &amp; Media Library</h1>
+            <p class="text-xs text-slate-500 mt-0.5">High-speed CDN storage powered by Cloudflare R2. Public bucket: <span class="font-mono text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded font-bold">pub-8bcbaae497aa4994a6c3852932093ce1.r2.dev</span></p>
           </div>
-          <button onclick="triggerSimulatedMediaUpload()" class="px-4 py-2 bg-teal-800 text-white font-bold rounded-xl text-xs">+ Upload New File</button>
+          <div class="flex items-center gap-2">
+            <button onclick="triggerR2FilenameGenerator()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs flex items-center space-x-1.5">
+              <span>⚡ Generate R2 URL</span>
+            </button>
+            <button onclick="triggerSimulatedMediaUpload()" class="px-3.5 py-2 bg-teal-800 hover:bg-teal-900 text-white font-bold rounded-xl text-xs flex items-center space-x-1.5">
+              <span>+ Add Image Link</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- R2 Quick Connect Banner -->
+        <div class="p-4 bg-linear-to-r from-teal-900 via-slate-900 to-slate-950 rounded-3xl text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm border border-teal-800/40">
+          <div class="space-y-1">
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 bg-teal-500/20 text-teal-300 border border-teal-500/30 rounded-md text-[10px] font-black uppercase tracking-wider">Cloudflare R2 Connected</span>
+              <span class="text-xs text-slate-400">Zero Egress Fees CDN</span>
+            </div>
+            <p class="text-xs text-slate-300">R2 Bucket Base URL: <code class="text-cyan-300 font-mono select-all">https://pub-8bcbaae497aa4994a6c3852932093ce1.r2.dev/</code></p>
+          </div>
+          <button onclick="navigator.clipboard.writeText('https://pub-8bcbaae497aa4994a6c3852932093ce1.r2.dev/'); showToast('R2 Base URL Copied!')" class="px-3 py-1.5 bg-teal-700 hover:bg-teal-600 rounded-xl text-xs font-bold shrink-0 transition">
+            Copy Base URL
+          </button>
         </div>
 
         <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-slate-900 text-sm">Media Catalog Images</h3>
+            <span class="text-xs text-slate-500" id="mediaCountText">Loading...</span>
+          </div>
           <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3" id="mediaLibraryGrid">
             <!-- Dynamically populated from product images -->
           </div>
@@ -1442,8 +1467,13 @@
         <!-- TAB 4: IMAGES -->
         <div id="prodTab-images" class="prod-tab-pane space-y-3">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Main Featured Image URL *</label>
-            <input type="url" id="pImage" required placeholder="https://..." class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-bold text-slate-700">Main Featured Image URL *</label>
+              <button type="button" onclick="const f = prompt('Enter image filename uploaded to Cloudflare R2 (e.g., watch-1.jpg):'); if (f) document.getElementById('pImage').value = 'https://pub-8bcbaae497aa4994a6c3852932093ce1.r2.dev/' + f.trim().replace(/^\//, '');" class="text-[10px] font-bold text-teal-700 hover:text-teal-900 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                ⚡ Use Cloudflare R2 Link
+              </button>
+            </div>
+            <input type="url" id="pImage" required placeholder="https://pub-8bcbaae497aa4994a6c3852932093ce1.r2.dev/..." class="w-full text-xs p-2.5 border border-slate-200 rounded-xl font-mono">
           </div>
         </div>
 
@@ -2672,28 +2702,52 @@
     }
 
     // -------------------------------------------------------------
-    // WORDPRESS MEDIA LIBRARY
+    // CLOUDFLARE R2 & MEDIA LIBRARY
     // -------------------------------------------------------------
+    const CLOUDFLARE_R2_PUBLIC_URL = 'https://pub-8bcbaae497aa4994a6c3852932093ce1.r2.dev/';
+
     function renderMediaLibrary() {
       const grid = document.getElementById('mediaLibraryGrid');
       if (!grid) return;
       const prods = getAllProducts();
+      const countEl = document.getElementById('mediaCountText');
+      if (countEl) {
+        countEl.textContent = `${prods.length} Images Available`;
+      }
       
       grid.innerHTML = prods.map(p => `
         <div class="p-2 bg-slate-50 rounded-2xl border border-slate-200 space-y-1.5 group relative">
-          <img src="${p.image}" class="w-full h-24 object-contain rounded-xl bg-white">
-          <p class="text-[10px] font-bold text-slate-700 truncate">${p.title}</p>
-          <button onclick="navigator.clipboard.writeText('${p.image}'); showToast('Media URL copied!');" class="w-full py-1 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold rounded-lg text-[10px]">
-            Copy URL
-          </button>
+          <img src="${p.image}" class="w-full h-24 object-contain rounded-xl bg-white" alt="${p.title}" onerror="this.src='images/save-and-smile-logo.png'">
+          <p class="text-[10px] font-bold text-slate-700 truncate" title="${p.title}">${p.title}</p>
+          <div class="flex gap-1">
+            <button onclick="navigator.clipboard.writeText('${p.image}'); showToast('Direct URL copied!');" class="flex-1 py-1 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold rounded-lg text-[10px]">
+              Copy URL
+            </button>
+            <a href="${p.image}" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-lg text-[10px] flex items-center justify-center">
+              ↗
+            </a>
+          </div>
         </div>
       `).join('');
     }
 
+    function triggerR2FilenameGenerator() {
+      const fileName = prompt('Enter your image file name uploaded in Cloudflare R2 (e.g., product-1.jpg or earbuds.png):');
+      if (fileName) {
+        const cleaned = fileName.trim().replace(/^\//, '');
+        const fullR2Url = CLOUDFLARE_R2_PUBLIC_URL + cleaned;
+        navigator.clipboard.writeText(fullR2Url);
+        showToast('R2 Image URL generated and copied to clipboard!', '✅');
+        
+        // Also register in audit log
+        recordAuditLog('R2 Media Generated', fullR2Url);
+      }
+    }
+
     function triggerSimulatedMediaUpload() {
-      const url = prompt('Enter image URL to register in Media Library:');
-      if (url) {
-        recordAuditLog('Media Uploaded', url);
+      const url = prompt('Enter image URL or Cloudflare R2 link to register in Media Library:', CLOUDFLARE_R2_PUBLIC_URL);
+      if (url && url.trim() !== CLOUDFLARE_R2_PUBLIC_URL) {
+        recordAuditLog('Media Uploaded', url.trim());
         showToast('Image registered in Media Library!');
         renderMediaLibrary();
       }

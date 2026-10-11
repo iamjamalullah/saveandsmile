@@ -133,6 +133,15 @@
         <span>Home</span>
       </button>
 
+      <!-- 1B. Home Page & Hero Customizer (Direct Top Access) -->
+      <button onclick="switchView('home-customizer', this)" class="nav-item w-full flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-cyan-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
+        <div class="flex items-center space-x-2.5">
+          <svg class="w-4 h-4 shrink-0 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+          <span class="font-bold">Home Page &amp; Hero</span>
+        </div>
+        <span class="text-[9px] bg-cyan-500/20 text-cyan-300 px-1.5 py-0.5 rounded font-black">EDIT</span>
+      </button>
+
       <!-- 2. Orders -->
       <button onclick="switchView('orders', this)" class="nav-item w-full flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
         <div class="flex items-center space-x-2.5">
@@ -317,6 +326,11 @@
           <span class="hidden sm:inline">Storefront</span>
         </a>
 
+        <!-- Edit Home Page Quick Button -->
+        <button onclick="switchView('home-customizer')" class="text-xs font-semibold text-cyan-800 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 flex items-center space-x-1.5 py-1.5 px-3 rounded-lg shadow-xs transition">
+          <span>🎨 Edit Home Page</span>
+        </button>
+
         <!-- Add Product Quick Button -->
         <button onclick="openProfessionalAddProductModal()" class="text-xs font-semibold text-white bg-[#008060] hover:bg-[#006e52] flex items-center space-x-1.5 py-1.5 px-3 rounded-lg shadow-sm transition">
           <span>+ Add Product</span>
@@ -372,7 +386,34 @@
             <button onclick="openProfessionalAddProductModal()" class="px-4 py-2 bg-teal-800 hover:bg-teal-900 text-white font-bold rounded-xl text-xs transition shadow-sm">
               + Add Product
             </button>
+
+            <!-- Edit Home Page & Hero Banners Button -->
+            <button onclick="switchView('home-customizer')" class="px-4 py-2 bg-gradient-to-r from-cyan-700 to-teal-700 hover:from-cyan-600 hover:to-teal-600 text-white font-black rounded-xl text-xs flex items-center space-x-1.5 transition shadow-sm">
+              <svg class="w-3.5 h-3.5 text-cyan-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+              <span>🎨 Edit Home Page &amp; Hero</span>
+            </button>
           </div>
+        </div>
+
+        <!-- Quick Action Banner: Home Page Customizer -->
+        <div class="bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 border-2 border-teal-500/40 rounded-2xl p-4 sm:p-5 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-lg">
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-teal-500/20 border border-teal-400/40 flex items-center justify-center text-2xl shrink-0">
+              🎨
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <h3 class="font-black text-base text-white">Homepage &amp; Hero Section Customizer</h3>
+                <span class="px-2 py-0.5 text-[10px] font-black uppercase rounded bg-teal-400 text-slate-950">Featured</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-1">
+                Yahan se Hero Slider Banners add/edit karein, Top Announcement Bar badlein, aur homepage ke تمام sections ko show/hide karein.
+              </p>
+            </div>
+          </div>
+          <button onclick="switchView('home-customizer')" class="px-5 py-2.5 bg-gradient-to-r from-teal-400 to-cyan-400 hover:from-teal-300 hover:to-cyan-300 text-slate-950 font-black rounded-xl text-xs flex items-center space-x-2 transition shadow-md shrink-0">
+            <span>Open Home Customizer ➔</span>
+          </button>
         </div>
 
         <!-- 6 Metrics Cards Grid (Seamless full-width response) -->
@@ -5663,6 +5704,13 @@
     window.addEventListener('DOMContentLoaded', () => {
       renderDashboardMetrics();
       renderAuditTrail();
+
+      // Check URL query parameters or hash to open specific view directly
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetView = urlParams.get('view') || (window.location.hash ? window.location.hash.replace('#', '') : '');
+      if (targetView) {
+        switchView(targetView);
+      }
 
       // Hydrate server-side products if available
       fetch('/api/products')

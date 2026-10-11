@@ -8,7 +8,75 @@ CREATE TABLE IF NOT EXISTS categories (
   id VARCHAR(50) PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   icon TEXT,
-  count INT DEFAULT 0
+  count INT DEFAULT 0,
+  -- SEO & Categorization Fields
+  slug VARCHAR(255),
+  seo_title TEXT,
+  seo_description TEXT,
+  focus_keyword VARCHAR(150),
+  canonical_url TEXT,
+  is_noindex BOOLEAN DEFAULT false,
+  og_title TEXT,
+  og_description TEXT,
+  og_image TEXT,
+  banner_alt TEXT
+);
+
+-- Safe migrations for categories
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS slug VARCHAR(255);
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS seo_title TEXT;
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS seo_description TEXT;
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS focus_keyword VARCHAR(150);
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS canonical_url TEXT;
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS is_noindex BOOLEAN DEFAULT false;
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS og_title TEXT;
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS og_description TEXT;
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS og_image TEXT;
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS banner_alt TEXT;
+
+-- 1B. Pages SEO Table (Homepage, Shop, About, Contact, Policies)
+CREATE TABLE IF NOT EXISTS pages_seo (
+  id VARCHAR(100) PRIMARY KEY,
+  page_name VARCHAR(100) NOT NULL,
+  slug VARCHAR(255) NOT NULL,
+  seo_title TEXT,
+  seo_description TEXT,
+  canonical_url TEXT,
+  is_noindex BOOLEAN DEFAULT false,
+  og_title TEXT,
+  og_description TEXT,
+  og_image TEXT,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 1C. Global SEO Settings & Verification
+CREATE TABLE IF NOT EXISTS global_seo_settings (
+  id INT PRIMARY KEY DEFAULT 1,
+  default_title TEXT,
+  default_description TEXT,
+  site_url TEXT DEFAULT 'https://saveandsmile.pk',
+  default_og_image TEXT,
+  default_social_title TEXT,
+  default_social_desc TEXT,
+  org_name TEXT DEFAULT 'Save & Smile',
+  logo_url TEXT DEFAULT 'https://saveandsmile.pk/images/save-and-smile-logo.png',
+  helpline_phone TEXT DEFAULT '0316-2323616',
+  business_address TEXT DEFAULT 'Wholesale Market, Karachi / Lahore, Pakistan',
+  gsc_verification_code TEXT,
+  ga4_measurement_id TEXT,
+  bing_verification_code TEXT,
+  robots_txt_content TEXT,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 1D. Technical SEO Redirects (301 Permanent / 302 Temporary)
+CREATE TABLE IF NOT EXISTS seo_redirects (
+  id SERIAL PRIMARY KEY,
+  source_url TEXT UNIQUE NOT NULL,
+  target_url TEXT NOT NULL,
+  status_code INT DEFAULT 301,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 2. Products Table
@@ -27,8 +95,33 @@ CREATE TABLE IF NOT EXISTS products (
   image TEXT NOT NULL,
   stock INT DEFAULT 100,
   is_flash_sale BOOLEAN DEFAULT false,
+  -- SEO & Search Engine Optimization Fields
+  slug VARCHAR(255),
+  seo_title TEXT,
+  seo_description TEXT,
+  focus_keyword VARCHAR(150),
+  secondary_keywords TEXT,
+  canonical_url TEXT,
+  is_noindex BOOLEAN DEFAULT false,
+  og_title TEXT,
+  og_description TEXT,
+  og_image TEXT,
+  image_alt TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Safe migrations for existing products tables
+ALTER TABLE products ADD COLUMN IF NOT EXISTS slug VARCHAR(255);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS seo_title TEXT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS seo_description TEXT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS focus_keyword VARCHAR(150);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS secondary_keywords TEXT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS canonical_url TEXT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS is_noindex BOOLEAN DEFAULT false;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS og_title TEXT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS og_description TEXT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS og_image TEXT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS image_alt TEXT;
 
 -- 3. Orders Table
 CREATE TABLE IF NOT EXISTS orders (

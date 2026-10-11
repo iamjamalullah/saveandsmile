@@ -3,8 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Product Details | Qadri Gadgets Wholesale</title>
-  <link rel="icon" type="image/png" href="https://www.qadrigadgets.pk/images/site_logo/favicon_7450.ico">
+  <title>Product Details | Save &amp; Smile Wholesale Store Pakistan</title>
+  <meta name="description" id="metaDescriptionTag" content="Buy wholesale gadgets, household storage racks, and trending daily utilities at factory rates with cash on delivery across Pakistan.">
+  <link rel="canonical" id="canonicalTag" href="https://saveandsmile.pk/product-detail">
+  <meta name="robots" id="robotsMetaTag" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="icon" type="image/png" href="images/save-and-smile-logo.png">
+
+  <!-- Open Graph / WhatsApp / Facebook -->
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="product">
+  <meta property="og:site_name" content="Save &amp; Smile">
+  <meta property="og:title" id="ogTitleTag" content="Product Details | Save &amp; Smile">
+  <meta property="og:description" id="ogDescTag" content="Wholesale rates with Cash on Delivery nationwide. Direct factory dispatch.">
+  <meta property="og:url" id="ogUrlTag" content="https://saveandsmile.pk/product-detail">
+  <meta property="og:image" id="ogImageTag" content="https://saveandsmile.pk/images/save-and-smile-logo.png">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" id="twitterTitleTag" content="Product Details | Save &amp; Smile">
+  <meta name="twitter:description" id="twitterDescTag" content="Wholesale rates with Cash on Delivery nationwide. Direct factory dispatch.">
+  <meta name="twitter:image" id="twitterImageTag" content="https://saveandsmile.pk/images/save-and-smile-logo.png">
+
+  <!-- JSON-LD Product & BreadcrumbList Schema Placeholder -->
+  <script type="application/ld+json" id="productSchemaJsonLd">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Save & Smile Wholesale Product",
+    "image": ["https://saveandsmile.pk/images/save-and-smile-logo.png"],
+    "description": "Trending wholesale gadgets and organizers in Pakistan.",
+    "brand": {
+      "@type": "Brand",
+      "name": "Save & Smile"
+    },
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "PKR",
+      "price": "180",
+      "availability": "https://schema.org/InStock",
+      "itemCondition": "https://schema.org/NewCondition"
+    }
+  }
+  </script>
+
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -333,7 +374,98 @@
       currentProduct = all.find(p => p.id === prodId) || all[0];
       if (!currentProduct) return;
 
-      document.title = `${currentProduct.title} | Save & Smile`;
+      // Dynamic SEO Meta & Schema.org Synchronization
+      const pageTitle = (currentProduct.seo_title || currentProduct.seoTitle || currentProduct.title) + ' | Save & Smile';
+      const metaDesc = (currentProduct.seo_description || currentProduct.seoDescription || currentProduct.description || '').replace(/"/g, '&quot;');
+      const prodSlug = currentProduct.slug || (currentProduct.title ? currentProduct.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : `product-${currentProduct.id}`);
+      const canonicalUrl = currentProduct.canonical_url || currentProduct.canonicalUrl || `https://saveandsmile.pk/product-detail?id=${currentProduct.id}&slug=${encodeURIComponent(prodSlug)}`;
+      const prodImg = currentProduct.og_image || currentProduct.ogImage || currentProduct.image || 'https://saveandsmile.pk/images/save-and-smile-logo.png';
+      const imgAlt = currentProduct.image_alt || currentProduct.imageAlt || currentProduct.title || 'Product Image';
+
+      document.title = pageTitle;
+      const metaDescTag = document.getElementById('metaDescriptionTag');
+      if (metaDescTag) metaDescTag.content = metaDesc;
+
+      const canonicalTag = document.getElementById('canonicalTag');
+      if (canonicalTag) canonicalTag.href = canonicalUrl;
+
+      const robotsTag = document.getElementById('robotsMetaTag');
+      if (robotsTag) robotsTag.content = (currentProduct.is_noindex || currentProduct.isNoindex) ? 'noindex, nofollow' : 'index, follow, max-image-preview:large';
+
+      // Open Graph Tags
+      const ogTitleTag = document.getElementById('ogTitleTag');
+      if (ogTitleTag) ogTitleTag.content = currentProduct.og_title || currentProduct.ogTitle || pageTitle;
+      const ogDescTag = document.getElementById('ogDescTag');
+      if (ogDescTag) ogDescTag.content = currentProduct.og_description || currentProduct.ogDescription || metaDesc;
+      const ogUrlTag = document.getElementById('ogUrlTag');
+      if (ogUrlTag) ogUrlTag.content = canonicalUrl;
+      const ogImageTag = document.getElementById('ogImageTag');
+      if (ogImageTag) ogImageTag.content = prodImg;
+
+      // Twitter Cards
+      const twTitleTag = document.getElementById('twitterTitleTag');
+      if (twTitleTag) twTitleTag.content = currentProduct.og_title || currentProduct.ogTitle || pageTitle;
+      const twDescTag = document.getElementById('twitterDescTag');
+      if (twDescTag) twDescTag.content = currentProduct.og_description || currentProduct.ogDescription || metaDesc;
+      const twImgTag = document.getElementById('twitterImageTag');
+      if (twImgTag) twImgTag.content = prodImg;
+
+      // Schema.org Product & BreadcrumbList JSON-LD
+      const schemaScript = document.getElementById('productSchemaJsonLd');
+      if (schemaScript) {
+        const schemaGraph = {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Product",
+              "@id": `${canonicalUrl}#product`,
+              "name": currentProduct.title,
+              "image": [prodImg],
+              "description": metaDesc,
+              "sku": currentProduct.code || `QGW-${currentProduct.id}`,
+              "brand": {
+                "@type": "Brand",
+                "name": "Save & Smile"
+              },
+              "offers": {
+                "@type": "Offer",
+                "url": canonicalUrl,
+                "priceCurrency": "PKR",
+                "price": currentProduct.price,
+                "priceValidUntil": "2027-12-31",
+                "availability": (currentProduct.stock === 0) ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+                "itemCondition": "https://schema.org/NewCondition"
+              }
+            },
+            {
+              "@type": "BreadcrumbList",
+              "@id": `${canonicalUrl}#breadcrumb`,
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://saveandsmile.pk/"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": (currentProduct.category || 'General').toUpperCase(),
+                  "item": `https://saveandsmile.pk/?cat=${encodeURIComponent(currentProduct.category || 'all')}`
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": currentProduct.title,
+                  "item": canonicalUrl
+                }
+              ]
+            }
+          ]
+        };
+        schemaScript.textContent = JSON.stringify(schemaGraph, null, 2);
+      }
+
       const bcTitle = document.getElementById('detailBreadcrumbTitle');
       const bcCat = document.getElementById('detailBreadcrumbCat');
       if (bcTitle) bcTitle.textContent = currentProduct.title;
@@ -342,7 +474,7 @@
       const mainImg = document.getElementById('detailMainImg');
       if (mainImg) {
         mainImg.src = currentProduct.image;
-        mainImg.alt = currentProduct.title;
+        mainImg.alt = imgAlt;
       }
 
       const badgeEl = document.getElementById('detailBadge');

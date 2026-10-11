@@ -5,12 +5,12 @@ const { getDb } = require('./db');
 const isProd = process.env.NODE_ENV === 'production';
 const JWT_SECRET = process.env.JWT_SECRET || (isProd ? null : 'saveandsmile_dev_jwt_secret_2026');
 
-// Helper to verify JWT token from Authorization header
 function verifyAuthToken(req) {
   if (!JWT_SECRET) {
     return null;
   }
-  const authHeader = req.headers['authorization'] || req.headers['Authorization'];
+  const headers = req && req.headers ? req.headers : {};
+  const authHeader = headers['authorization'] || headers['Authorization'];
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return null;
   }

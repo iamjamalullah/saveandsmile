@@ -8,6 +8,7 @@
     "build": "node scripts/build-static.js",
     "start": "node server.js",
     "test": "node test-qa-master.js",
+    "test:seo": "node test-seo-master.js",
     "db:seed": "node scripts/seed-full-catalog.js"
   },
   "keywords": [

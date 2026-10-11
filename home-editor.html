@@ -197,7 +197,7 @@
               <p class="text-xs text-slate-500 mt-0.5">Storefront ke bilkul ooper chalne wali patti ka text aur speed.</p>
             </div>
             <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
-              <input type="checkbox" id="tickerEnableCheck" checked class="rounded text-[#008060] focus:ring-[#008060]">
+              <input type="checkbox" id="tickerEnableCheck" checked onchange="handleTickerLiveChange()" class="rounded text-[#008060] focus:ring-[#008060]">
               <span>Enable Bar</span>
             </label>
           </div>
@@ -205,13 +205,13 @@
           <div class="space-y-4">
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Messages (Har line mein 1 paighaam)</label>
-              <textarea id="tickerMessagesText" rows="5" class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl font-sans" placeholder="One message per line..."></textarea>
+              <textarea id="tickerMessagesText" oninput="handleTickerLiveChange()" rows="5" class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl font-sans" placeholder="One message per line..."></textarea>
               <span class="text-[10px] text-slate-400 mt-1 block">Emojis aur bold tags (e.g. &lt;strong&gt;text&lt;/strong&gt;) supported hain.</span>
             </div>
 
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Scroll Speed (Seconds)</label>
-              <input type="number" id="tickerSpeedInput" value="32" min="15" max="60" class="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-xl">
+              <input type="number" id="tickerSpeedInput" oninput="handleTickerLiveChange()" value="32" min="15" max="60" class="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-xl">
               <span class="text-[10px] text-slate-400 mt-1 block">Kam number = tez raftaar scroll. Zyada number = aahista scroll.</span>
             </div>
           </div>
@@ -438,6 +438,28 @@
       }
     }
 
+    function dispatchLivePreviewUpdate() {
+      if (!homeConfig) return;
+      // 1. Instantly update localStorage so any open tab updates immediately
+      try {
+        localStorage.setItem('save_and_smile_home_config', JSON.stringify(homeConfig));
+        if (Array.isArray(homeConfig.hero_slides)) {
+          localStorage.setItem('qadri_custom_banners', JSON.stringify(homeConfig.hero_slides));
+        }
+      } catch (e) {}
+
+      // 2. Post direct message to the preview iframe on the right side
+      try {
+        const iframe = document.getElementById('storePreviewIframe');
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.postMessage({
+            type: 'HOME_CONFIG_UPDATE',
+            config: homeConfig
+          }, '*');
+        }
+      } catch (e) {}
+    }
+
     function reloadPreviewIframe() {
       const iframe = document.getElementById('storePreviewIframe');
       if (iframe) iframe.src = 'index.html?t=' + Date.now();
@@ -585,6 +607,9 @@
       }
       if (topBtn) topBtn.classList.add('ring-2', 'ring-amber-400', 'shadow-lg');
       if (headerBtn) headerBtn.classList.add('ring-2', 'ring-amber-400');
+
+      // Instantly reflect change on the live screen preview on the right side
+      dispatchLivePreviewUpdate();
     }
 
     function clearUnsavedChanges() {
@@ -1141,6 +1166,24 @@
       if (spd) spd.value = ticker.speed || 32;
     }
 
+    function handleTickerLiveChange() {
+      if (!homeConfig) return;
+      const tickerEnabled = document.getElementById('tickerEnableCheck')?.checked !== false;
+      const tickerLines = (document.getElementById('tickerMessagesText')?.value || '')
+        .split('\n')
+        .map(l => l.trim())
+        .filter(Boolean);
+      const tickerSpeed = parseInt(document.getElementById('tickerSpeedInput')?.value, 10) || 32;
+
+      homeConfig.announcement_ticker = {
+        enabled: tickerEnabled,
+        speed: tickerSpeed,
+        items: tickerLines.length > 0 ? tickerLines : (homeConfig.announcement_ticker?.items || [])
+      };
+
+      markUnsavedChanges();
+    }
+
     // -------------------------------------------------------------
     // SAVE & PUBLISH LIVE
     // -------------------------------------------------------------
@@ -1214,6 +1257,16 @@
     // Init on DOM ready
     window.addEventListener('DOMContentLoaded', () => {
       loadHomeConfig();
+
+      // Hook up iframe load event to send configuration immediately upon frame reload
+      const iframe = document.getElementById('storePreviewIframe');
+      if (iframe) {
+        iframe.addEventListener('load', () => {
+          setTimeout(() => {
+            dispatchLivePreviewUpdate();
+          }, 150);
+        });
+      }
     });
   </script>
 </body>

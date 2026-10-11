@@ -67,6 +67,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   } catch (e) {}
 
+  // Instant Live Synchronization Listeners (Live Screen Preview & Multi-tab Sync)
+  window.addEventListener('message', (event) => {
+    try {
+      if (event.data && event.data.type === 'HOME_CONFIG_UPDATE' && event.data.config) {
+        applyHomeCustomization(event.data.config);
+      }
+    } catch (err) {}
+  });
+
+  window.addEventListener('storage', (event) => {
+    try {
+      if (event.key === 'save_and_smile_home_config' && event.newValue) {
+        const parsed = JSON.parse(event.newValue);
+        if (parsed) applyHomeCustomization(parsed);
+      }
+    } catch (err) {}
+  });
+
   // Live Backend Sync: Fetch dynamic products and home customization
   syncLiveStorefrontData();
 });

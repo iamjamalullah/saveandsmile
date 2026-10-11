@@ -4,10 +4,9 @@
   "description": "Save & Smile wholesale e-commerce store with live tracking and serverless backend",
   "main": "server.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "server": "node server.js",
+    "dev": "node server.js",
+    "build": "node scripts/build-static.js",
+    "start": "node server.js",
     "test": "node test-qa-master.js",
     "test:seo": "node test-seo-master.js",
     "db:seed": "node scripts/seed-full-catalog.js"
@@ -22,20 +21,8 @@
   "license": "ISC",
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
-    "@types/node": "^26.6.5",
-    "@types/react": "^18.3.31",
-    "@types/react-dom": "^18.3.7",
-    "autoprefixer": "^10.6.1",
     "bcryptjs": "^3.0.3",
     "dotenv": "^18.0.6",
-    "jsonwebtoken": "^9.0.3",
-    "next": "^14.2.35",
-    "postcss": "^8.5.29",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "tailwindcss": "^3.4.19"
-  },
-  "devDependencies": {
-    "typescript": "^5.4.5"
+    "jsonwebtoken": "^9.0.3"
   }
 }

@@ -6,6 +6,9 @@ import Footer from '@/components/Footer';
 import HeroSlider from '@/components/HeroSlider';
 import ProductCard from '@/components/ProductCard';
 import AiAssistant from '@/components/AiAssistant';
+import FlashSaleTimer from '@/components/FlashSaleTimer';
+import VideoReels from '@/components/VideoReels';
+import Reviews from '@/components/Reviews';
 import { Product } from '@/lib/types';
 import { getClientProducts } from '@/lib/store';
 
@@ -15,13 +18,32 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
+    // 1. Instant hydration from client cache
     setProducts(getClientProducts());
+
+    // 2. Fetch live products from backend API (database / sync file)
+    function fetchLiveProducts() {
+      fetch('/api/products', { cache: 'no-store' })
+        .then(res => res.json())
+        .then(data => {
+          if (data && Array.isArray(data.products) && data.products.length > 0) {
+            try {
+              localStorage.setItem('save_and_smile_server_products', JSON.stringify(data.products));
+            } catch (e) {}
+            setProducts(getClientProducts());
+          }
+        })
+        .catch(() => {});
+    }
+
+    fetchLiveProducts();
 
     function handleSync(e: any) {
       if (e.data && e.data.type === 'qadri_sync_products') {
         setProducts(e.data.products);
       } else {
         setProducts(getClientProducts());
+        fetchLiveProducts();
       }
     }
 
@@ -29,10 +51,19 @@ export default function HomePage() {
     window.addEventListener('storage', handleSync);
     window.addEventListener('qadri_products_updated', handleSync);
 
+    let channel: BroadcastChannel | null = null;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        channel = new BroadcastChannel('qadri_store_sync');
+        channel.onmessage = () => fetchLiveProducts();
+      }
+    } catch (e) {}
+
     return () => {
       window.removeEventListener('message', handleSync);
       window.removeEventListener('storage', handleSync);
       window.removeEventListener('qadri_products_updated', handleSync);
+      if (channel) channel.close();
     };
   }, []);
 
@@ -46,10 +77,15 @@ export default function HomePage() {
   ];
 
   const filteredProducts = products.filter(p => {
-    const matchesTab = activeTab === 'all' || p.category.toLowerCase().includes(activeTab.toLowerCase());
-    const matchesSearch = !searchQuery || p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesTab = activeTab === 'all' || (p.category && p.category.toLowerCase().includes(activeTab.toLowerCase()));
+    const matchesSearch = !searchQuery || p.title.toLowerCase().includes(searchQuery.toLowerCase()) || (p.category && p.category.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesTab && matchesSearch;
   });
+
+  // Categorized sections for rich storefront display
+  const hotSellingProducts = products.filter(p => p.badge?.toLowerCase().includes('hot') || p.isFlashSale).slice(0, 4);
+  const newArrivalProducts = products.slice(0, 4);
+  const trendingProducts = products.filter(p => p.badge?.toLowerCase().includes('trending') || p.badge?.toLowerCase().includes('sale') || Number(p.price) > 300).slice(0, 4);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
@@ -119,7 +155,91 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Main Products Grid */}
+        {/* PORTION 1: Hot Selling Products */}
+        {hotSellingProducts.length > 0 && (
+          <section className="store-portion-section portion-hot-selling py-8 bg-[#fff9f5]" id="hotSelling">
+            <div className="site-container">
+              <div className="portion-header-bar mb-6">
+                <div className="portion-title-group flex items-center gap-3">
+                  <span className="portion-pill-tag bg-orange-600 text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">🔥 HOT SELLING</span>
+                  <div>
+                    <h2 className="portion-heading-text text-xl font-black text-slate-900">Hot Selling Wholesale Gadgets</h2>
+                    <p className="portion-subtitle-text text-xs text-slate-500">Fast moving products with highest reseller profit margins</p>
+                  </div>
+                </div>
+              </div>
+              <div className="products-grid">
+                {hotSellingProducts.map(product => (
+                  <ProductCard key={`hot-${product.id}`} product={product} />
+                ))}
+              </div>
+              <div className="portion-bottom-action flex justify-center mt-6">
+                <a href="#products" onClick={() => setActiveTab('all')} className="portion-view-all px-5 py-2 rounded-full border border-orange-500 text-orange-600 text-xs font-bold hover:bg-orange-600 hover:text-white transition">
+                  See All Hot Items →
+                </a>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* PORTION 2: New Arrivals */}
+        {newArrivalProducts.length > 0 && (
+          <section className="store-portion-section portion-new-arrivals py-8 bg-[#f5fbf6]" id="newArrivals">
+            <div className="site-container">
+              <div className="portion-header-bar mb-6">
+                <div className="portion-title-group flex items-center gap-3">
+                  <span className="portion-pill-tag bg-emerald-600 text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">✨ NEW ARRIVALS</span>
+                  <div>
+                    <h2 className="portion-heading-text text-xl font-black text-slate-900">Latest New Arrivals</h2>
+                    <p className="portion-subtitle-text text-xs text-slate-500">Fresh containers imported this week — First batch wholesale prices</p>
+                  </div>
+                </div>
+              </div>
+              <div className="products-grid">
+                {newArrivalProducts.map(product => (
+                  <ProductCard key={`new-${product.id}`} product={product} />
+                ))}
+              </div>
+              <div className="portion-bottom-action flex justify-center mt-6">
+                <a href="#products" onClick={() => setActiveTab('all')} className="portion-view-all px-5 py-2 rounded-full border border-emerald-500 text-emerald-600 text-xs font-bold hover:bg-emerald-600 hover:text-white transition">
+                  See All New Arrivals →
+                </a>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* PORTION 3: Flash Sale with Live Timer */}
+        <FlashSaleTimer />
+
+        {/* PORTION 4: Trending Wholesale Picks */}
+        {trendingProducts.length > 0 && (
+          <section className="store-portion-section portion-trending-gadgets py-8 bg-[#f0f9fa]" id="trendingPicks">
+            <div className="site-container">
+              <div className="portion-header-bar mb-6">
+                <div className="portion-title-group flex items-center gap-3">
+                  <span className="portion-pill-tag bg-[#007382] text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">🌟 TRENDING PICKS</span>
+                  <div>
+                    <h2 className="portion-heading-text text-xl font-black text-[#00363d]">Trending Wholesale Picks</h2>
+                    <p className="portion-subtitle-text text-xs text-slate-500">Most demanded smart watches, organizers & lifestyle essentials</p>
+                  </div>
+                </div>
+              </div>
+              <div className="products-grid">
+                {trendingProducts.map(product => (
+                  <ProductCard key={`trend-${product.id}`} product={product} />
+                ))}
+              </div>
+              <div className="portion-bottom-action flex justify-center mt-6">
+                <a href="#products" onClick={() => setActiveTab('all')} className="portion-view-all px-5 py-2 rounded-full border border-[#007382] text-[#007382] text-xs font-bold hover:bg-[#007382] hover:text-white transition">
+                  See All Trending →
+                </a>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* PORTION 5: Main Products Catalog */}
         <section id="products" className="py-8">
           <div className="site-container">
             <div className="flex items-center justify-between mb-6">
@@ -149,6 +269,12 @@ export default function HomePage() {
             )}
           </div>
         </section>
+
+        {/* PORTION 6: Watch & Shop Video Reels */}
+        <VideoReels />
+
+        {/* PORTION 7: Verified Client Reviews */}
+        <Reviews />
       </main>
 
       <Footer />

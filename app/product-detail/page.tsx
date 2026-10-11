@@ -7,25 +7,69 @@ import AiAssistant from '@/components/AiAssistant';
 import Link from 'next/link';
 import { Product, ProductVariant } from '@/lib/types';
 import { getClientProducts, getCart, saveCart } from '@/lib/store';
+import ProductCard from '@/components/ProductCard';
 
 export default function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [activeImg, setActiveImg] = useState<string>('');
   const [selectedQty, setSelectedQty] = useState<number>(1);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
-    const all = getClientProducts();
-    const found = (id ? all.find(p => String(p.id) === String(id)) : null) || all[0];
-    if (found) {
-      setProduct(found);
-      setActiveImg(found.image);
-      if (found.variants && found.variants.length > 0) {
-        setSelectedVariant(found.variants[0]);
+
+    function applyProductData(all: Product[]) {
+      const found = (id ? all.find(p => String(p.id) === String(id)) : null) || all[0];
+      if (found) {
+        setProduct(found);
+        setActiveImg(prev => prev || found.image);
+        if (found.variants && found.variants.length > 0) {
+          setSelectedVariant(prev => prev || (found.variants ? found.variants[0] : null));
+        }
+        const related = all.filter(p => String(p.id) !== String(found.id)).slice(0, 4);
+        setRelatedProducts(related);
       }
     }
+
+    // 1. Instant hydration from client cache
+    const initialAll = getClientProducts();
+    applyProductData(initialAll);
+
+    // 2. Fetch live product details from backend API
+    function fetchLiveProduct() {
+      fetch('/api/products', { cache: 'no-store' })
+        .then(res => res.json())
+        .then(data => {
+          if (data && Array.isArray(data.products) && data.products.length > 0) {
+            try {
+              localStorage.setItem('save_and_smile_server_products', JSON.stringify(data.products));
+            } catch (e) {}
+            applyProductData(data.products);
+          }
+        })
+        .catch(() => {});
+    }
+
+    fetchLiveProduct();
+
+    window.addEventListener('storage', fetchLiveProduct);
+    window.addEventListener('qadri_products_updated', fetchLiveProduct);
+
+    let channel: BroadcastChannel | null = null;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        channel = new BroadcastChannel('qadri_store_sync');
+        channel.onmessage = () => fetchLiveProduct();
+      }
+    } catch (e) {}
+
+    return () => {
+      window.removeEventListener('storage', fetchLiveProduct);
+      window.removeEventListener('qadri_products_updated', fetchLiveProduct);
+      if (channel) channel.close();
+    };
   }, []);
 
   if (!product) {
@@ -122,32 +166,32 @@ export default function ProductDetailPage() {
       </div>
 
       <main className="site-container my-8 flex-1">
-        <div className="product-detail-layout bg-white p-6 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="product-detail-layout bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.05fr) minmax(0, 1fr)', gap: '2.5rem', alignItems: 'start' }}>
           
-          {/* Left: Gallery & Thumbnails */}
-          <div className="gallery-container space-y-4">
-            <div className="main-image-display rounded-xl overflow-hidden border border-slate-200 p-4 bg-slate-50 flex items-center justify-center max-h-[420px]">
+          {/* Left Column: Product Gallery (Sticky with alignSelf: start) */}
+          <div className="gallery-container space-y-4" style={{ position: 'sticky', top: '90px', alignSelf: 'start', zIndex: 20 }}>
+            <div className="main-image-display rounded-xl overflow-hidden border border-slate-200 p-4 bg-slate-50 flex items-center justify-center aspect-square">
               <img
                 src={activeImg.startsWith('http') || activeImg.startsWith('/') ? activeImg : `/${activeImg}`}
                 alt={product.title}
-                className="max-h-[380px] w-auto object-contain"
+                className="max-h-[420px] w-full h-full object-contain transition-transform duration-300 hover:scale-105"
               />
             </div>
 
             {/* Gallery Thumbnails Strip */}
             {allImages.length > 1 && (
-              <div className="thumbs-strip flex gap-2 overflow-x-auto pb-2">
+              <div className="thumbs-strip flex gap-2.5 overflow-x-auto pb-2">
                 {allImages.map((src, i) => (
                   <button
                     key={i}
                     type="button"
                     onClick={() => setActiveImg(src)}
-                    className={`thumb-box w-16 h-16 rounded-lg overflow-hidden border-2 shrink-0 p-1 bg-white ${activeImg === src ? 'border-[#007382]' : 'border-slate-200'}`}
+                    className={`thumb-box w-16 h-16 rounded-lg overflow-hidden border-2 shrink-0 p-1 bg-white transition-all ${activeImg === src ? 'border-[#007382] ring-2 ring-[#007382]/20 shadow-xs' : 'border-slate-200 hover:border-slate-400'}`}
                   >
                     <img
                       src={src.startsWith('http') || src.startsWith('/') ? src : `/${src}`}
                       alt="Thumbnail"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </button>
                 ))}
@@ -155,10 +199,10 @@ export default function ProductDetailPage() {
             )}
           </div>
 
-          {/* Right: Info & Selectors */}
+          {/* Right Column: Product Information & Controls (Natural Scroll) */}
           <div className="detail-info-col space-y-4">
             <span className="product-badge inline-block">{product.badge || 'SPECIAL DEAL'}</span>
-            <h1 className="text-xl font-black text-slate-900 leading-snug">{product.title}</h1>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 leading-snug">{product.title}</h1>
 
             <div className="flex items-center gap-2">
               <span className="bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-full">
@@ -205,7 +249,7 @@ export default function ProductDetailPage() {
                           if (m.image) setActiveImg(m.image);
                         }
                       }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition ${selectedVariant?.size === sz ? 'bg-[#e6f7ec] border-[#007382] text-[#007382]' : 'bg-white border-slate-300 text-slate-700'}`}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition ${selectedVariant?.size === sz ? 'bg-[#e6f7ec] border-[#007382] text-[#007382]' : 'bg-white border-slate-300 text-slate-700 hover:border-slate-400'}`}
                     >
                       {sz}
                     </button>
@@ -230,7 +274,7 @@ export default function ProductDetailPage() {
                         setSelectedVariant(col);
                         if (col.image) setActiveImg(col.image);
                       }}
-                      className={`px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-1.5 transition ${selectedVariant?.name === col.name ? 'bg-[#e6f7ec] border-[#007382] text-[#007382]' : 'bg-white border-slate-300 text-slate-700'}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-1.5 transition ${selectedVariant?.name === col.name ? 'bg-[#e6f7ec] border-[#007382] text-[#007382]' : 'bg-white border-slate-300 text-slate-700 hover:border-slate-400'}`}
                     >
                       <span className="w-2.5 h-2.5 rounded-full border border-black/20" style={{ backgroundColor: col.hex || '#111827' }} />
                       <span>{col.name}</span>
@@ -289,8 +333,53 @@ export default function ProductDetailPage() {
                 <span>📦 Buy in Wholesale (Direct Factory Rate Cartons)</span>
               </button>
             </div>
+
+            {/* Trust Badges */}
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs text-slate-600">
+              <div className="flex items-center gap-2 font-semibold text-slate-800">
+                <span className="text-emerald-600 font-black">✓</span>
+                <span>7 Days Checking Warranty: Verification &amp; replacement guarantee</span>
+              </div>
+              <div className="flex items-center gap-2 font-semibold text-slate-800">
+                <span className="text-emerald-600 font-black">✓</span>
+                <span>Cash on Delivery (COD): Doorstep payment across Pakistan</span>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Product Specifications (Below the fold) */}
+        <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm mb-8">
+          <h3 className="text-base font-bold text-[#00363d] pb-3 border-b border-slate-100 mb-4">
+            Product Specifications &amp; Details
+          </h3>
+          <p className="text-xs text-slate-600 leading-relaxed mb-4">{product.description}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <strong className="text-slate-800">Category:</strong> <span className="text-slate-600">{product.category}</span>
+            </div>
+            <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <strong className="text-slate-800">Availability:</strong> <span className="text-emerald-700 font-bold">Ready to Dispatch</span>
+            </div>
+            <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <strong className="text-slate-800">Warranty:</strong> <span className="text-slate-600">7 Days Checking Guarantee</span>
+            </div>
+          </div>
+        </div>
+
+        {/* More Products You May Like (Below the fold) */}
+        {relatedProducts.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-xl font-bold text-[#00363d] mb-4">
+              More Products You May Like
+            </h2>
+            <div className="products-grid">
+              {relatedProducts.map(rel => (
+                <ProductCard key={rel.id} product={rel} />
+              ))}
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />

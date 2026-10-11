@@ -26,7 +26,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="site-header">
+    <header className="site-header header-wrapper" id="headerWrapper">
       <div className="site-container header-inner">
         {/* Brand Logo */}
         <Link href="/" className="brand-logo-wrap">

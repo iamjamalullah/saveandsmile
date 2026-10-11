@@ -12,12 +12,29 @@ export default function HeroSlider() {
     // Initial load from client storage or defaults
     setSlides(getClientHeroSlides());
 
-    // Listen to real-time sync events from Live Editor
+    function fetchLiveHeroBanners() {
+      fetch('/api/home-customization', { cache: 'no-store' })
+        .then(res => res.json())
+        .then(data => {
+          if (data?.config?.hero_slides && Array.isArray(data.config.hero_slides) && data.config.hero_slides.length > 0) {
+            setSlides(data.config.hero_slides);
+            try {
+              localStorage.setItem('qadri_hero_slides', JSON.stringify(data.config.hero_slides));
+            } catch (e) {}
+          }
+        })
+        .catch(() => {});
+    }
+
+    fetchLiveHeroBanners();
+
+    // Listen to real-time sync events from Live Editor & Admin CRM
     function handleStorageOrSync(e: any) {
       if (e.data && e.data.type === 'qadri_sync_hero_slides') {
         setSlides(e.data.slides);
       } else {
         setSlides(getClientHeroSlides());
+        fetchLiveHeroBanners();
       }
     }
 

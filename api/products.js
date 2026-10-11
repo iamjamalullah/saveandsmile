@@ -28,14 +28,15 @@ module.exports = async function handler(req, res) {
       console.warn('Neon query failed, using static fallback:', err.message);
     }
 
-    // Fallback to static products.json
+    // Fallback to static products.json (always read fresh from disk, avoid require.cache)
     try {
-      let staticData;
-      try {
-        staticData = require('../products.json');
-      } catch (e) {
-        const fallbackPath = path.join(__dirname, '..', 'products.json');
+      const fallbackPath = path.join(__dirname, '..', 'products.json');
+      const publicPath = path.join(__dirname, '..', 'public', 'products.json');
+      let staticData = [];
+      if (fs.existsSync(fallbackPath)) {
         staticData = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
+      } else if (fs.existsSync(publicPath)) {
+        staticData = JSON.parse(fs.readFileSync(publicPath, 'utf8'));
       }
       return res.status(200).json({ source: 'fallback', count: staticData.length, products: staticData });
     } catch (err) {
@@ -81,66 +82,76 @@ module.exports = async function handler(req, res) {
       const oImg = og_image || ogImage || image;
       const iAlt = image_alt || imageAlt || title;
 
+      let dbProduct = null;
       if (sql) {
-        if (req.method === 'PUT' && id) {
-          const updated = await sql`
-            UPDATE products SET
-              title = ${title},
-              description = ${description || ''},
-              code = ${code || ''},
-              category = ${category || 'storage'},
-              tab = ${tab || 'storage'},
-              price = ${parseFloat(price) || 0},
-              original_price = ${originalPrice ? parseFloat(originalPrice) : null},
-              badge = ${badge || 'NEW'},
-              image = ${image},
-              stock = ${parseInt(stock, 10) || 100},
-              slug = ${sSlug},
-              seo_title = ${sTitle},
-              seo_description = ${sDesc},
-              focus_keyword = ${fKey},
-              secondary_keywords = ${sKey},
-              canonical_url = ${cUrl},
-              is_noindex = ${noIdx},
-              og_title = ${oTitle},
-              og_description = ${oDesc},
-              og_image = ${oImg},
-              image_alt = ${iAlt}
-            WHERE id = ${id}
-            RETURNING *
-          `;
-          return res.status(200).json({ success: true, product: updated[0] });
+        try {
+          if (req.method === 'PUT' && id) {
+            const updated = await sql`
+              UPDATE products SET
+                title = ${title},
+                description = ${description || ''},
+                code = ${code || ''},
+                category = ${category || 'storage'},
+                tab = ${tab || 'storage'},
+                price = ${parseFloat(price) || 0},
+                original_price = ${originalPrice ? parseFloat(originalPrice) : null},
+                badge = ${badge || 'NEW'},
+                image = ${image},
+                stock = ${parseInt(stock, 10) || 100},
+                slug = ${sSlug},
+                seo_title = ${sTitle},
+                seo_description = ${sDesc},
+                focus_keyword = ${fKey},
+                secondary_keywords = ${sKey},
+                canonical_url = ${cUrl},
+                is_noindex = ${noIdx},
+                og_title = ${oTitle},
+                og_description = ${oDesc},
+                og_image = ${oImg},
+                image_alt = ${iAlt}
+              WHERE id = ${id}
+              RETURNING *
+            `;
+            if (updated && updated.length > 0) dbProduct = updated[0];
+          } else {
+            const result = await sql`
+              INSERT INTO products (
+                title, description, code, category, tab, price, original_price, badge, image, stock,
+                slug, seo_title, seo_description, focus_keyword, secondary_keywords,
+                canonical_url, is_noindex, og_title, og_description, og_image, image_alt
+              )
+              VALUES (
+                ${title}, ${description || ''}, ${code || ''}, ${category || 'storage'}, ${tab || 'storage'},
+                ${parseFloat(price) || 0}, ${originalPrice ? parseFloat(originalPrice) : null}, ${badge || 'NEW'},
+                ${image}, ${parseInt(stock, 10) || 100},
+                ${sSlug}, ${sTitle}, ${sDesc}, ${fKey}, ${sKey},
+                ${cUrl}, ${noIdx}, ${oTitle}, ${oDesc}, ${oImg}, ${iAlt}
+              )
+              RETURNING *
+            `;
+            if (result && result.length > 0) dbProduct = result[0];
+          }
+        } catch (dbErr) {
+          console.warn('Neon DB mutation error, syncing to JSON fallback:', dbErr.message);
         }
-
-        const result = await sql`
-          INSERT INTO products (
-            title, description, code, category, tab, price, original_price, badge, image, stock,
-            slug, seo_title, seo_description, focus_keyword, secondary_keywords,
-            canonical_url, is_noindex, og_title, og_description, og_image, image_alt
-          )
-          VALUES (
-            ${title}, ${description || ''}, ${code || ''}, ${category || 'storage'}, ${tab || 'storage'},
-            ${parseFloat(price) || 0}, ${originalPrice ? parseFloat(originalPrice) : null}, ${badge || 'NEW'},
-            ${image}, ${parseInt(stock, 10) || 100},
-            ${sSlug}, ${sTitle}, ${sDesc}, ${fKey}, ${sKey},
-            ${cUrl}, ${noIdx}, ${oTitle}, ${oDesc}, ${oImg}, ${iAlt}
-          )
-          RETURNING *
-        `;
-        return res.status(201).json({ success: true, product: result[0] });
       }
 
-      // Local fallback file persistence if Neon DB is not configured
+      // Synchronize with JSON persistence files (both root and public)
       const fallbackPath = path.join(__dirname, '..', 'products.json');
+      const publicFallbackPath = path.join(__dirname, '..', 'public', 'products.json');
       let productsList = [];
       try {
         productsList = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
       } catch (e) {
-        productsList = [];
+        try {
+          productsList = JSON.parse(fs.readFileSync(publicFallbackPath, 'utf8'));
+        } catch (e2) {
+          productsList = [];
+        }
       }
 
       const productRecord = {
-        id: id || String(Date.now()),
+        id: (dbProduct && dbProduct.id) || id || String(Date.now()),
         title, description: description || '',
         code: code || ('QGW-' + Math.floor(100000 + Math.random() * 900000)),
         category: category || 'storage', tab: tab || 'storage',
@@ -169,8 +180,23 @@ module.exports = async function handler(req, res) {
       } catch (writeErr) {
         console.warn('Failed to write products fallback file:', writeErr.message);
       }
+      try {
+        if (fs.existsSync(path.dirname(publicFallbackPath))) {
+          fs.writeFileSync(publicFallbackPath, JSON.stringify(productsList, null, 2), 'utf8');
+        }
+      } catch (pubWriteErr) {
+        console.warn('Failed to write public products fallback file:', pubWriteErr.message);
+      }
 
-      return res.status(req.method === 'PUT' ? 200 : 201).json({ success: true, product: productRecord, source: 'local_fallback' });
+      try {
+        delete require.cache[require.resolve('../products.json')];
+      } catch (e) {}
+
+      return res.status(req.method === 'PUT' ? 200 : 201).json({
+        success: true,
+        product: dbProduct || productRecord,
+        source: dbProduct ? 'neon' : 'local_fallback'
+      });
     } catch (err) {
       return res.status(500).json({ success: false, error: err.message });
     }
@@ -202,6 +228,7 @@ module.exports = async function handler(req, res) {
       }
 
       const fallbackPath = path.join(__dirname, '..', 'products.json');
+      const publicFallbackPath = path.join(__dirname, '..', 'public', 'products.json');
       try {
         let productsList = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
         productsList = productsList.filter(p => String(p.id) !== String(id));
@@ -209,6 +236,19 @@ module.exports = async function handler(req, res) {
       } catch (fileErr) {
         console.warn('Fallback file delete warning:', fileErr.message);
       }
+      try {
+        if (fs.existsSync(path.dirname(publicFallbackPath))) {
+          let productsList = JSON.parse(fs.readFileSync(publicFallbackPath, 'utf8'));
+          productsList = productsList.filter(p => String(p.id) !== String(id));
+          fs.writeFileSync(publicFallbackPath, JSON.stringify(productsList, null, 2), 'utf8');
+        }
+      } catch (pubErr) {
+        console.warn('Public fallback delete warning:', pubErr.message);
+      }
+
+      try {
+        delete require.cache[require.resolve('../products.json')];
+      } catch (e) {}
 
       return res.status(200).json({ success: true, message: 'Product deleted successfully', id });
     } catch (err) {

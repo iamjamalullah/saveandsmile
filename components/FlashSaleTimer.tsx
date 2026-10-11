@@ -1,0 +1,62 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+
+export default function FlashSaleTimer() {
+  const [timeLeft, setTimeLeft] = useState({ hours: 14, minutes: 42, seconds: 19 });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        let { hours, minutes, seconds } = prev;
+        if (seconds > 0) {
+          seconds -= 1;
+        } else if (minutes > 0) {
+          minutes -= 1;
+          seconds = 59;
+        } else if (hours > 0) {
+          hours -= 1;
+          minutes = 59;
+          seconds = 59;
+        } else {
+          hours = 23;
+          minutes = 59;
+          seconds = 59;
+        }
+        return { hours, minutes, seconds };
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <section className="flash-sale-section" id="flashSale">
+      <div className="site-container">
+        <div className="flash-sale-header flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flash-title-area flex items-center gap-3">
+            <span className="text-2xl">⚡</span>
+            <div>
+              <h2 className="text-lg font-black tracking-wide text-white m-0">TODAY'S FLASH SALE</h2>
+              <p className="text-xs text-white/90 m-0">Limited quantity left at discounted wholesale prices!</p>
+            </div>
+          </div>
+          <div className="countdown-timer flex items-center gap-1.5 bg-black/30 px-3 py-1.5 rounded-xl border border-white/10">
+            <span className="text-xs font-semibold text-white mr-1.5">Ends In:</span>
+            <div className="timer-box bg-white text-slate-900 font-black px-2 py-1 rounded text-xs min-w-[28px] text-center">
+              {String(timeLeft.hours).padStart(2, '0')}
+            </div>
+            <span className="timer-sep text-white font-bold">:</span>
+            <div className="timer-box bg-white text-slate-900 font-black px-2 py-1 rounded text-xs min-w-[28px] text-center">
+              {String(timeLeft.minutes).padStart(2, '0')}
+            </div>
+            <span className="timer-sep text-white font-bold">:</span>
+            <div className="timer-box bg-white text-slate-900 font-black px-2 py-1 rounded text-xs min-w-[28px] text-center">
+              {String(timeLeft.seconds).padStart(2, '0')}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

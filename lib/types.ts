@@ -25,6 +25,7 @@ export interface Product {
   stock?: number;
   description?: string;
   variants?: ProductVariant[];
+  isFlashSale?: boolean;
   slug?: string;
   seo_title?: string;
   seo_description?: string;

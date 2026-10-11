@@ -33,11 +33,16 @@ export const DEFAULT_HERO_SLIDES: HeroSlide[] = [
 export function getClientProducts(): Product[] {
   if (typeof window === 'undefined') return DEFAULT_PRODUCTS;
   try {
+    const serverCached = JSON.parse(localStorage.getItem('save_and_smile_server_products') || 'null');
     const custom = JSON.parse(localStorage.getItem('qadri_custom_products') || '[]');
     const overrides = JSON.parse(localStorage.getItem('qadri_product_overrides') || '{}');
     const deleted = JSON.parse(localStorage.getItem('qadri_deleted_products') || '[]');
 
-    const base = DEFAULT_PRODUCTS
+    const baseSource = (Array.isArray(serverCached) && serverCached.length > 0)
+      ? serverCached
+      : DEFAULT_PRODUCTS;
+
+    const base = baseSource
       .filter(p => !deleted.some((d: any) => String(d) === String(p.id)))
       .map(p => {
         const override = overrides[p.id] || overrides[String(p.id)] || overrides[Number(p.id)];

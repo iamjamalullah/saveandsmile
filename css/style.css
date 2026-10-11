@@ -17,7 +17,7 @@
   --qadri-dark-emerald: #005662;
   --whatsapp-green: #25d366;
   --whatsapp-hover: #1ebc59;
-  --bg-gradient: linear-gradient(90deg, #005662 0%, #007382 55%, #83a82b 100%);
+  --bg-gradient: linear-gradient(90deg, #09233b 0%, #0e3b5e 50%, #026477 100%);
   --secondary-color: #f2f9f8;
   --text-dark: #00363d;
   --text-muted: #567276;
@@ -143,6 +143,7 @@ a {
 /* -------------------------------------------------------------
    Header & Dynamic Gradient Navigation
    ------------------------------------------------------------- */
+.site-header,
 .header-wrapper {
   background: var(--bg-gradient);
   color: #ffffff;
@@ -696,12 +697,12 @@ a {
   color: #ffffff;
 }
 
-/* Navigation Sub-Bar (Solid Deep Brand Teal #004d57) */
+/* Navigation Sub-Bar (Deep Ocean Blue Gradient Accent) */
 .sub-nav-wrapper {
-  background-color: #004d57;
-  background: #004d57;
+  background-color: #07233b;
+  background: linear-gradient(90deg, #07233b 0%, #0b3954 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.12);
-  border-bottom: 2px solid #83a82b;
+  border-bottom: 2px solid #0284c7;
   padding: 8px 0;
   position: relative;
   z-index: 998;
@@ -713,12 +714,12 @@ a {
 }
 
 .detail-back-home:hover {
-  color: #83a82b !important;
+  color: #38bdf8 !important;
   transform: translateX(-3px);
 }
 
 .social-icon-pill:hover {
-  background: #83a82b !important;
+  background: #0284c7 !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0,0,0,0.25);
 }
@@ -3117,12 +3118,17 @@ a {
   box-shadow: var(--card-shadow);
   border: 1px solid #e2e8f0;
   margin-bottom: 2.5rem;
+  align-items: start;
 }
 
 .gallery-container {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 90px;
+  z-index: 20;
 }
 
 .main-image-display {
@@ -3134,6 +3140,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .main-image-display img {
@@ -3151,6 +3158,8 @@ a {
 .thumbs-strip {
   display: flex;
   gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
 }
 
 .thumb-box {
@@ -3161,11 +3170,13 @@ a {
   cursor: pointer;
   padding: 4px;
   background: #f8fafc;
-  transition: border-color 0.2s ease;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
 }
 
 .thumb-box.active, .thumb-box:hover {
-  border-color: var(--qadri-emerald);
+  border-color: #007382;
+  box-shadow: 0 0 0 1px #007382;
 }
 
 .thumb-box img {
@@ -3287,7 +3298,7 @@ a {
 
 .btn-detail-bulk-wholesale {
   width: 100%;
-  background: linear-gradient(135deg, #005662 0%, #007382 50%, #83a82b 100%);
+  background: linear-gradient(135deg, #07233b 0%, #005662 50%, #0284c7 100%);
   color: #ffffff;
   border: none;
   padding: 14px 22px;
@@ -3925,6 +3936,10 @@ a {
     padding: 1rem !important;
     gap: 1.25rem !important;
     border-radius: 14px !important;
+  }
+  .gallery-container {
+    position: static !important;
+    top: auto !important;
   }
   .main-image-display {
     max-height: 280px !important;

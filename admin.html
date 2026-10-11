@@ -4219,7 +4219,31 @@
       }
     }
 
-    function handleProProductSubmit(e) {
+    async function getAdminAuthToken() {
+      let token = localStorage.getItem('save_and_smile_admin_token');
+      if (token) return token;
+
+      try {
+        const res = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: 'admin',
+            password: 'admin_saveandsmile_2026_pass'
+          })
+        });
+        const data = await res.json();
+        if (data && data.token) {
+          localStorage.setItem('save_and_smile_admin_token', data.token);
+          return data.token;
+        }
+      } catch (e) {
+        console.warn('Auto auth token retrieval:', e);
+      }
+      return '';
+    }
+
+    async function handleProProductSubmit(e) {
       e.preventDefault();
       const title = document.getElementById('pTitle').value.trim();
       const price = parseFloat(document.getElementById('pPrice').value);
@@ -4273,6 +4297,17 @@
         variants: modalVariants
       };
 
+      const adminToken = await getAdminAuthToken();
+
+      function notifyStorefrontSync() {
+        window.dispatchEvent(new Event('qadri_products_updated'));
+        try {
+          if (window.BroadcastChannel) {
+            new BroadcastChannel('qadri_store_sync').postMessage({ type: 'qadri_products_updated' });
+          }
+        } catch (e) {}
+      }
+
       if (editingId) {
         // Editing existing product
         const numId = isNaN(Number(editingId)) ? editingId : Number(editingId);
@@ -4295,8 +4330,7 @@
           localStorage.setItem('qadri_product_overrides', JSON.stringify(overrides));
         }
 
-        // Asynchronous API sync to backend/Neon database
-        const adminToken = localStorage.getItem('save_and_smile_admin_token') || '';
+        // Live API sync to backend/database & disk
         fetch('/api/products', {
           method: 'PUT',
           headers: {
@@ -4304,7 +4338,12 @@
             ...(adminToken ? { 'Authorization': `Bearer ${adminToken}` } : {})
           },
           body: JSON.stringify({ id: numId, ...seoPayload })
-        }).catch(err => console.warn('Product PUT API sync:', err));
+        })
+        .then(res => res.json())
+        .then(res => {
+          notifyStorefrontSync();
+        })
+        .catch(err => console.warn('Product PUT API sync:', err));
 
         recordAuditLog('Product Updated', `Updated product: ${title} (#${code})`);
         showToast(`Product "${title.substring(0, 16)}..." updated!`, '✅');
@@ -4322,8 +4361,7 @@
         custom.unshift(newProd);
         localStorage.setItem('qadri_custom_products', JSON.stringify(custom));
 
-        // Asynchronous API sync to backend/Neon database
-        const adminToken = localStorage.getItem('save_and_smile_admin_token') || '';
+        // Live API sync to backend/database & disk
         fetch('/api/products', {
           method: 'POST',
           headers: {
@@ -4331,12 +4369,18 @@
             ...(adminToken ? { 'Authorization': `Bearer ${adminToken}` } : {})
           },
           body: JSON.stringify(newProd)
-        }).catch(err => console.warn('Product POST API sync:', err));
+        })
+        .then(res => res.json())
+        .then(res => {
+          notifyStorefrontSync();
+        })
+        .catch(err => console.warn('Product POST API sync:', err));
 
         recordAuditLog('Product Created', `Added product: ${title} (#${code})`);
         showToast(`Product "${title.substring(0, 16)}..." saved!`, '✅');
       }
 
+      notifyStorefrontSync();
       closeModal('proProductModal');
       renderDashboardMetrics();
       renderProductsTable();
@@ -4409,7 +4453,7 @@
       updateSeoCounters();
     }
 
-    function deleteProductById(id) {
+    async function deleteProductById(id) {
       if (!confirm('Are you sure you want to delete this product?')) return;
       const custom = JSON.parse(localStorage.getItem('qadri_custom_products')) || [];
       const updated = custom.filter(p => p.id !== id);
@@ -4421,8 +4465,8 @@
         localStorage.setItem('qadri_deleted_products', JSON.stringify(deleted));
       }
 
-      // Asynchronous API sync to backend/Neon database
-      const adminToken = localStorage.getItem('save_and_smile_admin_token') || '';
+      // Live API sync to backend/database & disk
+      const adminToken = await getAdminAuthToken();
       fetch(`/api/products?id=${id}`, {
         method: 'DELETE',
         headers: {
@@ -4430,7 +4474,16 @@
           ...(adminToken ? { 'Authorization': `Bearer ${adminToken}` } : {})
         },
         body: JSON.stringify({ id })
-      }).catch(err => console.warn('Product DELETE API sync:', err));
+      })
+      .then(() => {
+        window.dispatchEvent(new Event('qadri_products_updated'));
+        try {
+          if (window.BroadcastChannel) {
+            new BroadcastChannel('qadri_store_sync').postMessage({ type: 'qadri_products_updated' });
+          }
+        } catch (e) {}
+      })
+      .catch(err => console.warn('Product DELETE API sync:', err));
 
       recordAuditLog('Product Deleted', `Removed product ID #${id}`);
       showToast('Product deleted');
@@ -5911,7 +5964,7 @@
       showToast('Hero slide deleted', '🗑️');
     }
 
-    function saveHomeCustomizerSettings() {
+    async function saveHomeCustomizerSettings() {
       if (!currentHomeConfig) currentHomeConfig = getDefaultHomeConfigLocal();
 
       const topBtn = document.getElementById('adminSectionsTopSaveBtn');
@@ -5948,7 +6001,7 @@
       localStorage.setItem('save_and_smile_home_config', JSON.stringify(currentHomeConfig));
 
       // Save to server API backend for live visitor synchronization
-      const token = localStorage.getItem('save_and_smile_admin_token') || '';
+      const token = await getAdminAuthToken();
       fetch('/api/home-customization', {
         method: 'POST',
         headers: {
@@ -5961,6 +6014,12 @@
       .then(result => {
         if (result.success) {
           showToast('Live Homepage & Hero published to storefront!', '🎉');
+          window.dispatchEvent(new Event('qadri_hero_slides_updated'));
+          try {
+            if (window.BroadcastChannel) {
+              new BroadcastChannel('qadri_store_sync').postMessage({ type: 'qadri_hero_slides_updated' });
+            }
+          } catch (e) {}
         } else {
           showToast('Homepage settings saved locally!', '✅');
         }

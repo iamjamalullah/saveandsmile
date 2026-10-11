@@ -48,7 +48,7 @@ export default function Footer() {
         </div>
 
         <div className="footer-bottom">
-          <div>&copy; {new Date().getFullYear()} Save &amp; Smile Wholesale Pakistan. All rights reserved.</div>
+          <div>&copy; {new Date().getFullYear()} Save &amp; Smile (Shop • Save • Smile). All rights reserved.</div>
           <div className="footer-security-tags">
             <span>🔒 SSL 256-Bit Encrypted</span>
             <span>📦 Nationwide COD Service</span>

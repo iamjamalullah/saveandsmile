@@ -205,17 +205,6 @@
     </div>
   </div>
 
-  <!-- Breadcrumbs -->
-  <div class="site-container">
-    <div class="breadcrumb-bar" style="padding: 0.75rem 0;">
-      <a href="index.html">Home</a>
-      <span>/</span>
-      <a href="index.html#products" id="detailBreadcrumbCat">Category</a>
-      <span>/</span>
-      <strong id="detailBreadcrumbTitle" style="color: #0f172a;">Product Title</strong>
-    </div>
-  </div>
-
   <!-- Main Product Detail View -->
   <main class="site-container">
     <div class="product-detail-layout" id="productDetailContainer">
@@ -407,6 +396,57 @@
     💬
     <div class="floating-whatsapp-tooltip">Buy in Wholesale: 0316-2323616</div>
   </a>
+
+  <!-- AI Store Assistant Robot (Auto Store Support) -->
+  <button type="button" class="floating-ai-robot" id="aiRobotToggleBtn" onclick="toggleAiChat()" title="Ask Save & Smile AI Assistant">
+    <span class="ai-robot-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="10" rx="3"></rect>
+        <circle cx="9" cy="16" r="1.5" fill="currentColor"></circle>
+        <circle cx="15" cy="16" r="1.5" fill="currentColor"></circle>
+        <path d="M8 7l4-4 4 4"></path>
+        <line x1="12" y1="3" x2="12" y2="11"></line>
+        <line x1="2" y1="16" x2="3" y2="16"></line>
+        <line x1="21" y1="16" x2="22" y2="16"></line>
+      </svg>
+    </span>
+    <span class="ai-status-pulse"></span>
+    <div class="floating-ai-tooltip">Need Help? Ask AI Robot!</div>
+  </button>
+
+  <!-- Interactive AI Assistant Modal / Popup -->
+  <div class="ai-chat-window" id="aiChatWindow">
+    <div class="ai-chat-header">
+      <div class="ai-header-info">
+        <div class="ai-header-avatar">🤖</div>
+        <div>
+          <div class="ai-header-title">Save &amp; Smile AI Assistant</div>
+          <div class="ai-header-status">● Online • 24/7 Store Support</div>
+        </div>
+      </div>
+      <button class="ai-close-btn" onclick="toggleAiChat()">✕</button>
+    </div>
+    <div class="ai-chat-messages" id="aiChatMessages">
+      <div class="ai-msg bot">
+        <div class="ai-msg-bubble">
+          Assalam-o-Alaikum! 👋 Main Save &amp; Smile ka AI Assistant hoon.<br>
+          Aap mujh se is product, delivery time, EasyPaisa / Bank payments ya kisi bhi query k baray mein pooch sakte hain!
+        </div>
+      </div>
+      <div class="ai-suggestions-quick">
+        <button onclick="sendQuickAiQuery('EasyPaisa aur Bank account details kya hain?')">💳 Account details?</button>
+        <button onclick="sendQuickAiQuery('Delivery kitne din mein aati hai?')">🚚 Delivery time?</button>
+        <button onclick="sendQuickAiQuery('Wholesale bulk discounts?')">📦 Wholesale rates?</button>
+        <button onclick="sendQuickAiQuery('Order track kaise karein?')">📍 Track order?</button>
+      </div>
+    </div>
+    <form class="ai-chat-input-bar" onsubmit="handleAiMessageSubmit(event)">
+      <input type="text" id="aiUserInput" placeholder="Poochiye (e.g. delivery, payment, wholesale)..." autocomplete="off">
+      <button type="submit" class="ai-send-btn" title="Send message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </form>
+  </div>
 
   <!-- Toast Notice -->
   <div class="toast-notice" id="toastNotice">Item added!</div>

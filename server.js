@@ -63,6 +63,9 @@ async function handleApiRequest(req, res) {
       } else if (urlPath.startsWith('/api/seo')) {
         const handler = require('./api/seo');
         return await handler(req, res);
+      } else if (urlPath.startsWith('/api/chat')) {
+        const handler = require('./api/chat');
+        return await handler(req, res);
       } else if (urlPath.startsWith('/api/home-customization')) {
         const handler = require('./api/home-customization');
         return await handler(req, res);

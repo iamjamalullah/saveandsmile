@@ -1174,8 +1174,8 @@ function openCheckoutModal() {
             <label>Payment Method *</label>
             <div class="payment-method-selector">
               <div class="payment-option-card selected" onclick="selectPayment(this, 'COD')">Cash on Delivery</div>
-              <div class="payment-option-card" onclick="selectPayment(this, 'JazzCash')">JazzCash</div>
               <div class="payment-option-card" onclick="selectPayment(this, 'EasyPaisa')">EasyPaisa</div>
+              <div class="payment-option-card" onclick="selectPayment(this, 'Bank')">Bank Transfer</div>
             </div>
             <input type="hidden" id="custPayment" value="COD">
           </div>
@@ -1814,7 +1814,7 @@ function handleAiMessageSubmit(e) {
   processAiQuery(query);
 }
 
-function processAiQuery(query) {
+async function processAiQuery(query) {
   const container = document.getElementById('aiChatMessages');
   if (!container) return;
 
@@ -1825,15 +1825,37 @@ function processAiQuery(query) {
   container.appendChild(userDiv);
   scrollAiMessages();
 
-  // Generate automated intelligent response
-  setTimeout(() => {
+  // Temporary typing indicator
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'ai-msg bot typing-indicator';
+  typingDiv.innerHTML = `<div class="ai-msg-bubble" style="color: #64748b; font-style: italic;">🤖 AI thinking...</div>`;
+  container.appendChild(typingDiv);
+  scrollAiMessages();
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: query })
+    });
+    const data = await res.json();
+    typingDiv.remove();
+
+    const reply = (data && data.reply) ? data.reply : getAiAutoResponse(query);
+    const botDiv = document.createElement('div');
+    botDiv.className = 'ai-msg bot';
+    botDiv.innerHTML = `<div class="ai-msg-bubble">${reply}</div>`;
+    container.appendChild(botDiv);
+    scrollAiMessages();
+  } catch (err) {
+    typingDiv.remove();
     const reply = getAiAutoResponse(query);
     const botDiv = document.createElement('div');
     botDiv.className = 'ai-msg bot';
     botDiv.innerHTML = `<div class="ai-msg-bubble">${reply}</div>`;
     container.appendChild(botDiv);
     scrollAiMessages();
-  }, 450);
+  }
 }
 
 function escapeHtml(str) {
@@ -1842,6 +1864,16 @@ function escapeHtml(str) {
 
 function getAiAutoResponse(text) {
   const q = text.toLowerCase();
+
+  if (q.includes('payment') || q.includes('easypaisa') || q.includes('faysal') || q.includes('bank') || q.includes('jazzcash') || q.includes('pesy') || q.includes('account')) {
+    return `💳 <strong>Payment Options:</strong><br>
+    1. <strong>Cash on Delivery (COD)</strong> - Parcel milne par ada karein.<br>
+    2. <strong>EasyPaisa:</strong> 03337221552<br>
+    3. <strong>Bank Transfer (Faysal Bank):</strong><br>
+    • Title: Muhammd Jamalullah<br>
+    • Account: 3516390000005787<br>
+    <em>Transfer k baad WhatsApp 0316-2323616 par receipt share karein.</em>`;
+  }
 
   if (q.includes('delivery') || q.includes('time') || q.includes('shipping') || q.includes('kitne din') || q.includes('kab milega')) {
     return `🚚 <strong>Delivery Policy:</strong><br>
@@ -1856,18 +1888,10 @@ function getAiAutoResponse(text) {
     Agar aap 1 carton ya bulk stock lena chahte hain to direct WhatsApp par rabta karein: <a href="https://wa.me/923162323616" target="_blank" style="color: #007382; font-weight: 700; text-decoration: underline;">0316-2323616</a>.`;
   }
 
-  if (q.includes('payment') || q.includes('jazzcash') || q.includes('easypaisa') || q.includes('cod') || q.includes('cash on delivery')) {
-    return `💳 <strong>Payment Options:</strong><br>
-    Aap in tareeqon se payment kar sakte hain:<br>
-    1. <strong>Cash on Delivery (COD)</strong> - Parcel milne par ada karein.<br>
-    2. <strong>JazzCash / EasyPaisa</strong> - Direct mobile transfer.<br>
-    3. <strong>Bank Transfer</strong>.`;
-  }
-
   if (q.includes('track') || q.includes('status') || q.includes('order')) {
     return `📍 <strong>Order Tracking:</strong><br>
     Aap apna order asaani se track kar sakte hain.<br>
-    Header mein 4-dots Menu open kar k <strong>"Track Order"</strong> par click karein aur apna Order ID / Mobile number enter karein!`;
+    Header mein <strong>"Track Order"</strong> par click karein aur apna Order ID / Mobile number enter karein!`;
   }
 
   if (q.includes('return') || q.includes('replace') || q.includes('warranty') || q.includes('kharaab')) {
@@ -1891,5 +1915,6 @@ function getAiAutoResponse(text) {
 
   // Default Fallback
   return `🤖 Shukriya aap k sawal ka!<br>
-  Save & Smile Pakistan ka top wholesale store hai. Mazeed maloomat ya customized bulk order k liye aap hamare WhatsApp helpline <strong>0316-2323616</strong> par bhi message kar sakte hain.`;
+  Save & Smile Pakistan ka top wholesale store hai. Payments: Cash on Delivery, EasyPaisa (03337221552), Faysal Bank (Account: 3516390000005787).<br>
+  Mazeed maloomat k liye hamare WhatsApp helpline <strong>0316-2323616</strong> par bhi message kar sakte hain.`;
 }

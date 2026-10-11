@@ -129,26 +129,45 @@ function applyHomeCustomization(cfg) {
     }
   }
 
-  // Apply Section Visibility Toggles
-  if (cfg.sections_visibility) {
-    const secMap = {
-      hero_slider: 'heroSliderSection',
-      categories_strip: 'shopSliderSection',
-      trust_badges: 'HomePageFooterIcons',
-      front_tabs: 'HomePageTabs',
-      hot_selling: 'hotSelling',
-      new_arrivals: 'newArrivals',
-      flash_sale: 'flashSale',
-      trending_picks: 'trendingPicks',
-      main_catalog: 'products',
-      search_hero: 'HomePageBuilder',
-      video_reels: 'reelsSection',
-      testimonials: 'testimonialsSection'
-    };
+  // Section Element Mapper for Reordering & Visibility
+  const secMap = {
+    hero_slider: 'heroSliderSection',
+    categories_strip: 'shopSliderSection',
+    trust_badges: 'HomePageFooterIcons',
+    front_tabs: 'HomePageTabs',
+    hot_selling: 'hotSelling',
+    new_arrivals: 'newArrivals',
+    flash_sale: 'flashSale',
+    trending_picks: 'trendingPicks',
+    main_catalog: 'products',
+    search_hero: 'HomePageBuilder',
+    video_reels: 'HomePageReels',
+    testimonials: 'testimonialsSection'
+  };
 
+  const getSectionElement = (k) => {
+    const elId = secMap[k];
+    if (!elId) return null;
+    return document.getElementById(elId) || (k === 'video_reels' ? document.getElementById('reelsSection') : null);
+  };
+
+  // 1. Apply Dynamic Sections Order (Move sections Up / Down)
+  if (Array.isArray(cfg.sections_order) && cfg.sections_order.length > 0) {
+    const container = document.getElementById('homepageSectionsContainer');
+    if (container) {
+      cfg.sections_order.forEach(k => {
+        const el = getSectionElement(k);
+        if (el && container.contains(el)) {
+          container.appendChild(el);
+        }
+      });
+    }
+  }
+
+  // 2. Apply Section Visibility Toggles (Show / Hide)
+  if (cfg.sections_visibility) {
     Object.keys(cfg.sections_visibility).forEach(k => {
-      const elId = secMap[k];
-      const el = elId ? document.getElementById(elId) : null;
+      const el = getSectionElement(k);
       if (el) {
         el.style.display = cfg.sections_visibility[k] === false ? 'none' : '';
       }

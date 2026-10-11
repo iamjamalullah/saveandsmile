@@ -107,6 +107,20 @@ const DEFAULT_HOME_CONFIG = {
     video_reels: true,
     testimonials: true
   },
+  sections_order: [
+    'hero_slider',
+    'categories_strip',
+    'trust_badges',
+    'front_tabs',
+    'hot_selling',
+    'new_arrivals',
+    'flash_sale',
+    'trending_picks',
+    'main_catalog',
+    'search_hero',
+    'video_reels',
+    'testimonials'
+  ],
   theme: {
     primary_color: "#008060",
     gradient_from: "#004d57",

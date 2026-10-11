@@ -211,13 +211,13 @@
       <!-- 8. Online Store Sales Channel -->
       <div class="pt-2">
         <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Sales Channels</div>
-        <a href="live-editor.html" target="_blank" class="w-full flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
+        <button onclick="switchView('home-customizer', this)" class="nav-item w-full flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
           <div class="flex items-center space-x-2.5">
-            <svg class="w-4 h-4 shrink-0 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            <span>Online Store</span>
+            <svg class="w-4 h-4 shrink-0 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+            <span>Edit Home Page</span>
           </div>
-          <span class="text-[9px] bg-teal-500/20 text-teal-300 px-1.5 py-0.5 rounded font-black">LIVE</span>
-        </a>
+          <span class="text-[9px] bg-teal-500/20 text-teal-300 px-1.5 py-0.5 rounded font-black">EDIT</span>
+        </button>
         <button onclick="switchView('home-customizer', this)" class="nav-item w-full flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
           <div class="flex items-center space-x-2.5">
             <svg class="w-4 h-4 shrink-0 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
@@ -376,21 +376,15 @@
               <span>All Reports</span>
             </button>
 
-            <!-- Launch Live Page Builder Button -->
-            <a href="live-editor.html" target="_blank" class="px-4 py-2 bg-gradient-to-r from-teal-700 to-cyan-700 hover:from-teal-600 hover:to-cyan-600 text-white font-black rounded-xl text-xs flex items-center space-x-1.5 transition shadow-md">
-              <svg class="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-              <span>Launch Live Page Builder</span>
-            </a>
+            <!-- Edit Home Page Button (Replacing Live Page Builder) -->
+            <button onclick="switchView('home-customizer')" class="px-4 py-2 bg-gradient-to-r from-teal-700 via-cyan-700 to-teal-800 hover:from-teal-600 hover:to-cyan-600 text-white font-black rounded-xl text-xs flex items-center space-x-1.5 transition shadow-md">
+              <svg class="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+              <span>🎨 Edit Home Page</span>
+            </button>
 
             <!-- Pro Add Product Button -->
             <button onclick="openProfessionalAddProductModal()" class="px-4 py-2 bg-teal-800 hover:bg-teal-900 text-white font-bold rounded-xl text-xs transition shadow-sm">
               + Add Product
-            </button>
-
-            <!-- Edit Home Page & Hero Banners Button -->
-            <button onclick="switchView('home-customizer')" class="px-4 py-2 bg-gradient-to-r from-cyan-700 to-teal-700 hover:from-cyan-600 hover:to-teal-600 text-white font-black rounded-xl text-xs flex items-center space-x-1.5 transition shadow-sm">
-              <svg class="w-3.5 h-3.5 text-cyan-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
-              <span>🎨 Edit Home Page &amp; Hero</span>
             </button>
           </div>
         </div>
@@ -1344,64 +1338,26 @@
           </div>
         </div>
 
-        <!-- 3. Homepage Sections Visibility & Layout Controls -->
+        <!-- 3. Homepage Portions & Sections Reordering & Organization Hub -->
         <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
-          <div class="border-b pb-3">
-            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <span>🧩 Homepage Portions &amp; Sections Layout</span>
-            </h3>
-            <p class="text-xs text-slate-500">Easily show or hide sections on the homepage without touching code.</p>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <span>🧩 Homepage Sections Order &amp; Layout Manager</span>
+                <span class="text-[10px] px-2 py-0.5 rounded font-bold bg-teal-50 text-teal-800">12 Sections Active</span>
+              </h3>
+              <p class="text-xs text-slate-500">Sections ko apni marzi se ooper (▲ Ooper) ya neechay (▼ Neechay) karein taake pehly Hot Selling aey ya Categories aey, aur show/hide karein.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="resetDefaultSectionsOrder()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">
+                ↺ Reset Default Order
+              </button>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 text-xs" id="hcSectionTogglesGrid">
-            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
-              <span class="font-bold text-slate-800">Hero Main Slider</span>
-              <input type="checkbox" id="sec_hero_slider" checked class="rounded text-[#008060]">
-            </label>
-            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
-              <span class="font-bold text-slate-800">Categories Round Strip</span>
-              <input type="checkbox" id="sec_categories_strip" checked class="rounded text-[#008060]">
-            </label>
-            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
-              <span class="font-bold text-slate-800">24/7 Trust Badges Bar</span>
-              <input type="checkbox" id="sec_trust_badges" checked class="rounded text-[#008060]">
-            </label>
-            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
-              <span class="font-bold text-slate-800">Front Category Tabs</span>
-              <input type="checkbox" id="sec_front_tabs" checked class="rounded text-[#008060]">
-            </label>
-            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
-              <span class="font-bold text-slate-800">🔥 Hot Selling Grid</span>
-              <input type="checkbox" id="sec_hot_selling" checked class="rounded text-[#008060]">
-            </label>
-            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
-              <span class="font-bold text-slate-800">✨ New Arrivals Grid</span>
-              <input type="checkbox" id="sec_new_arrivals" checked class="rounded text-[#008060]">
-            </label>
-            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
-              <span class="font-bold text-slate-800">⚡ Flash Sale &amp; Countdown</span>
-              <input type="checkbox" id="sec_flash_sale" checked class="rounded text-[#008060]">
-            </label>
-            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
-              <span class="font-bold text-slate-800">🌟 Trending Picks Grid</span>
-              <input type="checkbox" id="sec_trending_picks" checked class="rounded text-[#008060]">
-            </label>
-            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
-              <span class="font-bold text-slate-800">🛍️ All Products Catalog</span>
-              <input type="checkbox" id="sec_main_catalog" checked class="rounded text-[#008060]">
-            </label>
-            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
-              <span class="font-bold text-slate-800">🔍 Quick Finder Hero Search</span>
-              <input type="checkbox" id="sec_search_hero" checked class="rounded text-[#008060]">
-            </label>
-            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
-              <span class="font-bold text-slate-800">🎬 Watch &amp; Shop Reels</span>
-              <input type="checkbox" id="sec_video_reels" checked class="rounded text-[#008060]">
-            </label>
-            <label class="p-3 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition">
-              <span class="font-bold text-slate-800">💬 Client Testimonials</span>
-              <input type="checkbox" id="sec_testimonials" checked class="rounded text-[#008060]">
-            </label>
+          <!-- Interactive Ordered Sections List Container -->
+          <div id="hcSectionsOrderList" class="space-y-2.5">
+            <!-- Dynamically populated with order, move up/down, and visibility -->
           </div>
         </div>
       </section>
@@ -2471,9 +2427,9 @@
           <span class="flex items-center space-x-2"><span>🌐</span> <span>SEO &amp; OpenGraph Suite</span></span>
           <span class="text-[10px] text-slate-400 font-mono">/seo</span>
         </div>
-        <div onclick="window.open('live-editor.html', '_blank'); closeModal('commandPaletteModal');" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-teal-800 bg-teal-50">
-          <span class="flex items-center space-x-2"><span>⚡</span> <span>Open Live Theme Visual Builder</span></span>
-          <span class="text-[10px] text-teal-600 font-mono">/live-editor</span>
+        <div onclick="executePaletteNavigation('home-customizer')" class="p-2 hover:bg-slate-100 rounded-xl cursor-pointer flex items-center justify-between font-bold text-teal-800 bg-teal-50">
+          <span class="flex items-center space-x-2"><span>🎨</span> <span>Edit Home Page (Hero &amp; Sections Order)</span></span>
+          <span class="text-[10px] text-teal-600 font-mono">/home-customizer</span>
         </div>
       </div>
     </div>
@@ -5097,6 +5053,27 @@
       };
     }
 
+    const HOMEPAGE_SECTIONS_DEF = {
+      hero_slider: { name: 'Hero Main Slider Banners', icon: '🖼️', desc: 'Top rotating banners with CTA buttons & titles' },
+      categories_strip: { name: 'Shop By Categories Strip', icon: '🗂️', desc: 'Round animated categories icons marquee slider' },
+      trust_badges: { name: '24/7 Trust Badges Bar', icon: '🛡️', desc: 'Support 24/7, Best Prices, COD & 7-Day Exchange badges' },
+      front_tabs: { name: 'Front Categories Tabs', icon: '🏷️', desc: 'Category filter tab pills above products' },
+      hot_selling: { name: '🔥 Hot Selling Wholesale Gadgets', icon: '🔥', desc: 'Portion 1: High margin fast moving bestsellers' },
+      new_arrivals: { name: '✨ Latest New Arrivals', icon: '✨', desc: 'Portion 2: Fresh imports containers collection' },
+      flash_sale: { name: '⚡ Today\'s Flash Sale & Timer', icon: '⚡', desc: 'Portion 3: Live countdown deal cards' },
+      trending_picks: { name: '🌟 Trending Wholesale Picks', icon: '🌟', desc: 'Portion 4: Demanded lifestyle gadgets & organizers' },
+      main_catalog: { name: '🛍️ All Wholesale Products Catalog', icon: '🛍️', desc: 'Portion 5: Complete catalog grid with category filters' },
+      search_hero: { name: '🔍 Interactive Search Hero', icon: '🔍', desc: 'Portion 6: Instant search bar and quick finding card' },
+      video_reels: { name: '🎬 Watch & Shop Video Reels', icon: '🎬', desc: 'Portion 7: TikTok style short video shopping carousel' },
+      testimonials: { name: '💬 Client Testimonials & Reviews', icon: '💬', desc: 'Portion 8: Verified wholesale client reviews marquee' }
+    };
+
+    const DEFAULT_SECTIONS_ORDER = [
+      'hero_slider', 'categories_strip', 'trust_badges', 'front_tabs',
+      'hot_selling', 'new_arrivals', 'flash_sale', 'trending_picks',
+      'main_catalog', 'search_hero', 'video_reels', 'testimonials'
+    ];
+
     function populateHomeCustomizerForm() {
       if (!currentHomeConfig) return;
 
@@ -5116,12 +5093,108 @@
       const speedInput = document.getElementById('hcTickerSpeed');
       if (speedInput) speedInput.value = ticker.speed || 32;
 
-      // 3. Sections Toggles
-      const secVis = currentHomeConfig.sections_visibility || {};
-      Object.keys(secVis).forEach(key => {
-        const toggle = document.getElementById(`sec_${key}`);
-        if (toggle) toggle.checked = secVis[key] !== false;
-      });
+      // 3. Render Sections Order & Organization List
+      renderSectionsOrderList();
+    }
+
+    function renderSectionsOrderList() {
+      const container = document.getElementById('hcSectionsOrderList');
+      if (!container || !currentHomeConfig) return;
+
+      if (!Array.isArray(currentHomeConfig.sections_order) || currentHomeConfig.sections_order.length === 0) {
+        currentHomeConfig.sections_order = [...DEFAULT_SECTIONS_ORDER];
+      }
+
+      const order = currentHomeConfig.sections_order;
+      const vis = currentHomeConfig.sections_visibility || {};
+
+      container.innerHTML = order.map((secKey, idx) => {
+        const def = HOMEPAGE_SECTIONS_DEF[secKey] || { name: secKey, icon: '📦', desc: 'Homepage Section' };
+        const isVisible = vis[secKey] !== false;
+
+        return `
+          <div class="p-3.5 bg-slate-50 hover:bg-slate-100/90 rounded-2xl border ${isVisible ? 'border-slate-200' : 'border-slate-300 opacity-60'} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition">
+            <div class="flex items-center space-x-3 min-w-0">
+              <span class="w-7 h-7 rounded-full ${idx === 0 ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-white font-bold'} flex items-center justify-center text-xs shrink-0 shadow-xs">#${idx + 1}</span>
+              <span class="text-xl shrink-0">${def.icon}</span>
+              <div class="min-w-0">
+                <div class="font-bold text-slate-900 text-xs flex items-center gap-2">
+                  <span>${def.name}</span>
+                  ${idx === 0 ? '<span class="px-1.5 py-0.5 bg-amber-100 text-amber-900 text-[9px] font-black rounded uppercase">Top Section</span>' : ''}
+                </div>
+                <div class="text-[11px] text-slate-500 truncate max-w-md">${def.desc}</div>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-2 self-end sm:self-center shrink-0">
+              ${idx > 0 ? `
+                <button type="button" onclick="moveSectionOrder(${idx}, -1)" title="Move Up" class="px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-400 text-slate-700 font-bold rounded-lg text-xs flex items-center gap-1 transition shadow-xs">
+                  ▲ Ooper
+                </button>
+              ` : `
+                <span class="w-16"></span>
+              `}
+              ${idx < order.length - 1 ? `
+                <button type="button" onclick="moveSectionOrder(${idx}, 1)" title="Move Down" class="px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-400 text-slate-700 font-bold rounded-lg text-xs flex items-center gap-1 transition shadow-xs">
+                  ▼ Neechay
+                </button>
+              ` : `
+                <span class="w-16"></span>
+              `}
+
+              <label class="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition shadow-xs">
+                <input type="checkbox" onchange="toggleSectionVis('${secKey}', this.checked)" ${isVisible ? 'checked' : ''} class="rounded text-[#008060] focus:ring-[#008060]">
+                <span class="text-xs font-bold ${isVisible ? 'text-emerald-700' : 'text-slate-400'}">${isVisible ? 'Visible' : 'Hidden'}</span>
+              </label>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function moveSectionOrder(idx, delta) {
+      if (!currentHomeConfig || !currentHomeConfig.sections_order) return;
+      const order = currentHomeConfig.sections_order;
+      const newIdx = idx + delta;
+      if (newIdx < 0 || newIdx >= order.length) return;
+
+      const temp = order[idx];
+      order[idx] = order[newIdx];
+      order[newIdx] = temp;
+
+      renderSectionsOrderList();
+      showToast(`Section "${HOMEPAGE_SECTIONS_DEF[temp]?.name || temp}" moved to #${newIdx + 1}!`, '↕️');
+    }
+
+    function toggleSectionVis(secKey, isChecked) {
+      if (!currentHomeConfig) currentHomeConfig = getDefaultHomeConfigLocal();
+      currentHomeConfig.sections_visibility = currentHomeConfig.sections_visibility || {};
+      currentHomeConfig.sections_visibility[secKey] = isChecked;
+      renderSectionsOrderList();
+    }
+
+    function resetDefaultSectionsOrder() {
+      if (!confirm('Default section order restore karna chahte hain?')) return;
+      if (!currentHomeConfig) currentHomeConfig = getDefaultHomeConfigLocal();
+      currentHomeConfig.sections_order = [...DEFAULT_SECTIONS_ORDER];
+      renderSectionsOrderList();
+      showToast('Default sections order restored!', '↺');
+    }
+
+    async function quickChangeSlideImage(idx, e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      showToast('Converting image to WebP...', '⚡');
+      try {
+        const webpResult = await convertImageFileToWebP(file);
+        if (currentHomeConfig && currentHomeConfig.hero_slides && currentHomeConfig.hero_slides[idx]) {
+          currentHomeConfig.hero_slides[idx].image = webpResult.dataUrl;
+          renderHeroBannersList();
+          showToast(`Banner image converted to WebP (-${webpResult.percentReduced}%)! Save to publish.`, '🎉');
+        }
+      } catch (err) {
+        alert('Image error: ' + err.message);
+      }
     }
 
     function renderHeroBannersList() {
@@ -5145,7 +5218,7 @@
         <div class="p-3.5 bg-slate-50 hover:bg-slate-100/90 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition">
           <div class="flex items-center space-x-3 min-w-0">
             <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-[11px] shrink-0">${idx + 1}</span>
-            <div class="w-24 h-12 rounded-xl overflow-hidden border border-slate-200 bg-white shrink-0">
+            <div class="w-24 h-12 rounded-xl overflow-hidden border border-slate-200 bg-white shrink-0 relative group">
               <img src="${slide.image}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=120'">
             </div>
             <div class="min-w-0">
@@ -5159,6 +5232,12 @@
           </div>
 
           <div class="flex items-center space-x-1.5 self-end sm:self-center shrink-0">
+            <!-- Direct Change Pic File Upload Button -->
+            <label class="px-2.5 py-1.5 bg-cyan-50 hover:bg-cyan-100 text-cyan-800 font-bold rounded-lg text-xs cursor-pointer flex items-center gap-1 transition shadow-2xs">
+              <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" onchange="quickChangeSlideImage(${idx}, event)">
+              <span>📷 Change Pic</span>
+            </label>
+
             ${idx > 0 ? `<button type="button" onclick="moveHeroSlide(${idx}, -1)" title="Move Up" class="p-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-xs">▲</button>` : ''}
             ${idx < slides.length - 1 ? `<button type="button" onclick="moveHeroSlide(${idx}, 1)" title="Move Down" class="p-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-xs">▼</button>` : ''}
             <button type="button" onclick="openEditHeroBannerModal(${slide.id || idx})" class="px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-lg text-xs">Edit</button>
@@ -5300,17 +5379,14 @@
         items: tickerLines.length > 0 ? tickerLines : currentHomeConfig.announcement_ticker.items
       };
 
-      // Read sections visibility
-      const secKeys = [
-        'hero_slider', 'categories_strip', 'trust_badges', 'front_tabs',
-        'hot_selling', 'new_arrivals', 'flash_sale', 'trending_picks',
-        'main_catalog', 'search_hero', 'video_reels', 'testimonials'
-      ];
-      currentHomeConfig.sections_visibility = {};
-      secKeys.forEach(k => {
-        const toggle = document.getElementById(`sec_${k}`);
-        currentHomeConfig.sections_visibility[k] = toggle ? toggle.checked : true;
-      });
+      // Ensure sections order and visibility are present
+      if (!Array.isArray(currentHomeConfig.sections_order) || currentHomeConfig.sections_order.length === 0) {
+        currentHomeConfig.sections_order = [...DEFAULT_SECTIONS_ORDER];
+      }
+      if (!currentHomeConfig.sections_visibility) {
+        currentHomeConfig.sections_visibility = {};
+        DEFAULT_SECTIONS_ORDER.forEach(k => { currentHomeConfig.sections_visibility[k] = true; });
+      }
 
       // Save locally to immediate localStorage cache for zero delay
       localStorage.setItem('qadri_custom_banners', JSON.stringify(currentHomeConfig.hero_slides));

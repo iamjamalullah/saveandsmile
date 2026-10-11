@@ -121,6 +121,63 @@ const DEFAULT_HOME_CONFIG = {
     'video_reels',
     'testimonials'
   ],
+  sections_config: {
+    categories_strip: {
+      title: "Shop By Categories",
+      selected_categories: ["storage", "kitchen", "smartwatches", "bottles", "insect-killers", "beauty", "accessories", "toys"]
+    },
+    hot_selling: {
+      title: "Hot Selling Wholesale Gadgets",
+      subtitle: "Fast moving products with highest reseller profit margins",
+      tag: "🔥 HOT SELLING",
+      limit: 8,
+      category_filter: "all"
+    },
+    new_arrivals: {
+      title: "Latest New Arrivals",
+      subtitle: "Fresh containers imported this week — First batch wholesale prices",
+      tag: "✨ NEW ARRIVALS",
+      limit: 8
+    },
+    flash_sale: {
+      title: "TODAY'S FLASH SALE",
+      subtitle: "Limited quantity left at discounted wholesale prices!",
+      countdown_hours: 14
+    },
+    trending_picks: {
+      title: "Trending Wholesale Picks",
+      subtitle: "Most demanded smart watches, organizers & lifestyle essentials",
+      tag: "🌟 TRENDING PICKS",
+      limit: 8
+    },
+    main_catalog: {
+      title: "All Wholesale Products",
+      subtitle: "Browse our entire wholesale catalog"
+    },
+    trust_badges: {
+      badge1_title: "Support 24/7",
+      badge1_desc: "Direct WhatsApp & Call wholesale assistance",
+      badge2_title: "Best Prices",
+      badge2_desc: "Direct factory prices for bulk & retail",
+      badge3_title: "Secure Payment",
+      badge3_desc: "Cash on delivery & verified digital transfers",
+      badge4_title: "7 Days Replacement",
+      badge4_desc: "Hassle-free product verification & exchange"
+    },
+    search_hero: {
+      title: "Find Any Product Instantly",
+      subtitle: "Search through thousands of top-selling gadgets, home organizers, smart watches, and trending electronic items in Pakistan."
+    },
+    video_reels: {
+      title: "Watch & Shop",
+      tag: "IN MOTION"
+    },
+    testimonials: {
+      title: "What Our Clients Say",
+      subtitle: "Real stories and verified reviews from our valued wholesale customers across Pakistan",
+      tag: "FEEDBACK"
+    }
+  },
   theme: {
     primary_color: "#008060",
     gradient_from: "#004d57",

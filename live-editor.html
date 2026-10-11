@@ -140,16 +140,30 @@
         </div>
 
         <!-- ============================================================ -->
-        <!-- TAB 2: SECTIONS REORDERING (OOPER / NEECHAY) -->
+        <!-- TAB 2: SECTIONS REORDERING (OOPER / NEECHAY) & CONFIG -->
         <!-- ============================================================ -->
-        <div id="tabContent-sections" class="space-y-5 hidden">
+        <div id="tabContent-sections" class="space-y-4 hidden">
+          <!-- Prominent Top Save Bar -->
+          <div class="sticky top-0 z-20 bg-slate-900 text-white p-3.5 rounded-2xl shadow-lg border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+              <span id="sectionsSaveStatusDot" class="w-3 h-3 rounded-full bg-emerald-400 shrink-0"></span>
+              <div>
+                <div id="sectionsSaveStatusTitle" class="text-xs font-black text-white">Live Storefront Synced</div>
+                <div id="sectionsSaveStatusSub" class="text-[10px] text-slate-300">Click button to publish all sections &amp; category changes</div>
+              </div>
+            </div>
+            <button type="button" onclick="saveAndPublishHome()" id="sectionsTopSaveBtn" class="px-5 py-2.5 bg-[#008060] hover:bg-[#006e52] text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-md transition transform active:scale-95">
+              <span>💾 Save &amp; Publish to Store</span>
+            </button>
+          </div>
+
           <div class="flex items-center justify-between border-b pb-3">
             <div>
               <h2 class="text-sm font-black text-slate-900 flex items-center gap-2">
-                <span>🧩 Sections Order &amp; Sequence</span>
+                <span>🧩 Sections Order &amp; Layout Manager</span>
                 <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-teal-100 text-teal-800">12 Portions</span>
               </h2>
-              <p class="text-xs text-slate-500 mt-0.5">Hot Selling, Categories, ya Flash Sale ko ▲ Ooper ya ▼ Neechay move karein.</p>
+              <p class="text-xs text-slate-500 mt-0.5">Hot Selling, Categories, ya Flash Sale ko ▲ Ooper ya ▼ Neechay move karein, aur ⚙️ Edit Section se categories chunein.</p>
             </div>
             <button type="button" onclick="resetSectionsOrder()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">
               ↺ Reset Default
@@ -161,13 +175,13 @@
             <span class="text-base shrink-0">💡</span>
             <div>
               <strong class="font-bold">Kaise Kaam Karta Hai?</strong>
-              <p class="text-[11px] text-amber-800 mt-0.5">Agar aap chahte hain ke "🔥 Hot Selling" sab se pehly aaye to us ke sath <strong>▲ Ooper</strong> dabayein jab tak woh #1 position par na aa jaye.</p>
+              <p class="text-[11px] text-amber-800 mt-0.5">Kisi bhi section ko upar/neeche karne ke liye <strong>▲ Ooper</strong> ya <strong>▼ Neechay</strong> dabayein. Categories chunnay ke liye <strong>⚙️ Edit Section</strong> dabayein.</p>
             </div>
           </div>
 
           <!-- Interactive Ordered Sections List -->
           <div id="sectionsOrderList" class="space-y-2.5">
-            <!-- Dynamically populated with #1-#12 order and up/down buttons -->
+            <!-- Dynamically populated with #1-#12 order, edit buttons, and up/down controls -->
           </div>
         </div>
 
@@ -265,6 +279,25 @@
               </button>
             </div>
           </div>
+
+          <!-- Recommended Image Size Spec Box -->
+          <div class="mt-2.5 p-3 bg-cyan-50/80 border border-cyan-200 rounded-xl text-xs space-y-1">
+            <div class="flex items-center justify-between text-cyan-950 font-bold">
+              <span class="flex items-center gap-1.5">
+                <span>📐</span>
+                <span>Recommended Slider Size:</span>
+              </span>
+              <span class="bg-cyan-200/90 text-cyan-900 px-2 py-0.5 rounded font-mono font-black text-[11px]">2117 × 743 px</span>
+            </div>
+            <div class="text-[11px] text-cyan-800">
+              Aspect ratio: <strong>~21:7 (2.85:1)</strong> • Max size: <strong>&lt; 1.5MB</strong> • Format: <strong>WebP (Auto-converted)</strong>
+            </div>
+            <div id="modalDetectedSizeBox" class="hidden mt-1.5 pt-1.5 border-t border-cyan-200/70 text-[11px] font-semibold text-emerald-800 flex items-center justify-between">
+              <span>Detected Image Size:</span>
+              <span id="modalDetectedSizeText" class="font-mono bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded font-black text-[10px]">--</span>
+            </div>
+          </div>
+
           <!-- Preview Box -->
           <div class="mt-2.5 h-32 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center relative">
             <img id="modalPreviewImg" src="" class="w-full h-full object-cover hidden">
@@ -286,6 +319,35 @@
         <div class="pt-3 border-t flex items-center justify-end space-x-2">
           <button type="button" onclick="closeSlideModal()" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50">Cancel</button>
           <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-[#008060] hover:bg-[#006e52] rounded-xl shadow-sm">Save Slide</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: EDIT HOMEPAGE SECTION CONFIGURATION (SHOP BY CATEGORY, ETC) -->
+  <!-- ============================================================ -->
+  <div id="sectionConfigModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl relative border border-slate-200 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b shrink-0">
+        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+          <span id="secModalIcon">⚙️</span>
+          <span id="secModalTitle">Edit Section Settings</span>
+        </h3>
+        <button onclick="closeSectionConfigModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+      </div>
+
+      <form id="sectionConfigForm" onsubmit="handleSectionConfigSubmit(event)" class="space-y-4 pt-4 text-xs overflow-y-auto flex-1 pr-1">
+        <input type="hidden" id="modalSectionKey" value="">
+
+        <!-- Dynamic Body populated based on section key -->
+        <div id="modalSectionDynamicBody" class="space-y-4">
+          <!-- Populated by openSectionConfigModal -->
+        </div>
+
+        <div class="pt-4 border-t flex items-center justify-between shrink-0">
+          <button type="button" onclick="closeSectionConfigModal()" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-[#008060] hover:bg-[#006e52] rounded-xl shadow-sm">Save Section Settings</button>
         </div>
       </form>
     </div>
@@ -485,6 +547,59 @@
       populateTickerForm();
     }
 
+    const STORE_CATEGORIES = [
+      { id: 'storage', name: 'Storage & Racks', icon: '📦', count: 142 },
+      { id: 'kitchen', name: 'Kitchen Gadgets', icon: '🍳', count: 98 },
+      { id: 'electronics', name: 'Electronic Items', icon: '⚡', count: 215 },
+      { id: 'smartwatches', name: 'Smart Watches', icon: '⌚', count: 64 },
+      { id: 'bottles', name: 'Mugs & Bottles', icon: '🥤', count: 76 },
+      { id: 'beauty', name: 'Beauty & Makeup', icon: '💄', count: 85 },
+      { id: 'insect-killers', name: 'Insect Killers', icon: '🦟', count: 32 },
+      { id: 'accessories', name: 'Mobile Accessories', icon: '📱', count: 120 },
+      { id: 'cleaning', name: 'Wipers & Cleaning', icon: '🧹', count: 53 },
+      { id: 'toys', name: 'Toys & Kids Collection', icon: '🧸', count: 48 }
+    ];
+
+    function markUnsavedChanges() {
+      const dot = document.getElementById('sectionsSaveStatusDot');
+      const title = document.getElementById('sectionsSaveStatusTitle');
+      const sub = document.getElementById('sectionsSaveStatusSub');
+      const topBtn = document.getElementById('sectionsTopSaveBtn');
+      const headerBtn = document.getElementById('savePublishBtn');
+
+      if (dot) dot.className = 'w-3 h-3 rounded-full bg-amber-400 animate-pulse shrink-0';
+      if (title) {
+        title.textContent = '● Unsaved Changes Detected';
+        title.className = 'text-xs font-black text-amber-300';
+      }
+      if (sub) {
+        sub.textContent = 'Aap ne changes ki hain — "Save & Publish" par click karein!';
+        sub.className = 'text-[10px] text-amber-200';
+      }
+      if (topBtn) topBtn.classList.add('ring-2', 'ring-amber-400', 'shadow-lg');
+      if (headerBtn) headerBtn.classList.add('ring-2', 'ring-amber-400');
+    }
+
+    function clearUnsavedChanges() {
+      const dot = document.getElementById('sectionsSaveStatusDot');
+      const title = document.getElementById('sectionsSaveStatusTitle');
+      const sub = document.getElementById('sectionsSaveStatusSub');
+      const topBtn = document.getElementById('sectionsTopSaveBtn');
+      const headerBtn = document.getElementById('savePublishBtn');
+
+      if (dot) dot.className = 'w-3 h-3 rounded-full bg-emerald-400 shrink-0';
+      if (title) {
+        title.textContent = 'Live Storefront Synced';
+        title.className = 'text-xs font-black text-white';
+      }
+      if (sub) {
+        sub.textContent = 'All layout & category changes saved live to Save & Smile Store';
+        sub.className = 'text-[10px] text-slate-300';
+      }
+      if (topBtn) topBtn.classList.remove('ring-2', 'ring-amber-400', 'shadow-lg');
+      if (headerBtn) headerBtn.classList.remove('ring-2', 'ring-amber-400');
+    }
+
     // -------------------------------------------------------------
     // HERO BANNERS MANAGEMENT
     // -------------------------------------------------------------
@@ -515,9 +630,10 @@
             <div class="min-w-0">
               <div class="font-bold text-slate-900 text-xs truncate">${slide.title}</div>
               <div class="text-[11px] text-slate-500 truncate max-w-sm">${slide.subtitle || 'No subtitle'}</div>
-              <div class="flex items-center gap-2 mt-0.5 text-[10px]">
+              <div class="flex flex-wrap items-center gap-1.5 mt-1 text-[10px]">
+                <span class="bg-cyan-50 text-cyan-900 border border-cyan-200 px-1.5 py-0.5 rounded font-mono font-bold">📐 Size: 2117 × 743 px</span>
                 <span class="font-mono text-teal-800 font-semibold">${slide.link || '#products'}</span>
-                ${slide.badge ? `<span class="bg-cyan-100 text-cyan-800 px-1.5 py-0.2 rounded font-black">${slide.badge}</span>` : ''}
+                ${slide.badge ? `<span class="bg-cyan-100 text-cyan-800 px-1.5 py-0.5 rounded font-black">${slide.badge}</span>` : ''}
               </div>
             </div>
           </div>
@@ -547,7 +663,8 @@
         if (homeConfig && homeConfig.hero_slides && homeConfig.hero_slides[idx]) {
           homeConfig.hero_slides[idx].image = webpResult.dataUrl;
           renderHeroBannersList();
-          showToast(`Picture changed to WebP (-${webpResult.percentReduced}%)! Click Save to publish.`, '🎉');
+          markUnsavedChanges();
+          showToast(`Picture converted to WebP (${webpResult.width}×${webpResult.height}px, -${webpResult.percentReduced}%)! Click Save to publish.`, '🎉');
         }
       } catch (err) {
         alert('Image error: ' + err.message);
@@ -563,12 +680,14 @@
       slides[idx] = slides[newIdx];
       slides[newIdx] = temp;
       renderHeroBannersList();
+      markUnsavedChanges();
     }
 
     function deleteSlide(slideId) {
       if (!confirm('Are you sure you want to remove this slide?')) return;
       homeConfig.hero_slides = homeConfig.hero_slides.filter(s => s.id != slideId && s != slideId);
       renderHeroBannersList();
+      markUnsavedChanges();
       showToast('Slide removed', '🗑️');
     }
 
@@ -577,6 +696,8 @@
       document.getElementById('slideModalTitle').textContent = 'Add Hero Banner Slide';
       document.getElementById('slideForm').reset();
       document.getElementById('modalSlideId').value = '';
+      const detectedBox = document.getElementById('modalDetectedSizeBox');
+      if (detectedBox) detectedBox.classList.add('hidden');
       previewModalImage('');
       document.getElementById('slideModal').classList.remove('hidden');
       document.getElementById('slideModal').classList.add('flex');
@@ -594,6 +715,8 @@
       document.getElementById('modalSlideImage').value = slide.image || '';
       document.getElementById('modalSlideLink').value = slide.link || '#products';
       document.getElementById('modalSlideBadge').value = slide.badge || '';
+      const detectedBox = document.getElementById('modalDetectedSizeBox');
+      if (detectedBox) detectedBox.classList.add('hidden');
       previewModalImage(slide.image || '');
 
       document.getElementById('slideModal').classList.remove('hidden');
@@ -608,14 +731,25 @@
     function previewModalImage(url) {
       const img = document.getElementById('modalPreviewImg');
       const placeholder = document.getElementById('modalPreviewPlaceholder');
+      const detectedBox = document.getElementById('modalDetectedSizeBox');
+      const detectedText = document.getElementById('modalDetectedSizeText');
       if (!img || !placeholder) return;
+
       if (url && url.trim().length > 5) {
         img.src = url.trim();
         img.classList.remove('hidden');
         placeholder.classList.add('hidden');
+        img.onload = () => {
+          if (detectedBox && detectedText && img.naturalWidth) {
+            detectedBox.classList.remove('hidden');
+            const ratio = (img.naturalWidth / img.naturalHeight).toFixed(2);
+            detectedText.textContent = `${img.naturalWidth} × ${img.naturalHeight} px (Ratio ${ratio}:1)`;
+          }
+        };
       } else {
         img.classList.add('hidden');
         placeholder.classList.remove('hidden');
+        if (detectedBox) detectedBox.classList.add('hidden');
       }
     }
 
@@ -627,7 +761,14 @@
         const webpResult = await convertImageFileToWebP(file);
         document.getElementById('modalSlideImage').value = webpResult.dataUrl;
         previewModalImage(webpResult.dataUrl);
-        showToast(`Picture converted to WebP (-${webpResult.percentReduced}%)`, '🎉');
+
+        const detectedBox = document.getElementById('modalDetectedSizeBox');
+        const detectedText = document.getElementById('modalDetectedSizeText');
+        if (detectedBox && detectedText) {
+          detectedBox.classList.remove('hidden');
+          detectedText.textContent = `${webpResult.width} × ${webpResult.height} px • ${webpResult.webpSizeKB} KB WebP (-${webpResult.percentReduced}%)`;
+        }
+        showToast(`Picture converted to WebP (${webpResult.width}×${webpResult.height}px, -${webpResult.percentReduced}%)`, '🎉');
       } catch (err) {
         alert('Image error: ' + err.message);
       }
@@ -667,10 +808,11 @@
 
       closeSlideModal();
       renderHeroBannersList();
+      markUnsavedChanges();
     }
 
     // -------------------------------------------------------------
-    // SECTIONS REORDERING (OOPER / NEECHAY)
+    // SECTIONS REORDERING & CONFIGURATION (OOPER / NEECHAY / EDIT)
     // -------------------------------------------------------------
     function renderSectionsOrderList() {
       const container = document.getElementById('sectionsOrderList');
@@ -678,10 +820,17 @@
 
       const order = homeConfig.sections_order || DEFAULT_SECTIONS_ORDER;
       const vis = homeConfig.sections_visibility || {};
+      const sc = homeConfig.sections_config || {};
 
       container.innerHTML = order.map((secKey, idx) => {
         const def = HOMEPAGE_SECTIONS_DEF[secKey] || { name: secKey, icon: '📦', desc: 'Homepage Section' };
         const isVisible = vis[secKey] !== false;
+
+        // Custom config badges (e.g. categories count)
+        let configBadge = '';
+        if (secKey === 'categories_strip' && sc.categories_strip?.selected_categories) {
+          configBadge = `<span class="px-1.5 py-0.5 bg-teal-50 text-teal-800 border border-teal-200 text-[10px] font-bold rounded">${sc.categories_strip.selected_categories.length} Categories Active</span>`;
+        }
 
         return `
           <div class="p-3.5 bg-white hover:bg-slate-50 rounded-2xl border ${isVisible ? 'border-slate-200' : 'border-slate-300 opacity-60'} shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition">
@@ -692,12 +841,18 @@
                 <div class="font-bold text-slate-900 text-xs flex items-center gap-2">
                   <span>${def.name}</span>
                   ${idx === 0 ? '<span class="px-1.5 py-0.5 bg-amber-100 text-amber-900 text-[9px] font-black rounded uppercase">Top Section</span>' : ''}
+                  ${configBadge}
                 </div>
                 <div class="text-[11px] text-slate-500 truncate max-w-md">${def.desc}</div>
               </div>
             </div>
 
             <div class="flex items-center space-x-2 self-end sm:self-center shrink-0">
+              <!-- Edit Section Settings Button -->
+              <button type="button" onclick="openSectionConfigModal('${secKey}')" title="Configure Section" class="px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-800 font-bold rounded-lg text-xs flex items-center gap-1 transition shadow-xs">
+                <span>⚙️ Edit Section</span>
+              </button>
+
               ${idx > 0 ? `
                 <button type="button" onclick="moveSection(${idx}, -1)" title="Move Up" class="px-2.5 py-1.5 bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-800 font-bold rounded-lg text-xs flex items-center gap-1 transition shadow-xs">
                   ▲ Ooper
@@ -734,6 +889,7 @@
       order[newIdx] = temp;
 
       renderSectionsOrderList();
+      markUnsavedChanges();
       showToast(`"${HOMEPAGE_SECTIONS_DEF[temp]?.name || temp}" moved to #${newIdx + 1}!`, '↕️');
     }
 
@@ -741,13 +897,228 @@
       homeConfig.sections_visibility = homeConfig.sections_visibility || {};
       homeConfig.sections_visibility[secKey] = isChecked;
       renderSectionsOrderList();
+      markUnsavedChanges();
     }
 
     function resetSectionsOrder() {
       if (!confirm('Default section order restore karna chahte hain?')) return;
       homeConfig.sections_order = [...DEFAULT_SECTIONS_ORDER];
       renderSectionsOrderList();
+      markUnsavedChanges();
       showToast('Default sections order restored!', '↺');
+    }
+
+    // -------------------------------------------------------------
+    // SECTION CONFIGURATION MODAL (SHOP BY CATEGORIES, HOT SELLING, ETC)
+    // -------------------------------------------------------------
+    function openSectionConfigModal(secKey) {
+      if (!homeConfig) return;
+      homeConfig.sections_config = homeConfig.sections_config || {};
+      const cfg = homeConfig.sections_config[secKey] || {};
+      const def = HOMEPAGE_SECTIONS_DEF[secKey] || { name: secKey, icon: '⚙️' };
+
+      document.getElementById('modalSectionKey').value = secKey;
+      document.getElementById('secModalIcon').textContent = def.icon;
+      document.getElementById('secModalTitle').textContent = `Edit Section: ${def.name}`;
+
+      const body = document.getElementById('modalSectionDynamicBody');
+      if (!body) return;
+
+      if (secKey === 'categories_strip') {
+        const selected = cfg.selected_categories || ['storage', 'kitchen', 'smartwatches', 'bottles', 'insect-killers', 'beauty', 'accessories', 'toys'];
+        const title = cfg.title || 'Shop By Categories';
+
+        body.innerHTML = `
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Section Heading Title</label>
+            <input type="text" id="cfg_cat_title" value="${title}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+            <span class="text-[10px] text-slate-400 mt-1 block">Default: Shop By Categories</span>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="font-bold text-slate-700">Select Categories to Display on Homepage</label>
+              <div class="space-x-2">
+                <button type="button" onclick="toggleAllCategoryChecks(true)" class="text-[11px] font-bold text-[#008060] hover:underline">Select All</button>
+                <span class="text-slate-300">|</span>
+                <button type="button" onclick="toggleAllCategoryChecks(false)" class="text-[11px] font-bold text-rose-600 hover:underline">Clear All</button>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-500 mb-3">Apne hisab se categories check/uncheck karein kon konsi categories storefront par gol icons marquee strip mein show honi chahiyen:</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-60 overflow-y-auto p-1.5 border border-slate-200 rounded-2xl bg-slate-50/50">
+              ${STORE_CATEGORIES.map(cat => {
+                const isChecked = selected.includes(cat.id);
+                return `
+                  <label class="flex items-center space-x-2.5 p-2.5 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 cursor-pointer shadow-2xs">
+                    <input type="checkbox" name="cfg_selected_categories" value="${cat.id}" ${isChecked ? 'checked' : ''} class="rounded text-[#008060] focus:ring-[#008060] w-4 h-4">
+                    <span class="text-lg">${cat.icon}</span>
+                    <div class="min-w-0">
+                      <div class="font-bold text-slate-800 text-xs truncate">${cat.name}</div>
+                      <div class="text-[10px] text-slate-400">${cat.count} items</div>
+                    </div>
+                  </label>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      } else if (['hot_selling', 'new_arrivals', 'trending_picks'].includes(secKey)) {
+        const title = cfg.title || HOMEPAGE_SECTIONS_DEF[secKey].name;
+        const subtitle = cfg.subtitle || '';
+        const tag = cfg.tag || (secKey === 'hot_selling' ? '🔥 HOT SELLING' : secKey === 'new_arrivals' ? '✨ NEW ARRIVALS' : '🌟 TRENDING PICKS');
+        const limit = cfg.limit || 8;
+
+        body.innerHTML = `
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Section Title</label>
+            <input type="text" id="cfg_sec_title" value="${title}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Subtitle / Description</label>
+            <input type="text" id="cfg_sec_subtitle" value="${subtitle}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Badge Tag</label>
+              <input type="text" id="cfg_sec_tag" value="${tag}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Items Limit</label>
+              <select id="cfg_sec_limit" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-medium">
+                <option value="4" ${limit == 4 ? 'selected' : ''}>4 Products</option>
+                <option value="8" ${limit == 8 ? 'selected' : ''}>8 Products</option>
+                <option value="12" ${limit == 12 ? 'selected' : ''}>12 Products</option>
+                <option value="16" ${limit == 16 ? 'selected' : ''}>16 Products</option>
+              </select>
+            </div>
+          </div>
+        `;
+      } else if (secKey === 'flash_sale') {
+        const title = cfg.title || "TODAY'S FLASH SALE";
+        const subtitle = cfg.subtitle || "Limited quantity left at discounted wholesale prices!";
+        const hours = cfg.countdown_hours || 14;
+
+        body.innerHTML = `
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Flash Sale Title</label>
+            <input type="text" id="cfg_fs_title" value="${title}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Subtitle</label>
+            <input type="text" id="cfg_fs_subtitle" value="${subtitle}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Countdown Hours</label>
+            <input type="number" id="cfg_fs_hours" value="${hours}" min="1" max="72" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+          </div>
+        `;
+      } else if (secKey === 'trust_badges') {
+        const tb = cfg || {};
+        body.innerHTML = `
+          <p class="text-slate-500 mb-2">Storefront ke 4 trust badges ke titles aur descriptions edit karein:</p>
+          <div class="space-y-3">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <label class="block font-bold text-slate-700 mb-1">Badge 1 (Support)</label>
+              <input type="text" id="cfg_tb_b1_title" value="${tb.badge1_title || 'Support 24/7'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg font-bold mb-1">
+              <input type="text" id="cfg_tb_b1_desc" value="${tb.badge1_desc || 'Direct WhatsApp & Call wholesale assistance'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-[11px]">
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <label class="block font-bold text-slate-700 mb-1">Badge 2 (Pricing)</label>
+              <input type="text" id="cfg_tb_b2_title" value="${tb.badge2_title || 'Best Prices'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg font-bold mb-1">
+              <input type="text" id="cfg_tb_b2_desc" value="${tb.badge2_desc || 'Direct factory prices for bulk & retail'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-[11px]">
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <label class="block font-bold text-slate-700 mb-1">Badge 3 (Payment)</label>
+              <input type="text" id="cfg_tb_b3_title" value="${tb.badge3_title || 'Secure Payment'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg font-bold mb-1">
+              <input type="text" id="cfg_tb_b3_desc" value="${tb.badge3_desc || 'Cash on delivery & verified digital transfers'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-[11px]">
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <label class="block font-bold text-slate-700 mb-1">Badge 4 (Exchange)</label>
+              <input type="text" id="cfg_tb_b4_title" value="${tb.badge4_title || '7 Days Replacement'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg font-bold mb-1">
+              <input type="text" id="cfg_tb_b4_desc" value="${tb.badge4_desc || 'Hassle-free product verification & exchange'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-[11px]">
+            </div>
+          </div>
+        `;
+      } else {
+        const title = cfg.title || HOMEPAGE_SECTIONS_DEF[secKey].name;
+        const subtitle = cfg.subtitle || '';
+        body.innerHTML = `
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Section Title</label>
+            <input type="text" id="cfg_gen_title" value="${title}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Subtitle / Information Text</label>
+            <input type="text" id="cfg_gen_subtitle" value="${subtitle}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+          </div>
+        `;
+      }
+
+      document.getElementById('sectionConfigModal').classList.remove('hidden');
+      document.getElementById('sectionConfigModal').classList.add('flex');
+    }
+
+    function closeSectionConfigModal() {
+      document.getElementById('sectionConfigModal').classList.add('hidden');
+      document.getElementById('sectionConfigModal').classList.remove('flex');
+    }
+
+    function toggleAllCategoryChecks(checkAll) {
+      document.querySelectorAll('input[name="cfg_selected_categories"]').forEach(cb => {
+        cb.checked = checkAll;
+      });
+    }
+
+    function handleSectionConfigSubmit(e) {
+      e.preventDefault();
+      const secKey = document.getElementById('modalSectionKey').value;
+      if (!homeConfig) return;
+      homeConfig.sections_config = homeConfig.sections_config || {};
+
+      if (secKey === 'categories_strip') {
+        const title = document.getElementById('cfg_cat_title')?.value.trim() || 'Shop By Categories';
+        const selected = Array.from(document.querySelectorAll('input[name="cfg_selected_categories"]:checked')).map(cb => cb.value);
+        homeConfig.sections_config.categories_strip = {
+          title,
+          selected_categories: selected
+        };
+        showToast(`Categories updated (${selected.length} active)! Click Save to publish.`, '🗂️');
+      } else if (['hot_selling', 'new_arrivals', 'trending_picks'].includes(secKey)) {
+        const title = document.getElementById('cfg_sec_title')?.value.trim();
+        const subtitle = document.getElementById('cfg_sec_subtitle')?.value.trim();
+        const tag = document.getElementById('cfg_sec_tag')?.value.trim();
+        const limit = parseInt(document.getElementById('cfg_sec_limit')?.value, 10) || 8;
+        homeConfig.sections_config[secKey] = { title, subtitle, tag, limit };
+        showToast(`Section "${title}" updated! Click Save to publish.`, '⚙️');
+      } else if (secKey === 'flash_sale') {
+        const title = document.getElementById('cfg_fs_title')?.value.trim();
+        const subtitle = document.getElementById('cfg_fs_subtitle')?.value.trim();
+        const countdown_hours = parseInt(document.getElementById('cfg_fs_hours')?.value, 10) || 14;
+        homeConfig.sections_config.flash_sale = { title, subtitle, countdown_hours };
+        showToast('Flash Sale settings updated!', '⚡');
+      } else if (secKey === 'trust_badges') {
+        homeConfig.sections_config.trust_badges = {
+          badge1_title: document.getElementById('cfg_tb_b1_title')?.value.trim(),
+          badge1_desc: document.getElementById('cfg_tb_b1_desc')?.value.trim(),
+          badge2_title: document.getElementById('cfg_tb_b2_title')?.value.trim(),
+          badge2_desc: document.getElementById('cfg_tb_b2_desc')?.value.trim(),
+          badge3_title: document.getElementById('cfg_tb_b3_title')?.value.trim(),
+          badge3_desc: document.getElementById('cfg_tb_b3_desc')?.value.trim(),
+          badge4_title: document.getElementById('cfg_tb_b4_title')?.value.trim(),
+          badge4_desc: document.getElementById('cfg_tb_b4_desc')?.value.trim()
+        };
+        showToast('Trust badges updated!', '🛡️');
+      } else {
+        const title = document.getElementById('cfg_gen_title')?.value.trim();
+        const subtitle = document.getElementById('cfg_gen_subtitle')?.value.trim();
+        homeConfig.sections_config[secKey] = { title, subtitle };
+        showToast('Section settings updated!', '✅');
+      }
+
+      closeSectionConfigModal();
+      renderSectionsOrderList();
+      markUnsavedChanges();
     }
 
     // -------------------------------------------------------------
@@ -768,9 +1139,14 @@
     // -------------------------------------------------------------
     async function saveAndPublishHome() {
       const btn = document.getElementById('savePublishBtn');
+      const topBtn = document.getElementById('sectionsTopSaveBtn');
       if (btn) {
         btn.disabled = true;
         btn.innerHTML = '<span>⏳ Saving to Store...</span>';
+      }
+      if (topBtn) {
+        topBtn.disabled = true;
+        topBtn.innerHTML = '<span>⏳ Saving...</span>';
       }
 
       // Read ticker form
@@ -813,9 +1189,15 @@
         showToast('Settings saved to browser storage!', '✅');
       }
 
+      clearUnsavedChanges();
+
       if (btn) {
         btn.disabled = false;
         btn.innerHTML = '<span>💾 Save &amp; Publish to Store</span>';
+      }
+      if (topBtn) {
+        topBtn.disabled = false;
+        topBtn.innerHTML = '<span>💾 Save &amp; Publish to Store</span>';
       }
 
       // Refresh live storefront preview iframe

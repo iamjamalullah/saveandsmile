@@ -174,6 +174,85 @@ function applyHomeCustomization(cfg) {
     });
   }
 
+  // 3. Apply Sections Config (Custom Categories Filter, Titles, Subtitles, Badges)
+  if (cfg.sections_config) {
+    const sc = cfg.sections_config;
+
+    // A. Shop By Categories Strip
+    if (sc.categories_strip) {
+      if (sc.categories_strip.title) {
+        const titleEl = document.querySelector('#shopSliderSection .cat-section-title');
+        if (titleEl) titleEl.textContent = sc.categories_strip.title;
+      }
+      if (Array.isArray(sc.categories_strip.selected_categories) && sc.categories_strip.selected_categories.length > 0) {
+        const filtered = CATEGORIES.filter(c => sc.categories_strip.selected_categories.includes(c.id));
+        if (filtered.length > 0) {
+          renderCategoryStrip(filtered);
+        }
+      }
+    }
+
+    // B. Hot Selling Wholesale Gadgets
+    if (sc.hot_selling) {
+      const headingEl = document.querySelector('#hotSelling .portion-heading-text');
+      const subEl = document.querySelector('#hotSelling .portion-subtitle-text');
+      const tagEl = document.querySelector('#hotSelling .portion-pill-tag');
+      if (headingEl && sc.hot_selling.title) headingEl.textContent = sc.hot_selling.title;
+      if (subEl && sc.hot_selling.subtitle) subEl.textContent = sc.hot_selling.subtitle;
+      if (tagEl && sc.hot_selling.tag) tagEl.textContent = sc.hot_selling.tag;
+    }
+
+    // C. Latest New Arrivals
+    if (sc.new_arrivals) {
+      const headingEl = document.querySelector('#newArrivals .portion-heading-text');
+      const subEl = document.querySelector('#newArrivals .portion-subtitle-text');
+      const tagEl = document.querySelector('#newArrivals .portion-pill-tag');
+      if (headingEl && sc.new_arrivals.title) headingEl.textContent = sc.new_arrivals.title;
+      if (subEl && sc.new_arrivals.subtitle) subEl.textContent = sc.new_arrivals.subtitle;
+      if (tagEl && sc.new_arrivals.tag) tagEl.textContent = sc.new_arrivals.tag;
+    }
+
+    // D. Flash Sale
+    if (sc.flash_sale) {
+      const headingEl = document.querySelector('#flashSale .flash-title-area h2') || document.querySelector('#flashSale .portion-heading-text');
+      const subEl = document.querySelector('#flashSale .flash-title-area p') || document.querySelector('#flashSale .portion-subtitle-text');
+      if (headingEl && sc.flash_sale.title) headingEl.textContent = sc.flash_sale.title;
+      if (subEl && sc.flash_sale.subtitle) subEl.textContent = sc.flash_sale.subtitle;
+    }
+
+    // E. Trending Wholesale Picks
+    if (sc.trending_picks) {
+      const headingEl = document.querySelector('#trendingPicks .portion-heading-text');
+      const subEl = document.querySelector('#trendingPicks .portion-subtitle-text');
+      const tagEl = document.querySelector('#trendingPicks .portion-pill-tag');
+      if (headingEl && sc.trending_picks.title) headingEl.textContent = sc.trending_picks.title;
+      if (subEl && sc.trending_picks.subtitle) subEl.textContent = sc.trending_picks.subtitle;
+      if (tagEl && sc.trending_picks.tag) tagEl.textContent = sc.trending_picks.tag;
+    }
+
+    // F. Main Catalog
+    if (sc.main_catalog) {
+      const headingEl = document.querySelector('#products .section-heading h2') || document.querySelector('#products h2');
+      if (headingEl && sc.main_catalog.title) headingEl.textContent = sc.main_catalog.title;
+    }
+
+    // G. Trust Badges
+    if (sc.trust_badges) {
+      const tb = sc.trust_badges;
+      const cards = document.querySelectorAll('#HomePageFooterIcons .trust-feature-card');
+      if (cards.length >= 4) {
+        if (tb.badge1_title) { const h = cards[0].querySelector('h4'); if (h) h.textContent = tb.badge1_title; }
+        if (tb.badge1_desc) { const p = cards[0].querySelector('p'); if (p) p.textContent = tb.badge1_desc; }
+        if (tb.badge2_title) { const h = cards[1].querySelector('h4'); if (h) h.textContent = tb.badge2_title; }
+        if (tb.badge2_desc) { const p = cards[1].querySelector('p'); if (p) p.textContent = tb.badge2_desc; }
+        if (tb.badge3_title) { const h = cards[2].querySelector('h4'); if (h) h.textContent = tb.badge3_title; }
+        if (tb.badge3_desc) { const p = cards[2].querySelector('p'); if (p) p.textContent = tb.badge3_desc; }
+        if (tb.badge4_title) { const h = cards[3].querySelector('h4'); if (h) h.textContent = tb.badge4_title; }
+        if (tb.badge4_desc) { const p = cards[3].querySelector('p'); if (p) p.textContent = tb.badge4_desc; }
+      }
+    }
+  }
+
   // Apply Promo Banners / Strips text
   if (Array.isArray(cfg.promo_banners)) {
     cfg.promo_banners.forEach(pb => {
@@ -300,12 +379,14 @@ function initCountdown() {
 // -------------------------------------------------------------
 // Render Category Circles Strip & Mega Menu
 // -------------------------------------------------------------
-function renderCategoryStrip() {
+function renderCategoryStrip(catsList) {
   const strip = document.getElementById('categoryStrip');
-  if (!strip) return;
+  if (!strip || !Array.isArray(CATEGORIES)) return;
+
+  const activeCats = Array.isArray(catsList) && catsList.length > 0 ? catsList : CATEGORIES;
 
   // Duplicate categories to create a seamless infinite left-to-right sliding marquee
-  const repeated = [...CATEGORIES, ...CATEGORIES, ...CATEGORIES];
+  const repeated = [...activeCats, ...activeCats, ...activeCats];
   strip.innerHTML = repeated.map(cat => `
     <div class="cat-circle-card" onclick="filterByCategory('${cat.id}')">
       <div class="cat-circle-img-wrap">

@@ -1355,9 +1355,23 @@
             </div>
           </div>
 
+          <!-- Prominent Top Save Bar for Sections & Categories -->
+          <div class="sticky top-2 z-10 bg-slate-900 text-white p-3.5 rounded-2xl shadow-lg border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+              <span id="adminSectionsSaveDot" class="w-3 h-3 rounded-full bg-emerald-400 shrink-0"></span>
+              <div>
+                <div id="adminSectionsSaveTitle" class="text-xs font-black text-white">Live Storefront Synced</div>
+                <div id="adminSectionsSaveSub" class="text-[10px] text-slate-300">Sections sequence &amp; categories ready to publish</div>
+              </div>
+            </div>
+            <button type="button" onclick="saveHomeCustomizerSettings()" id="adminSectionsTopSaveBtn" class="px-5 py-2.5 bg-[#008060] hover:bg-[#006e52] text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-md transition transform active:scale-95">
+              <span>💾 Save &amp; Publish to Store</span>
+            </button>
+          </div>
+
           <!-- Interactive Ordered Sections List Container -->
           <div id="hcSectionsOrderList" class="space-y-2.5">
-            <!-- Dynamically populated with order, move up/down, and visibility -->
+            <!-- Dynamically populated with order, move up/down, edit section, and visibility -->
           </div>
         </div>
       </section>
@@ -2679,6 +2693,25 @@
               </button>
             </div>
           </div>
+
+          <!-- Recommended Image Size Spec Box -->
+          <div class="mt-2.5 p-3 bg-cyan-50/80 border border-cyan-200 rounded-xl text-xs space-y-1">
+            <div class="flex items-center justify-between text-cyan-950 font-bold">
+              <span class="flex items-center gap-1.5">
+                <span>📐</span>
+                <span>Recommended Slider Size:</span>
+              </span>
+              <span class="bg-cyan-200/90 text-cyan-900 px-2 py-0.5 rounded font-mono font-black text-[11px]">2117 × 743 px</span>
+            </div>
+            <div class="text-[11px] text-cyan-800">
+              Aspect ratio: <strong>~21:7 (2.85:1)</strong> • Max size: <strong>&lt; 1.5MB</strong> • Format: <strong>WebP (Auto-converted)</strong>
+            </div>
+            <div id="hbDetectedSizeBox" class="hidden mt-1.5 pt-1.5 border-t border-cyan-200/70 text-[11px] font-semibold text-emerald-800 flex items-center justify-between">
+              <span>Detected Image Size:</span>
+              <span id="hbDetectedSizeText" class="font-mono bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded font-black text-[10px]">--</span>
+            </div>
+          </div>
+
           <!-- Preview Frame -->
           <div id="hbPreviewFrame" class="mt-2 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 aspect-[21/7] max-h-32 flex items-center justify-center">
             <img id="hbPreviewImg" src="" class="w-full h-full object-cover hidden">
@@ -2700,6 +2733,35 @@
         <div class="pt-3 border-t flex items-center justify-end space-x-2">
           <button type="button" onclick="closeModal('heroBannerModal')" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg">Cancel</button>
           <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-[#008060] hover:bg-[#006e52] rounded-lg shadow-sm">Save Banner Slide</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: EDIT HOMEPAGE SECTION CONFIGURATION (ADMIN PANEL) -->
+  <!-- ============================================================ -->
+  <div id="adminSectionConfigModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl relative border border-slate-200 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b shrink-0">
+        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+          <span id="adminSecModalIcon">⚙️</span>
+          <span id="adminSecModalTitle">Edit Section Settings</span>
+        </h3>
+        <button onclick="closeAdminSectionConfigModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+      </div>
+
+      <form id="adminSectionConfigForm" onsubmit="handleAdminSectionConfigSubmit(event)" class="space-y-4 pt-4 text-xs overflow-y-auto flex-1 pr-1">
+        <input type="hidden" id="adminModalSectionKey" value="">
+
+        <!-- Dynamic Body populated based on section key -->
+        <div id="adminModalSectionDynamicBody" class="space-y-4">
+          <!-- Populated by openAdminSectionConfigModal -->
+        </div>
+
+        <div class="pt-4 border-t flex items-center justify-between shrink-0">
+          <button type="button" onclick="closeAdminSectionConfigModal()" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-[#008060] hover:bg-[#006e52] rounded-xl shadow-sm">Save Section Settings</button>
         </div>
       </form>
     </div>
@@ -5097,6 +5159,28 @@
       renderSectionsOrderList();
     }
 
+    function markAdminUnsavedChanges() {
+      const dot = document.getElementById('adminSectionsSaveDot');
+      const title = document.getElementById('adminSectionsSaveTitle');
+      const sub = document.getElementById('adminSectionsSaveSub');
+      const btn = document.getElementById('adminSectionsTopSaveBtn');
+      if (dot) dot.className = 'w-3 h-3 rounded-full bg-amber-400 animate-pulse shrink-0';
+      if (title) { title.textContent = '● Unsaved Changes Detected'; title.className = 'text-xs font-black text-amber-300'; }
+      if (sub) { sub.textContent = 'Aap ne changes ki hain — "Save & Publish to Store" dabayein!'; sub.className = 'text-[10px] text-amber-200'; }
+      if (btn) btn.classList.add('ring-2', 'ring-amber-400');
+    }
+
+    function clearAdminUnsavedChanges() {
+      const dot = document.getElementById('adminSectionsSaveDot');
+      const title = document.getElementById('adminSectionsSaveTitle');
+      const sub = document.getElementById('adminSectionsSaveSub');
+      const btn = document.getElementById('adminSectionsTopSaveBtn');
+      if (dot) dot.className = 'w-3 h-3 rounded-full bg-emerald-400 shrink-0';
+      if (title) { title.textContent = 'Live Storefront Synced'; title.className = 'text-xs font-black text-white'; }
+      if (sub) { sub.textContent = 'Sections sequence & categories ready to publish'; sub.className = 'text-[10px] text-slate-300'; }
+      if (btn) btn.classList.remove('ring-2', 'ring-amber-400');
+    }
+
     function renderSectionsOrderList() {
       const container = document.getElementById('hcSectionsOrderList');
       if (!container || !currentHomeConfig) return;
@@ -5107,10 +5191,16 @@
 
       const order = currentHomeConfig.sections_order;
       const vis = currentHomeConfig.sections_visibility || {};
+      const sc = currentHomeConfig.sections_config || {};
 
       container.innerHTML = order.map((secKey, idx) => {
         const def = HOMEPAGE_SECTIONS_DEF[secKey] || { name: secKey, icon: '📦', desc: 'Homepage Section' };
         const isVisible = vis[secKey] !== false;
+
+        let configBadge = '';
+        if (secKey === 'categories_strip' && sc.categories_strip?.selected_categories) {
+          configBadge = `<span class="px-1.5 py-0.5 bg-teal-50 text-teal-800 border border-teal-200 text-[10px] font-bold rounded">${sc.categories_strip.selected_categories.length} Categories Active</span>`;
+        }
 
         return `
           <div class="p-3.5 bg-slate-50 hover:bg-slate-100/90 rounded-2xl border ${isVisible ? 'border-slate-200' : 'border-slate-300 opacity-60'} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition">
@@ -5121,12 +5211,18 @@
                 <div class="font-bold text-slate-900 text-xs flex items-center gap-2">
                   <span>${def.name}</span>
                   ${idx === 0 ? '<span class="px-1.5 py-0.5 bg-amber-100 text-amber-900 text-[9px] font-black rounded uppercase">Top Section</span>' : ''}
+                  ${configBadge}
                 </div>
                 <div class="text-[11px] text-slate-500 truncate max-w-md">${def.desc}</div>
               </div>
             </div>
 
             <div class="flex items-center space-x-2 self-end sm:self-center shrink-0">
+              <!-- Edit Section Button -->
+              <button type="button" onclick="openAdminSectionConfigModal('${secKey}')" title="Configure Section" class="px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-800 font-bold rounded-lg text-xs flex items-center gap-1 transition shadow-xs">
+                <span>⚙️ Edit Section</span>
+              </button>
+
               ${idx > 0 ? `
                 <button type="button" onclick="moveSectionOrder(${idx}, -1)" title="Move Up" class="px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-400 text-slate-700 font-bold rounded-lg text-xs flex items-center gap-1 transition shadow-xs">
                   ▲ Ooper
@@ -5163,6 +5259,7 @@
       order[newIdx] = temp;
 
       renderSectionsOrderList();
+      markAdminUnsavedChanges();
       showToast(`Section "${HOMEPAGE_SECTIONS_DEF[temp]?.name || temp}" moved to #${newIdx + 1}!`, '↕️');
     }
 
@@ -5171,6 +5268,7 @@
       currentHomeConfig.sections_visibility = currentHomeConfig.sections_visibility || {};
       currentHomeConfig.sections_visibility[secKey] = isChecked;
       renderSectionsOrderList();
+      markAdminUnsavedChanges();
     }
 
     function resetDefaultSectionsOrder() {
@@ -5178,7 +5276,232 @@
       if (!currentHomeConfig) currentHomeConfig = getDefaultHomeConfigLocal();
       currentHomeConfig.sections_order = [...DEFAULT_SECTIONS_ORDER];
       renderSectionsOrderList();
+      markAdminUnsavedChanges();
       showToast('Default sections order restored!', '↺');
+    }
+
+    // -------------------------------------------------------------
+    // ADMIN SECTION CONFIGURATION MODAL
+    // -------------------------------------------------------------
+    const ADMIN_STORE_CATEGORIES = [
+      { id: 'storage', name: 'Storage & Racks', icon: '📦', count: 142 },
+      { id: 'kitchen', name: 'Kitchen Gadgets', icon: '🍳', count: 98 },
+      { id: 'electronics', name: 'Electronic Items', icon: '⚡', count: 215 },
+      { id: 'smartwatches', name: 'Smart Watches', icon: '⌚', count: 64 },
+      { id: 'bottles', name: 'Mugs & Bottles', icon: '🥤', count: 76 },
+      { id: 'beauty', name: 'Beauty & Makeup', icon: '💄', count: 85 },
+      { id: 'insect-killers', name: 'Insect Killers', icon: '🦟', count: 32 },
+      { id: 'accessories', name: 'Mobile Accessories', icon: '📱', count: 120 },
+      { id: 'cleaning', name: 'Wipers & Cleaning', icon: '🧹', count: 53 },
+      { id: 'toys', name: 'Toys & Kids Collection', icon: '🧸', count: 48 }
+    ];
+
+    function openAdminSectionConfigModal(secKey) {
+      if (!currentHomeConfig) currentHomeConfig = getDefaultHomeConfigLocal();
+      currentHomeConfig.sections_config = currentHomeConfig.sections_config || {};
+      const cfg = currentHomeConfig.sections_config[secKey] || {};
+      const def = HOMEPAGE_SECTIONS_DEF[secKey] || { name: secKey, icon: '⚙️' };
+
+      document.getElementById('adminModalSectionKey').value = secKey;
+      document.getElementById('adminSecModalIcon').textContent = def.icon;
+      document.getElementById('adminSecModalTitle').textContent = `Edit Section: ${def.name}`;
+
+      const body = document.getElementById('adminModalSectionDynamicBody');
+      if (!body) return;
+
+      if (secKey === 'categories_strip') {
+        const selected = cfg.selected_categories || ['storage', 'kitchen', 'smartwatches', 'bottles', 'insect-killers', 'beauty', 'accessories', 'toys'];
+        const title = cfg.title || 'Shop By Categories';
+
+        body.innerHTML = `
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Section Heading Title</label>
+            <input type="text" id="admin_cfg_cat_title" value="${title}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+            <span class="text-[10px] text-slate-400 mt-1 block">Default: Shop By Categories</span>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="font-bold text-slate-700">Select Categories to Display on Homepage</label>
+              <div class="space-x-2">
+                <button type="button" onclick="toggleAdminAllCategoryChecks(true)" class="text-[11px] font-bold text-[#008060] hover:underline">Select All</button>
+                <span class="text-slate-300">|</span>
+                <button type="button" onclick="toggleAdminAllCategoryChecks(false)" class="text-[11px] font-bold text-rose-600 hover:underline">Clear All</button>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-500 mb-3">Apne hisab se check/uncheck karein kon konsi categories storefront par gol icons strip mein show honi chahiyen:</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-60 overflow-y-auto p-1.5 border border-slate-200 rounded-2xl bg-slate-50/50">
+              ${ADMIN_STORE_CATEGORIES.map(cat => {
+                const isChecked = selected.includes(cat.id);
+                return `
+                  <label class="flex items-center space-x-2.5 p-2.5 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 cursor-pointer shadow-2xs">
+                    <input type="checkbox" name="admin_cfg_selected_categories" value="${cat.id}" ${isChecked ? 'checked' : ''} class="rounded text-[#008060] focus:ring-[#008060] w-4 h-4">
+                    <span class="text-lg">${cat.icon}</span>
+                    <div class="min-w-0">
+                      <div class="font-bold text-slate-800 text-xs truncate">${cat.name}</div>
+                      <div class="text-[10px] text-slate-400">${cat.count} items</div>
+                    </div>
+                  </label>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      } else if (['hot_selling', 'new_arrivals', 'trending_picks'].includes(secKey)) {
+        const title = cfg.title || HOMEPAGE_SECTIONS_DEF[secKey].name;
+        const subtitle = cfg.subtitle || '';
+        const tag = cfg.tag || (secKey === 'hot_selling' ? '🔥 HOT SELLING' : secKey === 'new_arrivals' ? '✨ NEW ARRIVALS' : '🌟 TRENDING PICKS');
+        const limit = cfg.limit || 8;
+
+        body.innerHTML = `
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Section Title</label>
+            <input type="text" id="admin_cfg_sec_title" value="${title}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Subtitle / Description</label>
+            <input type="text" id="admin_cfg_sec_subtitle" value="${subtitle}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Badge Tag</label>
+              <input type="text" id="admin_cfg_sec_tag" value="${tag}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Items Limit</label>
+              <select id="admin_cfg_sec_limit" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-medium">
+                <option value="4" ${limit == 4 ? 'selected' : ''}>4 Products</option>
+                <option value="8" ${limit == 8 ? 'selected' : ''}>8 Products</option>
+                <option value="12" ${limit == 12 ? 'selected' : ''}>12 Products</option>
+                <option value="16" ${limit == 16 ? 'selected' : ''}>16 Products</option>
+              </select>
+            </div>
+          </div>
+        `;
+      } else if (secKey === 'flash_sale') {
+        const title = cfg.title || "TODAY'S FLASH SALE";
+        const subtitle = cfg.subtitle || "Limited quantity left at discounted wholesale prices!";
+        const hours = cfg.countdown_hours || 14;
+
+        body.innerHTML = `
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Flash Sale Title</label>
+            <input type="text" id="admin_cfg_fs_title" value="${title}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Subtitle</label>
+            <input type="text" id="admin_cfg_fs_subtitle" value="${subtitle}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Countdown Hours</label>
+            <input type="number" id="admin_cfg_fs_hours" value="${hours}" min="1" max="72" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+          </div>
+        `;
+      } else if (secKey === 'trust_badges') {
+        const tb = cfg || {};
+        body.innerHTML = `
+          <p class="text-slate-500 mb-2">Storefront ke 4 trust badges ke titles aur descriptions edit karein:</p>
+          <div class="space-y-3">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <label class="block font-bold text-slate-700 mb-1">Badge 1 (Support)</label>
+              <input type="text" id="admin_cfg_tb_b1_title" value="${tb.badge1_title || 'Support 24/7'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg font-bold mb-1">
+              <input type="text" id="admin_cfg_tb_b1_desc" value="${tb.badge1_desc || 'Direct WhatsApp & Call wholesale assistance'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-[11px]">
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <label class="block font-bold text-slate-700 mb-1">Badge 2 (Pricing)</label>
+              <input type="text" id="admin_cfg_tb_b2_title" value="${tb.badge2_title || 'Best Prices'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg font-bold mb-1">
+              <input type="text" id="admin_cfg_tb_b2_desc" value="${tb.badge2_desc || 'Direct factory prices for bulk & retail'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-[11px]">
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <label class="block font-bold text-slate-700 mb-1">Badge 3 (Payment)</label>
+              <input type="text" id="admin_cfg_tb_b3_title" value="${tb.badge3_title || 'Secure Payment'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg font-bold mb-1">
+              <input type="text" id="admin_cfg_tb_b3_desc" value="${tb.badge3_desc || 'Cash on delivery & verified digital transfers'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-[11px]">
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <label class="block font-bold text-slate-700 mb-1">Badge 4 (Exchange)</label>
+              <input type="text" id="admin_cfg_tb_b4_title" value="${tb.badge4_title || '7 Days Replacement'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg font-bold mb-1">
+              <input type="text" id="admin_cfg_tb_b4_desc" value="${tb.badge4_desc || 'Hassle-free product verification & exchange'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-[11px]">
+            </div>
+          </div>
+        `;
+      } else {
+        const title = cfg.title || HOMEPAGE_SECTIONS_DEF[secKey].name;
+        const subtitle = cfg.subtitle || '';
+        body.innerHTML = `
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Section Title</label>
+            <input type="text" id="admin_cfg_gen_title" value="${title}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Subtitle / Information Text</label>
+            <input type="text" id="admin_cfg_gen_subtitle" value="${subtitle}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+          </div>
+        `;
+      }
+
+      openModal('adminSectionConfigModal');
+    }
+
+    function closeAdminSectionConfigModal() {
+      closeModal('adminSectionConfigModal');
+    }
+
+    function toggleAdminAllCategoryChecks(checkAll) {
+      document.querySelectorAll('input[name="admin_cfg_selected_categories"]').forEach(cb => {
+        cb.checked = checkAll;
+      });
+    }
+
+    function handleAdminSectionConfigSubmit(e) {
+      e.preventDefault();
+      const secKey = document.getElementById('adminModalSectionKey').value;
+      if (!currentHomeConfig) currentHomeConfig = getDefaultHomeConfigLocal();
+      currentHomeConfig.sections_config = currentHomeConfig.sections_config || {};
+
+      if (secKey === 'categories_strip') {
+        const title = document.getElementById('admin_cfg_cat_title')?.value.trim() || 'Shop By Categories';
+        const selected = Array.from(document.querySelectorAll('input[name="admin_cfg_selected_categories"]:checked')).map(cb => cb.value);
+        currentHomeConfig.sections_config.categories_strip = {
+          title,
+          selected_categories: selected
+        };
+        showToast(`Categories updated (${selected.length} active)! Click Save to publish.`, '🗂️');
+      } else if (['hot_selling', 'new_arrivals', 'trending_picks'].includes(secKey)) {
+        const title = document.getElementById('admin_cfg_sec_title')?.value.trim();
+        const subtitle = document.getElementById('admin_cfg_sec_subtitle')?.value.trim();
+        const tag = document.getElementById('admin_cfg_sec_tag')?.value.trim();
+        const limit = parseInt(document.getElementById('admin_cfg_sec_limit')?.value, 10) || 8;
+        currentHomeConfig.sections_config[secKey] = { title, subtitle, tag, limit };
+        showToast(`Section "${title}" updated! Click Save to publish.`, '⚙️');
+      } else if (secKey === 'flash_sale') {
+        const title = document.getElementById('admin_cfg_fs_title')?.value.trim();
+        const subtitle = document.getElementById('admin_cfg_fs_subtitle')?.value.trim();
+        const countdown_hours = parseInt(document.getElementById('admin_cfg_fs_hours')?.value, 10) || 14;
+        currentHomeConfig.sections_config.flash_sale = { title, subtitle, countdown_hours };
+        showToast('Flash Sale settings updated!', '⚡');
+      } else if (secKey === 'trust_badges') {
+        currentHomeConfig.sections_config.trust_badges = {
+          badge1_title: document.getElementById('admin_cfg_tb_b1_title')?.value.trim(),
+          badge1_desc: document.getElementById('admin_cfg_tb_b1_desc')?.value.trim(),
+          badge2_title: document.getElementById('admin_cfg_tb_b2_title')?.value.trim(),
+          badge2_desc: document.getElementById('admin_cfg_tb_b2_desc')?.value.trim(),
+          badge3_title: document.getElementById('admin_cfg_tb_b3_title')?.value.trim(),
+          badge3_desc: document.getElementById('admin_cfg_tb_b3_desc')?.value.trim(),
+          badge4_title: document.getElementById('admin_cfg_tb_b4_title')?.value.trim(),
+          badge4_desc: document.getElementById('admin_cfg_tb_b4_desc')?.value.trim()
+        };
+        showToast('Trust badges updated!', '🛡️');
+      } else {
+        const title = document.getElementById('admin_cfg_gen_title')?.value.trim();
+        const subtitle = document.getElementById('admin_cfg_gen_subtitle')?.value.trim();
+        currentHomeConfig.sections_config[secKey] = { title, subtitle };
+        showToast('Section settings updated!', '✅');
+      }
+
+      closeAdminSectionConfigModal();
+      renderSectionsOrderList();
+      markAdminUnsavedChanges();
     }
 
     async function quickChangeSlideImage(idx, e) {
@@ -5190,7 +5513,8 @@
         if (currentHomeConfig && currentHomeConfig.hero_slides && currentHomeConfig.hero_slides[idx]) {
           currentHomeConfig.hero_slides[idx].image = webpResult.dataUrl;
           renderHeroBannersList();
-          showToast(`Banner image converted to WebP (-${webpResult.percentReduced}%)! Save to publish.`, '🎉');
+          markAdminUnsavedChanges();
+          showToast(`Banner converted to WebP (${webpResult.width}×${webpResult.height}px, -${webpResult.percentReduced}%)! Save to publish.`, '🎉');
         }
       } catch (err) {
         alert('Image error: ' + err.message);
@@ -5224,7 +5548,8 @@
             <div class="min-w-0">
               <div class="font-bold text-slate-900 text-xs truncate">${slide.title}</div>
               <div class="text-[11px] text-slate-500 truncate max-w-sm">${slide.subtitle || 'No subtitle'}</div>
-              <div class="flex items-center gap-2 mt-0.5 text-[10px]">
+              <div class="flex flex-wrap items-center gap-1.5 mt-1 text-[10px]">
+                <span class="bg-cyan-50 text-cyan-900 border border-cyan-200 px-1.5 py-0.5 rounded font-mono font-bold">📐 Size: 2117 × 743 px</span>
                 <span class="font-mono text-teal-800">${slide.link || '#products'}</span>
                 ${slide.badge ? `<span class="bg-cyan-100 text-cyan-800 px-1.5 py-0.2 rounded font-bold">${slide.badge}</span>` : ''}
               </div>
@@ -5251,6 +5576,8 @@
       document.getElementById('heroBannerModalTitle').textContent = 'Add Hero Banner Slide';
       document.getElementById('heroBannerForm').reset();
       document.getElementById('hbEditSlideId').value = '';
+      const detectedBox = document.getElementById('hbDetectedSizeBox');
+      if (detectedBox) detectedBox.classList.add('hidden');
       previewHeroBannerModalImage('');
       openModal('heroBannerModal');
     }
@@ -5268,6 +5595,8 @@
       document.getElementById('hbImage').value = slide.image || '';
       document.getElementById('hbLink').value = slide.link || '#products';
       document.getElementById('hbBadge').value = slide.badge || '';
+      const detectedBox = document.getElementById('hbDetectedSizeBox');
+      if (detectedBox) detectedBox.classList.add('hidden');
       previewHeroBannerModalImage(slide.image || '');
       openModal('heroBannerModal');
     }
@@ -5275,15 +5604,25 @@
     function previewHeroBannerModalImage(url) {
       const img = document.getElementById('hbPreviewImg');
       const placeholder = document.getElementById('hbPreviewPlaceholder');
+      const detectedBox = document.getElementById('hbDetectedSizeBox');
+      const detectedText = document.getElementById('hbDetectedSizeText');
       if (!img || !placeholder) return;
 
       if (url && url.trim().length > 5) {
         img.src = url.trim();
         img.classList.remove('hidden');
         placeholder.classList.add('hidden');
+        img.onload = () => {
+          if (detectedBox && detectedText && img.naturalWidth) {
+            detectedBox.classList.remove('hidden');
+            const ratio = (img.naturalWidth / img.naturalHeight).toFixed(2);
+            detectedText.textContent = `${img.naturalWidth} × ${img.naturalHeight} px (Ratio ${ratio}:1)`;
+          }
+        };
       } else {
         img.classList.add('hidden');
         placeholder.classList.remove('hidden');
+        if (detectedBox) detectedBox.classList.add('hidden');
       }
     }
 
@@ -5296,7 +5635,14 @@
         const webpResult = await convertImageFileToWebP(file);
         document.getElementById('hbImage').value = webpResult.dataUrl;
         previewHeroBannerModalImage(webpResult.dataUrl);
-        showToast(`Banner converted to WebP (${webpResult.origSizeKB}KB → ${webpResult.webpSizeKB}KB, -${webpResult.percentReduced}%)`, '🎉');
+
+        const detectedBox = document.getElementById('hbDetectedSizeBox');
+        const detectedText = document.getElementById('hbDetectedSizeText');
+        if (detectedBox && detectedText) {
+          detectedBox.classList.remove('hidden');
+          detectedText.textContent = `${webpResult.width} × ${webpResult.height} px • ${webpResult.webpSizeKB} KB WebP (-${webpResult.percentReduced}%)`;
+        }
+        showToast(`Banner converted to WebP (${webpResult.width}×${webpResult.height}px, -${webpResult.percentReduced}%)`, '🎉');
       } catch (err) {
         alert('Image conversion error: ' + err.message);
       }
@@ -5340,6 +5686,7 @@
 
       closeModal('heroBannerModal');
       renderHeroBannersList();
+      markAdminUnsavedChanges();
     }
 
     function moveHeroSlide(idx, delta) {
@@ -5352,6 +5699,7 @@
       slides[idx] = slides[newIdx];
       slides[newIdx] = temp;
       renderHeroBannersList();
+      markAdminUnsavedChanges();
     }
 
     function deleteHeroSlide(slideId) {
@@ -5359,11 +5707,18 @@
       if (!currentHomeConfig || !currentHomeConfig.hero_slides) return;
       currentHomeConfig.hero_slides = currentHomeConfig.hero_slides.filter(s => s.id != slideId && s != slideId);
       renderHeroBannersList();
+      markAdminUnsavedChanges();
       showToast('Hero slide deleted', '🗑️');
     }
 
     function saveHomeCustomizerSettings() {
       if (!currentHomeConfig) currentHomeConfig = getDefaultHomeConfigLocal();
+
+      const topBtn = document.getElementById('adminSectionsTopSaveBtn');
+      if (topBtn) {
+        topBtn.disabled = true;
+        topBtn.innerHTML = '<span>⏳ Saving...</span>';
+      }
 
       // Read ticker
       const tickerEnabled = document.getElementById('hcTickerEnabled')?.checked !== false;
@@ -5413,6 +5768,13 @@
       .catch(err => {
         console.warn('Home publish API fallback:', err);
         showToast('Homepage settings saved locally!', '✅');
+      })
+      .finally(() => {
+        clearAdminUnsavedChanges();
+        if (topBtn) {
+          topBtn.disabled = false;
+          topBtn.innerHTML = '<span>💾 Save &amp; Publish to Store</span>';
+        }
       });
 
       recordAuditLog('Homepage Customization Saved', 'Updated hero banners, ticker and layout');

@@ -9,6 +9,7 @@
     }
   },
   "rewrites": [
+    { "source": "/", "destination": "/index.html" },
     { "source": "/sitemap.xml", "destination": "/api/seo?type=sitemap" },
     { "source": "/robots.txt", "destination": "/api/seo?type=robots" },
     { "source": "/api/(.*)", "destination": "/api/$1" },

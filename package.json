@@ -4,9 +4,9 @@
   "description": "Save & Smile wholesale e-commerce store with live tracking and serverless backend",
   "main": "server.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "node server.js",
+    "build": "node scripts/build-static.js",
+    "preview": "node server.js",
     "start": "node server.js",
     "db:seed": "node scripts/seed-neon.js"
   },

@@ -66,12 +66,12 @@ async function runTestSuite() {
   // 2.2 Vercel Configuration Check
   try {
     const vercelConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'vercel.json'), 'utf8'));
-    const frameworkVite = vercelConfig.framework === 'vite';
-    const apiRewrites = vercelConfig.rewrites?.some(r => r.source === '/api/(.*)');
-    if (frameworkVite && apiRewrites) {
-      recordTest('Phase 2', 'Vercel Deployment Config', 'framework: vite and API rewrites defined', 'Vercel configuration is valid', 'PASS', JSON.stringify(vercelConfig));
+    const validOutput = vercelConfig.outputDirectory === 'dist';
+    const hasFunctions = Boolean(vercelConfig.functions && vercelConfig.functions['api/*.js']);
+    if (validOutput && hasFunctions) {
+      recordTest('Phase 2', 'Vercel Deployment Config', 'outputDirectory: dist and API functions defined', 'Vercel configuration is valid', 'PASS', JSON.stringify(vercelConfig));
     } else {
-      recordTest('Phase 2', 'Vercel Deployment Config', 'framework: vite defined', 'Invalid vercel.json', 'FAIL', JSON.stringify(vercelConfig));
+      recordTest('Phase 2', 'Vercel Deployment Config', 'valid vercel.json defined', 'Invalid vercel.json', 'FAIL', JSON.stringify(vercelConfig));
     }
   } catch (e) {
     recordTest('Phase 2', 'Vercel Deployment Config', 'Valid vercel.json', e.message, 'FAIL', e.stack);

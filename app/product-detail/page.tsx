@@ -351,25 +351,6 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* Product Specifications (Below the fold) */}
-        <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm mb-8">
-          <h3 className="text-base font-bold text-[#00363d] pb-3 border-b border-slate-100 mb-4">
-            Product Specifications &amp; Details
-          </h3>
-          <p className="text-xs text-slate-600 leading-relaxed mb-4">{product.description}</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-              <strong className="text-slate-800">Category:</strong> <span className="text-slate-600">{product.category}</span>
-            </div>
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-              <strong className="text-slate-800">Availability:</strong> <span className="text-emerald-700 font-bold">Ready to Dispatch</span>
-            </div>
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-              <strong className="text-slate-800">Warranty:</strong> <span className="text-slate-600">7 Days Checking Guarantee</span>
-            </div>
-          </div>
-        </div>
-
         {/* More Products You May Like (Below the fold) */}
         {relatedProducts.length > 0 && (
           <div className="mb-12">

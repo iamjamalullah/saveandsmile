@@ -7,14 +7,15 @@
       "includeFiles": "products.json"
     }
   },
-  "rewrites": [
-    { "source": "/admin/live-editor", "destination": "/live-editor.html" },
-    { "source": "/live-editor", "destination": "/live-editor.html" },
-    { "source": "/track", "destination": "/track-order.html" },
-    { "source": "/track-order", "destination": "/track-order.html" },
-    { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/cart", "destination": "/cart.html" },
-    { "source": "/checkout", "destination": "/checkout.html" },
-    { "source": "/product-detail", "destination": "/product-detail.html" }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/admin", "dest": "/admin.html" },
+    { "src": "/cart", "dest": "/cart.html" },
+    { "src": "/checkout", "dest": "/checkout.html" },
+    { "src": "/track-order", "dest": "/track-order.html" },
+    { "src": "/track", "dest": "/track-order.html" },
+    { "src": "/product-detail", "dest": "/product-detail.html" },
+    { "src": "/live-editor", "dest": "/live-editor.html" },
+    { "src": "/(.*)", "dest": "/$1" }
   ]
 }

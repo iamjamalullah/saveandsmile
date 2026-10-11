@@ -50,12 +50,11 @@ async function runTestSuite() {
   // 2.1 Package & Config Integrity
   try {
     const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
-    const hasVite = !!pkg.devDependencies?.vite;
     const hasDb = !!pkg.dependencies?.['@neondatabase/serverless'];
     const hasJwt = !!pkg.dependencies?.jsonwebtoken;
     const hasBcrypt = !!pkg.dependencies?.bcryptjs;
-    if (hasVite && hasDb && hasJwt && hasBcrypt) {
-      recordTest('Phase 2', 'Package Dependencies Check', 'Required dependencies present in package.json', 'All required dependencies found', 'PASS', 'Dependencies: vite, @neondatabase/serverless, jsonwebtoken, bcryptjs');
+    if (hasDb && hasJwt && hasBcrypt) {
+      recordTest('Phase 2', 'Package Dependencies Check', 'Required dependencies present in package.json', 'All required dependencies found', 'PASS', 'Dependencies: @neondatabase/serverless, jsonwebtoken, bcryptjs');
     } else {
       recordTest('Phase 2', 'Package Dependencies Check', 'Required dependencies present', 'Missing required dependencies', 'FAIL', JSON.stringify(pkg.dependencies));
     }

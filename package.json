@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "node server.js",
     "build": "node scripts/build-static.js",
-    "preview": "node server.js",
     "start": "node server.js",
-    "db:seed": "node scripts/seed-neon.js"
+    "test": "node test-qa-master.js",
+    "db:seed": "node scripts/seed-full-catalog.js"
   },
   "keywords": [
     "ecommerce",
@@ -22,13 +22,6 @@
     "@neondatabase/serverless": "^1.2.0",
     "bcryptjs": "^3.0.3",
     "dotenv": "^18.0.6",
-    "jsonwebtoken": "^9.0.3",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
-    "react-router-dom": "^7.18.4"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^6.1.2",
-    "vite": "^8.3.4"
+    "jsonwebtoken": "^9.0.3"
   }
 }

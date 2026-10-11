@@ -1,23 +1,4 @@
 {
-  "framework": null,
-  "cleanUrls": true,
-  "outputDirectory": "dist",
-  "buildCommand": "npm run build",
-  "functions": {
-    "api/*.js": {
-      "includeFiles": "products.json"
-    }
-  },
-  "rewrites": [
-    { "source": "/sitemap.xml", "destination": "/api/seo?type=sitemap" },
-    { "source": "/robots.txt", "destination": "/api/seo?type=robots" },
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/cart", "destination": "/cart.html" },
-    { "source": "/checkout", "destination": "/checkout.html" },
-    { "source": "/track-order", "destination": "/track-order.html" },
-    { "source": "/track", "destination": "/track-order.html" },
-    { "source": "/product-detail", "destination": "/product-detail.html" },
-    { "source": "/live-editor", "destination": "/live-editor.html" }
-  ]
+  "buildCommand": "next build",
+  "cleanUrls": true
 }

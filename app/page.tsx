@@ -660,15 +660,7 @@ export default function StorefrontHomePage() {
               {activeBanners.map((slide: any, idx: number) => (
                 <div
                   key={slide.id || idx}
-                  className={`slide ${idx === activeSlide ? 'active' : ''}`}
-                  style={{
-                    display: idx === activeSlide ? 'block' : 'none',
-                    position: 'relative',
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: '16px',
-                    overflow: 'hidden',
-                  }}
+                  className={`slide-item ${idx === activeSlide ? 'active' : ''}`}
                 >
                   <img
                     src={slide.image}
@@ -717,7 +709,7 @@ export default function StorefrontHomePage() {
               {activeBanners.map((_: any, idx: number) => (
                 <span
                   key={idx}
-                  className={`dot ${idx === activeSlide ? 'active' : ''}`}
+                  className={`slider-dot ${idx === activeSlide ? 'active' : ''}`}
                   onClick={() => setActiveSlide(idx)}
                 />
               ))}
@@ -2027,65 +2019,101 @@ export default function StorefrontHomePage() {
   function renderProductCard(product: Product) {
     const isWished = wishlist.includes(product.id);
     return (
-      <div key={product.id} className="product-card">
-        <div className="product-img-wrap">
-          {product.badge && <span className="product-badge">{product.badge}</span>}
+      <div key={product.id} className={`product-card cat-${product.category}`}>
+        {product.badge && <span className="product-badge">{product.badge}</span>}
+
+        <div className="product-img-wrapper" onClick={() => setQuickViewProduct(product)}>
+          <img
+            src={product.image}
+            alt={product.title}
+            loading="lazy"
+          />
+        </div>
+
+        <div className="card-quick-actions">
           <button
             type="button"
-            className={`wishlist-btn ${isWished ? 'active' : ''}`}
+            className={`action-icon-circle ${isWished ? 'favorited' : ''}`}
             onClick={(e) => {
               e.stopPropagation();
               toggleWishlist(product.id);
             }}
             title="Add to Wishlist"
           >
-            {isWished ? '❤️' : '♡'}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill={isWished ? '#ef4444' : 'none'} stroke="currentColor" strokeWidth="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
           </button>
-          <img
-            src={product.image}
-            alt={product.title}
-            loading="lazy"
-            onClick={() => setQuickViewProduct(product)}
-            style={{ cursor: 'pointer' }}
-          />
+          <button
+            type="button"
+            className="action-icon-circle"
+            title="Quick View"
+            onClick={(e) => {
+              e.stopPropagation();
+              setQuickViewProduct(product);
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
         </div>
 
-        <div className="product-info">
-          {product.code && <div className="product-code">{product.code}</div>}
-          <Link
-            href={`/product-detail?id=${product.id}`}
-            className="product-title"
-            title={product.title}
-          >
-            {product.title}
-          </Link>
+        <div className="product-card-body">
+          <h3 className="product-title">
+            <Link href={`/product-detail?id=${product.id}`}>
+              {product.title}
+            </Link>
+          </h3>
 
-          <div className="product-price-row">
-            <span className="price-current">Rs. {product.price.toLocaleString()}</span>
+          <div className="product-pricing">
             {product.originalPrice && (
-              <span className="price-original">
-                Rs. {product.originalPrice.toLocaleString()}
+              <span className="original-price">
+                <span className="currency-symbol">Rs.</span> {product.originalPrice.toLocaleString()}
               </span>
             )}
+            <span className="wholesale-price">
+              <span className="currency-symbol">Rs.</span> {product.price.toLocaleString()}
+            </span>
           </div>
 
-          <div className="product-actions-group">
+          <div className="product-card-actions">
             <button
               type="button"
               className="btn-add-cart"
               onClick={() => handleAddToCart(product)}
+              title="Add to Cart"
             >
-              <span>+ Add to Cart</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+              </svg>
+              <span className="btn-cart-text">Add to Cart</span>
             </button>
-            <button
-              type="button"
-              className="btn-quick-view"
-              onClick={() => setQuickViewProduct(product)}
-              title="Quick View"
+            <Link
+              href="/checkout"
+              onClick={() => handleAddToCart(product)}
+              className="btn-buy-now"
+              title="Direct Checkout"
             >
-              👁
-            </button>
+              <span>Buy Now</span>
+            </Link>
           </div>
+
+          <a
+            href={`https://wa.me/${STORE_CONFIG.whatsapp}?text=${encodeURIComponent(`Salam! I want to buy *${product.title}* in Wholesale bulk quantity.`)}`}
+            target="_blank"
+            rel="noreferrer"
+            className="card-wholesale-strip"
+            title="Inquire Wholesale Bulk Quantity"
+          >
+            <span>📦 Buy in Wholesale</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </a>
         </div>
       </div>
     );

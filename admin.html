@@ -3,24 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Executive Admin OS | SAVE &amp; SMILE Commerce Operating System</title>
+  <title>Shopify Pro Admin | SAVE &amp; SMILE Commerce Operating System</title>
   <link rel="icon" type="image/png" href="images/save-and-smile-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
           },
           colors: {
-            brand: {
-              teal: '#064C63',
-              cyan: '#008FAF',
+            shopify: {
+              canvas: '#f1f2f4',
+              surface: '#ffffff',
+              border: '#e1e3e5',
+              subdued: '#6d7175',
+              text: '#202223',
+              dark: '#1a1a1a',
+              green: '#008060',
+              greenHover: '#006e52',
+              greenLight: '#f1f8f5',
+              sidebar: '#1a1d21',
+              sidebarHover: '#2a2e33',
+              sidebarActive: '#30353b',
+              badge: '#e4e5e7'
             }
+          },
+          boxShadow: {
+            'shopify-card': '0 0 0 1px rgba(63, 63, 68, 0.05), 0 1px 3px 0 rgba(63, 63, 68, 0.15)',
+            'shopify-modal': '0 6px 20px rgba(0, 0, 0, 0.18)',
+            'shopify-subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
           }
         }
       }
@@ -36,28 +53,29 @@
       overflow: hidden;
       display: flex !important;
       flex-direction: row !important;
-      background-color: #f1f5f9;
+      background-color: #f1f2f4;
       -webkit-font-smoothing: antialiased;
+      color: #202223;
     }
     *, *::before, *::after { box-sizing: border-box; }
 
     /* Custom scrollbars */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f8fafc; }
+    ::-webkit-scrollbar-track { background: #f1f2f4; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     
     .sidebar-scroll::-webkit-scrollbar { width: 4px; }
-    .sidebar-scroll::-webkit-scrollbar-track { background: #020617; }
-    .sidebar-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: #1a1d21; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: #30353b; border-radius: 9999px; }
 
-    .bg-linear-to-br { background-image: linear-gradient(to bottom right, #064C63, #008FAF); }
-    .bg-linear-to-t { background-image: linear-gradient(to top, #064C63, #008FAF); }
-    .bg-linear-to-r { background-image: linear-gradient(to right, #064C63, #008FAF); }
+    .bg-linear-to-br { background-image: linear-gradient(to bottom right, #008060, #004c3f); }
+    .bg-linear-to-t { background-image: linear-gradient(to top, #008060, #004c3f); }
+    .bg-linear-to-r { background-image: linear-gradient(to right, #008060, #004c3f); }
 
     .modal-backdrop {
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(4px);
+      background: rgba(17, 24, 39, 0.65);
+      backdrop-filter: blur(3px);
     }
 
     /* Active view panel display */
@@ -76,28 +94,29 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-900 font-sans antialiased h-full w-full flex overflow-hidden selection:bg-teal-500 selection:text-white">
+<body class="bg-[#f1f2f4] text-[#202223] font-sans antialiased h-full w-full flex overflow-hidden selection:bg-[#008060] selection:text-white">
 
   <!-- Mobile Sidebar Backdrop -->
   <div id="sidebarBackdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden transition-opacity"></div>
 
   <!-- ============================================================ -->
-  <!-- 1. LEFT SIDEBAR (PROFESSIONAL WOOCOMMERCE / SHOPIFY TREE) -->
+  <!-- 1. LEFT SIDEBAR (SHOPIFY PRO NAVIGATION TREE) -->
   <!-- ============================================================ -->
-  <aside id="sidebarEl" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-slate-950 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 select-none transition-transform duration-300 transform -translate-x-full md:translate-x-0 h-full overflow-hidden">
+  <aside id="sidebarEl" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-[#1a1d21] text-slate-300 flex flex-col shrink-0 border-r border-[#2a2e33] select-none transition-transform duration-300 transform -translate-x-full md:translate-x-0 h-full overflow-hidden">
     
-    <!-- Brand Header -->
-    <div class="p-4 border-b border-slate-800/80 flex items-center justify-between shrink-0">
+    <!-- Shopify Store Selector Header -->
+    <div class="p-3.5 border-b border-[#2a2e33] flex items-center justify-between shrink-0 bg-[#16181b]">
       <a href="admin.html" class="flex items-center space-x-2.5">
-        <div class="w-8 h-8 rounded-lg bg-linear-to-br flex items-center justify-center text-white font-black text-xs shadow-md">
-          S&amp;S
+        <div class="w-8 h-8 rounded-lg bg-[#008060] flex items-center justify-center text-white font-black text-xs shadow-sm">
+          🛍️
         </div>
         <div>
-          <span class="font-black text-sm text-white tracking-tight leading-none block">
-            SAVE &amp; SMILE
+          <span class="font-bold text-sm text-white tracking-tight leading-none block">
+            Save &amp; Smile
           </span>
-          <span class="text-[9px] text-cyan-400 font-bold uppercase tracking-wider block mt-0.5">
-            COMMERCE OPERATING SYSTEM
+          <span class="text-[10px] text-emerald-400 font-medium tracking-wide block mt-1 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            Shopify Pro Edition
           </span>
         </div>
       </a>
@@ -105,169 +124,148 @@
     </div>
 
     <!-- Scrollable Navigation Tree -->
-    <div class="flex-1 overflow-y-auto px-3 py-4 space-y-1 sidebar-scroll text-xs">
+    <div class="flex-1 overflow-y-auto px-2.5 py-3 space-y-0.5 sidebar-scroll text-xs">
       
-      <!-- 1. Home (Dashboard Overview) -->
-      <button onclick="switchView('dashboard', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold bg-teal-900/60 text-cyan-300 border border-teal-700/60 shadow-xs transition text-left">
-        <svg class="w-4 h-4 shrink-0 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-        <span>Executive Dashboard</span>
+      <!-- 1. Home (Analytics & Summary) -->
+      <button onclick="switchView('dashboard', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg font-semibold bg-[#30353b] text-white shadow-xs transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span>Home</span>
       </button>
 
-      <!-- 2. Orders (WooCommerce Order Engine) -->
-      <button onclick="switchView('orders', this)" class="nav-item w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+      <!-- 2. Orders -->
+      <button onclick="switchView('orders', this)" class="nav-item w-full flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
         <div class="flex items-center space-x-2.5">
-          <svg class="w-4 h-4 shrink-0 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
           <span>Orders</span>
         </div>
-        <span class="text-[10px] bg-teal-800 text-teal-100 px-1.5 py-0.5 rounded-full font-bold" id="sidebarOrderCount">
+        <span class="text-[10px] bg-[#008060] text-white px-1.5 py-0.5 rounded-full font-bold" id="sidebarOrderCount">
           2 Live
         </span>
       </button>
 
-      <!-- 3. Delivery Control Room & ShipOps (Collapsible Group) -->
-      <div class="pt-1">
-        <button onclick="toggleSidebarSub('operations-sub', 'action-inbox')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-amber-400/90 hover:text-amber-300 hover:bg-slate-900 transition text-left">
-          <div class="flex items-center space-x-2.5">
-            <svg class="w-4 h-4 shrink-0 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            <span class="font-extrabold tracking-tight">Delivery Control Room</span>
-          </div>
-          <div class="flex items-center space-x-1.5">
-            <span class="bg-amber-500/20 text-amber-300 text-[9px] px-1.5 py-0.5 rounded font-black tracking-wider uppercase border border-amber-500/30">
-              CONTROL
-            </span>
-            <svg id="arr-operations-sub" class="w-3.5 h-3.5 text-slate-500 transform transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-          </div>
-        </button>
-        <div id="operations-sub" class="pl-6 pr-1 py-1 space-y-0.5 border-l border-amber-800/40 ml-4 my-1">
-          <button onclick="switchView('action-inbox', this)" class="nav-sub-item w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white transition text-left">
-            <span>Action Inbox (ShipOps)</span>
-            <span class="bg-rose-500/20 text-rose-300 text-[9px] px-1 rounded font-bold">Tasks</span>
-          </button>
-          <button onclick="switchView('cod-control', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
-            COD WhatsApp Verification
-          </button>
-          <button onclick="switchView('fulfillment', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
-            Airway Bills &amp; Manifests
-          </button>
-          <button onclick="switchView('settlements', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
-            Settlements &amp; COD Payouts
-          </button>
-          <button onclick="switchView('couriers', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
-            Courier Integration Hub (TCS, Trax...)
-          </button>
-          <button onclick="switchView('returns', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
-            Returns &amp; Restocking (RTO)
-          </button>
-        </div>
-      </div>
-
-      <!-- 4. Products (Collapsible Group - 10-Tab Editor) -->
-      <div class="pt-1">
-        <button onclick="toggleSidebarSub('products-sub', 'products')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+      <!-- 3. Products (With Sub-links) -->
+      <div>
+        <button onclick="toggleSidebarSub('products-sub', 'products')" class="w-full flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
           <div class="flex items-center space-x-2.5">
             <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             <span>Products</span>
           </div>
-          <svg id="arr-products-sub" class="w-3.5 h-3.5 text-slate-500 transform transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          <svg id="arr-products-sub" class="w-3 h-3 text-slate-500 transform transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
         </button>
-        <div id="products-sub" class="pl-6 pr-1 py-1 space-y-0.5 border-l border-slate-800 ml-4 my-1">
-          <button onclick="switchView('products', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+        <div id="products-sub" class="pl-6 pr-1 py-1 space-y-0.5 border-l border-slate-700 ml-4 my-0.5">
+          <button onclick="switchView('products', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white hover:bg-[#2a2e33] transition text-left">
             All Products
           </button>
-          <button onclick="openProfessionalAddProductModal()" class="w-full block px-2.5 py-1.5 rounded-lg text-xs font-bold text-cyan-300 bg-teal-950/60 hover:text-white transition text-left">
-            + Add Product (Pro 10-Tabs)
+          <button onclick="openProfessionalAddProductModal()" class="w-full block px-2.5 py-1.5 rounded-md text-xs font-bold text-emerald-400 hover:text-emerald-300 hover:bg-[#2a2e33] transition text-left">
+            + Add Product (Pro)
           </button>
-          <button onclick="switchView('categories', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
-            Categories &amp; Subcategories
+          <button onclick="switchView('categories', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white hover:bg-[#2a2e33] transition text-left">
+            Collections / Categories
           </button>
-          <button onclick="switchView('inventory', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
-            Inventory &amp; Hubs
+          <button onclick="switchView('inventory', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white hover:bg-[#2a2e33] transition text-left">
+            Inventory Tracking
           </button>
-          <button onclick="switchView('variants-hub', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
-            Attributes &amp; Color Variants
+          <button onclick="switchView('variants-hub', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white hover:bg-[#2a2e33] transition text-left">
+            Variants &amp; Options
           </button>
-          <button onclick="switchView('reviews', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition text-left">
+          <button onclick="switchView('reviews', this)" class="nav-sub-item w-full block px-2.5 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white hover:bg-[#2a2e33] transition text-left">
             Product Reviews
           </button>
         </div>
       </div>
 
-      <!-- 5. Customers CRM -->
-      <button onclick="switchView('customers', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
+      <!-- 4. Customers -->
+      <button onclick="switchView('customers', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
         <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
         <span>Customers CRM</span>
       </button>
 
-      <!-- 6. Marketing & Coupons -->
-      <button onclick="switchView('discounts', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
-        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-        <span>Discounts &amp; Coupons</span>
+      <!-- 5. Content & Media Files -->
+      <button onclick="switchView('media-library', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <span>Content &amp; R2 Media</span>
       </button>
 
-      <!-- 7. Content & Media Library -->
-      <button onclick="switchView('media-library', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
-        <svg class="w-4 h-4 shrink-0 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-        <span>WordPress Media Library</span>
+      <!-- 6. Analytics -->
+      <button onclick="switchView('reports', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        <span>Analytics</span>
       </button>
 
-      <!-- 8. Live Visual Page Builder (Elementor/Divi Style) -->
-      <div class="pt-1">
-        <a href="live-editor.html" target="_blank" class="w-full flex items-center justify-between px-3 py-2 rounded-xl font-bold text-cyan-300 bg-teal-950/80 border border-teal-700/60 hover:bg-teal-900 transition text-left">
+      <!-- 7. Discounts & Marketing -->
+      <button onclick="switchView('discounts', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
+        <svg class="w-4 h-4 shrink-0 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+        <span>Discounts</span>
+      </button>
+
+      <!-- 8. Online Store Sales Channel -->
+      <div class="pt-2">
+        <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Sales Channels</div>
+        <a href="live-editor.html" target="_blank" class="w-full flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
           <div class="flex items-center space-x-2.5">
-            <svg class="w-4 h-4 shrink-0 text-amber-400 animate-pulse" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-            <span>Live Visual Page Builder</span>
+            <svg class="w-4 h-4 shrink-0 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span>Online Store</span>
           </div>
-          <span class="text-[9px] bg-cyan-500/20 text-cyan-300 px-1.5 py-0.5 rounded font-black">DIVI</span>
+          <span class="text-[9px] bg-teal-500/20 text-teal-300 px-1.5 py-0.5 rounded font-black">LIVE</span>
         </a>
+        <button onclick="switchView('seo', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
+          <svg class="w-4 h-4 shrink-0 text-yellow-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <span>SEO &amp; Meta Previews</span>
+        </button>
       </div>
 
-      <!-- 9. SEO & Pixels -->
-      <button onclick="switchView('seo', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
-        <svg class="w-4 h-4 shrink-0 text-yellow-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <span>SEO &amp; Meta Center</span>
-      </button>
+      <!-- 9. Apps & ShipOps Operations -->
+      <div class="pt-2">
+        <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Apps &amp; ShipOps</div>
+        <button onclick="switchView('action-inbox', this)" class="nav-item w-full flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
+          <div class="flex items-center space-x-2.5">
+            <svg class="w-4 h-4 shrink-0 text-rose-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            <span>ShipOps Desk</span>
+          </div>
+          <span class="bg-rose-500/20 text-rose-300 text-[9px] px-1 rounded font-bold">Tasks</span>
+        </button>
+        <button onclick="switchView('cod-control', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
+          <svg class="w-4 h-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          <span>WhatsApp COD Verification</span>
+        </button>
+        <button onclick="switchView('couriers', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
+          <svg class="w-4 h-4 shrink-0 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span>Courier Integrations</span>
+        </button>
+      </div>
 
-      <!-- 10. Analytics & Business Reports -->
-      <button onclick="switchView('reports', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
-        <svg class="w-4 h-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-        <span>Analytics &amp; GMV Reports</span>
-      </button>
-
-      <!-- 11. Settings & Store Config -->
-      <button onclick="switchView('settings', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
-        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        <span>Store Settings &amp; Rules</span>
-      </button>
-
-      <!-- 12. Roles & Permissions -->
-      <button onclick="switchView('users', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
-        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-        <span>Roles &amp; Access (RBAC)</span>
-      </button>
-
-      <!-- 13. Audit Log -->
-      <button onclick="switchView('audit-log', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition text-left">
-        <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span>Audit Trail &amp; Logs</span>
-      </button>
+      <!-- 10. Settings -->
+      <div class="pt-2">
+        <button onclick="switchView('settings', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
+          <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <span>Settings</span>
+        </button>
+        <button onclick="switchView('audit-log', this)" class="nav-item w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg font-semibold text-slate-300 hover:text-white hover:bg-[#2a2e33] transition text-left">
+          <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Activity Log</span>
+        </button>
+      </div>
 
     </div>
 
     <!-- Sidebar Bottom Profile & Storefront Exit -->
-    <div class="p-3 border-t border-slate-800 bg-slate-950 shrink-0 space-y-2">
-      <a href="index.html" target="_blank" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold text-cyan-300 bg-slate-900 hover:bg-teal-950 border border-slate-800 transition">
-        <span>Live Storefront</span>
-        <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+    <div class="p-3 border-t border-[#2a2e33] bg-[#16181b] shrink-0 space-y-2">
+      <a href="index.html" target="_blank" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-emerald-300 bg-[#24292f] hover:bg-[#2e343b] border border-[#343a40] transition">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          View Online Store
+        </span>
+        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
       </a>
-      <div class="flex items-center justify-between pt-1 border-t border-slate-900">
+      <div class="flex items-center justify-between pt-1 border-t border-[#24292f]">
         <div class="flex items-center space-x-2">
-          <div class="w-7 h-7 rounded-full bg-teal-800 text-teal-100 flex items-center justify-center font-bold text-xs">S</div>
+          <div class="w-7 h-7 rounded-full bg-[#008060] text-white flex items-center justify-center font-bold text-xs shadow-sm">S</div>
           <div class="leading-none">
-            <span class="text-xs font-bold text-white block">Administrator</span>
-            <span class="text-[10px] text-teal-400 font-medium">Super Admin</span>
+            <span class="text-xs font-bold text-white block">Shopify Admin</span>
+            <span class="text-[10px] text-emerald-400 font-medium">Store Owner</span>
           </div>
         </div>
-        <a href="index.html" title="Exit to store" class="text-slate-500 hover:text-rose-400 transition p-1">
+        <a href="index.html" title="Exit to store" class="text-slate-400 hover:text-rose-400 transition p-1">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
         </a>
       </div>
@@ -279,48 +277,47 @@
   <!-- ============================================================ -->
   <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-slate-100">
 
-    <!-- Top Admin Bar -->
-    <header class="h-16 bg-white border-b border-slate-200/90 px-4 sm:px-8 flex items-center justify-between shrink-0 z-30">
+    <!-- Top Shopify Polaris Admin Bar -->
+    <header class="h-14 bg-white border-b border-[#e1e3e5] px-4 sm:px-6 flex items-center justify-between shrink-0 z-30 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
       <div class="flex items-center space-x-3">
         <!-- Mobile Toggle Hamburger Button -->
-        <button onclick="toggleMobileSidebar()" class="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100">
+        <button onclick="toggleMobileSidebar()" class="md:hidden p-1.5 rounded-lg text-slate-600 hover:bg-[#f1f2f4]">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
-        <span class="text-xs font-semibold text-slate-400">Admin</span>
+        <span class="text-xs font-medium text-slate-500">Admin</span>
         <span class="text-xs text-slate-300">/</span>
-        <span class="text-xs font-bold text-slate-700" id="topBreadcrumb">Dashboard</span>
+        <span class="text-xs font-semibold text-[#202223]" id="topBreadcrumb">Home</span>
       </div>
 
-      <div class="flex items-center space-x-3">
-        <!-- Quick Global Search with Ctrl+K trigger -->
+      <div class="flex items-center space-x-2.5">
+        <!-- Shopify Search Bar with Ctrl+K trigger -->
         <div class="relative hidden lg:block cursor-pointer" onclick="openCommandPalette()">
-          <input type="text" readonly placeholder="Quick Command Palette... (Ctrl+K)" class="w-72 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 pl-8 pr-16 text-xs cursor-pointer hover:bg-slate-100 focus:outline-none">
-          <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <span class="absolute right-2 top-2 text-[10px] font-mono bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-bold">Ctrl+K</span>
+          <input type="text" readonly placeholder="Search (Ctrl+K)..." class="w-80 bg-[#f1f2f4] border border-[#e1e3e5] focus:bg-white rounded-lg px-3 py-1.5 pl-8 pr-16 text-xs cursor-pointer hover:bg-slate-100 transition focus:outline-none">
+          <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <span class="absolute right-2 top-1.5 text-[10px] font-mono bg-white border border-[#e1e3e5] text-slate-600 px-1.5 py-0.5 rounded font-semibold">Ctrl+K</span>
         </div>
 
         <!-- Notification Bell -->
-        <button onclick="toggleNotificationsModal()" class="p-2 text-slate-400 hover:text-slate-600 relative rounded-xl hover:bg-slate-50 transition" title="Notifications">
+        <button onclick="toggleNotificationsModal()" class="p-1.5 text-slate-600 hover:text-slate-900 relative rounded-lg hover:bg-[#f1f2f4] transition" title="Notifications">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-          <span class="w-2 h-2 rounded-full bg-rose-500 absolute top-1.5 right-1.5 ring-2 ring-white"></span>
+          <span class="w-2 h-2 rounded-full bg-[#008060] absolute top-1.5 right-1.5 ring-2 ring-white"></span>
         </button>
 
-        <!-- Live Visual Editor Link -->
-        <a href="live-editor.html" target="_blank" class="text-xs font-bold text-teal-800 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 flex items-center space-x-1.5 py-1.5 px-3 rounded-xl border border-teal-200 transition">
-          <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-          <span>Live Editor</span>
-        </a>
-
-        <!-- Storefront Link -->
-        <a href="index.html" target="_blank" class="text-xs font-bold text-slate-600 hover:text-teal-800 flex items-center space-x-1.5 py-1.5 px-3 rounded-xl border border-slate-200/80 hover:bg-slate-50 transition">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        <!-- View Store Button -->
+        <a href="index.html" target="_blank" class="text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-[#f1f2f4] flex items-center space-x-1.5 py-1.5 px-3 rounded-lg border border-[#e1e3e5] transition">
+          <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
           <span class="hidden sm:inline">Storefront</span>
         </a>
 
-        <!-- Profile -->
-        <div class="flex items-center space-x-2 pl-2 border-l border-slate-200">
-          <div class="w-8 h-8 rounded-full bg-teal-800 text-teal-100 flex items-center justify-center font-bold text-xs shadow-xs">S</div>
-          <span class="text-xs font-bold text-slate-800 hidden sm:inline">Store Administrator</span>
+        <!-- Add Product Quick Button -->
+        <button onclick="openProfessionalAddProductModal()" class="text-xs font-semibold text-white bg-[#008060] hover:bg-[#006e52] flex items-center space-x-1.5 py-1.5 px-3 rounded-lg shadow-sm transition">
+          <span>+ Add Product</span>
+        </button>
+
+        <!-- User Profile Pill -->
+        <div class="flex items-center space-x-2 pl-1 border-l border-[#e1e3e5]">
+          <div class="w-7 h-7 rounded-full bg-[#202223] text-white flex items-center justify-center font-bold text-xs shadow-xs">S</div>
+          <span class="text-xs font-semibold text-[#202223] hidden sm:inline">Jamal</span>
         </div>
       </div>
     </header>
@@ -1370,284 +1367,295 @@
   </main>
 
   <!-- ============================================================ -->
-  <!-- MODALS: PRO 10-TAB PRODUCT EDITOR (WOOCOMMERCE / SHOPIFY LEVEL) -->
   <!-- ============================================================ -->
-  <div id="proProductModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-3xl max-w-4xl w-full p-6 space-y-4 shadow-2xl relative max-h-[92vh] overflow-y-auto">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-        <div>
-          <h3 class="text-lg font-black text-slate-900" id="proModalHeading">Add Product (WooCommerce &amp; Shopify Standard)</h3>
-          <p class="text-xs text-slate-500">Configure catalog information, pricing, stock, attributes, and color variant photos.</p>
+  <!-- MODALS: SHOPIFY PRO 2-COLUMN PRODUCT EDITOR -->
+  <!-- ============================================================ -->
+  <div id="proProductModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50 p-3 sm:p-6">
+    <div class="bg-white rounded-2xl max-w-5xl w-full p-0 shadow-2xl relative max-h-[94vh] flex flex-col overflow-hidden border border-[#e1e3e5]">
+      
+      <!-- Shopify Top Modal Header -->
+      <div class="px-6 py-4 border-b border-[#e1e3e5] flex items-center justify-between bg-white shrink-0">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-[#f1f8f5] text-[#008060] flex items-center justify-center font-bold text-base">
+            🏷️
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-[#202223]" id="proModalHeading">Add Product</h3>
+            <p class="text-xs text-[#6d7175]">Shopify Polaris catalog architecture with Cloudflare R2 media &amp; real-time margin calculation</p>
+          </div>
         </div>
-        <button onclick="closeModal('proProductModal')" class="text-slate-400 hover:text-slate-600 font-bold text-lg p-1">✕</button>
+        <div class="flex items-center space-x-2">
+          <button type="button" onclick="closeModal('proProductModal')" class="px-3.5 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-[#e1e3e5] rounded-lg transition">Discard</button>
+          <button type="button" onclick="document.getElementById('proProductFormSubmitBtn').click()" class="px-4 py-1.5 text-xs font-semibold text-white bg-[#008060] hover:bg-[#006e52] rounded-lg shadow-sm transition">Save Product</button>
+          <button onclick="closeModal('proProductModal')" class="text-slate-400 hover:text-slate-600 font-bold text-lg p-1 ml-1">✕</button>
+        </div>
       </div>
 
-      <!-- 10 Navigation Tabs Strip -->
-      <div class="flex items-center space-x-1 overflow-x-auto pb-2 border-b border-slate-100 text-xs font-bold">
-        <button onclick="switchProdEditorTab('general', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-teal-800 text-white shrink-0">1. General</button>
-        <button onclick="switchProdEditorTab('pricing', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">2. Pricing</button>
-        <button onclick="switchProdEditorTab('inventory', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">3. Inventory</button>
-        <button onclick="switchProdEditorTab('images', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">4. Images</button>
-        <button onclick="switchProdEditorTab('variants', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">5. Variants Engine</button>
-        <button onclick="switchProdEditorTab('shipping', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">6. Shipping</button>
-        <button onclick="switchProdEditorTab('seo', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">7. SEO</button>
-        <button onclick="switchProdEditorTab('attributes', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">8. Attributes</button>
-        <button onclick="switchProdEditorTab('related', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">9. Related</button>
-        <button onclick="switchProdEditorTab('advanced', this)" class="prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">10. Advanced</button>
-      </div>
+      <!-- Main Form (Scrollable 2-Column Shopify Layout) -->
+      <form id="proProductForm" onsubmit="handleProProductSubmit(event)" class="flex-1 overflow-y-auto p-6 bg-[#f6f6f7]">
+        <button type="submit" id="proProductFormSubmitBtn" class="hidden"></button>
 
-      <form id="proProductForm" onsubmit="handleProProductSubmit(event)" class="space-y-4">
-        
-        <!-- TAB 1: GENERAL -->
-        <div id="prodTab-general" class="prod-tab-pane active space-y-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Product Title *</label>
-            <input type="text" id="pTitle" required placeholder="e.g. Multipurpose Corner Storage Rack Organizer" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">SKU Code</label>
-              <input type="text" id="pSku" placeholder="QGW-10099" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Category</label>
-              <select id="pCat" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
-                <option value="storage">Storage &amp; Organization</option>
-                <option value="kitchen">Kitchen Tools &amp; Gadgets</option>
-                <option value="bottles">Mugs &amp; Bottles</option>
-                <option value="beauty">Beauty &amp; Makeup</option>
-                <option value="insect-killers">Insect Killers</option>
-                <option value="accessories">Mobile Accessories</option>
-                <option value="travel">Bags &amp; Travel</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Full Description</label>
-            <textarea id="pDesc" rows="3" placeholder="Enter detailed product description..." class="w-full text-xs p-2.5 border border-slate-200 rounded-xl"></textarea>
-          </div>
-        </div>
-
-        <!-- TAB 2: PRICING -->
-        <div id="prodTab-pricing" class="prod-tab-pane space-y-3">
-          <div class="grid grid-cols-3 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Cost Price (Rs.)</label>
-              <input type="number" id="pCost" oninput="calcProfitMargin()" placeholder="100" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Selling / Sale Price (Rs.) *</label>
-              <input type="number" id="pPrice" required oninput="calcProfitMargin()" placeholder="180" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Compare-At / MRP (Rs.)</label>
-              <input type="number" id="pOrigPrice" placeholder="450" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
-            </div>
-          </div>
-          <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between text-xs">
-            <span class="font-bold text-emerald-900">Profit: <span id="calcProfitText">Rs. 80</span></span>
-            <span class="font-bold text-emerald-900">Margin: <span id="calcMarginText">44.4%</span></span>
-          </div>
-        </div>
-
-        <!-- TAB 3: INVENTORY -->
-        <div id="prodTab-inventory" class="prod-tab-pane space-y-3">
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Stock Quantity *</label>
-              <input type="number" id="pStock" value="100" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Low Stock Warning Threshold</label>
-              <input type="number" id="pThreshold" value="15" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
-            </div>
-          </div>
-        </div>
-
-        <!-- TAB 4: IMAGES -->
-        <div id="prodTab-images" class="prod-tab-pane space-y-3">
-          <div>
-            <div class="flex items-center justify-between mb-1">
-              <label class="block text-xs font-bold text-slate-700">Main Featured Image URL *</label>
-              <button type="button" onclick="const f = prompt('Enter image filename uploaded to Cloudflare R2 (e.g., watch-1.jpg):'); if (f) document.getElementById('pImage').value = 'https://pub-8bcbaae497aa4994a6c3852932093ce1.r2.dev/' + f.trim().replace(/^\//, '');" class="text-[10px] font-bold text-teal-700 hover:text-teal-900 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
-                ⚡ Use Cloudflare R2 Link
-              </button>
-            </div>
-            <input type="url" id="pImage" required placeholder="https://pub-8bcbaae497aa4994a6c3852932093ce1.r2.dev/..." class="w-full text-xs p-2.5 border border-slate-200 rounded-xl font-mono">
-          </div>
-        </div>
-
-        <!-- TAB 5: VARIANTS MATRIX (COLOR × SWITCH × CONNECTION) -->
-        <div id="prodTab-variants" class="prod-tab-pane space-y-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-xs font-bold text-slate-800">Multi-Option Variant Matrix</p>
-              <p class="text-[11px] text-slate-500">Configure combinations for Color, Switch Type, and Connection Mode with strict integer pricing.</p>
-            </div>
-            <button type="button" onclick="addVariantRow()" class="px-3 py-1.5 bg-teal-800 text-white font-bold rounded-xl text-xs hover:bg-teal-900">+ Add Variant Row</button>
-          </div>
-
-          <div id="variantRowsContainer" class="space-y-3">
-            <div class="border border-slate-200 rounded-2xl p-3 bg-slate-50 space-y-2">
-              <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
-                <div>
-                  <label class="block font-bold text-slate-600 mb-1">Color / Finish</label>
-                  <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-medium" value="Deep Midnight">
-                </div>
-                <div>
-                  <label class="block font-bold text-slate-600 mb-1">Switch Type</label>
-                  <select class="w-full p-2 border rounded-xl bg-white text-xs font-medium">
-                    <option value="Hall-Effect Magnetic">Hall-Effect Magnetic</option>
-                    <option value="Tactile Brown">Tactile Brown</option>
-                    <option value="Linear Red">Linear Red</option>
-                    <option value="Speed Silver">Speed Silver</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block font-bold text-slate-600 mb-1">SKU</label>
-                  <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-mono" value="APX-HE-MID">
-                </div>
-                <div>
-                  <label class="block font-bold text-slate-600 mb-1">Price (Cents)</label>
-                  <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs font-bold" value="18999">
-                </div>
-                <div>
-                  <label class="block font-bold text-slate-600 mb-1">Stock Qty</label>
-                  <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs" value="75">
-                </div>
-              </div>
-            </div>
-
-            <div class="border border-slate-200 rounded-2xl p-3 bg-slate-50 space-y-2">
-              <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
-                <div>
-                  <label class="block font-bold text-slate-600 mb-1">Color / Finish</label>
-                  <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-medium" value="Arctic Cyan">
-                </div>
-                <div>
-                  <label class="block font-bold text-slate-600 mb-1">Switch Type</label>
-                  <select class="w-full p-2 border rounded-xl bg-white text-xs font-medium">
-                    <option value="Tactile Brown">Tactile Brown</option>
-                    <option value="Hall-Effect Magnetic">Hall-Effect Magnetic</option>
-                    <option value="Linear Red">Linear Red</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block font-bold text-slate-600 mb-1">SKU</label>
-                  <input type="text" class="w-full p-2 border rounded-xl bg-white text-xs font-mono" value="APX-TAC-CYN">
-                </div>
-                <div>
-                  <label class="block font-bold text-slate-600 mb-1">Price (Cents)</label>
-                  <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs font-bold" value="16999">
-                </div>
-                <div>
-                  <label class="block font-bold text-slate-600 mb-1">Stock Qty</label>
-                  <input type="number" class="w-full p-2 border rounded-xl bg-white text-xs" value="50">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- TAB 6: SHIPPING -->
-        <div id="prodTab-shipping" class="prod-tab-pane space-y-3">
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Weight (kg)</label>
-              <input type="number" step="0.1" value="0.5" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Free Shipping</label>
-              <select class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
-                <option value="no">Standard Shipping</option>
-                <option value="yes">Free Delivery</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- TAB 7: SEO & SOCIAL GRAPH SUITE -->
-        <div id="prodTab-seo" class="prod-tab-pane space-y-4">
-          <div class="space-y-3">
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <label class="block text-xs font-bold text-slate-700">SEO Meta Title *</label>
-                <span id="seoTitleCounter" class="text-[10px] font-mono text-slate-500">0 / 60 chars</span>
-              </div>
-              <input type="text" id="pSeoTitle" oninput="updateSeoCounters()" placeholder="Apex Pro Hall-Effect Keyboard | High-Performance Gear" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-teal-700">
-            </div>
-
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <label class="block text-xs font-bold text-slate-700">SEO URL Slug *</label>
-                <span class="text-[10px] text-emerald-600 font-bold">Valid format: a-z, 0-9, hyphens</span>
-              </div>
-              <div class="flex items-center space-x-1">
-                <span class="text-xs text-slate-400 font-mono bg-slate-100 p-2.5 rounded-l-xl border border-r-0 border-slate-200">https://techadvizer.com/p/</span>
-                <input type="text" id="pSlug" oninput="updateSeoCounters()" placeholder="apex-pro-hall-effect-keyboard" class="flex-1 text-xs p-2.5 border border-slate-200 rounded-r-xl font-mono focus:ring-1 focus:ring-teal-700">
-              </div>
-            </div>
-
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <label class="block text-xs font-bold text-slate-700">SEO Meta Description</label>
-                <span id="seoDescCounter" class="text-[10px] font-mono text-slate-500">0 / 160 chars</span>
-              </div>
-              <textarea id="pSeoDesc" oninput="updateSeoCounters()" rows="2" placeholder="Engineered with analog hall-effect magnetic switches and zero rounding errors. Fast worldwide dispatch with 30-day warranty." class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-teal-700"></textarea>
-            </div>
-          </div>
-
-          <!-- Real-Time SERP & Social Previews -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-100">
-            <!-- Google SERP Snippet Preview -->
-            <div class="p-3 bg-white border border-slate-200 rounded-2xl space-y-1 shadow-2xs">
-              <span class="text-[10px] font-black uppercase text-slate-400 block tracking-wider">Google Search Snippet Preview</span>
-              <p class="text-xs text-[#1a0dab] hover:underline font-medium truncate cursor-pointer" id="serpPreviewTitle">Apex Pro Hall-Effect Keyboard | High-Performance Gear</p>
-              <p class="text-[10px] text-[#006621] font-mono truncate" id="serpPreviewUrl">https://techadvizer.com/p/apex-pro-hall-effect-keyboard</p>
-              <p class="text-[11px] text-[#545454] line-clamp-2 leading-relaxed" id="serpPreviewDesc">Engineered with analog hall-effect magnetic switches and zero rounding errors. Fast worldwide dispatch with 30-day warranty.</p>
-            </div>
-
-            <!-- Twitter / Discord OpenGraph Preview -->
-            <div class="p-3 bg-slate-900 text-white rounded-2xl space-y-2 border border-slate-800">
-              <span class="text-[10px] font-black uppercase text-cyan-400 block tracking-wider">Discord / Twitter Social Card</span>
-              <div class="h-20 bg-slate-800 rounded-xl flex items-center justify-center text-slate-500 text-xs font-mono overflow-hidden">
-                <img id="ogPreviewImage" src="images/product_gallery/md_1779101219_ChatGPT_Image_May_18,_2026,_03_46_14_PM.png" class="w-full h-full object-cover">
-              </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 max-w-5xl mx-auto">
+          
+          <!-- LEFT COLUMN (8 cols): Core Product Details -->
+          <div class="lg:col-span-8 space-y-5">
+            
+            <!-- Card 1: Title & Description -->
+            <div class="bg-white rounded-xl p-5 border border-[#e1e3e5] shadow-sm space-y-4">
               <div>
-                <p class="text-xs font-bold text-white truncate" id="ogPreviewTitle">Apex Pro Hall-Effect Keyboard</p>
-                <p class="text-[10px] text-slate-400 line-clamp-1" id="ogPreviewDesc">Bespoke tactile engineering with calibrated analog switches.</p>
+                <label class="block text-xs font-semibold text-[#202223] mb-1.5">Title <span class="text-rose-500">*</span></label>
+                <input type="text" id="pTitle" required oninput="updateSeoCounters()" placeholder="Short sleeve t-shirt, Multipurpose Corner Rack..." class="w-full text-xs p-2.5 bg-white border border-[#c9cccf] hover:border-[#8c9196] focus:border-[#008060] focus:ring-1 focus:ring-[#008060] rounded-lg transition">
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="block text-xs font-semibold text-[#202223]">Description</label>
+                  <span class="text-[11px] text-slate-400">Rich HTML Format</span>
+                </div>
+                <!-- Simulated TinyMCE / Shopify Polaris Toolbar -->
+                <div class="border border-[#c9cccf] rounded-lg overflow-hidden bg-white focus-within:border-[#008060] focus-within:ring-1 focus-within:ring-[#008060]">
+                  <div class="bg-[#f6f6f7] border-b border-[#e1e3e5] px-3 py-1.5 flex items-center space-x-2 text-xs text-slate-600">
+                    <button type="button" onclick="formatDocText('bold')" class="font-bold px-1.5 py-0.5 hover:bg-slate-200 rounded">B</button>
+                    <button type="button" onclick="formatDocText('italic')" class="italic px-1.5 py-0.5 hover:bg-slate-200 rounded">I</button>
+                    <button type="button" onclick="formatDocText('underline')" class="underline px-1.5 py-0.5 hover:bg-slate-200 rounded">U</button>
+                    <span class="text-slate-300">|</span>
+                    <button type="button" onclick="formatDocText('list')" class="px-1.5 py-0.5 hover:bg-slate-200 rounded">☰ List</button>
+                    <button type="button" onclick="formatDocText('link')" class="px-1.5 py-0.5 hover:bg-slate-200 rounded">🔗 Link</button>
+                  </div>
+                  <textarea id="pDesc" rows="4" placeholder="Mention product benefits, materials, sizing, and key selling points..." class="w-full text-xs p-3 border-none focus:outline-none resize-y"></textarea>
+                </div>
               </div>
             </div>
+
+            <!-- Card 2: Cloudflare R2 Media Dropzone -->
+            <div class="bg-white rounded-xl p-5 border border-[#e1e3e5] shadow-sm space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="text-xs font-bold text-[#202223]">Media &amp; Product Photography</h4>
+                  <p class="text-[11px] text-[#6d7175]">Powered by high-speed Cloudflare R2 CDN</p>
+                </div>
+                <button type="button" onclick="triggerR2FilenameGenerator();" class="text-xs font-semibold text-[#008060] hover:text-[#006e52] bg-[#f1f8f5] px-2.5 py-1 rounded-md border border-[#008060]/30 transition">
+                  ⚡ Generate R2 Link
+                </button>
+              </div>
+
+              <!-- Media URL Input Box -->
+              <div class="space-y-2">
+                <div class="relative">
+                  <input type="url" id="pImage" required oninput="previewModalProductImage(this.value)" placeholder="https://pub-8bcbaae497aa4994a6c3852932093ce1.r2.dev/product-image.jpg" class="w-full text-xs p-2.5 pl-8 font-mono bg-white border border-[#c9cccf] rounded-lg focus:border-[#008060] focus:ring-1 focus:ring-[#008060]">
+                  <span class="absolute left-2.5 top-2.5 text-xs text-slate-400">🖼️</span>
+                </div>
+              </div>
+
+              <!-- Media Preview Box -->
+              <div id="productMediaPreviewContainer" class="border-2 border-dashed border-[#c9cccf] hover:border-[#008060] rounded-xl p-4 text-center cursor-pointer bg-[#fafbfb] transition" onclick="document.getElementById('pImage').focus()">
+                <div id="mediaPreviewInner" class="flex flex-col items-center justify-center space-y-1">
+                  <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                  <p class="text-xs font-semibold text-slate-700">Paste your Cloudflare R2 URL or image link above</p>
+                  <p class="text-[10px] text-slate-400">Accepts WebP, PNG, JPG hosted on Cloudflare R2 bucket</p>
+                </div>
+                <div id="mediaImageRender" class="hidden flex items-center justify-center">
+                  <img id="modalPreviewImgTag" src="" class="max-h-40 rounded-lg object-contain shadow-xs border border-slate-200">
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Pricing & Margins -->
+            <div class="bg-white rounded-xl p-5 border border-[#e1e3e5] shadow-sm space-y-4">
+              <h4 class="text-xs font-bold text-[#202223]">Pricing</h4>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-[#202223] mb-1">Price (Sale Price) <span class="text-rose-500">*</span></label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-2.5 text-xs text-slate-400 font-semibold">Rs.</span>
+                    <input type="number" id="pPrice" required oninput="calcProfitMargin()" placeholder="180" class="w-full text-xs p-2.5 pl-9 bg-white border border-[#c9cccf] rounded-lg focus:border-[#008060] focus:ring-1 focus:ring-[#008060] font-semibold text-slate-900">
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-[#202223] mb-1">Compare-at price (MRP / Strike)</label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-2.5 text-xs text-slate-400 font-semibold">Rs.</span>
+                    <input type="number" id="pOrigPrice" oninput="calcProfitMargin()" placeholder="350" class="w-full text-xs p-2.5 pl-9 bg-white border border-[#c9cccf] rounded-lg focus:border-[#008060] focus:ring-1 focus:ring-[#008060]">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cost per item & Gross Profit Calculation -->
+              <div class="pt-3 border-t border-[#e1e3e5] grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Cost per item (Rs.)</label>
+                  <input type="number" id="pCost" oninput="calcProfitMargin()" placeholder="100" class="w-full text-xs p-2 bg-white border border-[#c9cccf] rounded-lg">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Profit</label>
+                  <div class="p-2 bg-[#f6f6f7] rounded-lg text-xs font-bold text-slate-800" id="calcProfitText">Rs. 80</div>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Margin</label>
+                  <div class="p-2 bg-[#f1f8f5] text-[#008060] rounded-lg text-xs font-bold" id="calcMarginText">44.4%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Inventory & Tracking -->
+            <div class="bg-white rounded-xl p-5 border border-[#e1e3e5] shadow-sm space-y-4">
+              <h4 class="text-xs font-bold text-[#202223]">Inventory</h4>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-[#202223] mb-1">SKU (Stock Keeping Unit)</label>
+                  <input type="text" id="pSku" placeholder="SNS-WH-1002" class="w-full text-xs p-2.5 font-mono bg-white border border-[#c9cccf] rounded-lg">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#202223] mb-1">Barcode (ISBN, UPC, GTIN)</label>
+                  <input type="text" id="pBarcode" placeholder="896400019283" class="w-full text-xs p-2.5 font-mono bg-white border border-[#c9cccf] rounded-lg">
+                </div>
+              </div>
+
+              <div class="pt-2 flex items-center justify-between">
+                <div>
+                  <label class="block text-xs font-semibold text-[#202223]">Quantity Available</label>
+                  <p class="text-[11px] text-[#6d7175]">Karachi / Lahore Central Wholesale Warehouse</p>
+                </div>
+                <div class="w-32">
+                  <input type="number" id="pStock" value="100" class="w-full text-xs p-2 bg-white border border-[#c9cccf] rounded-lg font-bold text-slate-900 text-right">
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5: Search Engine Listing (Live Google SERP Preview) -->
+            <div class="bg-white rounded-xl p-5 border border-[#e1e3e5] shadow-sm space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="text-xs font-bold text-[#202223]">Search engine listing</h4>
+                  <p class="text-[11px] text-[#6d7175]">Add a title and description to see how this product might appear in Google search results</p>
+                </div>
+              </div>
+
+              <!-- Live Google SERP Snippet Box -->
+              <div class="p-4 bg-[#fafbfb] border border-[#e1e3e5] rounded-xl space-y-1">
+                <span class="text-[10px] font-bold text-[#202223] uppercase tracking-wider block text-slate-400">Google Search Preview</span>
+                <p class="text-sm text-[#1a0dab] hover:underline font-medium truncate cursor-pointer" id="serpPreviewTitle">Apex Pro Hall-Effect Keyboard | Save &amp; Smile</p>
+                <p class="text-[11px] text-[#006621] font-mono truncate" id="serpPreviewUrl">https://saveandsmile.pk/products/apex-pro-hall-effect-keyboard</p>
+                <p class="text-xs text-[#545454] line-clamp-2 leading-relaxed" id="serpPreviewDesc">Engineered with high performance materials and fast nationwide COD dispatch. 30-day warranty across Pakistan.</p>
+              </div>
+
+              <div class="space-y-3 pt-2">
+                <div>
+                  <div class="flex justify-between text-xs mb-1">
+                    <label class="font-semibold text-slate-700">Page title</label>
+                    <span id="seoTitleCounter" class="text-[11px] text-slate-400 font-mono">0 of 70 characters used</span>
+                  </div>
+                  <input type="text" id="pSeoTitle" oninput="updateSeoCounters()" placeholder="Leave blank to use product title" class="w-full text-xs p-2 bg-white border border-[#c9cccf] rounded-lg">
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-xs mb-1">
+                    <label class="font-semibold text-slate-700">Meta description</label>
+                    <span id="seoDescCounter" class="text-[11px] text-slate-400 font-mono">0 of 320 characters used</span>
+                  </div>
+                  <textarea id="pSeoDesc" oninput="updateSeoCounters()" rows="2" placeholder="Brief summary of product for Google search crawlers..." class="w-full text-xs p-2 bg-white border border-[#c9cccf] rounded-lg"></textarea>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">URL handle</label>
+                  <div class="flex items-center text-xs">
+                    <span class="p-2 bg-[#f6f6f7] border border-r-0 border-[#c9cccf] text-slate-500 rounded-l-lg font-mono">https://saveandsmile.pk/products/</span>
+                    <input type="text" id="pSlug" oninput="updateSeoCounters()" placeholder="product-handle" class="flex-1 p-2 bg-white border border-[#c9cccf] rounded-r-lg font-mono">
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
-        </div>
 
-        <!-- TAB 8: ATTRIBUTES -->
-        <div id="prodTab-attributes" class="prod-tab-pane space-y-3">
-          <div class="p-3 bg-slate-50 border rounded-xl text-xs space-y-1">
-            <p class="font-bold">Active Attributes: Color, Size, Material</p>
+          <!-- RIGHT COLUMN (4 cols): Organization, Status & Sales Channels -->
+          <div class="lg:col-span-4 space-y-5">
+            
+            <!-- Status Card -->
+            <div class="bg-white rounded-xl p-5 border border-[#e1e3e5] shadow-sm space-y-3">
+              <label class="block text-xs font-bold text-[#202223]">Status</label>
+              <select id="pStatus" class="w-full text-xs p-2.5 bg-white border border-[#c9cccf] rounded-lg font-semibold text-[#202223]">
+                <option value="Active">🟢 Active (Visible in Store)</option>
+                <option value="Draft">⚪ Draft (Hidden)</option>
+              </select>
+            </div>
+
+            <!-- Publishing & Sales Channels -->
+            <div class="bg-white rounded-xl p-5 border border-[#e1e3e5] shadow-sm space-y-3 text-xs">
+              <h4 class="font-bold text-[#202223]">Publishing</h4>
+              <div class="space-y-2 text-slate-700">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" checked class="rounded text-[#008060] focus:ring-[#008060]">
+                  <span>Online Store (saveandsmile.vercel.app)</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" checked class="rounded text-[#008060] focus:ring-[#008060]">
+                  <span>WhatsApp Business Catalog</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" checked class="rounded text-[#008060] focus:ring-[#008060]">
+                  <span>Facebook &amp; Instagram Meta Pixel</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Product Organization -->
+            <div class="bg-white rounded-xl p-5 border border-[#e1e3e5] shadow-sm space-y-4">
+              <h4 class="text-xs font-bold text-[#202223]">Product Organization</h4>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Category / Collection <span class="text-rose-500">*</span></label>
+                <select id="pCat" class="w-full text-xs p-2.5 bg-white border border-[#c9cccf] rounded-lg font-medium">
+                  <option value="storage">Storage &amp; Organization</option>
+                  <option value="kitchen">Kitchen Tools &amp; Gadgets</option>
+                  <option value="bottles">Mugs &amp; Bottles</option>
+                  <option value="beauty">Beauty &amp; Makeup</option>
+                  <option value="insect-killers">Insect Killers</option>
+                  <option value="accessories">Mobile Accessories</option>
+                  <option value="travel">Bags &amp; Travel</option>
+                  <option value="cleaning">Wipers &amp; Cleaning</option>
+                  <option value="massager">Electric Massagers</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Promotional Badge</label>
+                <select id="pBadge" class="w-full text-xs p-2.5 bg-white border border-[#c9cccf] rounded-lg font-medium">
+                  <option value="NEW">NEW ARRIVAL</option>
+                  <option value="HOT">HOT SELLING</option>
+                  <option value="SALE">SALE DISCOUNT</option>
+                  <option value="TRENDING">TRENDING PICK</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Vendor / Supplier</label>
+                <input type="text" id="pVendor" value="Save &amp; Smile Direct Wholesale" class="w-full text-xs p-2.5 bg-white border border-[#c9cccf] rounded-lg">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Tags (Comma separated)</label>
+                <input type="text" id="pTags" placeholder="wholesale, trending, household" class="w-full text-xs p-2.5 bg-white border border-[#c9cccf] rounded-lg">
+              </div>
+            </div>
+
           </div>
-        </div>
 
-        <!-- TAB 9: RELATED -->
-        <div id="prodTab-related" class="prod-tab-pane space-y-3">
-          <p class="text-xs text-slate-500">Cross-sell and Upsell suggestions automatically curated from Category.</p>
         </div>
-
-        <!-- TAB 10: ADVANCED -->
-        <div id="prodTab-advanced" class="prod-tab-pane space-y-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Promotional Badge</label>
-            <input type="text" id="pBadge" value="HOT SELLER" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl">
-          </div>
-        </div>
-
-        <!-- Modal Bottom Actions -->
-        <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
-          <button type="button" onclick="closeModal('proProductModal')" class="px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 rounded-xl">Cancel</button>
-          <button type="submit" class="px-5 py-2 text-xs font-black text-white bg-teal-800 hover:bg-teal-900 rounded-xl shadow-sm">Save &amp; Publish Product</button>
-        </div>
-
       </form>
+
+      <!-- Bottom Sticky Footer Bar -->
+      <div class="px-6 py-3 border-t border-[#e1e3e5] bg-white flex items-center justify-between shrink-0">
+        <span class="text-xs text-slate-500">Unsaved changes will be lost if you leave.</span>
+        <div class="flex items-center space-x-2">
+          <button type="button" onclick="closeModal('proProductModal')" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-[#e1e3e5] rounded-lg">Cancel</button>
+          <button type="button" onclick="document.getElementById('proProductFormSubmitBtn').click()" class="px-5 py-2 text-xs font-semibold text-white bg-[#008060] hover:bg-[#006e52] rounded-lg shadow-sm">Save &amp; Publish</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -2405,21 +2413,49 @@
     }
 
     function openProfessionalAddProductModal(defaultTab = 'general') {
-      document.getElementById('proModalHeading').textContent = 'Add Product (10-Tab Pro Standard)';
+      document.getElementById('proModalHeading').textContent = 'Add Product';
       document.getElementById('proProductForm').reset();
-      switchProdEditorTab(defaultTab);
+      const previewImg = document.getElementById('modalPreviewImgTag');
+      const previewInner = document.getElementById('mediaPreviewInner');
+      const previewRender = document.getElementById('mediaImageRender');
+      if (previewImg) previewImg.src = '';
+      if (previewInner) previewInner.classList.remove('hidden');
+      if (previewRender) previewRender.classList.add('hidden');
+      calcProfitMargin();
+      updateSeoCounters();
       openModal('proProductModal');
     }
 
-    function switchProdEditorTab(tabName, btnEl) {
-      document.querySelectorAll('.prod-tab-pane').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.prod-tab-btn').forEach(b => {
-        b.className = 'prod-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0';
-      });
+    function previewModalProductImage(url) {
+      const previewImg = document.getElementById('modalPreviewImgTag');
+      const previewInner = document.getElementById('mediaPreviewInner');
+      const previewRender = document.getElementById('mediaImageRender');
+      if (url && url.trim().length > 5) {
+        if (previewImg) previewImg.src = url.trim();
+        if (previewInner) previewInner.classList.add('hidden');
+        if (previewRender) previewRender.classList.remove('hidden');
+      } else {
+        if (previewInner) previewInner.classList.remove('hidden');
+        if (previewRender) previewRender.classList.add('hidden');
+      }
+    }
 
-      const pane = document.getElementById('prodTab-' + tabName);
-      if (pane) pane.classList.add('active');
-      if (btnEl) btnEl.className = 'prod-tab-btn px-3 py-1.5 rounded-xl bg-teal-800 text-white shrink-0';
+    function formatDocText(type) {
+      const ta = document.getElementById('pDesc');
+      if (!ta) return;
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const selected = ta.value.substring(start, end) || 'text';
+      let replacement = selected;
+
+      if (type === 'bold') replacement = `<strong>${selected}</strong>`;
+      else if (type === 'italic') replacement = `<em>${selected}</em>`;
+      else if (type === 'underline') replacement = `<u>${selected}</u>`;
+      else if (type === 'list') replacement = `\n<ul>\n  <li>${selected}</li>\n</ul>\n`;
+      else if (type === 'link') replacement = `<a href="https://">${selected}</a>`;
+
+      ta.value = ta.value.substring(0, start) + replacement + ta.value.substring(end);
+      ta.focus();
     }
 
     function calcProfitMargin() {
@@ -2427,13 +2463,15 @@
       const price = parseFloat(document.getElementById('pPrice')?.value) || 0;
       const profit = price - cost;
       const margin = price > 0 ? ((profit / price) * 100).toFixed(1) : 0;
-      document.getElementById('calcProfitText').textContent = `Rs. ${profit.toLocaleString()}`;
-      document.getElementById('calcMarginText').textContent = `${margin}%`;
+      const profitEl = document.getElementById('calcProfitText');
+      const marginEl = document.getElementById('calcMarginText');
+      if (profitEl) profitEl.textContent = `Rs. ${profit.toLocaleString()}`;
+      if (marginEl) marginEl.textContent = `${margin}%`;
     }
 
     function updateSeoCounters() {
       const title = document.getElementById('pSeoTitle')?.value || document.getElementById('pTitle')?.value || '';
-      const desc = document.getElementById('pSeoDesc')?.value || '';
+      const desc = document.getElementById('pSeoDesc')?.value || document.getElementById('pDesc')?.value || '';
       let slug = document.getElementById('pSlug')?.value || '';
 
       if (!slug && title) {
@@ -2444,37 +2482,26 @@
       // Title Counter
       const titleCounter = document.getElementById('seoTitleCounter');
       if (titleCounter) {
-        titleCounter.textContent = `${title.length} / 60 chars`;
-        titleCounter.className = title.length > 60 ? 'text-[10px] font-mono text-rose-500 font-bold' : 'text-[10px] font-mono text-slate-500';
+        titleCounter.textContent = `${title.length} of 70 characters used`;
+        titleCounter.className = title.length > 70 ? 'text-[11px] font-mono text-rose-500 font-bold' : 'text-[11px] font-mono text-slate-400';
       }
 
       // Desc Counter
       const descCounter = document.getElementById('seoDescCounter');
       if (descCounter) {
-        descCounter.textContent = `${desc.length} / 160 chars`;
-        descCounter.className = desc.length > 160 ? 'text-[10px] font-mono text-rose-500 font-bold' : 'text-[10px] font-mono text-slate-500';
+        descCounter.textContent = `${desc.length} of 320 characters used`;
+        descCounter.className = desc.length > 320 ? 'text-[11px] font-mono text-rose-500 font-bold' : 'text-[11px] font-mono text-slate-400';
       }
 
       // SERP Live Snippet
       const serpTitle = document.getElementById('serpPreviewTitle');
-      if (serpTitle) serpTitle.textContent = title || 'Product Title | Tech Advizer High-Performance Gear';
+      if (serpTitle) serpTitle.textContent = `${title || 'Product Title'} | Save & Smile`;
 
       const serpUrl = document.getElementById('serpPreviewUrl');
-      if (serpUrl) serpUrl.textContent = `https://techadvizer.com/p/${slug || 'product-slug'}`;
+      if (serpUrl) serpUrl.textContent = `https://saveandsmile.pk/products/${slug || 'product-handle'}`;
 
       const serpDesc = document.getElementById('serpPreviewDesc');
-      if (serpDesc) serpDesc.textContent = desc || 'Engineered with analog hall-effect magnetic switches and zero rounding errors.';
-
-      // OpenGraph Card
-      const ogTitle = document.getElementById('ogPreviewTitle');
-      if (ogTitle) ogTitle.textContent = title || 'Product Title';
-
-      const ogDesc = document.getElementById('ogPreviewDesc');
-      if (ogDesc) ogDesc.textContent = desc || 'Bespoke tactile engineering with calibrated analog switches.';
-
-      const ogImg = document.getElementById('ogPreviewImage');
-      const pImgVal = document.getElementById('pImage')?.value;
-      if (ogImg && pImgVal) ogImg.src = pImgVal;
+      if (serpDesc) serpDesc.textContent = desc || 'Engineered with high quality materials and fast nationwide COD dispatch across Pakistan.';
     }
 
     function addVariantRow() {
@@ -2548,16 +2575,20 @@
       const p = all.find(item => item.id === id);
       if (!p) return;
 
-      openProfessionalAddProductModal('general');
+      openProfessionalAddProductModal();
       document.getElementById('proModalHeading').textContent = `Edit Product #${p.code || p.id}`;
       document.getElementById('pTitle').value = p.title || '';
       document.getElementById('pPrice').value = p.price || '';
+      if (document.getElementById('pOrigPrice')) document.getElementById('pOrigPrice').value = p.original_price || p.originalPrice || '';
       document.getElementById('pStock').value = p.stock || 100;
       document.getElementById('pImage').value = p.image || '';
       document.getElementById('pCat').value = p.category || 'storage';
       document.getElementById('pBadge').value = p.badge || 'HOT';
       document.getElementById('pSku').value = p.code || '';
+      if (document.getElementById('pDesc')) document.getElementById('pDesc').value = p.description || '';
+      if (p.image) previewModalProductImage(p.image);
       calcProfitMargin();
+      updateSeoCounters();
     }
 
     function deleteProductById(id) {
@@ -2585,33 +2616,47 @@
       const grid = document.getElementById('categoriesCardGrid');
       if (!grid) return;
       const categories = [
-        { id: 'storage', name: 'Storage & Organization', count: 45, icon: '🗄️' },
-        { id: 'kitchen', name: 'Kitchen Tools & Gadgets', count: 110, icon: '🍳' },
-        { id: 'bottles', name: 'Mugs & Bottles', count: 76, icon: '🍶' },
-        { id: 'beauty', name: 'Beauty & Makeup', count: 85, icon: '💄' },
-        { id: 'accessories', name: 'Mobile Accessories', count: 120, icon: '📱' },
-        { id: 'travel', name: 'Bags & Travel', count: 64, icon: '🎒' },
-        { id: 'cleaning', name: 'Wipers & Cleaning', count: 53, icon: '🧹' },
-        { id: 'massager', name: 'Electric Massagers', count: 29, icon: '⚡' }
+        { id: 'storage', name: 'Storage & Organization', count: 45, icon: '🗄️', type: 'Automated', image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=300' },
+        { id: 'kitchen', name: 'Kitchen Tools & Gadgets', count: 110, icon: '🍳', type: 'Manual', image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=300' },
+        { id: 'bottles', name: 'Mugs & Bottles', count: 76, icon: '🍶', type: 'Automated', image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=300' },
+        { id: 'beauty', name: 'Beauty & Makeup', count: 85, icon: '💄', type: 'Manual', image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=300' },
+        { id: 'accessories', name: 'Mobile Accessories', count: 120, icon: '📱', type: 'Automated', image: 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=300' },
+        { id: 'travel', name: 'Bags & Travel', count: 64, icon: '🎒', type: 'Manual', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300' },
+        { id: 'cleaning', name: 'Wipers & Cleaning', count: 53, icon: '🧹', type: 'Automated', image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=300' },
+        { id: 'massager', name: 'Electric Massagers', count: 29, icon: '⚡', type: 'Automated', image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300' }
       ];
 
       grid.innerHTML = categories.map(c => `
-        <div class="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs space-y-2">
-          <div class="text-2xl">${c.icon}</div>
-          <h4 class="font-bold text-sm text-slate-800">${c.name}</h4>
-          <div class="flex justify-between items-center text-xs text-slate-500">
-            <span>${c.count} Active Products</span>
-            <button onclick="showToast('Category updated')" class="text-teal-800 font-bold hover:underline">Edit</button>
+        <div class="bg-white rounded-xl border border-[#e1e3e5] p-4 shadow-sm space-y-3 hover:border-[#008060] transition group">
+          <div class="h-28 rounded-lg overflow-hidden relative bg-[#f6f6f7] flex items-center justify-center border border-[#e1e3e5]">
+            <img src="${c.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='images/save-and-smile-logo.png'">
+            <span class="absolute top-2 left-2 text-base bg-white/90 backdrop-blur-xs p-1 rounded-md shadow-xs">${c.icon}</span>
+            <span class="absolute bottom-2 right-2 text-[10px] bg-slate-900/80 text-white px-2 py-0.5 rounded font-mono font-semibold">${c.type}</span>
+          </div>
+          <div>
+            <h4 class="font-bold text-xs text-[#202223] truncate">${c.name}</h4>
+            <div class="flex justify-between items-center text-[11px] text-[#6d7175] mt-1">
+              <span>${c.count} Products</span>
+              <button onclick="promptEditCollection('${c.name}')" class="text-[#008060] font-semibold hover:underline">Edit Collection</button>
+            </div>
           </div>
         </div>
       `).join('');
     }
 
+    function promptEditCollection(name) {
+      const banner = prompt(`Enter Cloudflare R2 image link for "${name}" banner:`, 'https://pub-8bcbaae497aa4994a6c3852932093ce1.r2.dev/');
+      if (banner) {
+        recordAuditLog('Collection Updated', `${name} updated with R2 banner`);
+        showToast(`Collection "${name}" updated successfully!`, '✅');
+      }
+    }
+
     function promptAddCategory() {
-      const name = prompt('Enter new category name:');
+      const name = prompt('Enter new Collection / Category name (e.g., Summer Gadgets, Kitchen Essentials):');
       if (name) {
         recordAuditLog('Category Created', name);
-        showToast(`Category "${name}" created!`);
+        showToast(`Shopify Collection "${name}" created!`, '✅');
         renderCategoriesView();
       }
     }

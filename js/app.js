@@ -29,8 +29,11 @@ function getAllProducts() {
   const deleted = JSON.parse(localStorage.getItem('qadri_deleted_products')) || [];
 
   const base = (typeof PRODUCTS !== 'undefined' ? PRODUCTS : [])
-    .filter(p => !deleted.includes(p.id) && !deleted.includes(String(p.id)))
-    .map(p => overrides[p.id] ? { ...p, ...overrides[p.id] } : p);
+    .filter(p => !deleted.some(d => String(d) === String(p.id)))
+    .map(p => {
+      const override = overrides[p.id] || overrides[String(p.id)] || overrides[Number(p.id)];
+      return override ? { ...p, ...override } : p;
+    });
 
   return [...custom, ...base];
 }

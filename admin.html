@@ -1930,8 +1930,8 @@
                 </div>
               </div>
 
-              <!-- Hidden File Input for Auto-WebP processing -->
-              <input type="file" id="pImageFileInput" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" onchange="handleMainProductFileSelect(event)">
+              <!-- Hidden File Input for Auto-WebP processing (Multi-Image Support) -->
+              <input type="file" id="pImageFileInput" accept="image/png, image/jpeg, image/jpg, image/webp" multiple class="hidden" onchange="handleMainProductFileSelect(event)">
 
               <!-- Interactive Drag & Drop Zone -->
               <div id="productMediaDropzone" 
@@ -1946,8 +1946,8 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
                   </div>
                   <div>
-                    <p class="text-xs font-bold text-slate-800">Drag &amp; drop product image here, or <span class="text-[#008060] underline">browse files</span></p>
-                    <p class="text-[11px] text-slate-400 mt-0.5">Supports PNG, JPEG &amp; WebP &bull; Auto-converted to optimized WebP format</p>
+                    <p class="text-xs font-bold text-slate-800">Drag &amp; drop product images here, or <span class="text-[#008060] underline">browse files (1 or more)</span></p>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Supports multiple photos (PNG, JPEG &amp; WebP) &bull; Auto-converted to optimized WebP format</p>
                   </div>
                 </div>
 
@@ -1956,7 +1956,20 @@
                     <img id="modalPreviewImgTag" src="" class="max-h-48 rounded-lg object-contain shadow-xs border border-slate-200 bg-white">
                     <button type="button" onclick="event.stopPropagation(); clearMainUploadedImage();" class="absolute -top-2 -right-2 bg-rose-600 hover:bg-rose-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-md">✕</button>
                   </div>
-                  <p class="text-[11px] text-slate-500 font-medium">Click anywhere or drop another file to replace</p>
+                  <p class="text-[11px] text-slate-500 font-medium">Cover photo. Click anywhere or drop more files to add to gallery.</p>
+                </div>
+              </div>
+
+              <!-- Product Multi-Image Gallery Strip -->
+              <div id="modalGalleryGridContainer" class="space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] font-bold text-slate-700 flex items-center gap-1">
+                    <span>📸</span> Product Gallery Images (<span id="galleryCountBadge">0</span> photos)
+                  </span>
+                  <button type="button" onclick="document.getElementById('pImageFileInput').click()" class="text-[11px] text-[#008060] hover:underline font-bold">+ Upload More Photos</button>
+                </div>
+                <div id="modalGalleryThumbnailsList" class="flex flex-wrap gap-2 p-2 bg-[#f8fafc] border border-slate-200 rounded-xl min-h-[50px] items-center">
+                  <span class="text-[11px] text-slate-400 px-2">No extra gallery photos yet. Select multiple photos above to add.</span>
                 </div>
               </div>
 
@@ -2056,46 +2069,74 @@
               </div>
             </div>
 
-            <!-- Card 5: Color Variants & Variant Photography (Shopify Style) -->
+            <!-- Card 5: Color & Size Variants (Shopify Style) -->
             <div class="bg-white rounded-xl p-5 border border-[#e1e3e5] shadow-sm space-y-4">
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <h4 class="text-xs font-bold text-[#202223] flex items-center gap-1.5">
-                    <span>🎨</span> Color Variants &amp; Photography
+                    <span>🎨</span> Product Variants (Color, Size &amp; Dimensions)
                   </h4>
-                  <p class="text-[11px] text-[#6d7175]">Assign dedicated photos to each color variant (Auto-WebP) &amp; choose the Main Featured Image</p>
+                  <p class="text-[11px] text-[#6d7175]">Configure Colors, Sizes (S, M, L, XL, Standard), custom pricing, stock, &amp; dedicated photos</p>
                 </div>
-                <button type="button" onclick="addNewColorVariantRow()" class="text-xs font-semibold text-white bg-[#008060] hover:bg-[#006e52] px-3 py-1.5 rounded-lg transition shadow-xs flex items-center gap-1">
-                  <span>+ Add Color</span>
-                </button>
+                <div class="flex items-center gap-1.5">
+                  <button type="button" onclick="addNewColorVariantRow('Standard', '#111827', '', false, null, 50, 'Standard')" class="text-xs font-semibold text-[#008060] bg-[#f1f8f5] hover:bg-[#e3f1eb] border border-[#008060]/30 px-2.5 py-1.5 rounded-lg transition shadow-xs flex items-center gap-1">
+                    <span>+ Add Size</span>
+                  </button>
+                  <button type="button" onclick="addNewColorVariantRow()" class="text-xs font-semibold text-white bg-[#008060] hover:bg-[#006e52] px-3 py-1.5 rounded-lg transition shadow-xs flex items-center gap-1">
+                    <span>+ Add Color / Variant</span>
+                  </button>
+                </div>
               </div>
 
-              <!-- Quick Presets -->
-              <div class="flex items-center gap-1.5 flex-wrap pt-1 border-t border-slate-100">
-                <span class="text-[11px] text-slate-500 font-semibold mr-1">Quick Presets:</span>
-                <button type="button" onclick="quickAddColorVariant('Jet Black', '#111827')" class="text-[11px] px-2 py-0.5 rounded-full border border-slate-300 hover:border-slate-800 bg-white flex items-center gap-1 transition">
-                  <span class="w-2.5 h-2.5 rounded-full bg-black inline-block"></span> Black
-                </button>
-                <button type="button" onclick="quickAddColorVariant('Pearl White', '#ffffff')" class="text-[11px] px-2 py-0.5 rounded-full border border-slate-300 hover:border-slate-800 bg-white flex items-center gap-1 transition">
-                  <span class="w-2.5 h-2.5 rounded-full bg-white border border-slate-300 inline-block"></span> White
-                </button>
-                <button type="button" onclick="quickAddColorVariant('Midnight Blue', '#1e3a8a')" class="text-[11px] px-2 py-0.5 rounded-full border border-slate-300 hover:border-slate-800 bg-white flex items-center gap-1 transition">
-                  <span class="w-2.5 h-2.5 rounded-full bg-blue-900 inline-block"></span> Blue
-                </button>
-                <button type="button" onclick="quickAddColorVariant('Emerald Green', '#047857')" class="text-[11px] px-2 py-0.5 rounded-full border border-slate-300 hover:border-slate-800 bg-white flex items-center gap-1 transition">
-                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-700 inline-block"></span> Green
-                </button>
-                <button type="button" onclick="quickAddColorVariant('Ruby Red', '#b91c1c')" class="text-[11px] px-2 py-0.5 rounded-full border border-slate-300 hover:border-slate-800 bg-white flex items-center gap-1 transition">
-                  <span class="w-2.5 h-2.5 rounded-full bg-rose-700 inline-block"></span> Red
-                </button>
-                <button type="button" onclick="quickAddColorVariant('Rose Gold', '#fb7185')" class="text-[11px] px-2 py-0.5 rounded-full border border-slate-300 hover:border-slate-800 bg-white flex items-center gap-1 transition">
-                  <span class="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"></span> Rose
-                </button>
+              <!-- Quick Presets for Colors and Sizes -->
+              <div class="space-y-2 pt-1 border-t border-slate-100">
+                <!-- Color Presets -->
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] text-slate-500 font-semibold mr-1">Color Presets:</span>
+                  <button type="button" onclick="quickAddColorVariant('Jet Black', '#111827')" class="text-[11px] px-2 py-0.5 rounded-full border border-slate-300 hover:border-slate-800 bg-white flex items-center gap-1 transition">
+                    <span class="w-2.5 h-2.5 rounded-full bg-black inline-block"></span> Black
+                  </button>
+                  <button type="button" onclick="quickAddColorVariant('Pearl White', '#ffffff')" class="text-[11px] px-2 py-0.5 rounded-full border border-slate-300 hover:border-slate-800 bg-white flex items-center gap-1 transition">
+                    <span class="w-2.5 h-2.5 rounded-full bg-white border border-slate-300 inline-block"></span> White
+                  </button>
+                  <button type="button" onclick="quickAddColorVariant('Midnight Blue', '#1e3a8a')" class="text-[11px] px-2 py-0.5 rounded-full border border-slate-300 hover:border-slate-800 bg-white flex items-center gap-1 transition">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-900 inline-block"></span> Blue
+                  </button>
+                  <button type="button" onclick="quickAddColorVariant('Emerald Green', '#047857')" class="text-[11px] px-2 py-0.5 rounded-full border border-slate-300 hover:border-slate-800 bg-white flex items-center gap-1 transition">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-700 inline-block"></span> Green
+                  </button>
+                  <button type="button" onclick="quickAddColorVariant('Ruby Red', '#b91c1c')" class="text-[11px] px-2 py-0.5 rounded-full border border-slate-300 hover:border-slate-800 bg-white flex items-center gap-1 transition">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-700 inline-block"></span> Red
+                  </button>
+                  <button type="button" onclick="quickAddColorVariant('Rose Gold', '#fb7185')" class="text-[11px] px-2 py-0.5 rounded-full border border-slate-300 hover:border-slate-800 bg-white flex items-center gap-1 transition">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"></span> Rose
+                  </button>
+                </div>
+
+                <!-- Size Presets -->
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] text-slate-500 font-semibold mr-1">Quick Sizes:</span>
+                  <button type="button" onclick="quickAddSizeVariant('Small')" class="text-[11px] px-2 py-0.5 rounded-md border border-slate-300 hover:border-[#008060] bg-white text-slate-700 hover:text-[#008060] font-bold transition">
+                    📏 Small (S)
+                  </button>
+                  <button type="button" onclick="quickAddSizeVariant('Medium')" class="text-[11px] px-2 py-0.5 rounded-md border border-slate-300 hover:border-[#008060] bg-white text-slate-700 hover:text-[#008060] font-bold transition">
+                    📏 Medium (M)
+                  </button>
+                  <button type="button" onclick="quickAddSizeVariant('Large')" class="text-[11px] px-2 py-0.5 rounded-md border border-slate-300 hover:border-[#008060] bg-white text-slate-700 hover:text-[#008060] font-bold transition">
+                    📏 Large (L)
+                  </button>
+                  <button type="button" onclick="quickAddSizeVariant('XL')" class="text-[11px] px-2 py-0.5 rounded-md border border-slate-300 hover:border-[#008060] bg-white text-slate-700 hover:text-[#008060] font-bold transition">
+                    📏 Extra Large (XL)
+                  </button>
+                  <button type="button" onclick="quickAddSizeVariant('Free Size')" class="text-[11px] px-2 py-0.5 rounded-md border border-slate-300 hover:border-[#008060] bg-white text-slate-700 hover:text-[#008060] font-bold transition">
+                    📏 Free Size / Universal
+                  </button>
+                </div>
               </div>
 
               <!-- Variants Container -->
               <div id="modalColorVariantsList" class="space-y-3">
-                <!-- Dynamically rendered color variant items -->
+                <!-- Dynamically rendered variant items -->
               </div>
 
               <div class="p-3 bg-[#f1f8f5] rounded-xl border border-[#008060]/20 flex items-start gap-2.5 text-xs text-slate-700">
@@ -2788,8 +2829,11 @@
         const deleted = JSON.parse(localStorage.getItem('qadri_deleted_products')) || [];
 
         const base = (typeof PRODUCTS !== 'undefined' && Array.isArray(PRODUCTS) ? PRODUCTS : [])
-          .filter(p => !deleted.includes(p.id) && !deleted.includes(String(p.id)))
-          .map(p => overrides[p.id] ? { ...p, ...overrides[p.id] } : p);
+          .filter(p => !deleted.some(d => String(d) === String(p.id)))
+          .map(p => {
+            const override = overrides[p.id] || overrides[String(p.id)] || overrides[Number(p.id)];
+            return override ? { ...p, ...override } : p;
+          });
 
         return [...custom, ...base];
       } catch (err) {
@@ -3477,10 +3521,63 @@
       });
     }
 
+    let modalGalleryImages = [];
+
+    function renderModalGalleryThumbnails() {
+      const container = document.getElementById('modalGalleryThumbnailsList');
+      const badge = document.getElementById('galleryCountBadge');
+      if (badge) badge.textContent = modalGalleryImages.length;
+      if (!container) return;
+
+      if (!modalGalleryImages || modalGalleryImages.length === 0) {
+        container.innerHTML = `<span class="text-[11px] text-slate-400 px-2">No extra gallery photos yet. Select 1 or more images above.</span>`;
+        return;
+      }
+
+      const mainImg = document.getElementById('pImage')?.value || '';
+
+      container.innerHTML = modalGalleryImages.map((imgUrl, idx) => {
+        const isMain = imgUrl === mainImg;
+        return `
+          <div class="relative group/thumb w-14 h-14 rounded-lg overflow-hidden border ${isMain ? 'border-[#008060] ring-2 ring-[#008060]/30' : 'border-slate-300'} bg-white flex items-center justify-center shrink-0">
+            <img src="${imgUrl}" class="w-full h-full object-cover">
+            ${isMain ? '<span class="absolute top-0.5 left-0.5 bg-[#008060] text-white text-[8px] font-bold px-1 rounded">Main</span>' : ''}
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover/thumb:opacity-100 flex items-center justify-center gap-1 transition">
+              <button type="button" onclick="setGalleryImageAsMain(${idx})" class="p-1 bg-white/90 hover:bg-white text-[#008060] rounded text-[10px] font-bold" title="Set as Main Cover">⭐</button>
+              <button type="button" onclick="removeGalleryImage(${idx})" class="p-1 bg-rose-600 hover:bg-rose-700 text-white rounded text-[10px] font-bold" title="Delete Photo">✕</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setGalleryImageAsMain(idx) {
+      if (modalGalleryImages[idx]) {
+        const selected = modalGalleryImages[idx];
+        const pImageInput = document.getElementById('pImage');
+        if (pImageInput) pImageInput.value = selected;
+        previewModalProductImage(selected);
+        renderModalGalleryThumbnails();
+        showToast('Selected as Main Cover Photo!', '⭐');
+      }
+    }
+
+    function removeGalleryImage(idx) {
+      const removed = modalGalleryImages.splice(idx, 1)[0];
+      const pImageInput = document.getElementById('pImage');
+      if (pImageInput && pImageInput.value === removed) {
+        pImageInput.value = modalGalleryImages[0] || '';
+        previewModalProductImage(pImageInput.value);
+      }
+      renderModalGalleryThumbnails();
+      showToast('Image removed from gallery');
+    }
+
     async function handleMainProductFileSelect(e) {
-      const file = e.target.files && e.target.files[0];
-      if (!file) return;
-      await processAndApplyMainImage(file);
+      const files = e.target.files;
+      if (!files || files.length === 0) return;
+      await processAndApplyMultipleImages(Array.from(files));
+      e.target.value = '';
     }
 
     function handleMainProductDragOver(e) {
@@ -3503,42 +3600,59 @@
       const dropzone = document.getElementById('productMediaDropzone');
       if (dropzone) dropzone.classList.remove('border-[#008060]', 'bg-[#f1f8f5]/60');
       const dt = e.dataTransfer;
-      const file = dt && dt.files && dt.files[0];
-      if (file) {
-        await processAndApplyMainImage(file);
+      const files = dt && dt.files;
+      if (files && files.length > 0) {
+        await processAndApplyMultipleImages(Array.from(files));
       }
     }
 
-    async function processAndApplyMainImage(file) {
-      if (!file.type || !file.type.startsWith('image/')) {
-        alert('Please choose a valid image file (JPEG, PNG, or WebP).');
+    async function processAndApplyMultipleImages(files) {
+      const validFiles = files.filter(f => f.type && f.type.startsWith('image/'));
+      if (validFiles.length === 0) {
+        alert('Please choose valid image files (JPEG, PNG, or WebP).');
         return;
       }
-      showToast('Converting image to optimized WebP format...', '⚡');
-      try {
-        const res = await convertImageFileToWebP(file);
-        const pImageInput = document.getElementById('pImage');
-        if (pImageInput) {
-          pImageInput.value = res.dataUrl;
-          previewModalProductImage(res.dataUrl);
-        }
+      showToast(`Converting ${validFiles.length} photo(s) to optimized WebP format...`, '⚡');
 
-        // Show conversion reduction badge
-        const badgeEl = document.getElementById('mainImageWebpStatsBadge');
-        if (badgeEl) {
-          badgeEl.innerHTML = `
-            <span>⚡ Converted <strong>${res.origFormat}</strong> (${res.origSizeKB} KB) &rarr; <strong>WebP</strong> (${res.webpSizeKB} KB)</span>
-            <span class="font-bold text-[#008060] bg-[#e3f1eb] px-2 py-0.5 rounded">${res.percentReduced}% Smaller (R2 Optimized)</span>
-          `;
-          badgeEl.classList.remove('hidden');
+      for (let i = 0; i < validFiles.length; i++) {
+        const file = validFiles[i];
+        try {
+          const res = await convertImageFileToWebP(file);
+          if (!modalGalleryImages.includes(res.dataUrl)) {
+            modalGalleryImages.push(res.dataUrl);
+          }
+          // Set first uploaded image as primary if none currently selected
+          const pImageInput = document.getElementById('pImage');
+          if (pImageInput && (!pImageInput.value || pImageInput.value.length < 5)) {
+            pImageInput.value = res.dataUrl;
+            previewModalProductImage(res.dataUrl);
+          }
+        } catch (err) {
+          console.error('Failed to convert file:', file.name, err);
         }
-
-        recordAuditLog('WebP Image Upload', `${file.name} converted to WebP (${res.webpSizeKB} KB)`);
-        showToast(`Auto-converted to WebP (${res.webpSizeKB} KB)!`, '✅');
-      } catch (err) {
-        console.error('Image conversion error:', err);
-        showToast('Image conversion failed. Please try again.', '❌');
       }
+
+      // If main image was still empty, pick the first from gallery
+      const pImageInput = document.getElementById('pImage');
+      if (pImageInput && !pImageInput.value && modalGalleryImages.length > 0) {
+        pImageInput.value = modalGalleryImages[0];
+        previewModalProductImage(modalGalleryImages[0]);
+      }
+
+      renderModalGalleryThumbnails();
+
+      // Show stats badge
+      const badgeEl = document.getElementById('mainImageWebpStatsBadge');
+      if (badgeEl) {
+        badgeEl.innerHTML = `
+          <span>⚡ Converted <strong>${validFiles.length} photo(s)</strong> &rarr; <strong>WebP</strong></span>
+          <span class="font-bold text-[#008060] bg-[#e3f1eb] px-2 py-0.5 rounded">${modalGalleryImages.length} Total Gallery Images (R2 Ready)</span>
+        `;
+        badgeEl.classList.remove('hidden');
+      }
+
+      recordAuditLog('Multi-Image WebP Upload', `Uploaded ${validFiles.length} image(s)`);
+      showToast(`Uploaded ${validFiles.length} image(s) in WebP format!`, '✅');
     }
 
     function clearMainUploadedImage() {
@@ -3554,7 +3668,9 @@
       if (badgeEl) badgeEl.classList.add('hidden');
       const fileInput = document.getElementById('pImageFileInput');
       if (fileInput) fileInput.value = '';
-      showToast('Image cleared');
+      modalGalleryImages = [];
+      renderModalGalleryThumbnails();
+      showToast('Images cleared');
     }
 
     function copyCurrentR2Url() {
@@ -3579,7 +3695,7 @@
     }
 
     // -------------------------------------------------------------
-    // COLOR VARIANTS MATRIX WITH DEDICATED WEBP PHOTOS
+    // COLOR & SIZE VARIANTS MATRIX WITH DEDICATED WEBP PHOTOS
     // -------------------------------------------------------------
     let modalVariants = [];
 
@@ -3591,8 +3707,8 @@
         container.innerHTML = `
           <div class="p-4 border border-dashed border-slate-300 rounded-xl text-center text-slate-400 bg-white">
             <span class="text-lg">🎨</span>
-            <p class="text-xs font-semibold text-slate-600 mt-1">No color variants added yet.</p>
-            <p class="text-[11px] text-slate-400">Click <strong>"+ Add Color"</strong> above or pick a quick preset to attach specific photos to each color.</p>
+            <p class="text-xs font-semibold text-slate-600 mt-1">No variants added yet.</p>
+            <p class="text-[11px] text-slate-400">Click <strong>"+ Add Variant"</strong>, <strong>"+ Add Size"</strong>, or pick a preset above.</p>
           </div>
         `;
         return;
@@ -3602,9 +3718,10 @@
         <div class="border ${v.isFeatured ? 'border-[#008060] bg-[#f1f8f5]/40 shadow-xs ring-1 ring-[#008060]/30' : 'border-[#e1e3e5] bg-white'} rounded-xl p-3.5 space-y-3 transition">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-2">
-              <span class="w-3.5 h-3.5 rounded-full border border-slate-300 shadow-xs inline-block" style="background-color: ${v.hex};"></span>
-              <span class="text-xs font-bold text-[#202223]">${v.name || 'Color Variant'}</span>
-              ${v.isFeatured ? '<span class="text-[10px] bg-[#008060] text-white px-2 py-0.5 rounded-full font-bold">⭐ Main Featured</span>' : ''}
+              <span class="w-3.5 h-3.5 rounded-full border border-slate-300 shadow-xs inline-block" style="background-color: ${v.hex || '#111827'};"></span>
+              <span class="text-xs font-bold text-[#202223]">${v.name || 'Variant'}</span>
+              ${v.size ? `<span class="text-[10px] bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded-md font-mono font-bold">📏 ${v.size}</span>` : ''}
+              ${v.isFeatured ? '<span class="text-[10px] bg-[#008060] text-white px-2 py-0.5 rounded-full font-bold">⭐ Featured</span>' : ''}
             </div>
             <div class="flex items-center space-x-2">
               <button type="button" onclick="setVariantAsFeatured(${idx})" class="text-[11px] font-semibold ${v.isFeatured ? 'text-[#008060] bg-white border border-[#008060]/40' : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200'} px-2.5 py-1 rounded-md transition flex items-center gap-1">
@@ -3616,32 +3733,45 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center text-xs">
             <!-- Color Name & Picker -->
-            <div class="sm:col-span-4 flex items-center space-x-2">
+            <div class="sm:col-span-3 flex items-center space-x-2">
               <div class="relative w-8 h-8 rounded-lg overflow-hidden border border-slate-300 shrink-0">
-                <input type="color" value="${v.hex}" onchange="handleVariantColorChange(${idx}, this.value)" class="absolute -top-2 -left-2 w-12 h-12 cursor-pointer border-none bg-transparent">
+                <input type="color" value="${v.hex || '#111827'}" onchange="handleVariantColorChange(${idx}, this.value)" class="absolute -top-2 -left-2 w-12 h-12 cursor-pointer border-none bg-transparent">
               </div>
-              <input type="text" value="${v.name}" oninput="handleVariantColorNameChange(${idx}, this.value)" placeholder="e.g. Midnight Blue" class="flex-1 text-xs p-2 bg-white border border-[#c9cccf] rounded-lg font-medium focus:border-[#008060] focus:ring-1 focus:ring-[#008060]">
+              <input type="text" value="${v.name || ''}" oninput="handleVariantColorNameChange(${idx}, this.value)" placeholder="e.g. Black / Red" class="flex-1 text-xs p-2 bg-white border border-[#c9cccf] rounded-lg font-medium focus:border-[#008060] focus:ring-1 focus:ring-[#008060]">
             </div>
 
-            <!-- Dedicated Color Photo Upload (Auto-WebP) -->
-            <div class="sm:col-span-5 flex items-center space-x-2">
+            <!-- Size Selector / Input (NEW) -->
+            <div class="sm:col-span-2">
+              <select onchange="handleVariantSizeChange(${idx}, this.value)" class="w-full text-xs p-2 bg-white border border-[#c9cccf] rounded-lg font-semibold text-slate-800 focus:border-[#008060]">
+                <option value="Standard" ${v.size === 'Standard' ? 'selected' : ''}>Standard</option>
+                <option value="Small" ${v.size === 'Small' ? 'selected' : ''}>Small (S)</option>
+                <option value="Medium" ${v.size === 'Medium' ? 'selected' : ''}>Medium (M)</option>
+                <option value="Large" ${v.size === 'Large' ? 'selected' : ''}>Large (L)</option>
+                <option value="XL" ${v.size === 'XL' ? 'selected' : ''}>XL</option>
+                <option value="Free Size" ${v.size === 'Free Size' ? 'selected' : ''}>Free Size</option>
+                <option value="Custom" ${!['Standard','Small','Medium','Large','XL','Free Size'].includes(v.size || '') && v.size ? 'selected' : ''}>Custom...</option>
+              </select>
+            </div>
+
+            <!-- Dedicated Variant Photo Upload (Auto-WebP) -->
+            <div class="sm:col-span-4 flex items-center space-x-2">
               <div class="w-10 h-10 rounded-lg border border-slate-200 bg-[#fafbfb] flex items-center justify-center overflow-hidden shrink-0">
                 ${v.image ? `<img src="${v.image}" class="w-full h-full object-contain bg-white">` : '<span class="text-slate-400 text-xs">🖼️</span>'}
               </div>
               <input type="file" id="varFile_${idx}" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" onchange="handleVariantFileSelect(event, ${idx})">
               <button type="button" onclick="document.getElementById('varFile_${idx}').click()" class="flex-1 py-1.5 px-2 bg-white border border-[#c9cccf] hover:border-[#008060] text-slate-700 hover:text-[#008060] rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                <span>${v.image ? 'Change Photo (WebP)' : 'Upload Color Photo'}</span>
+                <span>${v.image ? 'Change Photo (WebP)' : 'Upload Variant Photo'}</span>
               </button>
             </div>
 
             <!-- Price & Stock -->
             <div class="sm:col-span-3 flex items-center space-x-2">
               <div class="w-1/2">
-                <input type="number" value="${v.price || ''}" placeholder="Price (Rs)" oninput="handleVariantPriceChange(${idx}, this.value)" class="w-full text-xs p-2 bg-white border border-[#c9cccf] rounded-lg font-medium">
+                <input type="number" value="${v.price || ''}" placeholder="Price (Rs)" oninput="handleVariantPriceChange(${idx}, this.value)" class="w-full text-xs p-2 bg-white border border-[#c9cccf] rounded-lg font-medium" title="Variant Specific Price">
               </div>
               <div class="w-1/2">
-                <input type="number" value="${v.stock || 50}" placeholder="Stock" oninput="handleVariantStockChange(${idx}, this.value)" class="w-full text-xs p-2 bg-white border border-[#c9cccf] rounded-lg font-medium">
+                <input type="number" value="${v.stock || 50}" placeholder="Stock" oninput="handleVariantStockChange(${idx}, this.value)" class="w-full text-xs p-2 bg-white border border-[#c9cccf] rounded-lg font-medium" title="Variant Stock Quantity">
               </div>
             </div>
           </div>
@@ -3649,24 +3779,54 @@
       `).join('');
     }
 
-    function addNewColorVariantRow(name = 'New Color', hex = '#3b82f6', img = '', isFeatured = false, price = null, stock = 50) {
+    function addNewColorVariantRow(name = 'New Color', hex = '#3b82f6', img = '', isFeatured = false, price = null, stock = 50, size = 'Standard') {
       const defaultPrice = parseFloat(document.getElementById('pPrice')?.value) || 0;
       const isFirst = modalVariants.length === 0;
       modalVariants.push({
         id: Date.now() + Math.floor(Math.random() * 1000),
         name,
         hex,
+        size: size || 'Standard',
         image: img || '',
         isFeatured: isFeatured || isFirst,
         price: price !== null ? price : defaultPrice,
         stock: stock || 50
       });
       renderModalColorVariants();
-      showToast(`Added variant: ${name}`);
+      showToast(`Added variant: ${name} (${size})`);
     }
 
     function quickAddColorVariant(name, hex) {
-      addNewColorVariantRow(name, hex);
+      addNewColorVariantRow(name, hex, '', false, null, 50, 'Standard');
+    }
+
+    function quickAddSizeVariant(size) {
+      const defaultPrice = parseFloat(document.getElementById('pPrice')?.value) || 0;
+      modalVariants.push({
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        name: `Size ${size}`,
+        hex: '#111827',
+        size: size,
+        image: '',
+        isFeatured: modalVariants.length === 0,
+        price: defaultPrice,
+        stock: 50
+      });
+      renderModalColorVariants();
+      showToast(`Added size variant: ${size}`);
+    }
+
+    function handleVariantSizeChange(idx, size) {
+      if (!modalVariants[idx]) return;
+      if (size === 'Custom') {
+        const customSize = prompt('Enter custom size or dimension (e.g. 500ml, 3-Tier, 24-Inch):', modalVariants[idx].size || '');
+        if (customSize) {
+          modalVariants[idx].size = customSize.trim();
+        }
+      } else {
+        modalVariants[idx].size = size;
+      }
+      renderModalColorVariants();
     }
 
     function removeColorVariantRow(idx) {
@@ -3687,9 +3847,13 @@
       if (featured && featured.image) {
         document.getElementById('pImage').value = featured.image;
         previewModalProductImage(featured.image);
+        if (!modalGalleryImages.includes(featured.image)) {
+          modalGalleryImages.unshift(featured.image);
+          renderModalGalleryThumbnails();
+        }
         showToast(`"${featured.name}" set as Main Featured Image!`, '⭐');
       } else {
-        showToast(`"${featured.name}" marked as Featured. Please upload a photo for this color.`, 'ℹ️');
+        showToast(`"${featured.name}" marked as Featured. Please upload a photo for this variant.`, 'ℹ️');
       }
     }
 
@@ -3725,6 +3889,10 @@
       try {
         const res = await convertImageFileToWebP(file);
         modalVariants[idx].image = res.dataUrl;
+        if (!modalGalleryImages.includes(res.dataUrl)) {
+          modalGalleryImages.push(res.dataUrl);
+          renderModalGalleryThumbnails();
+        }
         if (modalVariants[idx].isFeatured) {
           document.getElementById('pImage').value = res.dataUrl;
           previewModalProductImage(res.dataUrl);
@@ -4077,10 +4245,20 @@
       const og_image = document.getElementById('pOgImage')?.value.trim() || '';
       const image_alt = document.getElementById('pImageAlt')?.value.trim() || '';
 
-      // If a color variant is marked as featured and has an image, prefer that image
+      // Use modalGalleryImages if available
+      let imagesList = Array.isArray(modalGalleryImages) && modalGalleryImages.length > 0 ? [...modalGalleryImages] : [];
+      if (image && !imagesList.includes(image)) {
+        imagesList.unshift(image);
+      }
+      if (!image && imagesList.length > 0) {
+        image = imagesList[0];
+      }
+
+      // If user did not upload a custom image and a featured variant has an image, fallback to that
       const featuredVar = modalVariants.find(v => v.isFeatured && v.image);
-      if (featuredVar && featuredVar.image) {
+      if (!image && featuredVar && featuredVar.image) {
         image = featuredVar.image;
+        if (!imagesList.includes(image)) imagesList.unshift(image);
       }
 
       if (!image) {
@@ -4089,7 +4267,7 @@
       }
 
       const seoPayload = {
-        title, price, stock, image, category, badge, code, original_price, description,
+        title, price, stock, image, images: imagesList, category, badge, code, original_price, description,
         seo_title, seo_description, slug, focus_keyword, secondary_keywords,
         canonical_url, is_noindex, og_title, og_description, og_image, image_alt,
         variants: modalVariants
@@ -4099,7 +4277,7 @@
         // Editing existing product
         const numId = isNaN(Number(editingId)) ? editingId : Number(editingId);
         const custom = JSON.parse(localStorage.getItem('qadri_custom_products')) || [];
-        const cIdx = custom.findIndex(item => item.id == numId);
+        const cIdx = custom.findIndex(item => String(item.id) === String(numId));
 
         if (cIdx >= 0) {
           custom[cIdx] = {
@@ -4111,7 +4289,7 @@
           // It's a base catalog product; store in overrides
           const overrides = JSON.parse(localStorage.getItem('qadri_product_overrides')) || {};
           overrides[numId] = {
-            ...(overrides[numId] || {}),
+            ...(overrides[numId] || overrides[String(numId)] || {}),
             ...seoPayload
           };
           localStorage.setItem('qadri_product_overrides', JSON.stringify(overrides));
@@ -4166,7 +4344,7 @@
 
     function editProductPrompt(id) {
       const all = getAllProducts();
-      const p = all.find(item => item.id == id);
+      const p = all.find(item => String(item.id) === String(id));
       if (!p) return;
 
       openProfessionalAddProductModal();
@@ -4182,6 +4360,16 @@
       document.getElementById('pSku').value = p.code || '';
       if (document.getElementById('pDesc')) document.getElementById('pDesc').value = p.description || '';
       if (p.image) previewModalProductImage(p.image);
+
+      // Restore Gallery Images
+      if (p.images && Array.isArray(p.images) && p.images.length > 0) {
+        modalGalleryImages = [...p.images];
+      } else if (p.image) {
+        modalGalleryImages = [p.image];
+      } else {
+        modalGalleryImages = [];
+      }
+      renderModalGalleryThumbnails();
 
       // Restore SEO fields
       if (document.getElementById('pSeoTitle')) document.getElementById('pSeoTitle').value = p.seo_title || '';
@@ -4207,6 +4395,7 @@
             id: Date.now(),
             name: 'Standard / Primary',
             hex: '#111827',
+            size: 'Standard',
             image: p.image || '',
             isFeatured: true,
             price: p.price || 0,

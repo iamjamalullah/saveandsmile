@@ -57,7 +57,7 @@ module.exports = async function handler(req, res) {
       }
 
       const {
-        id, title, description, code, category, tab, price, originalPrice, badge, image, stock,
+        id, title, description, code, category, tab, price, originalPrice, badge, image, images, variants, stock,
         slug, seo_title, seoTitle, seo_description, seoDescription,
         focus_keyword, focusKeyword, secondary_keywords, secondaryKeywords,
         canonical_url, canonicalUrl, is_noindex, isNoindex,
@@ -146,7 +146,10 @@ module.exports = async function handler(req, res) {
         category: category || 'storage', tab: tab || 'storage',
         price: parseFloat(price) || 0,
         originalPrice: originalPrice ? parseFloat(originalPrice) : null,
-        badge: badge || 'NEW', image, stock: parseInt(stock, 10) || 100,
+        badge: badge || 'NEW', image,
+        images: Array.isArray(images) && images.length > 0 ? images : [image],
+        variants: Array.isArray(variants) ? variants : [],
+        stock: parseInt(stock, 10) || 100,
         slug: sSlug, seo_title: sTitle, seo_description: sDesc,
         focus_keyword: fKey, secondary_keywords: sKey, canonical_url: cUrl,
         is_noindex: noIdx, og_title: oTitle, og_description: oDesc,

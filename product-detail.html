@@ -244,6 +244,31 @@
           Product description loading...
         </p>
 
+        <!-- Variants Selection: Sizes & Colors -->
+        <div id="detailVariantsWrapper" style="display: none; margin-bottom: 1.5rem; flex-direction: column; gap: 14px;">
+          <!-- Sizes Section -->
+          <div id="detailSizesSection" style="display: none;">
+            <div style="font-size: 0.88rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+              <span>Select Size / Dimension:</span>
+              <span id="selectedSizeLabel" style="color: #007382; font-weight: 700; font-size: 0.85rem;">Standard</span>
+            </div>
+            <div id="detailSizesList" style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <!-- Dynamically populated size buttons -->
+            </div>
+          </div>
+
+          <!-- Colors Section -->
+          <div id="detailColorsSection" style="display: none;">
+            <div style="font-size: 0.88rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+              <span>Select Color:</span>
+              <span id="selectedColorLabel" style="color: #007382; font-weight: 700; font-size: 0.85rem;">Default</span>
+            </div>
+            <div id="detailColorsList" style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <!-- Dynamically populated color buttons -->
+            </div>
+          </div>
+        </div>
+
         <!-- Quantity Stepper -->
         <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 1.5rem;">
           <label style="font-weight: 700; font-size: 0.95rem; color: #0f172a;">Select Quantity:</label>
@@ -609,19 +634,162 @@
         `;
       }
 
-      // Thumbnails
+      // Multi-Image Gallery Thumbnails
       const thumbsContainer = document.getElementById('detailThumbsStrip');
-      if (thumbsContainer) {
-        thumbsContainer.innerHTML = `
-          <div class="thumb-box active" onclick="switchDetailThumb(this, '${currentProduct.image}')">
-            <img src="${currentProduct.image}" alt="Thumb">
-          </div>
-        `;
+      const allGalleryImages = [];
+      if (currentProduct.image) allGalleryImages.push(currentProduct.image);
+      if (Array.isArray(currentProduct.images)) {
+        currentProduct.images.forEach(img => {
+          if (img && !allGalleryImages.includes(img)) allGalleryImages.push(img);
+        });
       }
+      if (Array.isArray(currentProduct.variants)) {
+        currentProduct.variants.forEach(v => {
+          if (v.image && !allGalleryImages.includes(v.image)) allGalleryImages.push(v.image);
+        });
+      }
+
+      if (thumbsContainer) {
+        if (allGalleryImages.length > 0) {
+          thumbsContainer.innerHTML = allGalleryImages.map((imgSrc, idx) => `
+            <div class="thumb-box ${idx === 0 ? 'active' : ''}" onclick="switchDetailThumb(this, '${imgSrc}')">
+              <img src="${imgSrc}" alt="Gallery Thumb ${idx + 1}">
+            </div>
+          `).join('');
+        } else {
+          thumbsContainer.innerHTML = `
+            <div class="thumb-box active" onclick="switchDetailThumb(this, '${currentProduct.image}')">
+              <img src="${currentProduct.image}" alt="Thumb">
+            </div>
+          `;
+        }
+      }
+
+      // Populate Variant Selectors (Size & Color)
+      setupDetailProductVariants();
 
       // Update zoom background
       const lens = document.getElementById('detailZoomLens');
       if (lens) lens.style.backgroundImage = `url('${currentProduct.image}')`;
+    }
+
+    let selectedVariant = null;
+
+    function setupDetailProductVariants() {
+      const wrapper = document.getElementById('detailVariantsWrapper');
+      const sizesSec = document.getElementById('detailSizesSection');
+      const colorsSec = document.getElementById('detailColorsSection');
+      const sizesList = document.getElementById('detailSizesList');
+      const colorsList = document.getElementById('detailColorsList');
+
+      if (!wrapper || !sizesSec || !colorsSec || !sizesList || !colorsList) return;
+
+      const variants = Array.isArray(currentProduct.variants) ? currentProduct.variants : [];
+      if (variants.length === 0) {
+        wrapper.style.display = 'none';
+        return;
+      }
+
+      wrapper.style.display = 'flex';
+
+      // Detect Sizes
+      const uniqueSizes = [];
+      variants.forEach(v => {
+        if (v.size && !uniqueSizes.includes(v.size)) uniqueSizes.push(v.size);
+      });
+
+      if (uniqueSizes.length > 0) {
+        sizesSec.style.display = 'block';
+        sizesList.innerHTML = uniqueSizes.map((sz, idx) => `
+          <button type="button" onclick="selectDetailSize('${sz}')" class="size-pill-btn ${idx === 0 ? 'active' : ''}" data-size="${sz}" style="padding: 6px 14px; border-radius: 8px; border: 1.5px solid ${idx === 0 ? '#007382' : '#cbd5e1'}; background: ${idx === 0 ? '#e6f7ec' : '#fff'}; color: ${idx === 0 ? '#007382' : '#334155'}; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+            ${sz}
+          </button>
+        `).join('');
+        const lbl = document.getElementById('selectedSizeLabel');
+        if (lbl) lbl.textContent = uniqueSizes[0];
+      } else {
+        sizesSec.style.display = 'none';
+      }
+
+      // Detect Colors / Names
+      const uniqueColors = [];
+      variants.forEach(v => {
+        if (v.name && !uniqueColors.some(c => c.name === v.name)) {
+          uniqueColors.push(v);
+        }
+      });
+
+      if (uniqueColors.length > 0) {
+        colorsSec.style.display = 'block';
+        colorsList.innerHTML = uniqueColors.map((col, idx) => `
+          <button type="button" onclick="selectDetailColor('${col.name.replace(/'/g, "\\'")}')" class="color-pill-btn ${idx === 0 ? 'active' : ''}" data-color="${col.name}" style="padding: 5px 12px; border-radius: 99px; border: 1.5px solid ${idx === 0 ? '#007382' : '#cbd5e1'}; background: ${idx === 0 ? '#e6f7ec' : '#fff'}; color: ${idx === 0 ? '#007382' : '#334155'}; font-size: 0.82rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+            <span style="width: 10px; height: 10px; border-radius: 50%; background-color: ${col.hex || '#111827'}; display: inline-block; border: 1px solid rgba(0,0,0,0.15);"></span>
+            <span>${col.name}</span>
+          </button>
+        `).join('');
+        const lbl = document.getElementById('selectedColorLabel');
+        if (lbl) lbl.textContent = uniqueColors[0].name;
+      } else {
+        colorsSec.style.display = 'none';
+      }
+
+      selectedVariant = variants[0] || null;
+    }
+
+    function selectDetailSize(size) {
+      document.querySelectorAll('.size-pill-btn').forEach(btn => {
+        if (btn.getAttribute('data-size') === size) {
+          btn.style.borderColor = '#007382';
+          btn.style.background = '#e6f7ec';
+          btn.style.color = '#007382';
+        } else {
+          btn.style.borderColor = '#cbd5e1';
+          btn.style.background = '#fff';
+          btn.style.color = '#334155';
+        }
+      });
+      const lbl = document.getElementById('selectedSizeLabel');
+      if (lbl) lbl.textContent = size;
+
+      // Find matching variant
+      const variants = Array.isArray(currentProduct.variants) ? currentProduct.variants : [];
+      const match = variants.find(v => v.size === size);
+      if (match) applySelectedVariant(match);
+    }
+
+    function selectDetailColor(colorName) {
+      document.querySelectorAll('.color-pill-btn').forEach(btn => {
+        if (btn.getAttribute('data-color') === colorName) {
+          btn.style.borderColor = '#007382';
+          btn.style.background = '#e6f7ec';
+          btn.style.color = '#007382';
+        } else {
+          btn.style.borderColor = '#cbd5e1';
+          btn.style.background = '#fff';
+          btn.style.color = '#334155';
+        }
+      });
+      const lbl = document.getElementById('selectedColorLabel');
+      if (lbl) lbl.textContent = colorName;
+
+      // Find matching variant
+      const variants = Array.isArray(currentProduct.variants) ? currentProduct.variants : [];
+      const match = variants.find(v => v.name === colorName);
+      if (match) applySelectedVariant(match);
+    }
+
+    function applySelectedVariant(variant) {
+      selectedVariant = variant;
+      if (variant.price && variant.price > 0) {
+        const priceEl = document.getElementById('detailPrice');
+        if (priceEl) priceEl.textContent = `Rs. ${variant.price.toLocaleString()}`;
+      }
+      if (variant.image) {
+        const mainImg = document.getElementById('detailMainImg');
+        if (mainImg) mainImg.src = variant.image;
+        const lens = document.getElementById('detailZoomLens');
+        if (lens) lens.style.backgroundImage = `url('${variant.image}')`;
+      }
     }
 
     function initZoomLens() {
@@ -649,6 +817,8 @@
       document.querySelectorAll('.thumb-box').forEach(b => b.classList.remove('active'));
       el.classList.add('active');
       document.getElementById('detailMainImg').src = src;
+      const lens = document.getElementById('detailZoomLens');
+      if (lens) lens.style.backgroundImage = `url('${src}')`;
     }
 
     function adjustDetailQty(change) {
@@ -664,11 +834,13 @@
 
     function orderCurrentDetailWhatsApp() {
       if (!currentProduct) return;
-      const total = currentProduct.price * selectedQty;
+      const price = (selectedVariant && selectedVariant.price) ? selectedVariant.price : currentProduct.price;
+      const total = price * selectedQty;
+      const varInfo = selectedVariant ? ` (Variant: ${selectedVariant.name || ''} ${selectedVariant.size ? '| Size: ' + selectedVariant.size : ''})` : '';
       const msg = `Salam! I want to order this product:%0A%0A` +
-                  `*Product:* ${currentProduct.title}%0A` +
+                  `*Product:* ${currentProduct.title}${varInfo}%0A` +
                   `*Quantity:* ${selectedQty}%0A` +
-                  `*Price:* Rs. ${currentProduct.price}%0A` +
+                  `*Price:* Rs. ${price}%0A` +
                   `*Total:* Rs. ${total}%0A%0A` +
                   `Please confirm my order and share delivery details.`;
       window.open(`https://wa.me/923162323616?text=${msg}`, '_blank');
@@ -676,8 +848,9 @@
 
     function orderBulkWholesaleWhatsApp() {
       if (!currentProduct) return;
+      const varInfo = selectedVariant ? ` (Variant: ${selectedVariant.name || ''} ${selectedVariant.size ? '| Size: ' + selectedVariant.size : ''})` : '';
       const msg = `Salam Save & Smile! I want to place a *Bulk Wholesale Order*:%0A%0A` +
-                  `*Product:* ${currentProduct.title}%0A` +
+                  `*Product:* ${currentProduct.title}${varInfo}%0A` +
                   `*Required Quantity:* Bulk / Wholesale Cartons%0A` +
                   `*Product Code:* ${currentProduct.code || currentProduct.id}%0A%0A` +
                   `Please quote the best wholesale deal and dispatch details.`;

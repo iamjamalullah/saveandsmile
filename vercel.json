@@ -1,4 +1,5 @@
 {
+  "framework": null,
   "cleanUrls": true,
   "outputDirectory": "dist",
   "buildCommand": "npm run build",
@@ -7,15 +8,14 @@
       "includeFiles": "products.json"
     }
   },
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/admin", "dest": "/admin.html" },
-    { "src": "/cart", "dest": "/cart.html" },
-    { "src": "/checkout", "dest": "/checkout.html" },
-    { "src": "/track-order", "dest": "/track-order.html" },
-    { "src": "/track", "dest": "/track-order.html" },
-    { "src": "/product-detail", "dest": "/product-detail.html" },
-    { "src": "/live-editor", "dest": "/live-editor.html" },
-    { "src": "/(.*)", "dest": "/$1" }
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/cart", "destination": "/cart.html" },
+    { "source": "/checkout", "destination": "/checkout.html" },
+    { "source": "/track-order", "destination": "/track-order.html" },
+    { "source": "/track", "destination": "/track-order.html" },
+    { "source": "/product-detail", "destination": "/product-detail.html" },
+    { "source": "/live-editor", "destination": "/live-editor.html" }
   ]
 }

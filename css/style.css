@@ -4170,3 +4170,32 @@ a {
   font-weight: 500;
 }
 
+/* =============================================================
+   PRODUCT DETAIL PAGE STICKY GALLERY (Matches waseeh.com)
+   ============================================================= */
+.product-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.gallery-container {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 90px;
+  align-self: start;
+  z-index: 20;
+}
+
+@media (max-width: 1024px) {
+  .product-detail-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .gallery-container {
+    position: static;
+  }
+}
+
+

@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Save &amp; Smile — Homepage &amp; Hero Editor</title>
+  <link rel="icon" type="image/png" href="images/save-and-smile-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            brand: { teal: '#064C63', cyan: '#008FAF' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f2f4;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #e2e8f0; }
+    ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+    .customizer-tab-btn.active {
+      background-color: #008060;
+      color: #ffffff;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex flex-col select-none text-slate-800 overflow-hidden bg-[#f6f6f7]">
+
+  <!-- ============================================================ -->
+  <!-- TOP EDITOR TOOLBAR -->
+  <!-- ============================================================ -->
+  <header class="h-16 bg-[#1a1c1e] text-white px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-md z-50">
+    <div class="flex items-center space-x-3">
+      <!-- Back to Admin Dashboard -->
+      <a href="admin.html" class="flex items-center space-x-2 text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3.5 py-2 rounded-xl border border-slate-700 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        <span>Exit to Admin</span>
+      </a>
+
+      <div class="h-6 w-px bg-slate-700"></div>
+
+      <!-- Brand Heading -->
+      <div class="flex items-center space-x-2.5">
+        <span class="text-xl">🎨</span>
+        <div>
+          <h1 class="text-sm font-black tracking-tight text-white flex items-center gap-2">
+            <span>Homepage &amp; Hero Editor</span>
+            <span class="text-[9px] px-2 py-0.5 rounded-full font-black bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">LIVE STORE SYNC</span>
+          </h1>
+          <p class="text-[11px] text-slate-400">Hero banners picture uploader &amp; sections layout reordering</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Controls: View Storefront & Save and Publish -->
+    <div class="flex items-center space-x-2.5">
+      <!-- Device Preview Toggles -->
+      <div class="hidden lg:flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700 space-x-1 text-xs">
+        <button onclick="setPreviewDevice('desktop')" id="prev-desktop" class="px-2.5 py-1 rounded-lg bg-teal-800 text-cyan-300 font-bold flex items-center gap-1 shadow-xs">
+          <span>🖥️ Desktop</span>
+        </button>
+        <button onclick="setPreviewDevice('mobile')" id="prev-mobile" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white font-medium flex items-center gap-1">
+          <span>📱 Mobile</span>
+        </button>
+      </div>
+
+      <a href="index.html" target="_blank" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition">
+        <span>View Live Storefront</span> ↗
+      </a>
+
+      <button onclick="saveAndPublishHome()" id="savePublishBtn" class="px-5 py-2 bg-[#008060] hover:bg-[#006e52] text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-md transition transform active:scale-95">
+        <span>💾 Save &amp; Publish to Store</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- MAIN WORKSPACE: LEFT EDITOR CONTROLS + RIGHT LIVE PREVIEW -->
+  <!-- ============================================================ -->
+  <div class="flex-1 flex min-h-0 overflow-hidden">
+
+    <!-- LEFT PANEL: CUSTOMIZATION CONTROLS -->
+    <div class="w-full lg:w-[580px] xl:w-[640px] bg-white border-r border-[#e1e3e5] flex flex-col shrink-0 shadow-sm z-20">
+      
+      <!-- Sub-Tabs Navigation -->
+      <div class="p-3 bg-slate-100 border-b border-[#e1e3e5] flex items-center space-x-2">
+        <button onclick="switchEditorTab('hero')" id="tabBtn-hero" class="customizer-tab-btn active flex-1 py-2 px-3 rounded-xl text-xs font-semibold text-slate-700 bg-white shadow-xs transition flex items-center justify-center gap-1.5">
+          <span>🖼️ Hero Banners</span>
+        </button>
+        <button onclick="switchEditorTab('sections')" id="tabBtn-sections" class="customizer-tab-btn flex-1 py-2 px-3 rounded-xl text-xs font-semibold text-slate-700 hover:bg-white transition flex items-center justify-center gap-1.5">
+          <span>🧩 Sections Order (Ooper/Neechay)</span>
+        </button>
+        <button onclick="switchEditorTab('ticker')" id="tabBtn-ticker" class="customizer-tab-btn flex-1 py-2 px-3 rounded-xl text-xs font-semibold text-slate-700 hover:bg-white transition flex items-center justify-center gap-1.5">
+          <span>📢 Top Ticker Bar</span>
+        </button>
+      </div>
+
+      <!-- Scrollable Tab Contents -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+
+        <!-- ============================================================ -->
+        <!-- TAB 1: HERO SLIDER BANNERS -->
+        <!-- ============================================================ -->
+        <div id="tabContent-hero" class="space-y-5">
+          <div class="flex items-center justify-between border-b pb-3">
+            <div>
+              <h2 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                <span>🖼️ Hero Slider Banners</span>
+                <span id="heroSlidesBadge" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-700">6 Slides</span>
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">Tasweer upload karein ya URL badlein. WebP auto-convert hoti hai.</p>
+            </div>
+            <button type="button" onclick="openAddBannerModal()" class="px-3.5 py-2 bg-[#008060] hover:bg-[#006e52] text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-1 transition">
+              <span>+ Add New Slide</span>
+            </button>
+          </div>
+
+          <!-- Banners List Container -->
+          <div id="heroBannersList" class="space-y-3">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB 2: SECTIONS REORDERING (OOPER / NEECHAY) & CONFIG -->
+        <!-- ============================================================ -->
+        <div id="tabContent-sections" class="space-y-4 hidden">
+          <!-- Prominent Top Save Bar -->
+          <div class="sticky top-0 z-20 bg-slate-900 text-white p-3.5 rounded-2xl shadow-lg border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+              <span id="sectionsSaveStatusDot" class="w-3 h-3 rounded-full bg-emerald-400 shrink-0"></span>
+              <div>
+                <div id="sectionsSaveStatusTitle" class="text-xs font-black text-white">Live Storefront Synced</div>
+                <div id="sectionsSaveStatusSub" class="text-[10px] text-slate-300">Click button to publish all sections &amp; category changes</div>
+              </div>
+            </div>
+            <button type="button" onclick="saveAndPublishHome()" id="sectionsTopSaveBtn" class="px-5 py-2.5 bg-[#008060] hover:bg-[#006e52] text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-md transition transform active:scale-95">
+              <span>💾 Save &amp; Publish to Store</span>
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between border-b pb-3">
+            <div>
+              <h2 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                <span>🧩 Sections Order &amp; Layout Manager</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-teal-100 text-teal-800">12 Portions</span>
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">Hot Selling, Categories, ya Flash Sale ko ▲ Ooper ya ▼ Neechay move karein, aur ⚙️ Edit Section se categories chunein.</p>
+            </div>
+            <button type="button" onclick="resetSectionsOrder()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">
+              ↺ Reset Default
+            </button>
+          </div>
+
+          <!-- Notice Card -->
+          <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5">
+            <span class="text-base shrink-0">💡</span>
+            <div>
+              <strong class="font-bold">Kaise Kaam Karta Hai?</strong>
+              <p class="text-[11px] text-amber-800 mt-0.5">Kisi bhi section ko upar/neeche karne ke liye <strong>▲ Ooper</strong> ya <strong>▼ Neechay</strong> dabayein. Categories chunnay ke liye <strong>⚙️ Edit Section</strong> dabayein.</p>
+            </div>
+          </div>
+
+          <!-- Interactive Ordered Sections List -->
+          <div id="sectionsOrderList" class="space-y-2.5">
+            <!-- Dynamically populated with #1-#12 order, edit buttons, and up/down controls -->
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB 3: TOP ANNOUNCEMENT TICKER -->
+        <!-- ============================================================ -->
+        <div id="tabContent-ticker" class="space-y-5 hidden">
+          <div class="flex items-center justify-between border-b pb-3">
+            <div>
+              <h2 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                <span>📢 Top Announcement Marquee Bar</span>
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">Storefront ke bilkul ooper chalne wali patti ka text aur speed.</p>
+            </div>
+            <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+              <input type="checkbox" id="tickerEnableCheck" checked onchange="handleTickerLiveChange()" class="rounded text-[#008060] focus:ring-[#008060]">
+              <span>Enable Bar</span>
+            </label>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Messages (Har line mein 1 paighaam)</label>
+              <textarea id="tickerMessagesText" oninput="handleTickerLiveChange()" rows="5" class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl font-sans" placeholder="One message per line..."></textarea>
+              <span class="text-[10px] text-slate-400 mt-1 block">Emojis aur bold tags (e.g. &lt;strong&gt;text&lt;/strong&gt;) supported hain.</span>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Scroll Speed (Seconds)</label>
+              <input type="number" id="tickerSpeedInput" oninput="handleTickerLiveChange()" value="32" min="15" max="60" class="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-xl">
+              <span class="text-[10px] text-slate-400 mt-1 block">Kam number = tez raftaar scroll. Zyada number = aahista scroll.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: LIVE STOREFRONT PREVIEW IFRAME -->
+    <div class="flex-1 bg-[#202223] flex flex-col items-center justify-center p-3 sm:p-6 overflow-hidden relative">
+      <div id="previewDeviceFrame" class="w-full h-full bg-white rounded-2xl overflow-hidden shadow-2xl border border-slate-700 flex flex-col transition-all duration-300">
+        <!-- Frame Bar -->
+        <div class="h-9 bg-slate-900 px-4 flex items-center justify-between shrink-0 text-slate-400 text-xs border-b border-slate-800">
+          <div class="flex items-center space-x-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+            <span class="ml-2 font-mono text-[10px] text-slate-400">Save &amp; Smile Live Preview</span>
+          </div>
+          <button onclick="reloadPreviewIframe()" class="hover:text-white text-[11px] font-bold flex items-center gap-1" title="Refresh Live Preview">
+            <span>↻ Refresh Preview</span>
+          </button>
+        </div>
+        <!-- Iframe -->
+        <iframe id="storePreviewIframe" src="index.html" class="w-full flex-1 border-0 bg-white"></iframe>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: ADD / EDIT BANNER SLIDE -->
+  <!-- ============================================================ -->
+  <div id="slideModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative border border-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b">
+        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+          <span>🖼️</span>
+          <span id="slideModalTitle">Add Hero Banner Slide</span>
+        </h3>
+        <button onclick="closeSlideModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+      </div>
+
+      <form id="slideForm" onsubmit="handleSlideSubmit(event)" class="space-y-4 pt-4 text-xs">
+        <input type="hidden" id="modalSlideId" value="">
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Banner Title <span class="text-rose-500">*</span></label>
+          <input type="text" id="modalSlideTitle" required placeholder="e.g. Wholesale Online Mega Sale" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-medium">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Subtitle / Promotion Text</label>
+          <input type="text" id="modalSlideSubtitle" placeholder="e.g. Get unbeatable wholesale prices on trending gadgets" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Banner Image (Picture Upload or URL) <span class="text-rose-500">*</span></label>
+          <div class="space-y-2">
+            <input type="url" id="modalSlideImage" placeholder="https://pub-8bcbaae497aa4994a6c3852932093ce1.r2.dev/banner.webp" required oninput="previewModalImage(this.value)" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-mono text-[11px]">
+            <div class="flex items-center gap-2">
+              <input type="file" id="modalFileInput" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" onchange="handleModalFileUpload(event)">
+              <button type="button" onclick="document.getElementById('modalFileInput').click()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold flex items-center gap-1.5 transition">
+                <span>📷 Upload Picture from Computer (Auto-WebP)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Recommended Image Size Spec Box -->
+          <div class="mt-2.5 p-3 bg-cyan-50/80 border border-cyan-200 rounded-xl text-xs space-y-1">
+            <div class="flex items-center justify-between text-cyan-950 font-bold">
+              <span class="flex items-center gap-1.5">
+                <span>📐</span>
+                <span>Recommended Slider Size:</span>
+              </span>
+              <span class="bg-cyan-200/90 text-cyan-900 px-2 py-0.5 rounded font-mono font-black text-[11px]">2117 × 743 px</span>
+            </div>
+            <div class="text-[11px] text-cyan-800">
+              Aspect ratio: <strong>~21:7 (2.85:1)</strong> • Max size: <strong>&lt; 1.5MB</strong> • Format: <strong>WebP (Auto-converted)</strong>
+            </div>
+            <div id="modalDetectedSizeBox" class="hidden mt-1.5 pt-1.5 border-t border-cyan-200/70 text-[11px] font-semibold text-emerald-800 flex items-center justify-between">
+              <span>Detected Image Size:</span>
+              <span id="modalDetectedSizeText" class="font-mono bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded font-black text-[10px]">--</span>
+            </div>
+          </div>
+
+          <!-- Preview Box -->
+          <div class="mt-2.5 h-32 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center relative">
+            <img id="modalPreviewImg" src="" class="w-full h-full object-cover hidden">
+            <span id="modalPreviewPlaceholder" class="text-slate-400 font-semibold text-[11px]">Image preview will appear here (Aspect ratio ~21:7)</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Target Link</label>
+            <input type="text" id="modalSlideLink" value="#products" placeholder="#products or /category/kitchen" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-mono text-[11px]">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Badge Tag</label>
+            <input type="text" id="modalSlideBadge" placeholder="e.g. MEGA SALE" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-medium">
+          </div>
+        </div>
+
+        <div class="pt-3 border-t flex items-center justify-end space-x-2">
+          <button type="button" onclick="closeSlideModal()" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-[#008060] hover:bg-[#006e52] rounded-xl shadow-sm">Save Slide</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: EDIT HOMEPAGE SECTION CONFIGURATION (SHOP BY CATEGORY, ETC) -->
+  <!-- ============================================================ -->
+  <div id="sectionConfigModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl relative border border-slate-200 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b shrink-0">
+        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+          <span id="secModalIcon">⚙️</span>
+          <span id="secModalTitle">Edit Section Settings</span>
+        </h3>
+        <button onclick="closeSectionConfigModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+      </div>
+
+      <form id="sectionConfigForm" onsubmit="handleSectionConfigSubmit(event)" class="space-y-4 pt-4 text-xs overflow-y-auto flex-1 pr-1">
+        <input type="hidden" id="modalSectionKey" value="">
+
+        <!-- Dynamic Body populated based on section key -->
+        <div id="modalSectionDynamicBody" class="space-y-4">
+          <!-- Populated by openSectionConfigModal -->
+        </div>
+
+        <div class="pt-4 border-t flex items-center justify-between shrink-0">
+          <button type="button" onclick="closeSectionConfigModal()" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-[#008060] hover:bg-[#006e52] rounded-xl shadow-sm">Save Section Settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="editorToast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center space-x-2.5 border border-slate-700 text-xs font-bold pointer-events-none">
+    <span id="toastIcon">✅</span>
+    <span id="toastMsg">Saved successfully!</span>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- JAVASCRIPT CONTROLLER LOGIC -->
+  <!-- ============================================================ -->
+  <script>
+    const HOMEPAGE_SECTIONS_DEF = {
+      hero_slider: { name: 'Hero Main Slider Banners', icon: '🖼️', desc: 'Top rotating banners with CTA buttons & titles' },
+      categories_strip: { name: 'Shop By Categories Strip', icon: '🗂️', desc: 'Round animated categories icons marquee slider' },
+      trust_badges: { name: '24/7 Trust Badges Bar', icon: '🛡️', desc: 'Support 24/7, Best Prices, COD & 7-Day Exchange badges' },
+      front_tabs: { name: 'Front Categories Tabs', icon: '🏷️', desc: 'Category filter tab pills above products' },
+      hot_selling: { name: '🔥 Hot Selling Wholesale Gadgets', icon: '🔥', desc: 'Portion 1: High margin fast moving bestsellers' },
+      new_arrivals: { name: '✨ Latest New Arrivals', icon: '✨', desc: 'Portion 2: Fresh imports containers collection' },
+      flash_sale: { name: '⚡ Today\'s Flash Sale & Timer', icon: '⚡', desc: 'Portion 3: Live countdown deal cards' },
+      trending_picks: { name: '🌟 Trending Wholesale Picks', icon: '🌟', desc: 'Portion 4: Demanded lifestyle gadgets & organizers' },
+      main_catalog: { name: '🛍️ All Wholesale Products Catalog', icon: '🛍️', desc: 'Portion 5: Complete catalog grid with category filters' },
+      search_hero: { name: '🔍 Interactive Search Hero', icon: '🔍', desc: 'Portion 6: Instant search bar and quick finding card' },
+      video_reels: { name: '🎬 Watch & Shop Video Reels', icon: '🎬', desc: 'Portion 7: TikTok style short video shopping carousel' },
+      testimonials: { name: '💬 Client Testimonials & Reviews', icon: '💬', desc: 'Portion 8: Verified wholesale client reviews marquee' }
+    };
+
+    const DEFAULT_SECTIONS_ORDER = [
+      'hero_slider', 'categories_strip', 'trust_badges', 'front_tabs',
+      'hot_selling', 'new_arrivals', 'flash_sale', 'trending_picks',
+      'main_catalog', 'search_hero', 'video_reels', 'testimonials'
+    ];
+
+    let homeConfig = null;
+
+    // Toast helper
+    function showToast(msg, icon = '✅') {
+      const t = document.getElementById('editorToast');
+      const m = document.getElementById('toastMsg');
+      const i = document.getElementById('toastIcon');
+      if (!t || !m) return;
+      m.textContent = msg;
+      if (i) i.textContent = icon;
+      t.classList.remove('translate-y-20', 'opacity-0');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => {
+        t.classList.add('translate-y-20', 'opacity-0');
+      }, 3500);
+    }
+
+    // Tab switcher
+    function switchEditorTab(tabId) {
+      ['hero', 'sections', 'ticker'].forEach(t => {
+        const btn = document.getElementById(`tabBtn-${t}`);
+        const content = document.getElementById(`tabContent-${t}`);
+        if (t === tabId) {
+          btn?.classList.add('active');
+          content?.classList.remove('hidden');
+        } else {
+          btn?.classList.remove('active');
+          content?.classList.add('hidden');
+        }
+      });
+    }
+
+    // Device switch
+    function setPreviewDevice(device) {
+      const frame = document.getElementById('previewDeviceFrame');
+      const dBtn = document.getElementById('prev-desktop');
+      const mBtn = document.getElementById('prev-mobile');
+      if (device === 'mobile') {
+        frame.style.maxWidth = '390px';
+        frame.style.margin = '0 auto';
+        dBtn?.classList.remove('bg-teal-800', 'text-cyan-300');
+        dBtn?.classList.add('text-slate-400');
+        mBtn?.classList.add('bg-teal-800', 'text-cyan-300');
+        mBtn?.classList.remove('text-slate-400');
+      } else {
+        frame.style.maxWidth = '100%';
+        frame.style.margin = '0';
+        mBtn?.classList.remove('bg-teal-800', 'text-cyan-300');
+        mBtn?.classList.add('text-slate-400');
+        dBtn?.classList.add('bg-teal-800', 'text-cyan-300');
+        dBtn?.classList.remove('text-slate-400');
+      }
+    }
+
+    function dispatchLivePreviewUpdate() {
+      if (!homeConfig) return;
+      // 1. Instantly update localStorage so any open tab updates immediately
+      try {
+        localStorage.setItem('save_and_smile_home_config', JSON.stringify(homeConfig));
+        if (Array.isArray(homeConfig.hero_slides)) {
+          localStorage.setItem('qadri_custom_banners', JSON.stringify(homeConfig.hero_slides));
+        }
+      } catch (e) {}
+
+      // 2. Post direct message to the preview iframe on the right side
+      try {
+        const iframe = document.getElementById('storePreviewIframe');
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.postMessage({
+            type: 'HOME_CONFIG_UPDATE',
+            config: homeConfig
+          }, '*');
+        }
+      } catch (e) {}
+    }
+
+    function reloadPreviewIframe() {
+      const iframe = document.getElementById('storePreviewIframe');
+      if (iframe) iframe.src = 'index.html?t=' + Date.now();
+    }
+
+    // Auto-WebP conversion function with high-compression & quota protection
+    function convertImageFileToWebP(file, quality = 0.75) {
+      return new Promise((resolve, reject) => {
+        if (!file || !file.type.startsWith('image/')) {
+          return reject(new Error('Selected file is not an image.'));
+        }
+        const origSizeKB = Math.round(file.size / 1024);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.naturalWidth || img.width;
+            let h = img.naturalHeight || img.height;
+            const maxW = 1200;
+            if (w > maxW) {
+              h = Math.round((h * maxW) / w);
+              w = maxW;
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+
+            canvas.toBlob((blob) => {
+              if (!blob) {
+                return resolve({ dataUrl: e.target.result, origSizeKB, webpSizeKB: origSizeKB, percentReduced: 0, width: w, height: h });
+              }
+              const webpSizeKB = Math.round(blob.size / 1024);
+              const percentReduced = Math.max(0, Math.round(((file.size - blob.size) / file.size) * 100));
+              const blobReader = new FileReader();
+              blobReader.onload = (be) => {
+                resolve({
+                  dataUrl: be.target.result,
+                  origSizeKB,
+                  webpSizeKB,
+                  percentReduced,
+                  width: canvas.width,
+                  height: canvas.height
+                });
+              };
+              blobReader.readAsDataURL(blob);
+            }, 'image/webp', quality);
+          };
+          img.onerror = () => reject(new Error('Failed to load image file.'));
+          img.src = e.target.result;
+        };
+        reader.onerror = () => reject(new Error('Failed to read file.'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // -------------------------------------------------------------
+    // LOAD & INITIALIZE CONFIG (Timestamp-prioritized to avoid reverts)
+    // -------------------------------------------------------------
+    async function loadHomeConfig() {
+      let localConfig = null;
+      try {
+        const cached = localStorage.getItem('save_and_smile_home_config');
+        if (cached) localConfig = JSON.parse(cached);
+      } catch (e) {}
+
+      let serverConfig = null;
+      try {
+        const res = await fetch('/api/home-customization');
+        const data = await res.json();
+        if (data && data.config) {
+          serverConfig = data.config;
+        }
+      } catch (err) {
+        console.warn('API load fallback:', err);
+      }
+
+      const localTime = localConfig && localConfig.updated_at ? new Date(localConfig.updated_at).getTime() : 0;
+      const serverTime = serverConfig && serverConfig.updated_at ? new Date(serverConfig.updated_at).getTime() : 0;
+
+      // Prefer whichever is newer; never blindly overwrite newer user edits with stale server defaults
+      if (localConfig && localTime >= serverTime) {
+        homeConfig = localConfig;
+      } else if (serverConfig) {
+        homeConfig = serverConfig;
+      } else if (localConfig) {
+        homeConfig = localConfig;
+      } else {
+        homeConfig = {
+          hero_slides: [
+            { id: "slide_1", title: "Wholesale Online Mega Sale", subtitle: "Get unbeatable prices on trending gadgets & home organizers", image: "https://www.qadrigadgets.pk/images/banners/6a91c696b7d39.webp", link: "#products", badge: "MEGA SALE" },
+            { id: "slide_2", title: "Electric Insect Killers & Summer Gadgets", subtitle: "Premium mosquito killers and rechargeable lamps at direct wholesale rates", image: "https://www.qadrigadgets.pk/images/banners/6a7af65669503.webp", link: "#products", badge: "HOT SUMMER" },
+            { id: "slide_3", title: "Trending Water Bottles & Sippers", subtitle: "Modern aesthetic mugs and gym motivational bottles", image: "https://www.qadrigadgets.pk/images/banners/6a7af65669d26.webp", link: "#products", badge: "POPULAR" },
+            { id: "slide_4", title: "Store it Beautifully - Storage & Racks", subtitle: "Kitchen, Bathroom & Wardrobe organization solutions", image: "https://www.qadrigadgets.pk/images/banners/6a7af6566a0fa.webp", link: "#products", badge: "ORGANIZERS" },
+            { id: "slide_5", title: "Toys & Kids Collection", subtitle: "Exciting flying planes, remote control cars and educational toys", image: "https://www.qadrigadgets.pk/images/banners/6a6e1db8c4ccd.webp", link: "#products", badge: "KIDS SPECIAL" },
+            { id: "slide_6", title: "Fashion Mobile Accessories & Tech", subtitle: "Earbuds, Smart Watches, Cables & Fast Chargers", image: "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp", link: "#products", badge: "GADGETS" }
+          ],
+          announcement_ticker: {
+            enabled: true,
+            speed: 32,
+            items: [
+              "🚀 Welcome to <strong>Save & Smile Wholesale Portal</strong> (Shop • Save • Smile)",
+              "🔥 Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers",
+              "🚚 Cash on Delivery (COD) Nationwide | Free Delivery Above Rs. 3,000",
+              "📞 24/7 Helpline & WhatsApp: <strong>0316-2323616</strong>"
+            ]
+          },
+          sections_order: [...DEFAULT_SECTIONS_ORDER],
+          sections_visibility: {}
+        };
+      }
+
+      // Ensure stable string IDs on all slides
+      if (Array.isArray(homeConfig.hero_slides)) {
+        homeConfig.hero_slides.forEach((s, idx) => {
+          if (!s.id) s.id = 'slide_' + (idx + 1);
+          else s.id = String(s.id);
+        });
+      }
+
+      if (!Array.isArray(homeConfig.sections_order) || homeConfig.sections_order.length === 0) {
+        homeConfig.sections_order = [...DEFAULT_SECTIONS_ORDER];
+      }
+      if (!homeConfig.sections_visibility) {
+        homeConfig.sections_visibility = {};
+        DEFAULT_SECTIONS_ORDER.forEach(k => { homeConfig.sections_visibility[k] = true; });
+      }
+
+      renderHeroBannersList();
+      renderSectionsOrderList();
+      populateTickerForm();
+    }
+
+    const STORE_CATEGORIES = [
+      { id: 'storage', name: 'Storage & Racks', icon: '📦', count: 142 },
+      { id: 'kitchen', name: 'Kitchen Gadgets', icon: '🍳', count: 98 },
+      { id: 'electronics', name: 'Electronic Items', icon: '⚡', count: 215 },
+      { id: 'smartwatches', name: 'Smart Watches', icon: '⌚', count: 64 },
+      { id: 'bottles', name: 'Mugs & Bottles', icon: '🥤', count: 76 },
+      { id: 'beauty', name: 'Beauty & Makeup', icon: '💄', count: 85 },
+      { id: 'insect-killers', name: 'Insect Killers', icon: '🦟', count: 32 },
+      { id: 'accessories', name: 'Mobile Accessories', icon: '📱', count: 120 },
+      { id: 'cleaning', name: 'Wipers & Cleaning', icon: '🧹', count: 53 },
+      { id: 'toys', name: 'Toys & Kids Collection', icon: '🧸', count: 48 }
+    ];
+
+    function markUnsavedChanges() {
+      const dot = document.getElementById('sectionsSaveStatusDot');
+      const title = document.getElementById('sectionsSaveStatusTitle');
+      const sub = document.getElementById('sectionsSaveStatusSub');
+      const topBtn = document.getElementById('sectionsTopSaveBtn');
+      const headerBtn = document.getElementById('savePublishBtn');
+
+      if (dot) dot.className = 'w-3 h-3 rounded-full bg-amber-400 animate-pulse shrink-0';
+      if (title) {
+        title.textContent = '● Unsaved Changes Detected';
+        title.className = 'text-xs font-black text-amber-300';
+      }
+      if (sub) {
+        sub.textContent = 'Aap ne changes ki hain — "Save & Publish" par click karein!';
+        sub.className = 'text-[10px] text-amber-200';
+      }
+      if (topBtn) topBtn.classList.add('ring-2', 'ring-amber-400', 'shadow-lg');
+      if (headerBtn) headerBtn.classList.add('ring-2', 'ring-amber-400');
+
+      // Instantly reflect change on the live screen preview on the right side
+      dispatchLivePreviewUpdate();
+    }
+
+    function clearUnsavedChanges() {
+      const dot = document.getElementById('sectionsSaveStatusDot');
+      const title = document.getElementById('sectionsSaveStatusTitle');
+      const sub = document.getElementById('sectionsSaveStatusSub');
+      const topBtn = document.getElementById('sectionsTopSaveBtn');
+      const headerBtn = document.getElementById('savePublishBtn');
+
+      if (dot) dot.className = 'w-3 h-3 rounded-full bg-emerald-400 shrink-0';
+      if (title) {
+        title.textContent = 'Live Storefront Synced';
+        title.className = 'text-xs font-black text-white';
+      }
+      if (sub) {
+        sub.textContent = 'All layout & category changes saved live to Save & Smile Store';
+        sub.className = 'text-[10px] text-slate-300';
+      }
+      if (topBtn) topBtn.classList.remove('ring-2', 'ring-amber-400', 'shadow-lg');
+      if (headerBtn) headerBtn.classList.remove('ring-2', 'ring-amber-400');
+    }
+
+    // -------------------------------------------------------------
+    // HERO BANNERS MANAGEMENT
+    // -------------------------------------------------------------
+    function renderHeroBannersList() {
+      const container = document.getElementById('heroBannersList');
+      const badge = document.getElementById('heroSlidesBadge');
+      if (!container || !homeConfig) return;
+
+      const slides = homeConfig.hero_slides || [];
+      if (badge) badge.textContent = `${slides.length} Slides`;
+
+      if (slides.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center bg-slate-50 border border-slate-200 rounded-2xl text-slate-400 text-xs">
+            No slides configured. Click "+ Add New Slide" above.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = slides.map((slide, idx) => `
+        <div class="p-4 bg-white hover:bg-slate-50 rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition">
+          <div class="flex items-center space-x-3.5 min-w-0">
+            <span class="w-7 h-7 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-xs shrink-0">#${idx + 1}</span>
+            <div class="w-24 h-12 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shrink-0 relative group">
+              <img src="${slide.image}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=120'">
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-slate-900 text-xs truncate">${slide.title}</div>
+              <div class="text-[11px] text-slate-500 truncate max-w-sm">${slide.subtitle || 'No subtitle'}</div>
+              <div class="flex flex-wrap items-center gap-1.5 mt-1 text-[10px]">
+                <span class="bg-cyan-50 text-cyan-900 border border-cyan-200 px-1.5 py-0.5 rounded font-mono font-bold">📐 Size: 2117 × 743 px</span>
+                <span class="font-mono text-teal-800 font-semibold">${slide.link || '#products'}</span>
+                ${slide.badge ? `<span class="bg-cyan-100 text-cyan-800 px-1.5 py-0.5 rounded font-black">${slide.badge}</span>` : ''}
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-1.5 self-end sm:self-center shrink-0">
+            <!-- Direct Change Pic File Upload Button -->
+            <label class="px-2.5 py-1.5 bg-cyan-50 hover:bg-cyan-100 text-cyan-800 font-bold rounded-xl text-xs cursor-pointer flex items-center gap-1 transition shadow-2xs border border-cyan-200">
+              <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" onchange="quickChangeBannerPic(${idx}, event)">
+              <span>📷 Change Pic</span>
+            </label>
+
+            ${idx > 0 ? `<button type="button" onclick="moveSlide(${idx}, -1)" title="Move Up" class="p-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold">▲</button>` : ''}
+            ${idx < slides.length - 1 ? `<button type="button" onclick="moveSlide(${idx}, 1)" title="Move Down" class="p-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold">▼</button>` : ''}
+            <button type="button" onclick="openEditBannerModal('${slide.id}')" class="px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold rounded-lg text-xs">Edit</button>
+            <button type="button" onclick="deleteSlide('${slide.id}')" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-lg text-xs">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function quickChangeBannerPic(idx, e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      showToast('Converting picture to WebP...', '⚡');
+      try {
+        const webpResult = await convertImageFileToWebP(file);
+        if (homeConfig && homeConfig.hero_slides && homeConfig.hero_slides[idx]) {
+          homeConfig.hero_slides[idx].image = webpResult.dataUrl;
+          if (!homeConfig.hero_slides[idx].id) {
+            homeConfig.hero_slides[idx].id = 'slide_' + Date.now() + '_' + idx;
+          }
+          homeConfig.updated_at = new Date().toISOString();
+          renderHeroBannersList();
+          markUnsavedChanges();
+          showToast(`Picture converted to WebP (${webpResult.width}×${webpResult.height}px, -${webpResult.percentReduced}%)! Click "Save & Publish" to store.`, '🎉');
+        }
+      } catch (err) {
+        alert('Image error: ' + err.message);
+      }
+    }
+
+    function moveSlide(idx, delta) {
+      if (!homeConfig || !homeConfig.hero_slides) return;
+      const slides = homeConfig.hero_slides;
+      const newIdx = idx + delta;
+      if (newIdx < 0 || newIdx >= slides.length) return;
+      const temp = slides[idx];
+      slides[idx] = slides[newIdx];
+      slides[newIdx] = temp;
+      homeConfig.updated_at = new Date().toISOString();
+      renderHeroBannersList();
+      markUnsavedChanges();
+    }
+
+    function deleteSlide(slideId) {
+      if (!confirm('Are you sure you want to remove this slide?')) return;
+      homeConfig.hero_slides = (homeConfig.hero_slides || []).filter(s => String(s.id) !== String(slideId));
+      homeConfig.updated_at = new Date().toISOString();
+      renderHeroBannersList();
+      markUnsavedChanges();
+      showToast('Slide removed', '🗑️');
+    }
+
+    // Modal Add / Edit
+    function openAddBannerModal() {
+      document.getElementById('slideModalTitle').textContent = 'Add Hero Banner Slide';
+      document.getElementById('slideForm').reset();
+      document.getElementById('modalSlideId').value = '';
+      const detectedBox = document.getElementById('modalDetectedSizeBox');
+      if (detectedBox) detectedBox.classList.add('hidden');
+      previewModalImage('');
+      document.getElementById('slideModal').classList.remove('hidden');
+      document.getElementById('slideModal').classList.add('flex');
+    }
+
+    function openEditBannerModal(slideId) {
+      const slides = homeConfig.hero_slides || [];
+      const slide = slides.find(s => String(s.id) === String(slideId));
+      if (!slide) return;
+
+      document.getElementById('slideModalTitle').textContent = `Edit Slide: ${(slide.title || 'Slide').substring(0, 20)}...`;
+      document.getElementById('modalSlideId').value = String(slide.id);
+      document.getElementById('modalSlideTitle').value = slide.title || '';
+      document.getElementById('modalSlideSubtitle').value = slide.subtitle || '';
+      document.getElementById('modalSlideImage').value = slide.image || '';
+      document.getElementById('modalSlideLink').value = slide.link || '#products';
+      document.getElementById('modalSlideBadge').value = slide.badge || '';
+      const detectedBox = document.getElementById('modalDetectedSizeBox');
+      if (detectedBox) detectedBox.classList.add('hidden');
+      previewModalImage(slide.image || '');
+
+      document.getElementById('slideModal').classList.remove('hidden');
+      document.getElementById('slideModal').classList.add('flex');
+    }
+
+    function closeSlideModal() {
+      document.getElementById('slideModal').classList.add('hidden');
+      document.getElementById('slideModal').classList.remove('flex');
+    }
+
+    function previewModalImage(url) {
+      const img = document.getElementById('modalPreviewImg');
+      const placeholder = document.getElementById('modalPreviewPlaceholder');
+      const detectedBox = document.getElementById('modalDetectedSizeBox');
+      const detectedText = document.getElementById('modalDetectedSizeText');
+      if (!img || !placeholder) return;
+
+      if (url && url.trim().length > 5) {
+        img.src = url.trim();
+        img.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+        img.onload = () => {
+          if (detectedBox && detectedText && img.naturalWidth) {
+            detectedBox.classList.remove('hidden');
+            const ratio = (img.naturalWidth / img.naturalHeight).toFixed(2);
+            detectedText.textContent = `${img.naturalWidth} × ${img.naturalHeight} px (Ratio ${ratio}:1)`;
+          }
+        };
+      } else {
+        img.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        if (detectedBox) detectedBox.classList.add('hidden');
+      }
+    }
+
+    async function handleModalFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      showToast('Converting picture to WebP...', '⚡');
+      try {
+        const webpResult = await convertImageFileToWebP(file);
+        document.getElementById('modalSlideImage').value = webpResult.dataUrl;
+        previewModalImage(webpResult.dataUrl);
+
+        const detectedBox = document.getElementById('modalDetectedSizeBox');
+        const detectedText = document.getElementById('modalDetectedSizeText');
+        if (detectedBox && detectedText) {
+          detectedBox.classList.remove('hidden');
+          detectedText.textContent = `${webpResult.width} × ${webpResult.height} px • ${webpResult.webpSizeKB} KB WebP (-${webpResult.percentReduced}%)`;
+        }
+        showToast(`Picture converted to WebP (${webpResult.width}×${webpResult.height}px, -${webpResult.percentReduced}%)`, '🎉');
+      } catch (err) {
+        alert('Image error: ' + err.message);
+      }
+    }
+
+    function handleSlideSubmit(e) {
+      e.preventDefault();
+      const editId = document.getElementById('modalSlideId').value;
+      const title = document.getElementById('modalSlideTitle').value.trim();
+      const subtitle = document.getElementById('modalSlideSubtitle').value.trim();
+      const image = document.getElementById('modalSlideImage').value.trim();
+      const link = document.getElementById('modalSlideLink').value.trim() || '#products';
+      const badge = document.getElementById('modalSlideBadge').value.trim() || '';
+
+      if (!image) {
+        alert('Please provide or upload a banner picture.');
+        return;
+      }
+
+      homeConfig.updated_at = new Date().toISOString();
+
+      if (editId) {
+        const slides = homeConfig.hero_slides || [];
+        const idx = slides.findIndex(s => String(s.id) === String(editId));
+        if (idx >= 0) {
+          slides[idx] = { ...slides[idx], title, subtitle, image, link, badge };
+        }
+        showToast(`Slide "${title.substring(0, 16)}..." updated!`, '✅');
+      } else {
+        const newSlide = {
+          id: 'slide_' + Date.now(),
+          title, subtitle, image, link, badge,
+          btn_text: "Shop Wholesale Now"
+        };
+        homeConfig.hero_slides = homeConfig.hero_slides || [];
+        homeConfig.hero_slides.unshift(newSlide);
+        showToast('New banner slide added!', '🎉');
+      }
+
+      closeSlideModal();
+      renderHeroBannersList();
+      markUnsavedChanges();
+    }
+
+    // -------------------------------------------------------------
+    // SECTIONS REORDERING & CONFIGURATION (OOPER / NEECHAY / EDIT)
+    // -------------------------------------------------------------
+    function renderSectionsOrderList() {
+      const container = document.getElementById('sectionsOrderList');
+      if (!container || !homeConfig) return;
+
+      const order = homeConfig.sections_order || DEFAULT_SECTIONS_ORDER;
+      const vis = homeConfig.sections_visibility || {};
+      const sc = homeConfig.sections_config || {};
+
+      container.innerHTML = order.map((secKey, idx) => {
+        const def = HOMEPAGE_SECTIONS_DEF[secKey] || { name: secKey, icon: '📦', desc: 'Homepage Section' };
+        const isVisible = vis[secKey] !== false;
+
+        // Custom config badges (e.g. categories count)
+        let configBadge = '';
+        if (secKey === 'categories_strip' && sc.categories_strip?.selected_categories) {
+          configBadge = `<span class="px-1.5 py-0.5 bg-teal-50 text-teal-800 border border-teal-200 text-[10px] font-bold rounded">${sc.categories_strip.selected_categories.length} Categories Active</span>`;
+        }
+
+        return `
+          <div class="p-3.5 bg-white hover:bg-slate-50 rounded-2xl border ${isVisible ? 'border-slate-200' : 'border-slate-300 opacity-60'} shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition">
+            <div class="flex items-center space-x-3.5 min-w-0">
+              <span class="w-7 h-7 rounded-full ${idx === 0 ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-white font-bold'} flex items-center justify-center text-xs shrink-0 shadow-xs">#${idx + 1}</span>
+              <span class="text-xl shrink-0">${def.icon}</span>
+              <div class="min-w-0">
+                <div class="font-bold text-slate-900 text-xs flex items-center gap-2">
+                  <span>${def.name}</span>
+                  ${idx === 0 ? '<span class="px-1.5 py-0.5 bg-amber-100 text-amber-900 text-[9px] font-black rounded uppercase">Top Section</span>' : ''}
+                  ${configBadge}
+                </div>
+                <div class="text-[11px] text-slate-500 truncate max-w-md">${def.desc}</div>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-2 self-end sm:self-center shrink-0">
+              <!-- Edit Section Settings Button -->
+              <button type="button" onclick="openSectionConfigModal('${secKey}')" title="Configure Section" class="px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-800 font-bold rounded-lg text-xs flex items-center gap-1 transition shadow-xs">
+                <span>⚙️ Edit Section</span>
+              </button>
+
+              ${idx > 0 ? `
+                <button type="button" onclick="moveSection(${idx}, -1)" title="Move Up" class="px-2.5 py-1.5 bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-800 font-bold rounded-lg text-xs flex items-center gap-1 transition shadow-xs">
+                  ▲ Ooper
+                </button>
+              ` : `
+                <span class="w-16"></span>
+              `}
+              ${idx < order.length - 1 ? `
+                <button type="button" onclick="moveSection(${idx}, 1)" title="Move Down" class="px-2.5 py-1.5 bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-800 font-bold rounded-lg text-xs flex items-center gap-1 transition shadow-xs">
+                  ▼ Neechay
+                </button>
+              ` : `
+                <span class="w-16"></span>
+              `}
+
+              <label class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-100 transition shadow-xs">
+                <input type="checkbox" onchange="toggleSectionVis('${secKey}', this.checked)" ${isVisible ? 'checked' : ''} class="rounded text-[#008060] focus:ring-[#008060]">
+                <span class="text-xs font-bold ${isVisible ? 'text-emerald-700' : 'text-slate-400'}">${isVisible ? 'Visible' : 'Hidden'}</span>
+              </label>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function moveSection(idx, delta) {
+      if (!homeConfig || !homeConfig.sections_order) return;
+      const order = homeConfig.sections_order;
+      const newIdx = idx + delta;
+      if (newIdx < 0 || newIdx >= order.length) return;
+
+      const temp = order[idx];
+      order[idx] = order[newIdx];
+      order[newIdx] = temp;
+
+      renderSectionsOrderList();
+      markUnsavedChanges();
+      showToast(`"${HOMEPAGE_SECTIONS_DEF[temp]?.name || temp}" moved to #${newIdx + 1}!`, '↕️');
+    }
+
+    function toggleSectionVis(secKey, isChecked) {
+      homeConfig.sections_visibility = homeConfig.sections_visibility || {};
+      homeConfig.sections_visibility[secKey] = isChecked;
+      renderSectionsOrderList();
+      markUnsavedChanges();
+    }
+
+    function resetSectionsOrder() {
+      if (!confirm('Default section order restore karna chahte hain?')) return;
+      homeConfig.sections_order = [...DEFAULT_SECTIONS_ORDER];
+      renderSectionsOrderList();
+      markUnsavedChanges();
+      showToast('Default sections order restored!', '↺');
+    }
+
+    // -------------------------------------------------------------
+    // SECTION CONFIGURATION MODAL (SHOP BY CATEGORIES, HOT SELLING, ETC)
+    // -------------------------------------------------------------
+    function openSectionConfigModal(secKey) {
+      if (!homeConfig) return;
+      homeConfig.sections_config = homeConfig.sections_config || {};
+      const cfg = homeConfig.sections_config[secKey] || {};
+      const def = HOMEPAGE_SECTIONS_DEF[secKey] || { name: secKey, icon: '⚙️' };
+
+      document.getElementById('modalSectionKey').value = secKey;
+      document.getElementById('secModalIcon').textContent = def.icon;
+      document.getElementById('secModalTitle').textContent = `Edit Section: ${def.name}`;
+
+      const body = document.getElementById('modalSectionDynamicBody');
+      if (!body) return;
+
+      if (secKey === 'categories_strip') {
+        const selected = cfg.selected_categories || ['storage', 'kitchen', 'smartwatches', 'bottles', 'insect-killers', 'beauty', 'accessories', 'toys'];
+        const title = cfg.title || 'Shop By Categories';
+
+        body.innerHTML = `
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Section Heading Title</label>
+            <input type="text" id="cfg_cat_title" value="${title}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+            <span class="text-[10px] text-slate-400 mt-1 block">Default: Shop By Categories</span>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="font-bold text-slate-700">Select Categories to Display on Homepage</label>
+              <div class="space-x-2">
+                <button type="button" onclick="toggleAllCategoryChecks(true)" class="text-[11px] font-bold text-[#008060] hover:underline">Select All</button>
+                <span class="text-slate-300">|</span>
+                <button type="button" onclick="toggleAllCategoryChecks(false)" class="text-[11px] font-bold text-rose-600 hover:underline">Clear All</button>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-500 mb-3">Apne hisab se categories check/uncheck karein kon konsi categories storefront par gol icons marquee strip mein show honi chahiyen:</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-60 overflow-y-auto p-1.5 border border-slate-200 rounded-2xl bg-slate-50/50">
+              ${STORE_CATEGORIES.map(cat => {
+                const isChecked = selected.includes(cat.id);
+                return `
+                  <label class="flex items-center space-x-2.5 p-2.5 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 cursor-pointer shadow-2xs">
+                    <input type="checkbox" name="cfg_selected_categories" value="${cat.id}" ${isChecked ? 'checked' : ''} class="rounded text-[#008060] focus:ring-[#008060] w-4 h-4">
+                    <span class="text-lg">${cat.icon}</span>
+                    <div class="min-w-0">
+                      <div class="font-bold text-slate-800 text-xs truncate">${cat.name}</div>
+                      <div class="text-[10px] text-slate-400">${cat.count} items</div>
+                    </div>
+                  </label>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      } else if (['hot_selling', 'new_arrivals', 'trending_picks'].includes(secKey)) {
+        const title = cfg.title || HOMEPAGE_SECTIONS_DEF[secKey].name;
+        const subtitle = cfg.subtitle || '';
+        const tag = cfg.tag || (secKey === 'hot_selling' ? '🔥 HOT SELLING' : secKey === 'new_arrivals' ? '✨ NEW ARRIVALS' : '🌟 TRENDING PICKS');
+        const limit = cfg.limit || 8;
+
+        body.innerHTML = `
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Section Title</label>
+            <input type="text" id="cfg_sec_title" value="${title}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Subtitle / Description</label>
+            <input type="text" id="cfg_sec_subtitle" value="${subtitle}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Badge Tag</label>
+              <input type="text" id="cfg_sec_tag" value="${tag}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Items Limit</label>
+              <select id="cfg_sec_limit" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-medium">
+                <option value="4" ${limit == 4 ? 'selected' : ''}>4 Products</option>
+                <option value="8" ${limit == 8 ? 'selected' : ''}>8 Products</option>
+                <option value="12" ${limit == 12 ? 'selected' : ''}>12 Products</option>
+                <option value="16" ${limit == 16 ? 'selected' : ''}>16 Products</option>
+              </select>
+            </div>
+          </div>
+        `;
+      } else if (secKey === 'flash_sale') {
+        const title = cfg.title || "TODAY'S FLASH SALE";
+        const subtitle = cfg.subtitle || "Limited quantity left at discounted wholesale prices!";
+        const hours = cfg.countdown_hours || 14;
+
+        body.innerHTML = `
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Flash Sale Title</label>
+            <input type="text" id="cfg_fs_title" value="${title}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Subtitle</label>
+            <input type="text" id="cfg_fs_subtitle" value="${subtitle}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Countdown Hours</label>
+            <input type="number" id="cfg_fs_hours" value="${hours}" min="1" max="72" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+          </div>
+        `;
+      } else if (secKey === 'trust_badges') {
+        const tb = cfg || {};
+        body.innerHTML = `
+          <p class="text-slate-500 mb-2">Storefront ke 4 trust badges ke titles aur descriptions edit karein:</p>
+          <div class="space-y-3">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <label class="block font-bold text-slate-700 mb-1">Badge 1 (Support)</label>
+              <input type="text" id="cfg_tb_b1_title" value="${tb.badge1_title || 'Support 24/7'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg font-bold mb-1">
+              <input type="text" id="cfg_tb_b1_desc" value="${tb.badge1_desc || 'Direct WhatsApp & Call wholesale assistance'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-[11px]">
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <label class="block font-bold text-slate-700 mb-1">Badge 2 (Pricing)</label>
+              <input type="text" id="cfg_tb_b2_title" value="${tb.badge2_title || 'Best Prices'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg font-bold mb-1">
+              <input type="text" id="cfg_tb_b2_desc" value="${tb.badge2_desc || 'Direct factory prices for bulk & retail'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-[11px]">
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <label class="block font-bold text-slate-700 mb-1">Badge 3 (Payment)</label>
+              <input type="text" id="cfg_tb_b3_title" value="${tb.badge3_title || 'Secure Payment'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg font-bold mb-1">
+              <input type="text" id="cfg_tb_b3_desc" value="${tb.badge3_desc || 'Cash on delivery & verified digital transfers'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-[11px]">
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <label class="block font-bold text-slate-700 mb-1">Badge 4 (Exchange)</label>
+              <input type="text" id="cfg_tb_b4_title" value="${tb.badge4_title || '7 Days Replacement'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg font-bold mb-1">
+              <input type="text" id="cfg_tb_b4_desc" value="${tb.badge4_desc || 'Hassle-free product verification & exchange'}" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-[11px]">
+            </div>
+          </div>
+        `;
+      } else {
+        const title = cfg.title || HOMEPAGE_SECTIONS_DEF[secKey].name;
+        const subtitle = cfg.subtitle || '';
+        body.innerHTML = `
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Section Title</label>
+            <input type="text" id="cfg_gen_title" value="${title}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Subtitle / Information Text</label>
+            <input type="text" id="cfg_gen_subtitle" value="${subtitle}" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl">
+          </div>
+        `;
+      }
+
+      document.getElementById('sectionConfigModal').classList.remove('hidden');
+      document.getElementById('sectionConfigModal').classList.add('flex');
+    }
+
+    function closeSectionConfigModal() {
+      document.getElementById('sectionConfigModal').classList.add('hidden');
+      document.getElementById('sectionConfigModal').classList.remove('flex');
+    }
+
+    function toggleAllCategoryChecks(checkAll) {
+      document.querySelectorAll('input[name="cfg_selected_categories"]').forEach(cb => {
+        cb.checked = checkAll;
+      });
+    }
+
+    function handleSectionConfigSubmit(e) {
+      e.preventDefault();
+      const secKey = document.getElementById('modalSectionKey').value;
+      if (!homeConfig) return;
+      homeConfig.sections_config = homeConfig.sections_config || {};
+
+      if (secKey === 'categories_strip') {
+        const title = document.getElementById('cfg_cat_title')?.value.trim() || 'Shop By Categories';
+        const selected = Array.from(document.querySelectorAll('input[name="cfg_selected_categories"]:checked')).map(cb => cb.value);
+        homeConfig.sections_config.categories_strip = {
+          title,
+          selected_categories: selected
+        };
+        showToast(`Categories updated (${selected.length} active)! Click Save to publish.`, '🗂️');
+      } else if (['hot_selling', 'new_arrivals', 'trending_picks'].includes(secKey)) {
+        const title = document.getElementById('cfg_sec_title')?.value.trim();
+        const subtitle = document.getElementById('cfg_sec_subtitle')?.value.trim();
+        const tag = document.getElementById('cfg_sec_tag')?.value.trim();
+        const limit = parseInt(document.getElementById('cfg_sec_limit')?.value, 10) || 8;
+        homeConfig.sections_config[secKey] = { title, subtitle, tag, limit };
+        showToast(`Section "${title}" updated! Click Save to publish.`, '⚙️');
+      } else if (secKey === 'flash_sale') {
+        const title = document.getElementById('cfg_fs_title')?.value.trim();
+        const subtitle = document.getElementById('cfg_fs_subtitle')?.value.trim();
+        const countdown_hours = parseInt(document.getElementById('cfg_fs_hours')?.value, 10) || 14;
+        homeConfig.sections_config.flash_sale = { title, subtitle, countdown_hours };
+        showToast('Flash Sale settings updated!', '⚡');
+      } else if (secKey === 'trust_badges') {
+        homeConfig.sections_config.trust_badges = {
+          badge1_title: document.getElementById('cfg_tb_b1_title')?.value.trim(),
+          badge1_desc: document.getElementById('cfg_tb_b1_desc')?.value.trim(),
+          badge2_title: document.getElementById('cfg_tb_b2_title')?.value.trim(),
+          badge2_desc: document.getElementById('cfg_tb_b2_desc')?.value.trim(),
+          badge3_title: document.getElementById('cfg_tb_b3_title')?.value.trim(),
+          badge3_desc: document.getElementById('cfg_tb_b3_desc')?.value.trim(),
+          badge4_title: document.getElementById('cfg_tb_b4_title')?.value.trim(),
+          badge4_desc: document.getElementById('cfg_tb_b4_desc')?.value.trim()
+        };
+        showToast('Trust badges updated!', '🛡️');
+      } else {
+        const title = document.getElementById('cfg_gen_title')?.value.trim();
+        const subtitle = document.getElementById('cfg_gen_subtitle')?.value.trim();
+        homeConfig.sections_config[secKey] = { title, subtitle };
+        showToast('Section settings updated!', '✅');
+      }
+
+      closeSectionConfigModal();
+      renderSectionsOrderList();
+      markUnsavedChanges();
+    }
+
+    // -------------------------------------------------------------
+    // TOP TICKER BAR
+    // -------------------------------------------------------------
+    function populateTickerForm() {
+      const ticker = homeConfig.announcement_ticker || {};
+      const chk = document.getElementById('tickerEnableCheck');
+      if (chk) chk.checked = ticker.enabled !== false;
+      const txt = document.getElementById('tickerMessagesText');
+      if (txt && Array.isArray(ticker.items)) txt.value = ticker.items.join('\n');
+      const spd = document.getElementById('tickerSpeedInput');
+      if (spd) spd.value = ticker.speed || 32;
+    }
+
+    function handleTickerLiveChange() {
+      if (!homeConfig) return;
+      const tickerEnabled = document.getElementById('tickerEnableCheck')?.checked !== false;
+      const tickerLines = (document.getElementById('tickerMessagesText')?.value || '')
+        .split('\n')
+        .map(l => l.trim())
+        .filter(Boolean);
+      const tickerSpeed = parseInt(document.getElementById('tickerSpeedInput')?.value, 10) || 32;
+
+      homeConfig.announcement_ticker = {
+        enabled: tickerEnabled,
+        speed: tickerSpeed,
+        items: tickerLines.length > 0 ? tickerLines : (homeConfig.announcement_ticker?.items || [])
+      };
+
+      markUnsavedChanges();
+    }
+
+    // -------------------------------------------------------------
+    // SAVE & PUBLISH LIVE
+    // -------------------------------------------------------------
+    async function saveAndPublishHome() {
+      const btn = document.getElementById('savePublishBtn');
+      const topBtn = document.getElementById('sectionsTopSaveBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳ Saving to Store...</span>';
+      }
+      if (topBtn) {
+        topBtn.disabled = true;
+        topBtn.innerHTML = '<span>⏳ Saving...</span>';
+      }
+
+      // Read ticker form
+      const tickerEnabled = document.getElementById('tickerEnableCheck')?.checked !== false;
+      const tickerLines = (document.getElementById('tickerMessagesText')?.value || '')
+        .split('\n')
+        .map(l => l.trim())
+        .filter(Boolean);
+      const tickerSpeed = parseInt(document.getElementById('tickerSpeedInput')?.value, 10) || 32;
+
+      homeConfig.announcement_ticker = {
+        enabled: tickerEnabled,
+        speed: tickerSpeed,
+        items: tickerLines.length > 0 ? tickerLines : (homeConfig.announcement_ticker?.items || [])
+      };
+
+      homeConfig.updated_at = new Date().toISOString();
+
+      // Save locally to immediate localStorage caches
+      try {
+        localStorage.setItem('qadri_custom_banners', JSON.stringify(homeConfig.hero_slides));
+        localStorage.setItem('save_and_smile_home_config', JSON.stringify(homeConfig));
+      } catch (storageErr) {
+        console.warn('LocalStorage quota warning:', storageErr);
+      }
+
+      // Post to backend API
+      const token = localStorage.getItem('save_and_smile_admin_token') || '';
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const res = await fetch('/api/home-customization', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ config: homeConfig })
+        });
+        const result = await res.json();
+        if (result && result.success) {
+          showToast('Live Homepage & Hero published successfully!', '🎉');
+        } else {
+          showToast('Settings saved locally!', '✅');
+        }
+      } catch (err) {
+        console.warn('API sync warning:', err);
+        showToast('Settings saved to browser storage!', '✅');
+      }
+
+      clearUnsavedChanges();
+
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<span>💾 Save &amp; Publish to Store</span>';
+      }
+      if (topBtn) {
+        topBtn.disabled = false;
+        topBtn.innerHTML = '<span>💾 Save &amp; Publish to Store</span>';
+      }
+
+      // Refresh live storefront preview iframe
+      reloadPreviewIframe();
+    }
+
+    // Init on DOM ready
+    window.addEventListener('DOMContentLoaded', () => {
+      loadHomeConfig();
+
+      // Hook up iframe load event to send configuration immediately upon frame reload
+      const iframe = document.getElementById('storePreviewIframe');
+      if (iframe) {
+        iframe.addEventListener('load', () => {
+          setTimeout(() => {
+            dispatchLivePreviewUpdate();
+          }, 150);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

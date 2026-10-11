@@ -31,6 +31,7 @@ const filesToCopy = [
   'track-order.html',
   'admin.html',
   'live-editor.html',
+  'home-editor.html',
   'products.json'
 ];
 

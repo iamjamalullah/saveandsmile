@@ -37,6 +37,14 @@ function getAllProducts() {
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', () => {
+  // Immediately apply any locally saved customization to avoid any flash of uncustomized content
+  try {
+    const cachedHome = JSON.parse(localStorage.getItem('save_and_smile_home_config'));
+    if (cachedHome) {
+      applyHomeCustomization(cachedHome);
+    }
+  } catch (e) {}
+
   initTheme();
   initSlider();
   initCountdown();

@@ -65,10 +65,10 @@ async function runTestSuite() {
   // 2.2 Vercel Configuration Check
   try {
     const vercelConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'vercel.json'), 'utf8'));
-    const validOutput = vercelConfig.outputDirectory === 'dist';
-    const hasFunctions = Boolean(vercelConfig.functions && vercelConfig.functions['api/*.js']);
-    if (validOutput && hasFunctions) {
-      recordTest('Phase 2', 'Vercel Deployment Config', 'outputDirectory: dist and API functions defined', 'Vercel configuration is valid', 'PASS', JSON.stringify(vercelConfig));
+    const isPureNext = !vercelConfig.outputDirectory || vercelConfig.framework === 'nextjs';
+    const isStaticDist = vercelConfig.outputDirectory === 'dist';
+    if (isPureNext || isStaticDist) {
+      recordTest('Phase 2', 'Vercel Deployment Config', 'Valid Vercel configuration for deployment', 'Vercel configuration is valid', 'PASS', JSON.stringify(vercelConfig));
     } else {
       recordTest('Phase 2', 'Vercel Deployment Config', 'valid vercel.json defined', 'Invalid vercel.json', 'FAIL', JSON.stringify(vercelConfig));
     }

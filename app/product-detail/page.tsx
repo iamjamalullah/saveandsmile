@@ -28,7 +28,13 @@ export default function ProductDetailPage() {
         setProduct(found);
         setActiveImg(prev => prev || found.image);
         if (found.variants && found.variants.length > 0) {
-          setSelectedVariant(prev => prev || (found.variants ? found.variants[0] : null));
+          setSelectedVariant(prev => {
+            if (!prev) return found.variants![0];
+            const matching = found.variants!.find(v => (v.name && v.name === prev.name) || (v.size && v.size === prev.size));
+            return matching || found.variants![0];
+          });
+        } else {
+          setSelectedVariant(null);
         }
         const related = all.filter(p => String(p.id) !== String(found.id)).slice(0, 4);
         setRelatedProducts(related);
@@ -40,12 +46,12 @@ export default function ProductDetailPage() {
       applyProductData(all);
     }
 
-    // 1. Instant hydration from client cache (with admin overrides)
+    // 1. Instant hydration from client cache
     syncProducts();
 
     // 2. Fetch live product details from backend API
     function fetchLiveProduct() {
-      fetch('/api/products', { cache: 'no-store' })
+      fetch('/api/products?t=' + Date.now(), { cache: 'no-store' })
         .then(res => res.json())
         .then(data => {
           if (data && Array.isArray(data.products) && data.products.length > 0) {
@@ -63,10 +69,15 @@ export default function ProductDetailPage() {
     function handleSyncEvent(e: any) {
       if (e?.data?.type === 'product_updated' && e.data.product) {
         if (String(e.data.product.id) === String(id)) {
-          setProduct(e.data.product);
+          const fresh = e.data.product;
+          setProduct(fresh);
+          if (fresh.variants && fresh.variants.length > 0) {
+            setSelectedVariant(fresh.variants[0]);
+          } else {
+            setSelectedVariant(null);
+          }
         }
       }
-      syncProducts();
       fetchLiveProduct();
     }
 
@@ -81,10 +92,15 @@ export default function ProductDetailPage() {
         channel.onmessage = (ev) => {
           if (ev.data?.type === 'product_updated' && ev.data.product) {
             if (String(ev.data.product.id) === String(id)) {
-              setProduct(ev.data.product);
+              const fresh = ev.data.product;
+              setProduct(fresh);
+              if (fresh.variants && fresh.variants.length > 0) {
+                setSelectedVariant(fresh.variants[0]);
+              } else {
+                setSelectedVariant(null);
+              }
             }
           }
-          syncProducts();
           fetchLiveProduct();
         };
       }
@@ -131,15 +147,21 @@ export default function ProductDetailPage() {
     });
   }
 
+  const currentPrice = (selectedVariant && selectedVariant.price && product.variants && product.variants.length > 1 && selectedVariant.price !== product.price)
+    ? selectedVariant.price
+    : product.price;
+  const origPrice = product.originalPrice || product.original_price || Math.round(currentPrice * 1.35);
+  const savedPercent = origPrice > currentPrice ? Math.round(((origPrice - currentPrice) / origPrice) * 100) : 0;
+
   function handleAddToCart() {
     if (!product) return;
     const cart = getCart();
-    const price = selectedVariant?.price || product.price;
+    const price = currentPrice;
     cart.push({
       id: product.id,
       title: product.title,
       price: price,
-      originalPrice: product.originalPrice || product.original_price || price,
+      originalPrice: origPrice,
       image: activeImg || product.image,
       qty: selectedQty,
       variant: selectedVariant ? { name: selectedVariant.name, size: selectedVariant.size } : undefined
@@ -150,7 +172,7 @@ export default function ProductDetailPage() {
 
   function handleOrderWhatsApp() {
     if (!product) return;
-    const price = selectedVariant?.price || product.price;
+    const price = currentPrice;
     const total = price * selectedQty;
     const varInfo = selectedVariant ? ` (Variant: ${selectedVariant.name || ''} ${selectedVariant.size ? '| Size: ' + selectedVariant.size : ''})` : '';
     const msg = `Salam! I want to order this product:%0A%0A` +
@@ -172,10 +194,6 @@ export default function ProductDetailPage() {
                 `Please quote the best wholesale deal and dispatch details.`;
     window.open(`https://wa.me/923162323616?text=${msg}`, '_blank');
   }
-
-  const currentPrice = selectedVariant?.price || product.price;
-  const origPrice = product.originalPrice || product.original_price || currentPrice;
-  const savedPercent = Math.round(((origPrice - currentPrice) / origPrice) * 100);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">

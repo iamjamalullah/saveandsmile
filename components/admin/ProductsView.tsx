@@ -64,6 +64,14 @@ export default function ProductsView({
         } catch (e) {}
       }
 
+      // Clean up any stale local overrides
+      try {
+        const overrides = JSON.parse(localStorage.getItem('qadri_product_overrides') || '{}');
+        delete overrides[product.id];
+        delete overrides[String(product.id)];
+        localStorage.setItem('qadri_product_overrides', JSON.stringify(overrides));
+      } catch (e) {}
+
       // 3. Real-time broadcasts
       window.dispatchEvent(new Event('qadri_products_updated'));
       window.dispatchEvent(new Event('storage'));

@@ -88,7 +88,7 @@ module.exports = async function handler(req, res) {
       let dbProduct = null;
       if (sql) {
         try {
-          if (req.method === 'PUT' && id) {
+          if (id) {
             const updated = await sql`
               UPDATE products SET
                 title = ${title},
@@ -115,7 +115,26 @@ module.exports = async function handler(req, res) {
               WHERE id = ${id}
               RETURNING *
             `;
-            if (updated && updated.length > 0) dbProduct = updated[0];
+            if (updated && updated.length > 0) {
+              dbProduct = updated[0];
+            } else {
+              const result = await sql`
+                INSERT INTO products (
+                  id, title, description, code, category, tab, price, original_price, badge, image, stock,
+                  slug, seo_title, seo_description, focus_keyword, secondary_keywords,
+                  canonical_url, is_noindex, og_title, og_description, og_image, image_alt
+                )
+                VALUES (
+                  ${id}, ${title}, ${description || ''}, ${code || ''}, ${category || 'storage'}, ${tab || 'storage'},
+                  ${parseFloat(price) || 0}, ${originalPrice ? parseFloat(originalPrice) : null}, ${badge || 'NEW'},
+                  ${image}, ${parseInt(stock, 10) || 100},
+                  ${sSlug}, ${sTitle}, ${sDesc}, ${fKey}, ${sKey},
+                  ${cUrl}, ${noIdx}, ${oTitle}, ${oDesc}, ${oImg}, ${iAlt}
+                )
+                RETURNING *
+              `;
+              if (result && result.length > 0) dbProduct = result[0];
+            }
           } else {
             const result = await sql`
               INSERT INTO products (
@@ -170,10 +189,9 @@ module.exports = async function handler(req, res) {
         og_image: oImg, image_alt: iAlt
       };
 
-      if (req.method === 'PUT' && id) {
-        const idx = productsList.findIndex(p => String(p.id) === String(id));
-        if (idx >= 0) productsList[idx] = { ...productsList[idx], ...productRecord };
-        else productsList.push(productRecord);
+      const existingIdx = id ? productsList.findIndex(p => String(p.id) === String(id)) : -1;
+      if (existingIdx >= 0) {
+        productsList[existingIdx] = { ...productsList[existingIdx], ...productRecord };
       } else {
         productsList.unshift(productRecord);
       }

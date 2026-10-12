@@ -133,6 +133,18 @@ export default function ProductEditorModal({
       return;
     }
 
+    let finalVariants = hasVariants ? variantsList : undefined;
+    if (finalVariants && Array.isArray(finalVariants) && finalVariants.length > 0) {
+      const newBasePrice = Number(price);
+      const oldBasePrice = productToEdit?.price ? Number(productToEdit.price) : newBasePrice;
+      finalVariants = finalVariants.map(v => {
+        if (!v.price || v.price === oldBasePrice || finalVariants!.length === 1) {
+          return { ...v, price: newBasePrice };
+        }
+        return v;
+      });
+    }
+
     const payload: Product = {
       id: productToEdit?.id || Date.now(),
       title: title.trim(),
@@ -145,7 +157,7 @@ export default function ProductEditorModal({
       badge,
       image: imageUrl.trim() || 'images/save-and-smile-logo.png',
       images: [imageUrl.trim(), ...additionalImages].filter(Boolean),
-      variants: hasVariants ? variantsList : undefined,
+      variants: finalVariants,
       stock: Number(quantity) || 50
     };
 

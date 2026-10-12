@@ -33,7 +33,7 @@ const DEFAULT_GLOBAL_SETTINGS = {
   default_social_title: 'Save & Smile - Direct Factory Wholesale Store Pakistan',
   default_social_desc: 'Wholesale prices with Cash on Delivery nationwide across Pakistan. Verified margins for resellers.',
   org_name: 'Save & Smile Pakistan',
-  logo_url: 'https://saveandsmile.pk/images/save-and-smile-logo.png',
+  logo_url: '/images/save-and-smile-logo.png',
   helpline_phone: '0316-2323616',
   business_address: 'Wholesale Market, Karachi / Lahore, Pakistan',
   gsc_verification_code: '',

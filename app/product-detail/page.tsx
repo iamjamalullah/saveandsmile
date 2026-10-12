@@ -35,9 +35,13 @@ export default function ProductDetailPage() {
       }
     }
 
-    // 1. Instant hydration from client cache
-    const initialAll = getClientProducts();
-    applyProductData(initialAll);
+    function syncProducts() {
+      const all = getClientProducts();
+      applyProductData(all);
+    }
+
+    // 1. Instant hydration from client cache (with admin overrides)
+    syncProducts();
 
     // 2. Fetch live product details from backend API
     function fetchLiveProduct() {
@@ -48,7 +52,7 @@ export default function ProductDetailPage() {
             try {
               localStorage.setItem('save_and_smile_server_products', JSON.stringify(data.products));
             } catch (e) {}
-            applyProductData(data.products);
+            syncProducts();
           }
         })
         .catch(() => {});
@@ -56,23 +60,44 @@ export default function ProductDetailPage() {
 
     fetchLiveProduct();
 
-    window.addEventListener('storage', fetchLiveProduct);
-    window.addEventListener('qadri_products_updated', fetchLiveProduct);
+    function handleSyncEvent(e: any) {
+      if (e?.data?.type === 'product_updated' && e.data.product) {
+        if (String(e.data.product.id) === String(id)) {
+          setProduct(e.data.product);
+        }
+      }
+      syncProducts();
+      fetchLiveProduct();
+    }
+
+    window.addEventListener('storage', handleSyncEvent);
+    window.addEventListener('qadri_products_updated', handleSyncEvent);
+    window.addEventListener('message', handleSyncEvent);
 
     let channel: BroadcastChannel | null = null;
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         channel = new BroadcastChannel('qadri_store_sync');
-        channel.onmessage = () => fetchLiveProduct();
+        channel.onmessage = (ev) => {
+          if (ev.data?.type === 'product_updated' && ev.data.product) {
+            if (String(ev.data.product.id) === String(id)) {
+              setProduct(ev.data.product);
+            }
+          }
+          syncProducts();
+          fetchLiveProduct();
+        };
       }
     } catch (e) {}
 
     return () => {
-      window.removeEventListener('storage', fetchLiveProduct);
-      window.removeEventListener('qadri_products_updated', fetchLiveProduct);
+      window.removeEventListener('storage', handleSyncEvent);
+      window.removeEventListener('qadri_products_updated', handleSyncEvent);
+      window.removeEventListener('message', handleSyncEvent);
       if (channel) channel.close();
     };
   }, []);
+
 
   if (!product) {
     return (
@@ -172,13 +197,14 @@ export default function ProductDetailPage() {
           
           {/* Left Column: Product Gallery (Sticky with alignSelf: start) */}
           <div className="gallery-container space-y-4" style={{ position: 'sticky', top: '90px', alignSelf: 'start', zIndex: 20 }}>
-            <div className="main-image-display rounded-xl overflow-hidden border border-slate-200 p-4 bg-slate-50 flex items-center justify-center aspect-square">
+            <div className="main-image-display rounded-2xl overflow-hidden border border-slate-200/90 p-4 bg-white flex items-center justify-center w-full h-[320px] sm:h-[440px] shadow-xs">
               <img
                 src={activeImg.startsWith('http') || activeImg.startsWith('/') ? activeImg : `/${activeImg}`}
                 alt={product.title}
-                className="max-h-[420px] w-full h-full object-contain transition-transform duration-300 hover:scale-105"
+                className="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-300 hover:scale-105 block m-auto"
               />
             </div>
+
 
             {/* Gallery Thumbnails Strip */}
             {allImages.length > 1 && (
@@ -332,8 +358,9 @@ export default function ProductDetailPage() {
                 onClick={handleBulkWholesaleWhatsApp}
                 className="btn-detail-bulk-wholesale w-full py-2.5 px-4 bg-[#007382] hover:bg-[#005a66] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition"
               >
-                <span>📦 Buy in Wholesale (Direct Factory Rate Cartons)</span>
+                <span>📦 Buy in Wholesale</span>
               </button>
+
             </div>
 
             {/* Trust Badges */}

@@ -14,7 +14,9 @@ import Reviews from '@/components/Reviews';
 import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import AiAssistant from '@/components/AiAssistant';
+import QuickViewModal from '@/components/QuickViewModal';
 import { Product, HomeThemeConfig } from '@/lib/types';
+
 import { getClientProducts, getClientHomeConfig, DEFAULT_HOME_CONFIG } from '@/lib/store';
 
 export default function HomePage() {
@@ -357,8 +359,9 @@ export default function HomePage() {
       </main>
 
 
-      {/* Cart Drawer */}
+      {/* Cart Drawer & Quick View Modal */}
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+      <QuickViewModal />
 
       {/* Mobile Fixed Bottom Nav */}
       <MobileBottomNav onOpenCart={() => setCartOpen(true)} />
@@ -368,3 +371,4 @@ export default function HomePage() {
     </div>
   );
 }
+

@@ -58,8 +58,12 @@ export default function Header({ onOpenCart, onOpenWishlist, onOpenTrackOrder, t
         .then(res => res.json())
         .then(data => {
           if (data?.settings) {
+            const rawLogo = data.settings.logo_url;
+            const safeLogo = (rawLogo && !rawLogo.includes('saveandsmile.pk'))
+              ? rawLogo
+              : '/images/save-and-smile-logo.png';
             setBranding({
-              logo: data.settings.logo_url || '/images/save-and-smile-logo.png',
+              logo: safeLogo,
               phone: data.settings.helpline_phone || '0316-2323616',
               whatsapp: (data.settings.helpline_phone || '03162323616').replace(/[^0-9]/g, '')
             });
@@ -67,6 +71,7 @@ export default function Header({ onOpenCart, onOpenWishlist, onOpenTrackOrder, t
         })
         .catch(() => {});
     }
+
     fetchLiveBranding();
 
     window.addEventListener('qadri_cart_updated', updateCounts);
@@ -145,10 +150,23 @@ export default function Header({ onOpenCart, onOpenWishlist, onOpenTrackOrder, t
               </button>
 
               <h1 className="brand-heading-seo" style={{ margin: 0, padding: 0, lineHeight: 1 }}>
-                <Link href="/" className="brand-logo" title="Save & Smile - Shop • Save • Smile | Wholesale Store Pakistan">
-                  <img src={branding.logo} alt="Save & Smile - Wholesale Gadgets Pakistan" className="site-brand-logo" />
+                <Link
+                  href="/"
+                  className="brand-logo flex items-center bg-white/95 hover:bg-white px-2.5 py-1 rounded-xl shadow-xs transition"
+                  title="Save & Smile - Shop • Save • Smile | Wholesale Store Pakistan"
+                >
+                  <img
+                    src={branding.logo || '/images/save-and-smile-logo.png'}
+                    alt="Save & Smile Logo"
+                    className="site-brand-logo h-8 sm:h-9 w-auto object-contain"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = '/images/save-and-smile-logo.png';
+                    }}
+                  />
                 </Link>
               </h1>
+
             </div>
 
             {/* Desktop Center Navigation Menu */}

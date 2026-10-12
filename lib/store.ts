@@ -6,26 +6,50 @@ export const DEFAULT_PRODUCTS: Product[] = productsData as Product[];
 export const DEFAULT_HERO_SLIDES: HeroSlide[] = [
   {
     id: 1,
-    title: "Pakistan's #1 Wholesale Hub",
-    subtitle: "Direct Factory Prices • Guaranteed Profit Margins • Cash on Delivery",
-    image: "images/banner1.webp",
-    badge: "WHOLESALE DEALS",
+    title: "Wholesale Online Mega Sale",
+    subtitle: "Get unbeatable prices on trending gadgets & home organizers",
+    image: "https://www.qadrigadgets.pk/images/banners/6a91c696b7d39.webp",
+    badge: "MEGA SALE",
     link: "#products"
   },
   {
     id: 2,
-    title: "Trending Household & Kitchen Gadgets",
-    subtitle: "Over 500+ High Quality Smart Utility Items Ready to Dispatch",
-    image: "images/banner2.webp",
-    badge: "NEW ARRIVALS",
+    title: "Electric Insect Killers & Summer Gadgets",
+    subtitle: "Wholesale prices with Cash on Delivery nationwide across Pakistan",
+    image: "https://www.qadrigadgets.pk/images/banners/6a7af65669503.webp",
+    badge: "SUMMER DEALS",
     link: "#products"
   },
   {
     id: 3,
-    title: "Smartwatches, Audio & Mobile Gear",
-    subtitle: "Best Margin Reseller Deals with 7 Days Checking Warranty",
-    image: "images/banner3.webp",
-    badge: "TOP SELLERS",
+    title: "Trending Water Bottles & Sippers",
+    subtitle: "High quality mugs and bottles at direct factory rates",
+    image: "https://www.qadrigadgets.pk/images/banners/6a7af65669d26.webp",
+    badge: "POPULAR",
+    link: "#products"
+  },
+  {
+    id: 4,
+    title: "Store it Beautifully - Storage & Racks",
+    subtitle: "Best selling home organizers with high reseller margins",
+    image: "https://www.qadrigadgets.pk/images/banners/6a7af6566a0fa.webp",
+    badge: "STORAGE & RACKS",
+    link: "#products"
+  },
+  {
+    id: 5,
+    title: "Toys & Kids Collection",
+    subtitle: "Fun learning toys and games for resellers",
+    image: "https://www.qadrigadgets.pk/images/banners/6a6e1db8c4ccd.webp",
+    badge: "KIDS SPECIAL",
+    link: "#products"
+  },
+  {
+    id: 6,
+    title: "Fashion Mobile Accessories & Tech",
+    subtitle: "Direct wholesale rates for tech resellers",
+    image: "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+    badge: "MOBILE ACCESSORIES",
     link: "#products"
   }
 ];
@@ -59,10 +83,14 @@ export function getClientProducts(): Product[] {
 export function getClientHeroSlides(): HeroSlide[] {
   if (typeof window === 'undefined') return DEFAULT_HERO_SLIDES;
   try {
-    const stored = localStorage.getItem('qadri_hero_slides');
+    const stored = localStorage.getItem('qadri_hero_slides') || localStorage.getItem('qadri_custom_banners');
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // If stored contains non-existent local dummy paths like 'banner1.webp', fallback to DEFAULT_HERO_SLIDES
+        const isDummy = parsed.some((s: any) => s.image && s.image.includes('banner1.webp'));
+        if (!isDummy) return parsed;
+      }
     }
   } catch (err) {}
   return DEFAULT_HERO_SLIDES;

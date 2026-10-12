@@ -9,7 +9,7 @@ export default function HeroSlider() {
   const [currentIdx, setCurrentIdx] = useState(0);
 
   useEffect(() => {
-    // Initial load from client storage or defaults
+    // 1. Initial load from client storage or authentic defaults
     setSlides(getClientHeroSlides());
 
     function fetchLiveHeroBanners() {
@@ -28,7 +28,7 @@ export default function HeroSlider() {
 
     fetchLiveHeroBanners();
 
-    // Listen to real-time sync events from Live Editor & Admin CRM
+    // 2. Listen to real-time sync events from Live Editor & Admin CRM
     function handleStorageOrSync(e: any) {
       if (e.data && e.data.type === 'qadri_sync_hero_slides') {
         setSlides(e.data.slides);
@@ -49,6 +49,7 @@ export default function HeroSlider() {
     };
   }, []);
 
+  // Auto-slide interval
   useEffect(() => {
     if (slides.length <= 1) return;
     const interval = setInterval(() => {
@@ -57,39 +58,71 @@ export default function HeroSlider() {
     return () => clearInterval(interval);
   }, [slides]);
 
+  const prevSlide = () => {
+    setCurrentIdx(prev => (prev - 1 + slides.length) % slides.length);
+  };
+
+  const nextSlide = () => {
+    setCurrentIdx(prev => (prev + 1) % slides.length);
+  };
+
   if (slides.length === 0) return null;
 
   return (
-    <section className="hero-slider-wrap">
+    <section className="hero-slider-section" id="heroSliderSection">
       <div className="site-container">
-        <div className="hero-slider-viewport">
-          {slides.map((slide, idx) => (
-            <div
-              key={slide.id || idx}
-              className={`hero-slide-item ${idx === currentIdx ? 'active' : ''}`}
-              style={{
-                display: idx === currentIdx ? 'block' : 'none',
-                position: 'relative'
-              }}
-            >
-              <a href={slide.link || '#products'} style={{ display: 'block', width: '100%', height: '100%' }}>
-                <img
-                  src={slide.image.startsWith('http') || slide.image.startsWith('/') ? slide.image : `/${slide.image}`}
-                  alt={slide.title}
-                  className="hero-slide-img"
-                  style={{ width: '100%', borderRadius: '14px', objectFit: 'cover' }}
-                />
-              </a>
+        <div className="slider-container" id="heroSliderContainer">
+          {slides.map((slide, idx) => {
+            const isActive = idx === currentIdx;
+            const imgSrc = slide.image.startsWith('http') || slide.image.startsWith('/')
+              ? slide.image
+              : `/${slide.image}`;
+
+            return (
+              <div
+                key={slide.id || idx}
+                className={`slide-item ${isActive ? 'active' : ''}`}
+                data-index={idx}
+              >
+                <a href={slide.link || '#products'} style={{ display: 'block', width: '100%', height: '100%' }}>
+                  <img
+                    src={imgSrc}
+                    alt={slide.title || 'Save & Smile Wholesale Banner'}
+                    loading={idx === 0 ? 'eager' : 'lazy'}
+                  />
+                </a>
+              </div>
+            );
+          })}
+
+          {/* Slider Left & Right Controls */}
+          {slides.length > 1 && (
+            <div className="slider-controls">
+              <button
+                type="button"
+                className="slider-arrow"
+                onClick={prevSlide}
+                title="Previous Slide"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                className="slider-arrow"
+                onClick={nextSlide}
+                title="Next Slide"
+              >
+                ›
+              </button>
             </div>
-          ))}
+          )}
 
           {/* Dots Indicator */}
           {slides.length > 1 && (
-            <div className="slider-dots-container">
+            <div className="slider-dots" id="sliderDots">
               {slides.map((_, i) => (
-                <button
+                <div
                   key={i}
-                  type="button"
                   onClick={() => setCurrentIdx(i)}
                   className={`slider-dot ${i === currentIdx ? 'active' : ''}`}
                 />

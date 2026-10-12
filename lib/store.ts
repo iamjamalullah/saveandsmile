@@ -115,8 +115,8 @@ export const DEFAULT_HOME_CONFIG: HomeThemeConfig = {
   announcement_ticker: {
     enabled: true,
     speed: 32,
-    bgColor: "#004d57",
-    textColor: "#ffffff",
+    bgColor: "#ffffff",
+    textColor: "#004d57",
     items: [
       "🚀 Welcome to <strong>Save & Smile Wholesale Portal</strong> (Shop • Save • Smile)",
       "🔥 Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers",

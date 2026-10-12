@@ -104,7 +104,7 @@ a {
    ------------------------------------------------------------- */
 .ticker-bar {
   background-color: #ffffff;
-  border-bottom: 1px solid #eef2f0;
+  border-bottom: 1px solid #e2e8f0;
   font-size: 0.85rem;
   overflow: hidden;
   height: 38px;
@@ -126,12 +126,12 @@ a {
   display: inline-flex;
   align-items: center;
   padding: 0 2rem;
-  font-weight: 500;
-  color: #334155;
+  font-weight: 600;
+  color: #004d57;
 }
 
 .ticker-item strong {
-  color: var(--qadri-emerald);
+  color: #007382;
   margin-left: 4px;
 }
 
@@ -182,8 +182,8 @@ a {
   width: auto;
   object-fit: contain;
   transition: transform 0.25s ease;
+  filter: brightness(0) invert(1);
 }
-
 
 .site-brand-logo:hover,
 .brand-logo img:hover {
@@ -1707,7 +1707,7 @@ a {
 }
 
 .flash-sale-header {
-  background: linear-gradient(90deg, #b91c1c 0%, #dc2626 50%, #f97316 100%);
+  background: linear-gradient(135deg, #004d57 0%, #007382 50%, #0b3954 100%);
   color: #ffffff;
   border-radius: var(--radius-md) var(--radius-md) 0 0;
   padding: 1rem 1.5rem;
@@ -1716,6 +1716,7 @@ a {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 115, 130, 0.2);
 }
 
 .flash-title-area {
@@ -2084,29 +2085,27 @@ a {
 
 .btn-buy-now {
   flex: 1;
-  background: linear-gradient(135deg, #ff8c00 0%, #e65100 100%);
+  background: #83a82b;
   color: #ffffff;
   border: none;
-  padding: 8px 12px;
+  padding: 8px 10px;
   border-radius: var(--radius-pill);
-  font-weight: 800;
+  font-weight: 600;
   font-size: 0.82rem;
-  letter-spacing: 0.2px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
   cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease;
   font-family: inherit;
   white-space: nowrap;
-  box-shadow: 0 3px 10px rgba(230, 81, 0, 0.32);
+  box-shadow: 0 2px 8px rgba(131, 168, 43, 0.25);
 }
 
 .btn-buy-now:hover {
-  background: linear-gradient(135deg, #ffa726 0%, #ef6c00 100%);
-  transform: translateY(-1.5px);
-  box-shadow: 0 5px 14px rgba(230, 81, 0, 0.42);
+  background: #729424;
+  transform: translateY(-1px);
 }
 
 .btn-buy-now:active {
@@ -2772,6 +2771,32 @@ a {
   background: #10b981;
   border: 2px solid #ffffff;
   border-radius: 50%;
+}
+
+.floating-ai-badge {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 50%;
+  transform: translateX(50%);
+  background: linear-gradient(135deg, #004d57 0%, #007382 100%);
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 99px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 77, 87, 0.35);
+  border: 1.5px solid #ffffff;
+  pointer-events: none;
+  animation: bounceBadge 2.5s infinite ease-in-out;
+  font-family: 'Poppins', sans-serif;
+}
+
+@keyframes bounceBadge {
+  0%, 100% { transform: translateX(50%) translateY(0); }
+  50% { transform: translateX(50%) translateY(-3px); }
 }
 
 .floating-ai-tooltip {

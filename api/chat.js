@@ -94,51 +94,51 @@ async function generateAiReply(userText, catalog) {
 
 function generateIntelligentEngineReply(q, rawText, catalog) {
   // 1. Payment Methods Inquiry
-  if (q.includes('payment') || q.includes('easypaisa') || q.includes('faysal') || q.includes('bank') || q.includes('jazzcash') || q.includes('pesy') || q.includes('ada') || q.includes('account')) {
-    return `💳 <strong>Payment Details (طریقہ ادائیگی):</strong><br><br>
-    1. <strong>Cash on Delivery (COD):</strong> Parcel milne par rider ko cash ada karein.<br>
-    2. <strong>EasyPaisa:</strong> <code>03337221552</code><br>
+  if (q.includes('payment') || q.includes('easypaisa') || q.includes('faysal') || q.includes('bank') || q.includes('jazzcash') || q.includes('pesy') || q.includes('ada') || q.includes('account') || q.includes('cod') || q.includes('cash on delivery')) {
+    return `💳 <strong>Accepted Payment Methods:</strong><br><br>
+    1. <strong>Cash on Delivery (COD):</strong> Pay in cash directly to the courier upon parcel delivery anywhere in Pakistan.<br>
+    2. <strong>EasyPaisa:</strong> <code>0333-7221552</code> (Title: Muhammad Jamalullah)<br>
     3. <strong>Bank Transfer (Faysal Bank):</strong><br>
-    • <strong>Bank:</strong> Faysal Bank<br>
-    • <strong>Title:</strong> Muhammd Jamalullah<br>
+    • <strong>Bank Name:</strong> Faysal Bank<br>
+    • <strong>Account Title:</strong> Muhammd Jamalullah<br>
     • <strong>Account Number:</strong> <code>3516390000005787</code><br><br>
-    <em>Note: EasyPaisa ya Bank Transfer k baad screenshot WhatsApp helpline 0316-2323616 par share karein.</em>`;
+    <em>After sending payment via EasyPaisa or Bank Transfer, please send the screenshot to our WhatsApp helpline at <strong>0316-2323616</strong>.</em>`;
   }
 
   // 2. Delivery & Shipping
-  if (q.includes('delivery') || q.includes('shipping') || q.includes('charges') || q.includes('kitne din') || q.includes('kab tak') || q.includes('reach') || q.includes('free delivery')) {
-    return `🚚 <strong>Delivery & Shipping Policy:</strong><br><br>
-    • Delivery time pooray Pakistan mein <strong>2 se 3 working days</strong> hai.<br>
-    • <strong>Rs. 3,000 یا اس سے زائد</strong> کے آرڈر پر <strong>FREE Delivery</strong> ہے!<br>
-    • Rs. 3,000 se kam order par delivery charges sirf Rs. 200 hain.<br>
-    • Trax / Call Courier k zariye mehfooz dispatch ki jati hai.`;
+  if (q.includes('delivery') || q.includes('shipping') || q.includes('charges') || q.includes('kitne din') || q.includes('kab tak') || q.includes('reach') || q.includes('free delivery') || q.includes('time') || q.includes('how long')) {
+    return `🚚 <strong>Shipping & Delivery Policy:</strong><br><br>
+    • <strong>Delivery Time:</strong> 2 to 3 business days across Pakistan (24-48 hours in Karachi & Lahore).<br>
+    • <strong>FREE Delivery:</strong> Available on all orders of <strong>Rs. 3,000 or more</strong>!<br>
+    • <strong>Standard Shipping:</strong> Only Rs. 200 for orders under Rs. 3,000.<br>
+    • Dispatched safely through Leopards, Trax & PostEx couriers.`;
   }
 
   // 3. Wholesale & Bulk
-  if (q.includes('wholesale') || q.includes('bulk') || q.includes('carton') || q.includes('resell') || q.includes('shopkeeper') || q.includes('dokan')) {
-    return `📦 <strong>Wholesale & Bulk Orders:</strong><br><br>
-    Save & Smile par factory direct wholesale rates faraham kiye jaate hain.<br>
-    Agar aap 1 carton ya bulk stock lena chahte hain to direct WhatsApp helpline par rabta karein:<br>
-    👉 <a href="https://wa.me/923162323616?text=Salam!%20I%20want%20to%20buy%20in%20wholesale" target="_blank" style="color: #007382; font-weight: 700; text-decoration: underline;">0316-2323616</a>`;
+  if (q.includes('wholesale') || q.includes('bulk') || q.includes('carton') || q.includes('resell') || q.includes('shopkeeper') || q.includes('dokan') || q.includes('quantity')) {
+    return `📦 <strong>Wholesale & Bulk Inquiries:</strong><br><br>
+    Save & Smile offers direct factory rates for shopkeepers, online resellers, and carton buyers.<br>
+    For bulk carton discounts and dealer quotes, please connect with our wholesale department on WhatsApp:<br>
+    👉 <a href="https://wa.me/923162323616?text=Hello!%20I%20am%20interested%20in%20bulk%20wholesale%20rates" target="_blank" style="color: #007382; font-weight: 700; text-decoration: underline;">+92 316-2323616</a>`;
   }
 
   // 4. Return, Replacement & Warranty
-  if (q.includes('return') || q.includes('replace') || q.includes('warranty') || q.includes('kharaab') || q.includes('damage') || q.includes('wapsi')) {
-    return `🛡️ <strong>7 Days Replacement Guarantee:</strong><br><br>
-    Hamari tamam products par <strong>7 Days Checking & Replacement Warranty</strong> mojud hai.<br>
-    Agar parcel mein koi issue ho to parcel open karne ki short video banayein aur WhatsApp helpline <strong>0316-2323616</strong> par send karein، hamari team foran replacement bhejegi.`;
+  if (q.includes('return') || q.includes('replace') || q.includes('warranty') || q.includes('kharaab') || q.includes('damage') || q.includes('wapsi') || q.includes('refund') || q.includes('broken')) {
+    return `🛡️ <strong>7-Day Replacement Guarantee:</strong><br><br>
+    All our products come with a <strong>7-day checking & replacement warranty</strong>.<br>
+    If you receive a defective or damaged product, simply record a brief unboxing video and share it with our WhatsApp support at <strong>0316-2323616</strong>. Our team will arrange a quick replacement!`;
   }
 
   // 5. Order Tracking
-  if (q.includes('track') || q.includes('status') || q.includes('mera order') || q.includes('kahan he')) {
-    return `📍 <strong>Order Tracking:</strong><br><br>
-    Aap apna order hamare <a href="track-order.html" style="color: #007382; font-weight: 700; text-decoration: underline;">Track Order Page</a> par ja kar Order ID (e.g. SS-123456) ya Mobile Number daal kar live track kar sakte hain!`;
+  if (q.includes('track') || q.includes('status') || q.includes('mera order') || q.includes('kahan he') || q.includes('where is my order')) {
+    return `📍 <strong>Live Order Tracking:</strong><br><br>
+    You can easily track your order in real time on our <a href="/track-order" style="color: #007382; font-weight: 700; text-decoration: underline;">Track Order Page</a> by entering your Order ID (e.g., SS-100234) or Phone Number!`;
   }
 
-  // 6. Greetings
-  if (q.includes('salam') || q.includes('hello') || q.includes('hi') || q.includes('hey') || q.includes('aoa')) {
-    return `Walaykum Assalam! 😊 Welcome to Save & Smile Wholesale.<br><br>
-    Main aap ka AI Smart Assistant hoon. Aap mujh se kisi bhi product, wholesale rate, delivery, EasyPaisa / Bank payment ya order tracking k baray mein pooch sakte hain. Main aap ki kya madad karoon?`;
+  // 6. Greetings & Help
+  if (q.includes('salam') || q.includes('hello') || q.includes('hi') || q.includes('hey') || q.includes('help') || q.includes('aoa')) {
+    return `Hello and welcome to Save & Smile! 👋<br><br>
+    I am your AI Store Assistant. I can assist you with product details, wholesale bulk rates, delivery timelines, payment accounts (COD, EasyPaisa, Faysal Bank), and order tracking. How can I help you today?`;
   }
 
   // 7. Dynamic Product Catalog Search
@@ -151,15 +151,15 @@ function generateIntelligentEngineReply(q, rawText, catalog) {
     }).slice(0, 3);
 
     if (matched.length > 0) {
-      let prodList = matched.map(p => `• <strong>${p.title}</strong> — Rs. ${Number(p.price).toLocaleString()} <a href="product-detail.html?id=${p.id}" style="color: #007382; font-weight: 700; text-decoration: underline;">[View Product]</a>`).join('<br>');
-      return `✨ <strong>Aap ki pasandeeda products dastiyab hain:</strong><br><br>${prodList}<br><br>Aap inhein direct website se "Order Now" kar sakte hain ya WhatsApp par rabta kar sakte hain!`;
+      let prodList = matched.map(p => `• <strong>${p.title}</strong> — Rs. ${Number(p.price).toLocaleString()} <a href="/product-detail?id=${p.id}" style="color: #007382; font-weight: 700; text-decoration: underline;">[View Product]</a>`).join('<br>');
+      return `✨ <strong>Found matching items in our store:</strong><br><br>${prodList}<br><br>You can place an order directly or contact us on WhatsApp for carton pricing!`;
     }
   }
 
   // 8. General / Helpful Fallback
-  return `🤖 Shukriya aap k sawal ka!<br><br>
-  Save & Smile Pakistan ka top wholesale store hai. Aap cash on delivery ya <strong>EasyPaisa (03337221552)</strong> aur <strong>Faysal Bank (Account: 3516390000005787)</strong> se payment kar sakte hain.<br><br>
-  Mazeed rehnumai ya bulk order k liye hamare WhatsApp <strong>0316-2323616</strong> par rabta karein!`;
+  return `🤖 Thank you for your question!<br><br>
+  Save & Smile is Pakistan's leading wholesale portal. We offer Cash on Delivery (COD) as well as advance payments via <strong>EasyPaisa (0333-7221552)</strong> and <strong>Faysal Bank (Account: 3516390000005787)</strong>.<br><br>
+  For personalized wholesale support or custom inquiries, chat with us on WhatsApp at <strong>0316-2323616</strong>!`;
 }
 
 async function callGeminiApi(userPrompt, catalog) {

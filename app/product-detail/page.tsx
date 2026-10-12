@@ -197,11 +197,12 @@ export default function ProductDetailPage() {
           
           {/* Left Column: Product Gallery (Sticky with alignSelf: start) */}
           <div className="gallery-container space-y-4" style={{ position: 'sticky', top: '90px', alignSelf: 'start', zIndex: 20 }}>
-            <div className="main-image-display rounded-2xl overflow-hidden border border-slate-200/90 p-4 bg-white flex items-center justify-center w-full h-[320px] sm:h-[440px] shadow-xs">
+            <div className="main-image-display rounded-2xl overflow-hidden border border-slate-200/90 bg-[#f8fafc] flex items-center justify-center w-full aspect-square max-h-[460px] shadow-xs p-4 sm:p-6">
               <img
                 src={activeImg.startsWith('http') || activeImg.startsWith('/') ? activeImg : `/${activeImg}`}
                 alt={product.title}
-                className="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-300 hover:scale-105 block m-auto"
+                className="max-h-full max-w-full w-auto h-auto object-contain block m-auto transition-transform duration-300 hover:scale-105"
+                style={{ maxHeight: '100%', maxWidth: '100%', width: 'auto', height: 'auto', objectFit: 'contain' }}
               />
             </div>
 
@@ -377,12 +378,21 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* More Products You May Like (Below the fold) */}
+        {/* More Products You May Like (Centrally aligned & aesthetically enhanced) */}
         {relatedProducts.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-xl font-bold text-[#00363d] mb-4">
-              More Products You May Like
-            </h2>
+          <div className="mb-14 pt-8 border-t border-slate-200/80">
+            <div className="text-center max-w-xl mx-auto mb-8">
+              <span className="inline-block px-3 py-1 bg-[#007382]/10 text-[#007382] font-black text-[11px] rounded-full uppercase tracking-wider mb-2">
+                🌟 Handpicked For You
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#00363d] tracking-tight">
+                More Products You May Like
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium">
+                Top trending gadgets & bestselling wholesale deals with guaranteed profit margins
+              </p>
+              <div className="w-16 h-1 bg-gradient-to-r from-[#007382] to-[#83a82b] mx-auto mt-3 rounded-full"></div>
+            </div>
             <div className="products-grid">
               {relatedProducts.map(rel => (
                 <ProductCard key={rel.id} product={rel} />

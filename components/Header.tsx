@@ -152,7 +152,7 @@ export default function Header({ onOpenCart, onOpenWishlist, onOpenTrackOrder, t
               <h1 className="brand-heading-seo" style={{ margin: 0, padding: 0, lineHeight: 1 }}>
                 <Link
                   href="/"
-                  className="brand-logo flex items-center bg-white/95 hover:bg-white px-2.5 py-1 rounded-xl shadow-xs transition"
+                  className="brand-logo flex items-center transition hover:opacity-90"
                   title="Save & Smile - Shop • Save • Smile | Wholesale Store Pakistan"
                 >
                   <img

@@ -154,7 +154,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
             <span className="btn-cart-text">Add</span>
           </button>
           <button type="button" className="btn-buy-now" onClick={handleBuyNow} title="Buy Now & Checkout">
-            <span className="btn-buy-text">⚡ Buy Now</span>
+            <span className="btn-buy-text">Buy Now</span>
           </button>
           <button type="button" className="btn-whatsapp-direct" onClick={handleWhatsAppDirect} title="Order via WhatsApp">
             <svg viewBox="0 0 24 24">

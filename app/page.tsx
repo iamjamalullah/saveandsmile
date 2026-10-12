@@ -149,38 +149,6 @@ export default function HomePage() {
         themeConfig={liveLayout}
       />
 
-      {/* Sub Nav / Category Strip */}
-      <div className="sub-nav-wrapper">
-        <div className="site-container">
-          <div className="sub-nav-inner flex items-center justify-between overflow-x-auto py-2">
-            <div className="flex gap-2">
-              {categories.map(c => (
-                <button
-                  key={c.key}
-                  type="button"
-                  onClick={() => setActiveTab(c.key)}
-                  className={`sub-nav-btn px-3 py-1 rounded-full text-xs font-bold transition ${activeTab === c.key ? 'bg-white text-[#007382] shadow-sm' : 'text-white/80 hover:text-white'}`}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-
-            {/* In-strip Quick Search */}
-            <div className="relative min-w-[200px]">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full text-xs py-1 px-3 pl-7 rounded-full bg-white/20 text-white placeholder-white/70 outline-none focus:bg-white focus:text-slate-900 transition"
-              />
-              <span className="absolute left-2.5 top-1.5 text-xs text-white/70">🔍</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <main className="flex-1">
         {/* Dynamic Hero Slider */}
         {liveLayout.sections_visibility?.hero_slider !== false && (

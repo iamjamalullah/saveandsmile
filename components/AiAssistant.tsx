@@ -7,47 +7,53 @@ export default function AiAssistant() {
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      text: 'Assalam-o-Alaikum! 👋 Main Save & Smile ka AI Assistant hoon. Delivery time, EasyPaisa, Faysal Bank ya bulk wholesale rates k baray mein poohein!'
+      text: 'Hello! 👋 I am your AI Store Assistant. Feel free to ask about Delivery Times, EasyPaisa / Bank details, Wholesale rates, or any product!'
     }
   ]);
   const [inputVal, setInputVal] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
-  function handleSend(text?: string) {
+  async function handleSend(text?: string) {
     const query = (text || inputVal).trim();
     if (!query) return;
 
     const newMsgs = [...messages, { sender: 'user', text: query }];
     setMessages(newMsgs);
     setInputVal('');
+    setIsTyping(true);
 
-    // Instant smart store response
-    setTimeout(() => {
-      let reply = "Shukriya! Save & Smile Pakistan ka verified online wholesale portal hai.";
-      const q = query.toLowerCase();
-
-      if (q.includes('easypaisa') || q.includes('jazzcash') || q.includes('payment') || q.includes('account')) {
-        reply = "💳 Payment Methods:\n1) Cash on Delivery (COD) nationwide.\n2) EasyPaisa: 0333-7221552 (Muhammad Jamalullah).\n3) Bank Transfer: Faysal Bank, Title: Muhammad Jamalullah, A/C: 3516390000005787.";
-      } else if (q.includes('delivery') || q.includes('time') || q.includes('din')) {
-        reply = "🚚 Karachi & Lahore mein 24-48 ghantay, aur baqi cities mein 2-4 working days mein Leopards / PostEx COD deliver ho jata hai.";
-      } else if (q.includes('wholesale') || q.includes('bulk') || q.includes('reseller')) {
-        reply = "📦 Bulk Cartons & Reseller factory rates k liye hamari direct helpline par WhatsApp karein: 0316-2323616.";
-      } else if (q.includes('track') || q.includes('order')) {
-        reply = "📍 Track Order page par apna Order ID ya Phone number likh kar foran live status check kar sakte hain!";
-      }
-
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: query })
+      });
+      const data = await res.json();
+      const reply = data?.reply || "Thank you! For wholesale inquiries, feel free to chat with us on WhatsApp at 0316-2323616.";
       setMessages(prev => [...prev, { sender: 'bot', text: reply }]);
-    }, 400);
+    } catch (e) {
+      setMessages(prev => [
+        ...prev,
+        {
+          sender: 'bot',
+          text: 'Our AI Assistant is currently connecting. You can also chat directly with our team on WhatsApp at 0316-2323616.'
+        }
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
   }
 
   return (
     <>
-      {/* Floating Toggle Button */}
+      {/* Floating Toggle Button with Stylish 2-word Badge */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="floating-ai-robot"
         title="Ask Save & Smile AI Assistant"
       >
+        <span className="floating-ai-badge">Need Help?</span>
         <span className="ai-robot-icon">🤖</span>
         <span className="ai-status-pulse"></span>
       </button>
@@ -69,14 +75,25 @@ export default function AiAssistant() {
           <div className="ai-chat-messages">
             {messages.map((m, idx) => (
               <div key={idx} className={`ai-msg ${m.sender}`}>
-                <div className="ai-msg-bubble" style={{ whiteSpace: 'pre-line' }}>{m.text}</div>
+                <div
+                  className="ai-msg-bubble"
+                  dangerouslySetInnerHTML={{ __html: m.text }}
+                />
               </div>
             ))}
 
+            {isTyping && (
+              <div className="ai-msg bot">
+                <div className="ai-msg-bubble text-xs italic text-slate-500">
+                  AI is thinking...
+                </div>
+              </div>
+            )}
+
             <div className="ai-suggestions-quick">
-              <button onClick={() => handleSend('EasyPaisa aur Bank details?')}>💳 Accounts?</button>
-              <button onClick={() => handleSend('Delivery time kitna hai?')}>🚚 Delivery?</button>
-              <button onClick={() => handleSend('Wholesale bulk rates?')}>📦 Wholesale?</button>
+              <button type="button" onClick={() => handleSend('What are your payment methods?')}>💳 Payments?</button>
+              <button type="button" onClick={() => handleSend('What is the delivery time and cost?')}>🚚 Delivery?</button>
+              <button type="button" onClick={() => handleSend('How can I order wholesale cartons?')}>📦 Wholesale?</button>
             </div>
           </div>
 
@@ -91,7 +108,7 @@ export default function AiAssistant() {
               type="text"
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
-              placeholder="Poochiye (e.g. delivery, payments)..."
+              placeholder="Ask anything (e.g. delivery, payments)..."
             />
             <button type="submit" className="ai-send-btn">➔</button>
           </form>

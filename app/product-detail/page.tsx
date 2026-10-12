@@ -52,7 +52,7 @@ export default function ProductDetailPage() {
             try {
               localStorage.setItem('save_and_smile_server_products', JSON.stringify(data.products));
             } catch (e) {}
-            syncProducts();
+            applyProductData(data.products);
           }
         })
         .catch(() => {});

@@ -40,7 +40,7 @@ export default function HomePage() {
             try {
               localStorage.setItem('save_and_smile_server_products', JSON.stringify(data.products));
             } catch (e) {}
-            setProducts(getClientProducts());
+            setProducts(data.products);
           }
         })
         .catch(() => {});

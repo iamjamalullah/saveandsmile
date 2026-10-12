@@ -62,10 +62,12 @@ export function getClientProducts(): Product[] {
     const overrides = JSON.parse(localStorage.getItem('qadri_product_overrides') || '{}');
     const deleted = JSON.parse(localStorage.getItem('qadri_deleted_products') || '[]');
 
+    // Prioritize server data as base, fallback to DEFAULT_PRODUCTS
     const baseSource = (Array.isArray(serverCached) && serverCached.length > 0)
       ? serverCached
       : DEFAULT_PRODUCTS;
 
+    // Filter out deleted and apply overrides
     const base = baseSource
       .filter(p => !deleted.some((d: any) => String(d) === String(p.id)))
       .map(p => {
@@ -73,7 +75,9 @@ export function getClientProducts(): Product[] {
         return override ? { ...p, ...override } : p;
       });
 
-    return [...custom, ...base];
+    // Merge custom products, ensuring no duplicates with base
+    const customFiltered = custom.filter((cp: any) => !base.some(bp => String(bp.id) === String(cp.id)));
+    return [...customFiltered, ...base];
   } catch (err) {
     console.warn('Error reading products state:', err);
     return DEFAULT_PRODUCTS;

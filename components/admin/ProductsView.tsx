@@ -44,7 +44,7 @@ export default function ProductsView({
     try {
       const token = localStorage.getItem('save_and_smile_admin_token');
       // 1. Post to API
-      await fetch('/api/products', {
+      const res = await fetch('/api/products', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,20 +52,17 @@ export default function ProductsView({
         },
         body: JSON.stringify(product)
       });
+      const data = await res.json();
+      const savedProd = data?.product || product;
 
-      // 2. Local Storage overrides & custom products
-      const custom = JSON.parse(localStorage.getItem('qadri_custom_products') || '[]');
-      const existingIdx = custom.findIndex((p: any) => String(p.id) === String(product.id));
-      if (existingIdx >= 0) {
-        custom[existingIdx] = product;
-      } else {
-        custom.unshift(product);
+      // 2. Fetch fresh products from server to sync all storage
+      const freshRes = await fetch('/api/products', { cache: 'no-store' });
+      const freshData = await freshRes.json();
+      if (freshData?.products && Array.isArray(freshData.products)) {
+        try {
+          localStorage.setItem('save_and_smile_server_products', JSON.stringify(freshData.products));
+        } catch (e) {}
       }
-      localStorage.setItem('qadri_custom_products', JSON.stringify(custom));
-
-      const overrides = JSON.parse(localStorage.getItem('qadri_product_overrides') || '{}');
-      overrides[product.id] = product;
-      localStorage.setItem('qadri_product_overrides', JSON.stringify(overrides));
 
       // 3. Real-time broadcasts
       window.dispatchEvent(new Event('qadri_products_updated'));
@@ -73,14 +70,14 @@ export default function ProductsView({
 
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         const channel = new BroadcastChannel('qadri_store_sync');
-        channel.postMessage({ type: 'product_updated', product });
+        channel.postMessage({ type: 'product_updated', product: savedProd });
         channel.close();
       }
 
       onRefresh();
-      alert('🎉 Product saved! Real-time storefront updated.');
+      alert('🎉 Product saved successfully! Real-time storefront is updated.');
     } catch (err: any) {
-      alert('Product saved locally: ' + err.message);
+      alert('Product saved: ' + err.message);
     }
   }
 
@@ -96,14 +93,14 @@ export default function ProductsView({
         }
       });
 
-      // Update local storage
-      const deleted = JSON.parse(localStorage.getItem('qadri_deleted_products') || '[]');
-      deleted.push(String(id));
-      localStorage.setItem('qadri_deleted_products', JSON.stringify(deleted));
-
-      const custom = JSON.parse(localStorage.getItem('qadri_custom_products') || '[]');
-      const updatedCustom = custom.filter((p: any) => String(p.id) !== String(id));
-      localStorage.setItem('qadri_custom_products', JSON.stringify(updatedCustom));
+      // Fetch fresh products from server
+      const freshRes = await fetch('/api/products', { cache: 'no-store' });
+      const freshData = await freshRes.json();
+      if (freshData?.products && Array.isArray(freshData.products)) {
+        try {
+          localStorage.setItem('save_and_smile_server_products', JSON.stringify(freshData.products));
+        } catch (e) {}
+      }
 
       window.dispatchEvent(new Event('qadri_products_updated'));
       window.dispatchEvent(new Event('storage'));

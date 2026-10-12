@@ -1,17 +1,19 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import HeroSlider from '@/components/HeroSlider';
-import ProductCard from '@/components/ProductCard';
-import AiAssistant from '@/components/AiAssistant';
+import CategoryMarquee from '@/components/CategoryMarquee';
+import TrustFeatures from '@/components/TrustFeatures';
+import SearchHero from '@/components/SearchHero';
 import FlashSaleTimer from '@/components/FlashSaleTimer';
+import ProductCard from '@/components/ProductCard';
 import VideoReels from '@/components/VideoReels';
 import Reviews from '@/components/Reviews';
+import CartDrawer from '@/components/CartDrawer';
+import MobileBottomNav from '@/components/MobileBottomNav';
+import AiAssistant from '@/components/AiAssistant';
 import { Product } from '@/lib/types';
 import { getClientProducts } from '@/lib/store';
 
@@ -19,6 +21,7 @@ export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [activeTab, setActiveTab] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [cartOpen, setCartOpen] = useState<boolean>(false);
 
   useEffect(() => {
     // 1. Instant hydration from client cache
@@ -92,7 +95,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      <Header />
+      <Header onOpenCart={() => setCartOpen(true)} />
 
       {/* Sub Nav / Category Strip */}
       <div className="sub-nav-wrapper">
@@ -130,33 +133,15 @@ export default function HomePage() {
         {/* Dynamic Hero Slider */}
         <HeroSlider />
 
-        {/* Value Proposition Strip */}
-        <section className="features-strip py-4 bg-white border-y border-slate-200">
-          <div className="site-container">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div className="feature-item p-2">
-                <span className="text-xl">🚀</span>
-                <h4 className="text-xs font-bold text-slate-800 mt-1">Nationwide COD</h4>
-                <p className="text-[11px] text-slate-400">Doorstep delivery across Pakistan</p>
-              </div>
-              <div className="feature-item p-2">
-                <span className="text-xl">💰</span>
-                <h4 className="text-xs font-bold text-slate-800 mt-1">Direct Factory Rates</h4>
-                <p className="text-[11px] text-slate-400">Maximum reseller profit margins</p>
-              </div>
-              <div className="feature-item p-2">
-                <span className="text-xl">🛡️</span>
-                <h4 className="text-xs font-bold text-slate-800 mt-1">7 Days Checking Warranty</h4>
-                <p className="text-[11px] text-slate-400">100% replacement guarantee</p>
-              </div>
-              <div className="feature-item p-2">
-                <span className="text-xl">💬</span>
-                <h4 className="text-xs font-bold text-slate-800 mt-1">24/7 WhatsApp Support</h4>
-                <p className="text-[11px] text-slate-400">Dedicated wholesale manager</p>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* Circular Category Strip / Marquee */}
+        <CategoryMarquee onSelectCategory={(catId) => {
+          setActiveTab(catId);
+          const el = document.getElementById('products');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }} />
+
+        {/* Trust & Value Proposition Features */}
+        <TrustFeatures />
 
         {/* PORTION 1: Hot Selling Products */}
         {hotSellingProducts.length > 0 && (
@@ -224,7 +209,7 @@ export default function HomePage() {
                   <span className="portion-pill-tag bg-[#007382] text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">🌟 TRENDING PICKS</span>
                   <div>
                     <h2 className="portion-heading-text text-xl font-black text-[#00363d]">Trending Wholesale Picks</h2>
-                    <p className="portion-subtitle-text text-xs text-slate-500">Most demanded smart watches, organizers & lifestyle essentials</p>
+                    <p className="portion-subtitle-text text-xs text-slate-500">Most demanded smart watches, organizers &amp; lifestyle essentials</p>
                   </div>
                 </div>
               </div>
@@ -273,12 +258,25 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Quick Finder Search Hero */}
+        <SearchHero onSearch={(q) => {
+          setSearchQuery(q);
+          const el = document.getElementById('products');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }} />
+
         {/* PORTION 6: Watch & Shop Video Reels */}
         <VideoReels />
 
         {/* PORTION 7: Verified Client Reviews */}
         <Reviews />
       </main>
+
+      {/* Cart Drawer */}
+      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+
+      {/* Mobile Fixed Bottom Nav */}
+      <MobileBottomNav onOpenCart={() => setCartOpen(true)} />
 
       <Footer />
       <AiAssistant />

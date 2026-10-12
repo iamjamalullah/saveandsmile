@@ -1,12 +1,11 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AiAssistant from '@/components/AiAssistant';
+import CartDrawer from '@/components/CartDrawer';
+import MobileBottomNav from '@/components/MobileBottomNav';
 import Link from 'next/link';
 import { Product, ProductVariant } from '@/lib/types';
 import { getClientProducts, getCart, saveCart } from '@/lib/store';
@@ -365,6 +364,9 @@ export default function ProductDetailPage() {
           </div>
         )}
       </main>
+
+      <CartDrawer />
+      <MobileBottomNav />
 
       <Footer />
       <AiAssistant />

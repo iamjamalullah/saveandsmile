@@ -1,5 +1,5 @@
 export interface ProductVariant {
-  id: number | string;
+  id?: number | string;
   name: string;
   hex?: string;
   size?: string;
@@ -23,6 +23,7 @@ export interface Product {
   rating?: number;
   reviews?: number;
   stock?: number;
+  cost?: number;
   description?: string;
   variants?: ProductVariant[];
   isFlashSale?: boolean;

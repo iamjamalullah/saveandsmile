@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Product } from '@/lib/types';
+import ProductEditorModal from './ProductEditorModal';
 
 interface ProductsViewProps {
   products: Product[];
@@ -20,15 +21,7 @@ export default function ProductsView({
 }: ProductsViewProps) {
   const [search, setSearch] = useState('');
   const [selectedCat, setSelectedCat] = useState('all');
-  const [submitting, setSubmitting] = useState(false);
-
-  // New Product Form State
-  const [newTitle, setNewTitle] = useState('');
-  const [newPrice, setNewPrice] = useState('');
-  const [newOrigPrice, setNewOrigPrice] = useState('');
-  const [newCategory, setNewCategory] = useState('storage');
-  const [newImage, setNewImage] = useState('');
-  const [newCode, setNewCode] = useState('');
+  const [productBeingEdited, setProductBeingEdited] = useState<Product | null>(null);
 
   const categories = [
     { key: 'all', label: 'All Categories' },
@@ -47,55 +40,47 @@ export default function ProductsView({
     return matchesCat && matchesSearch;
   });
 
-  async function handleAddProduct(e: React.FormEvent) {
-    e.preventDefault();
-    if (!newTitle.trim() || !newPrice) return;
-
-    setSubmitting(true);
-    const id = Date.now();
-    const productPayload: Product = {
-      id,
-      title: newTitle.trim(),
-      price: Number(newPrice),
-      originalPrice: newOrigPrice ? Number(newOrigPrice) : Number(newPrice) * 1.3,
-      category: newCategory,
-      image: newImage.trim() || 'images/save-and-smile-logo.png',
-      code: newCode.trim() || `SNS-${Math.floor(1000 + Math.random() * 9000)}`,
-      badge: 'NEW ARRIVAL'
-    };
-
+  async function handleSaveProduct(product: Product) {
     try {
-      // 1. Post to API with token if available
       const token = localStorage.getItem('save_and_smile_admin_token');
+      // 1. Post to API
       await fetch('/api/products', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify(productPayload)
+        body: JSON.stringify(product)
       });
 
-      // 2. Local cache fallback
+      // 2. Local Storage overrides & custom products
       const custom = JSON.parse(localStorage.getItem('qadri_custom_products') || '[]');
-      custom.unshift(productPayload);
+      const existingIdx = custom.findIndex((p: any) => String(p.id) === String(product.id));
+      if (existingIdx >= 0) {
+        custom[existingIdx] = product;
+      } else {
+        custom.unshift(product);
+      }
       localStorage.setItem('qadri_custom_products', JSON.stringify(custom));
 
-      // Reset form
-      setNewTitle('');
-      setNewPrice('');
-      setNewOrigPrice('');
-      setNewImage('');
-      setNewCode('');
-      onCloseAddModal();
-      onRefresh();
+      const overrides = JSON.parse(localStorage.getItem('qadri_product_overrides') || '{}');
+      overrides[product.id] = product;
+      localStorage.setItem('qadri_product_overrides', JSON.stringify(overrides));
 
+      // 3. Real-time broadcasts
       window.dispatchEvent(new Event('qadri_products_updated'));
-      alert('✅ Product added successfully!');
+      window.dispatchEvent(new Event('storage'));
+
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const channel = new BroadcastChannel('qadri_store_sync');
+        channel.postMessage({ type: 'product_updated', product });
+        channel.close();
+      }
+
+      onRefresh();
+      alert('🎉 Product saved! Real-time storefront updated.');
     } catch (err: any) {
-      alert('Error adding product: ' + err.message);
-    } finally {
-      setSubmitting(false);
+      alert('Product saved locally: ' + err.message);
     }
   }
 
@@ -120,8 +105,16 @@ export default function ProductsView({
       const updatedCustom = custom.filter((p: any) => String(p.id) !== String(id));
       localStorage.setItem('qadri_custom_products', JSON.stringify(updatedCustom));
 
-      onRefresh();
       window.dispatchEvent(new Event('qadri_products_updated'));
+      window.dispatchEvent(new Event('storage'));
+
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const channel = new BroadcastChannel('qadri_store_sync');
+        channel.postMessage({ type: 'product_deleted', id });
+        channel.close();
+      }
+
+      onRefresh();
     } catch (err) {}
   }
 
@@ -183,7 +176,8 @@ export default function ProductsView({
                 <th className="p-3.5">Code / SKU</th>
                 <th className="p-3.5">Category</th>
                 <th className="p-3.5">Wholesale Price</th>
-                <th className="p-3.5">Original Price</th>
+                <th className="p-3.5">Compare Price</th>
+                <th className="p-3.5">Stock</th>
                 <th className="p-3.5">Badge</th>
                 <th className="p-3.5 pr-5 text-right">Actions</th>
               </tr>
@@ -221,6 +215,9 @@ export default function ProductsView({
                       Rs. {Number(p.originalPrice || p.original_price || p.price).toLocaleString()}
                     </td>
                     <td className="p-3.5">
+                      <span className="font-bold text-slate-700">{p.stock || 50} in stock</span>
+                    </td>
+                    <td className="p-3.5">
                       {p.badge ? (
                         <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-50 text-orange-700 border border-orange-200">
                           {p.badge}
@@ -229,7 +226,14 @@ export default function ProductsView({
                         <span className="text-[10px] text-slate-400">Regular</span>
                       )}
                     </td>
-                    <td className="p-3.5 pr-5 text-right space-x-2">
+                    <td className="p-3.5 pr-5 text-right space-x-1.5">
+                      <button
+                        onClick={() => setProductBeingEdited(p)}
+                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition"
+                        title="Edit Product"
+                      >
+                        Edit
+                      </button>
                       <button
                         onClick={() => handleDeleteProduct(p.id)}
                         className="px-2.5 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-xs font-bold transition"
@@ -252,114 +256,16 @@ export default function ProductsView({
         </div>
       </div>
 
-      {/* Add Product Modal */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="text-base font-black text-slate-900">Add New Wholesale Product</h3>
-              <button onClick={onCloseAddModal} className="text-slate-400 hover:text-slate-600 font-bold">
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleAddProduct} className="space-y-3 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Product Title *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. 360 Rotating Corner Storage Rack"
-                  value={newTitle}
-                  onChange={e => setNewTitle(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#007382]"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Wholesale Price (Rs.) *</label>
-                  <input
-                    type="number"
-                    required
-                    placeholder="e.g. 450"
-                    value={newPrice}
-                    onChange={e => setNewPrice(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#007382]"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Retail / Original Price (Rs.)</label>
-                  <input
-                    type="number"
-                    placeholder="e.g. 750"
-                    value={newOrigPrice}
-                    onChange={e => setNewOrigPrice(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#007382]"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Category</label>
-                  <select
-                    value={newCategory}
-                    onChange={e => setNewCategory(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#007382]"
-                  >
-                    <option value="storage">Storage &amp; Racks</option>
-                    <option value="kitchen">Kitchen Gadgets</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="smart-watch">Smart Watches</option>
-                    <option value="bottles">Mugs &amp; Bottles</option>
-                    <option value="beauty">Beauty &amp; Makeup</option>
-                    <option value="accessories">Mobile Accessories</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Product SKU / Code</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. SNS-2001"
-                    value={newCode}
-                    onChange={e => setNewCode(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#007382]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Image URL / Path</label>
-                <input
-                  type="text"
-                  placeholder="https://... or images/product.jpg"
-                  value={newImage}
-                  onChange={e => setNewImage(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#007382]"
-                />
-              </div>
-
-              <div className="pt-3 border-t flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={onCloseAddModal}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-5 py-2 bg-[#007382] hover:bg-[#005a66] text-white rounded-xl font-bold shadow-sm"
-                >
-                  {submitting ? 'Saving...' : 'Save Product'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Shopify Pro Modal: Add or Edit Product */}
+      <ProductEditorModal
+        isOpen={isAddModalOpen || !!productBeingEdited}
+        onClose={() => {
+          onCloseAddModal();
+          setProductBeingEdited(null);
+        }}
+        productToEdit={productBeingEdited}
+        onSave={handleSaveProduct}
+      />
     </div>
   );
 }

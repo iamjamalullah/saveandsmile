@@ -6,6 +6,7 @@ import DashboardView from '@/components/admin/DashboardView';
 import ProductsView from '@/components/admin/ProductsView';
 import OrdersView from '@/components/admin/OrdersView';
 import SettingsView from '@/components/admin/SettingsView';
+import ThemeCustomizerView from '@/components/admin/ThemeCustomizerView';
 import { Product } from '@/lib/types';
 import { getClientProducts } from '@/lib/store';
 
@@ -136,21 +137,7 @@ export default function AdminPage() {
           )}
 
           {activeTab === 'customizer' && (
-            <div className="space-y-4">
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-                <h2 className="text-base font-black text-slate-900 mb-2">Live Storefront Customizer</h2>
-                <p className="text-xs text-slate-500 mb-4">
-                  Open the visual customization studio to modify homepage banners, flash timer, and hero announcements.
-                </p>
-                <a
-                  href="/live-editor"
-                  target="_blank"
-                  className="inline-block px-5 py-2.5 bg-[#007382] text-white rounded-xl text-xs font-bold shadow-sm"
-                >
-                  Launch Live Customizer Studio ↗
-                </a>
-              </div>
-            </div>
+            <ThemeCustomizerView />
           )}
         </main>
       </div>

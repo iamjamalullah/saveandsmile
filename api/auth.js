@@ -3,9 +3,10 @@ const bcrypt = require('bcryptjs');
 const { getDb } = require('./db');
 
 const isProd = process.env.NODE_ENV === 'production';
-const JWT_SECRET = process.env.JWT_SECRET || (isProd ? null : 'saveandsmile_dev_jwt_secret_2026');
+const JWT_SECRET = process.env.JWT_SECRET || 'saveandsmile_super_secure_live_jwt_token_2026_key';
 
 function verifyAuthToken(req) {
+
   if (!JWT_SECRET) {
     return null;
   }

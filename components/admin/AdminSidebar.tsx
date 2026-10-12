@@ -89,6 +89,14 @@ export default function AdminSidebar({
           </div>
 
           <Link
+            href="/admin/builder"
+            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-cyan-300 hover:bg-cyan-500/10 transition text-left border border-cyan-500/20 bg-cyan-950/20"
+          >
+            <span className="text-base">🎨</span>
+            <span>Live Theme Builder ↗</span>
+          </Link>
+
+          <Link
             href="/"
             target="_blank"
             className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-emerald-400 hover:bg-emerald-500/10 transition text-left"
@@ -96,16 +104,8 @@ export default function AdminSidebar({
             <span className="text-base">🌐</span>
             <span>View Live Store ↗</span>
           </Link>
-
-          <a
-            href="/admin.html"
-            target="_blank"
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-amber-400 hover:bg-amber-500/10 transition text-left"
-          >
-            <span className="text-base">🖥️</span>
-            <span>Classic Admin View ↗</span>
-          </a>
         </nav>
+
 
         {/* User Footer */}
         <div className="p-3 border-t border-slate-800 bg-[#161a1e]">

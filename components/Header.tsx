@@ -2,11 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { HomeThemeConfig } from '@/lib/types';
 
 interface HeaderProps {
   onOpenCart?: () => void;
   onOpenWishlist?: () => void;
   onOpenTrackOrder?: () => void;
+  themeConfig?: HomeThemeConfig;
 }
 
 const CATEGORIES_DATA = [
@@ -20,7 +22,7 @@ const CATEGORIES_DATA = [
   { id: "accessories", name: "Mobile Accessories", icon: "https://www.qadrigadgets.pk/images/categories/ico_6a74c7db87df3.png", count: 120 }
 ];
 
-export default function Header({ onOpenCart, onOpenWishlist, onOpenTrackOrder }: HeaderProps) {
+export default function Header({ onOpenCart, onOpenWishlist, onOpenTrackOrder, themeConfig }: HeaderProps) {
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -84,42 +86,45 @@ export default function Header({ onOpenCart, onOpenWishlist, onOpenTrackOrder }:
     window.location.href = `/?search=${encodeURIComponent(searchQuery.trim())}#products`;
   }
 
+  const tickerEnabled = themeConfig?.announcement_ticker?.enabled !== false;
+  const rawItems = themeConfig?.announcement_ticker?.items && themeConfig.announcement_ticker.items.length > 0
+    ? themeConfig.announcement_ticker.items
+    : [
+        "🚀 Welcome to <strong>Save & Smile Wholesale Portal</strong> (Shop • Save • Smile)",
+        "🔥 Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers",
+        "🚚 Cash on Delivery (COD) Nationwide | Free Delivery Above Rs. 3,000",
+        `📞 24/7 Helpline & WhatsApp: <strong>${branding.phone}</strong>`
+      ];
+
   return (
     <>
       {/* 1. Top Announcement Bar / Marquee Ticker */}
-      <div className="ticker-bar" id="tickerSection">
-        <div className="site-container" style={{ overflow: 'hidden', width: '100%' }}>
-          <div className="ticker-track" id="tickerTrack">
-            <div className="ticker-item">
-              🚀 Welcome to <strong>Save &amp; Smile Wholesale Portal</strong> (Shop • Save • Smile)
-            </div>
-            <div className="ticker-item">
-              🔥 Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers
-            </div>
-            <div className="ticker-item">
-              🚚 Cash on Delivery (COD) Nationwide | Free Delivery Above Rs. 3,000
-            </div>
-            <div className="ticker-item">
-              📞 24/7 Helpline &amp; WhatsApp: <strong>{branding.phone}</strong>
-            </div>
-            <div className="ticker-item">
-              🚀 Welcome to <strong>Save &amp; Smile Wholesale Portal</strong> (Shop • Save • Smile)
-            </div>
-            <div className="ticker-item">
-              🔥 Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers
-            </div>
-            <div className="ticker-item">
-              🚚 Cash on Delivery (COD) Nationwide | Free Delivery Above Rs. 3,000
-            </div>
-            <div className="ticker-item">
-              📞 24/7 Helpline &amp; WhatsApp: <strong>{branding.phone}</strong>
+      {tickerEnabled && (
+        <div
+          className="ticker-bar"
+          id="tickerSection"
+          style={{
+            backgroundColor: themeConfig?.announcement_ticker?.bgColor || undefined,
+            color: themeConfig?.announcement_ticker?.textColor || undefined
+          }}
+        >
+          <div className="site-container" style={{ overflow: 'hidden', width: '100%' }}>
+            <div className="ticker-track" id="tickerTrack">
+              {rawItems.concat(rawItems).map((item, idx) => (
+                <div
+                  key={idx}
+                  className="ticker-item"
+                  dangerouslySetInnerHTML={{ __html: item }}
+                />
+              ))}
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* 2. Main Header & Dynamic Gradient Bar */}
       <header className="header-wrapper" id="headerSection">
+
         <div className="site-container">
           <div className="header-inner">
             {/* Left Side: 4-Dots Menu Trigger + Brand Logo */}

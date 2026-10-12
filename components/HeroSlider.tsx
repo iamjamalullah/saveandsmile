@@ -4,11 +4,20 @@ import React, { useState, useEffect } from 'react';
 import { HeroSlide } from '@/lib/types';
 import { getClientHeroSlides, DEFAULT_HERO_SLIDES } from '@/lib/store';
 
-export default function HeroSlider() {
-  const [slides, setSlides] = useState<HeroSlide[]>(DEFAULT_HERO_SLIDES);
+interface HeroSliderProps {
+  customSlides?: HeroSlide[];
+}
+
+export default function HeroSlider({ customSlides }: HeroSliderProps = {}) {
+  const [slides, setSlides] = useState<HeroSlide[]>(customSlides || DEFAULT_HERO_SLIDES);
   const [currentIdx, setCurrentIdx] = useState(0);
 
   useEffect(() => {
+    if (customSlides && customSlides.length > 0) {
+      setSlides(customSlides);
+      return;
+    }
+
     // 1. Initial load from client storage or authentic defaults
     setSlides(getClientHeroSlides());
 

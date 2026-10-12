@@ -2,8 +2,26 @@
 
 import React, { useState, useEffect } from 'react';
 
-export default function FlashSaleTimer() {
-  const [timeLeft, setTimeLeft] = useState({ hours: 14, minutes: 42, seconds: 19 });
+interface FlashSaleProps {
+  config?: {
+    title?: string;
+    subtitle?: string;
+    countdown_hours?: number;
+  };
+}
+
+export default function FlashSaleTimer({ config }: FlashSaleProps = {}) {
+  const title = config?.title || "TODAY'S FLASH SALE";
+  const subtitle = config?.subtitle || "Limited quantity left at discounted wholesale prices!";
+  const initialHours = config?.countdown_hours || 14;
+
+  const [timeLeft, setTimeLeft] = useState({ hours: initialHours, minutes: 42, seconds: 19 });
+
+  useEffect(() => {
+    if (config?.countdown_hours) {
+      setTimeLeft(prev => ({ ...prev, hours: config.countdown_hours || 14 }));
+    }
+  }, [config?.countdown_hours]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -37,10 +55,11 @@ export default function FlashSaleTimer() {
           <div className="flash-title-area flex items-center gap-3">
             <span className="text-2xl">⚡</span>
             <div>
-              <h2 className="text-lg font-black tracking-wide text-white m-0">TODAY'S FLASH SALE</h2>
-              <p className="text-xs text-white/90 m-0">Limited quantity left at discounted wholesale prices!</p>
+              <h2 className="text-lg font-black tracking-wide text-white m-0">{title}</h2>
+              <p className="text-xs text-white/90 m-0">{subtitle}</p>
             </div>
           </div>
+
           <div className="countdown-timer flex items-center gap-1.5 bg-black/30 px-3 py-1.5 rounded-xl border border-white/10">
             <span className="text-xs font-semibold text-white mr-1.5">Ends In:</span>
             <div className="timer-box bg-white text-slate-900 font-black px-2 py-1 rounded text-xs min-w-[28px] text-center">

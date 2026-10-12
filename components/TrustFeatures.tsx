@@ -2,7 +2,32 @@
 
 import React from 'react';
 
-export default function TrustFeatures() {
+interface TrustFeaturesProps {
+  config?: {
+    badge1_title?: string;
+    badge1_desc?: string;
+    badge2_title?: string;
+    badge2_desc?: string;
+    badge3_title?: string;
+    badge3_desc?: string;
+    badge4_title?: string;
+    badge4_desc?: string;
+  };
+}
+
+export default function TrustFeatures({ config }: TrustFeaturesProps = {}) {
+  const b1Title = config?.badge1_title || "Support 24/7";
+  const b1Desc = config?.badge1_desc || "Direct WhatsApp & Call wholesale assistance";
+
+  const b2Title = config?.badge2_title || "Best Prices";
+  const b2Desc = config?.badge2_desc || "Direct factory prices for bulk & retail";
+
+  const b3Title = config?.badge3_title || "Secure Payment";
+  const b3Desc = config?.badge3_desc || "Cash on delivery & verified digital transfers";
+
+  const b4Title = config?.badge4_title || "7 Days Replacement";
+  const b4Desc = config?.badge4_desc || "Hassle-free product verification & exchange";
+
   return (
     <section className="trust-features-section" id="HomePageFooterIcons">
       <div className="site-container">
@@ -15,8 +40,8 @@ export default function TrustFeatures() {
               </svg>
             </div>
             <div className="trust-feature-text">
-              <h4>Support 24/7</h4>
-              <p>Direct WhatsApp &amp; Call wholesale assistance</p>
+              <h4>{b1Title}</h4>
+              <p>{b1Desc}</p>
             </div>
           </div>
 
@@ -28,8 +53,8 @@ export default function TrustFeatures() {
               </svg>
             </div>
             <div className="trust-feature-text">
-              <h4>Best Prices</h4>
-              <p>Direct factory prices for bulk &amp; retail</p>
+              <h4>{b2Title}</h4>
+              <p>{b2Desc}</p>
             </div>
           </div>
 
@@ -41,8 +66,8 @@ export default function TrustFeatures() {
               </svg>
             </div>
             <div className="trust-feature-text">
-              <h4>Secure Payment</h4>
-              <p>Cash on delivery &amp; verified digital transfers</p>
+              <h4>{b3Title}</h4>
+              <p>{b3Desc}</p>
             </div>
           </div>
 
@@ -55,8 +80,8 @@ export default function TrustFeatures() {
               </svg>
             </div>
             <div className="trust-feature-text">
-              <h4>7 Days Replacement</h4>
-              <p>Hassle-free product verification &amp; exchange</p>
+              <h4>{b4Title}</h4>
+              <p>{b4Desc}</p>
             </div>
           </div>
         </div>
@@ -64,3 +89,4 @@ export default function TrustFeatures() {
     </section>
   );
 }
+

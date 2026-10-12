@@ -139,23 +139,31 @@ export default function ThemeCustomizerView() {
 
         <div className="flex items-center gap-2.5">
           <a
+            href="/admin/builder"
+            className="px-4 py-2 bg-gradient-to-r from-[#007382] to-teal-700 hover:from-[#005a66] hover:to-teal-800 text-white rounded-xl text-xs font-black shadow-sm transition flex items-center gap-1.5"
+          >
+            <span>🎨</span>
+            <span>Split-Screen Live Builder ↗</span>
+          </a>
+          <a
             href="/"
             target="_blank"
             className="px-4 py-2 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
           >
             <span>👁️</span>
-            <span>Live Preview ↗</span>
+            <span>Live Store ↗</span>
           </a>
           <button
             onClick={handlePublishTheme}
             disabled={saving}
-            className="px-6 py-2 bg-[#007382] hover:bg-[#005a66] text-white rounded-xl text-xs font-black shadow-sm transition flex items-center gap-1.5"
+            className="px-6 py-2 bg-[#1e2329] hover:bg-[#161a1e] text-white rounded-xl text-xs font-black shadow-sm transition flex items-center gap-1.5"
           >
             <span>🚀</span>
             <span>{saving ? 'Publishing...' : 'Publish to Store'}</span>
           </button>
         </div>
       </div>
+
 
       {/* Navigation Tabs (Shopify Style) */}
       <div className="flex gap-2 overflow-x-auto pb-1">

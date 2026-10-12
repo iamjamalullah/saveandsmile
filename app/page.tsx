@@ -14,11 +14,12 @@ import Reviews from '@/components/Reviews';
 import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import AiAssistant from '@/components/AiAssistant';
-import { Product } from '@/lib/types';
-import { getClientProducts } from '@/lib/store';
+import { Product, HomeThemeConfig } from '@/lib/types';
+import { getClientProducts, getClientHomeConfig, DEFAULT_HOME_CONFIG } from '@/lib/store';
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [liveLayout, setLiveLayout] = useState<HomeThemeConfig>(DEFAULT_HOME_CONFIG);
   const [activeTab, setActiveTab] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [cartOpen, setCartOpen] = useState<boolean>(false);
@@ -26,8 +27,9 @@ export default function HomePage() {
   useEffect(() => {
     // 1. Instant hydration from client cache
     setProducts(getClientProducts());
+    setLiveLayout(getClientHomeConfig());
 
-    // 2. Fetch live products from backend API (database / sync file)
+    // 2. Fetch live products and theme customization from backend
     function fetchLiveProducts() {
       fetch('/api/products', { cache: 'no-store' })
         .then(res => res.json())
@@ -42,10 +44,38 @@ export default function HomePage() {
         .catch(() => {});
     }
 
+    function fetchLiveTheme() {
+      fetch('/api/home-customization', { cache: 'no-store' })
+        .then(res => res.json())
+        .then(data => {
+          if (data?.config) {
+            setLiveLayout(prev => ({
+              ...prev,
+              ...data.config,
+              sections_visibility: {
+                ...prev.sections_visibility,
+                ...(data.config.sections_visibility || {})
+              },
+              sections_config: {
+                ...prev.sections_config,
+                ...(data.config.sections_config || {})
+              }
+            }));
+          }
+        })
+        .catch(() => {});
+    }
+
     fetchLiveProducts();
+    fetchLiveTheme();
 
     function handleSync(e: any) {
-      if (e.data && e.data.type === 'qadri_sync_products') {
+      if (e.data && e.data.type === 'LIVE_PREVIEW_UPDATE') {
+        // Instant Live PostMessage synchronization from Admin Customizer
+        setLiveLayout(e.data.payload);
+      } else if (e.data && e.data.type === 'qadri_sync_hero_slides') {
+        setLiveLayout(prev => ({ ...prev, hero_slides: e.data.slides }));
+      } else if (e.data && e.data.type === 'qadri_sync_products') {
         setProducts(e.data.products);
       } else {
         setProducts(getClientProducts());
@@ -56,12 +86,27 @@ export default function HomePage() {
     window.addEventListener('message', handleSync);
     window.addEventListener('storage', handleSync);
     window.addEventListener('qadri_products_updated', handleSync);
+    window.addEventListener('qadri_hero_slides_updated', fetchLiveTheme);
 
     let channel: BroadcastChannel | null = null;
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         channel = new BroadcastChannel('qadri_store_sync');
-        channel.onmessage = () => fetchLiveProducts();
+        channel.onmessage = (ev) => {
+          if (ev.data?.type === 'theme_updated') {
+            setLiveLayout(ev.data.config);
+          } else {
+            fetchLiveProducts();
+            fetchLiveTheme();
+          }
+        };
+      }
+    } catch (e) {}
+
+    // Notify parent builder if inside iframe preview
+    try {
+      if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'PREVIEW_FRAME_READY' }, '*');
       }
     } catch (e) {}
 
@@ -69,9 +114,11 @@ export default function HomePage() {
       window.removeEventListener('message', handleSync);
       window.removeEventListener('storage', handleSync);
       window.removeEventListener('qadri_products_updated', handleSync);
+      window.removeEventListener('qadri_hero_slides_updated', fetchLiveTheme);
       if (channel) channel.close();
     };
   }, []);
+
 
   const categories = [
     { key: 'all', label: 'All Wholesale Items' },
@@ -95,7 +142,10 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      <Header onOpenCart={() => setCartOpen(true)} />
+      <Header
+        onOpenCart={() => setCartOpen(true)}
+        themeConfig={liveLayout}
+      />
 
       {/* Sub Nav / Category Strip */}
       <div className="sub-nav-wrapper">
@@ -131,33 +181,45 @@ export default function HomePage() {
 
       <main className="flex-1">
         {/* Dynamic Hero Slider */}
-        <HeroSlider />
+        {liveLayout.sections_visibility?.hero_slider !== false && (
+          <HeroSlider customSlides={liveLayout.hero_slides} />
+        )}
 
         {/* Circular Category Strip / Marquee */}
-        <CategoryMarquee onSelectCategory={(catId) => {
-          setActiveTab(catId);
-          const el = document.getElementById('products');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }} />
+        {liveLayout.sections_visibility?.categories_strip !== false && (
+          <CategoryMarquee onSelectCategory={(catId) => {
+            setActiveTab(catId);
+            const el = document.getElementById('products');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }} />
+        )}
 
         {/* Trust & Value Proposition Features */}
-        <TrustFeatures />
+        {liveLayout.sections_visibility?.trust_badges !== false && (
+          <TrustFeatures config={liveLayout.sections_config?.trust_badges} />
+        )}
 
         {/* PORTION 1: Hot Selling Products */}
-        {hotSellingProducts.length > 0 && (
+        {liveLayout.sections_visibility?.hot_selling !== false && hotSellingProducts.length > 0 && (
           <section className="store-portion-section portion-hot-selling py-8 bg-[#fff9f5]" id="hotSelling">
             <div className="site-container">
               <div className="portion-header-bar mb-6">
                 <div className="portion-title-group flex items-center gap-3">
-                  <span className="portion-pill-tag bg-orange-600 text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">🔥 HOT SELLING</span>
+                  <span className="portion-pill-tag bg-orange-600 text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">
+                    {liveLayout.sections_config?.hot_selling?.tag || '🔥 HOT SELLING'}
+                  </span>
                   <div>
-                    <h2 className="portion-heading-text text-xl font-black text-slate-900">Hot Selling Wholesale Gadgets</h2>
-                    <p className="portion-subtitle-text text-xs text-slate-500">Fast moving products with highest reseller profit margins</p>
+                    <h2 className="portion-heading-text text-xl font-black text-slate-900">
+                      {liveLayout.sections_config?.hot_selling?.title || 'Hot Selling Wholesale Gadgets'}
+                    </h2>
+                    <p className="portion-subtitle-text text-xs text-slate-500">
+                      {liveLayout.sections_config?.hot_selling?.subtitle || 'Fast moving products with highest reseller profit margins'}
+                    </p>
                   </div>
                 </div>
               </div>
               <div className="products-grid">
-                {hotSellingProducts.map(product => (
+                {hotSellingProducts.slice(0, liveLayout.sections_config?.hot_selling?.limit || 4).map(product => (
                   <ProductCard key={`hot-${product.id}`} product={product} />
                 ))}
               </div>
@@ -171,20 +233,26 @@ export default function HomePage() {
         )}
 
         {/* PORTION 2: New Arrivals */}
-        {newArrivalProducts.length > 0 && (
+        {liveLayout.sections_visibility?.new_arrivals !== false && newArrivalProducts.length > 0 && (
           <section className="store-portion-section portion-new-arrivals py-8 bg-[#f5fbf6]" id="newArrivals">
             <div className="site-container">
               <div className="portion-header-bar mb-6">
                 <div className="portion-title-group flex items-center gap-3">
-                  <span className="portion-pill-tag bg-emerald-600 text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">✨ NEW ARRIVALS</span>
+                  <span className="portion-pill-tag bg-emerald-600 text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">
+                    {liveLayout.sections_config?.new_arrivals?.tag || '✨ NEW ARRIVALS'}
+                  </span>
                   <div>
-                    <h2 className="portion-heading-text text-xl font-black text-slate-900">Latest New Arrivals</h2>
-                    <p className="portion-subtitle-text text-xs text-slate-500">Fresh containers imported this week — First batch wholesale prices</p>
+                    <h2 className="portion-heading-text text-xl font-black text-slate-900">
+                      {liveLayout.sections_config?.new_arrivals?.title || 'Latest New Arrivals'}
+                    </h2>
+                    <p className="portion-subtitle-text text-xs text-slate-500">
+                      {liveLayout.sections_config?.new_arrivals?.subtitle || 'Fresh containers imported this week — First batch wholesale prices'}
+                    </p>
                   </div>
                 </div>
               </div>
               <div className="products-grid">
-                {newArrivalProducts.map(product => (
+                {newArrivalProducts.slice(0, liveLayout.sections_config?.new_arrivals?.limit || 4).map(product => (
                   <ProductCard key={`new-${product.id}`} product={product} />
                 ))}
               </div>
@@ -198,23 +266,31 @@ export default function HomePage() {
         )}
 
         {/* PORTION 3: Flash Sale with Live Timer */}
-        <FlashSaleTimer />
+        {liveLayout.sections_visibility?.flash_sale !== false && (
+          <FlashSaleTimer config={liveLayout.sections_config?.flash_sale} />
+        )}
 
         {/* PORTION 4: Trending Wholesale Picks */}
-        {trendingProducts.length > 0 && (
+        {liveLayout.sections_visibility?.trending_picks !== false && trendingProducts.length > 0 && (
           <section className="store-portion-section portion-trending-gadgets py-8 bg-[#f0f9fa]" id="trendingPicks">
             <div className="site-container">
               <div className="portion-header-bar mb-6">
                 <div className="portion-title-group flex items-center gap-3">
-                  <span className="portion-pill-tag bg-[#007382] text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">🌟 TRENDING PICKS</span>
+                  <span className="portion-pill-tag bg-[#007382] text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">
+                    {liveLayout.sections_config?.trending_picks?.tag || '🌟 TRENDING PICKS'}
+                  </span>
                   <div>
-                    <h2 className="portion-heading-text text-xl font-black text-[#00363d]">Trending Wholesale Picks</h2>
-                    <p className="portion-subtitle-text text-xs text-slate-500">Most demanded smart watches, organizers &amp; lifestyle essentials</p>
+                    <h2 className="portion-heading-text text-xl font-black text-[#00363d]">
+                      {liveLayout.sections_config?.trending_picks?.title || 'Trending Wholesale Picks'}
+                    </h2>
+                    <p className="portion-subtitle-text text-xs text-slate-500">
+                      {liveLayout.sections_config?.trending_picks?.subtitle || 'Most demanded smart watches, organizers & lifestyle essentials'}
+                    </p>
                   </div>
                 </div>
               </div>
               <div className="products-grid">
-                {trendingProducts.map(product => (
+                {trendingProducts.slice(0, liveLayout.sections_config?.trending_picks?.limit || 4).map(product => (
                   <ProductCard key={`trend-${product.id}`} product={product} />
                 ))}
               </div>
@@ -228,49 +304,58 @@ export default function HomePage() {
         )}
 
         {/* PORTION 5: Main Products Catalog */}
-        <section id="products" className="py-8">
-          <div className="site-container">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-black text-[#00363d]">Trending Wholesale Catalog</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Showing {filteredProducts.length} verified products in stock</p>
+        {liveLayout.sections_visibility?.main_catalog !== false && (
+          <section id="products" className="py-8">
+            <div className="site-container">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-black text-[#00363d]">
+                    {liveLayout.sections_config?.main_catalog?.title || 'Trending Wholesale Catalog'}
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {liveLayout.sections_config?.main_catalog?.subtitle || `Showing ${filteredProducts.length} verified products in stock`}
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div className="products-grid">
-              {filteredProducts.map(product => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-
-            {filteredProducts.length === 0 && (
-              <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
-                <span className="text-3xl">🔍</span>
-                <p className="text-sm font-bold text-slate-700 mt-2">No products found matching your search.</p>
-                <button
-                  onClick={() => { setActiveTab('all'); setSearchQuery(''); }}
-                  className="mt-3 px-4 py-1.5 bg-[#007382] text-white rounded-lg text-xs font-bold"
-                >
-                  Clear Filters
-                </button>
+              <div className="products-grid">
+                {filteredProducts.map(product => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
               </div>
-            )}
-          </div>
-        </section>
+
+              {filteredProducts.length === 0 && (
+                <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
+                  <span className="text-3xl">🔍</span>
+                  <p className="text-sm font-bold text-slate-700 mt-2">No products found matching your search.</p>
+                  <button
+                    onClick={() => { setActiveTab('all'); setSearchQuery(''); }}
+                    className="mt-3 px-4 py-1.5 bg-[#007382] text-white rounded-lg text-xs font-bold"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* Quick Finder Search Hero */}
-        <SearchHero onSearch={(q) => {
-          setSearchQuery(q);
-          const el = document.getElementById('products');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }} />
+        {liveLayout.sections_visibility?.search_hero !== false && (
+          <SearchHero onSearch={(q) => {
+            setSearchQuery(q);
+            const el = document.getElementById('products');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }} />
+        )}
 
         {/* PORTION 6: Watch & Shop Video Reels */}
-        <VideoReels />
+        {liveLayout.sections_visibility?.video_reels !== false && <VideoReels />}
 
         {/* PORTION 7: Verified Client Reviews */}
-        <Reviews />
+        {liveLayout.sections_visibility?.testimonials !== false && <Reviews />}
       </main>
+
 
       {/* Cart Drawer */}
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />

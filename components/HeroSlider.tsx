@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { HeroSlide } from '@/lib/types';
-import { getClientHeroSlides } from '@/lib/store';
+import { getClientHeroSlides, DEFAULT_HERO_SLIDES } from '@/lib/store';
 
 export default function HeroSlider() {
-  const [slides, setSlides] = useState<HeroSlide[]>([]);
+  const [slides, setSlides] = useState<HeroSlide[]>(DEFAULT_HERO_SLIDES);
   const [currentIdx, setCurrentIdx] = useState(0);
 
   useEffect(() => {

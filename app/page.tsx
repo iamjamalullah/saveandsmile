@@ -150,180 +150,215 @@ export default function HomePage() {
       />
 
       <main className="flex-1">
-        {/* Dynamic Hero Slider */}
-        {liveLayout.sections_visibility?.hero_slider !== false && (
-          <HeroSlider customSlides={liveLayout.hero_slides} />
-        )}
+        {/* Dynamic Reorderable Sections based on liveLayout.sections_order */}
+        {(liveLayout.sections_order || [
+          'hero_slider',
+          'categories_strip',
+          'trust_badges',
+          'hot_selling',
+          'new_arrivals',
+          'flash_sale',
+          'trending_picks',
+          'main_catalog',
+          'search_hero',
+          'video_reels',
+          'testimonials'
+        ]).map((secKey) => {
+          // Check visibility
+          if (liveLayout.sections_visibility?.[secKey] === false) return null;
 
-        {/* Circular Category Strip / Marquee */}
-        {liveLayout.sections_visibility?.categories_strip !== false && (
-          <CategoryMarquee onSelectCategory={(catId) => {
-            setActiveTab(catId);
-            const el = document.getElementById('products');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }} />
-        )}
+          switch (secKey) {
+            case 'hero_slider':
+              return (
+                <HeroSlider key="hero_slider" customSlides={liveLayout.hero_slides} />
+              );
 
-        {/* Trust & Value Proposition Features */}
-        {liveLayout.sections_visibility?.trust_badges !== false && (
-          <TrustFeatures config={liveLayout.sections_config?.trust_badges} />
-        )}
+            case 'categories_strip':
+              return (
+                <CategoryMarquee
+                  key="categories_strip"
+                  onSelectCategory={(catId) => {
+                    setActiveTab(catId);
+                    const el = document.getElementById('products');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                />
+              );
 
-        {/* PORTION 1: Hot Selling Products */}
-        {liveLayout.sections_visibility?.hot_selling !== false && hotSellingProducts.length > 0 && (
-          <section className="store-portion-section portion-hot-selling py-8 bg-[#fff9f5]" id="hotSelling">
-            <div className="site-container">
-              <div className="portion-header-bar mb-6">
-                <div className="portion-title-group flex items-center gap-3">
-                  <span className="portion-pill-tag bg-orange-600 text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">
-                    {liveLayout.sections_config?.hot_selling?.tag || '🔥 HOT SELLING'}
-                  </span>
-                  <div>
-                    <h2 className="portion-heading-text text-xl font-black text-slate-900">
-                      {liveLayout.sections_config?.hot_selling?.title || 'Hot Selling Wholesale Gadgets'}
-                    </h2>
-                    <p className="portion-subtitle-text text-xs text-slate-500">
-                      {liveLayout.sections_config?.hot_selling?.subtitle || 'Fast moving products with highest reseller profit margins'}
-                    </p>
+            case 'trust_badges':
+              return (
+                <TrustFeatures
+                  key="trust_badges"
+                  config={liveLayout.sections_config?.trust_badges}
+                />
+              );
+
+            case 'hot_selling':
+              if (hotSellingProducts.length === 0) return null;
+              return (
+                <section key="hot_selling" className="store-portion-section portion-hot-selling py-8 bg-[#fff9f5]" id="hotSelling">
+                  <div className="site-container">
+                    <div className="portion-header-bar mb-6">
+                      <div className="portion-title-group flex items-center gap-3">
+                        <span className="portion-pill-tag bg-orange-600 text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">
+                          {liveLayout.sections_config?.hot_selling?.tag || '🔥 HOT SELLING'}
+                        </span>
+                        <div>
+                          <h2 className="portion-heading-text text-xl font-black text-slate-900">
+                            {liveLayout.sections_config?.hot_selling?.title || 'Hot Selling Wholesale Gadgets'}
+                          </h2>
+                          <p className="portion-subtitle-text text-xs text-slate-500">
+                            {liveLayout.sections_config?.hot_selling?.subtitle || 'Fast moving products with highest reseller profit margins'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="products-grid">
+                      {hotSellingProducts.slice(0, liveLayout.sections_config?.hot_selling?.limit || 4).map(product => (
+                        <ProductCard key={`hot-${product.id}`} product={product} />
+                      ))}
+                    </div>
+                    <div className="portion-bottom-action flex justify-center mt-6">
+                      <a href="#products" onClick={() => setActiveTab('all')} className="portion-view-all px-5 py-2 rounded-full border border-orange-500 text-orange-600 text-xs font-bold hover:bg-orange-600 hover:text-white transition">
+                        See All Hot Items →
+                      </a>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div className="products-grid">
-                {hotSellingProducts.slice(0, liveLayout.sections_config?.hot_selling?.limit || 4).map(product => (
-                  <ProductCard key={`hot-${product.id}`} product={product} />
-                ))}
-              </div>
-              <div className="portion-bottom-action flex justify-center mt-6">
-                <a href="#products" onClick={() => setActiveTab('all')} className="portion-view-all px-5 py-2 rounded-full border border-orange-500 text-orange-600 text-xs font-bold hover:bg-orange-600 hover:text-white transition">
-                  See All Hot Items →
-                </a>
-              </div>
-            </div>
-          </section>
-        )}
+                </section>
+              );
 
-        {/* PORTION 2: New Arrivals */}
-        {liveLayout.sections_visibility?.new_arrivals !== false && newArrivalProducts.length > 0 && (
-          <section className="store-portion-section portion-new-arrivals py-8 bg-[#f5fbf6]" id="newArrivals">
-            <div className="site-container">
-              <div className="portion-header-bar mb-6">
-                <div className="portion-title-group flex items-center gap-3">
-                  <span className="portion-pill-tag bg-emerald-600 text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">
-                    {liveLayout.sections_config?.new_arrivals?.tag || '✨ NEW ARRIVALS'}
-                  </span>
-                  <div>
-                    <h2 className="portion-heading-text text-xl font-black text-slate-900">
-                      {liveLayout.sections_config?.new_arrivals?.title || 'Latest New Arrivals'}
-                    </h2>
-                    <p className="portion-subtitle-text text-xs text-slate-500">
-                      {liveLayout.sections_config?.new_arrivals?.subtitle || 'Fresh containers imported this week — First batch wholesale prices'}
-                    </p>
+            case 'new_arrivals':
+              if (newArrivalProducts.length === 0) return null;
+              return (
+                <section key="new_arrivals" className="store-portion-section portion-new-arrivals py-8 bg-[#f5fbf6]" id="newArrivals">
+                  <div className="site-container">
+                    <div className="portion-header-bar mb-6">
+                      <div className="portion-title-group flex items-center gap-3">
+                        <span className="portion-pill-tag bg-emerald-600 text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">
+                          {liveLayout.sections_config?.new_arrivals?.tag || '✨ NEW ARRIVALS'}
+                        </span>
+                        <div>
+                          <h2 className="portion-heading-text text-xl font-black text-slate-900">
+                            {liveLayout.sections_config?.new_arrivals?.title || 'Latest New Arrivals'}
+                          </h2>
+                          <p className="portion-subtitle-text text-xs text-slate-500">
+                            {liveLayout.sections_config?.new_arrivals?.subtitle || 'Fresh containers imported this week — First batch wholesale prices'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="products-grid">
+                      {newArrivalProducts.slice(0, liveLayout.sections_config?.new_arrivals?.limit || 4).map(product => (
+                        <ProductCard key={`new-${product.id}`} product={product} />
+                      ))}
+                    </div>
+                    <div className="portion-bottom-action flex justify-center mt-6">
+                      <a href="#products" onClick={() => setActiveTab('all')} className="portion-view-all px-5 py-2 rounded-full border border-emerald-500 text-emerald-600 text-xs font-bold hover:bg-emerald-600 hover:text-white transition">
+                        See All New Arrivals →
+                      </a>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div className="products-grid">
-                {newArrivalProducts.slice(0, liveLayout.sections_config?.new_arrivals?.limit || 4).map(product => (
-                  <ProductCard key={`new-${product.id}`} product={product} />
-                ))}
-              </div>
-              <div className="portion-bottom-action flex justify-center mt-6">
-                <a href="#products" onClick={() => setActiveTab('all')} className="portion-view-all px-5 py-2 rounded-full border border-emerald-500 text-emerald-600 text-xs font-bold hover:bg-emerald-600 hover:text-white transition">
-                  See All New Arrivals →
-                </a>
-              </div>
-            </div>
-          </section>
-        )}
+                </section>
+              );
 
-        {/* PORTION 3: Flash Sale with Live Timer */}
-        {liveLayout.sections_visibility?.flash_sale !== false && (
-          <FlashSaleTimer config={liveLayout.sections_config?.flash_sale} />
-        )}
+            case 'flash_sale':
+              return (
+                <FlashSaleTimer key="flash_sale" config={liveLayout.sections_config?.flash_sale} />
+              );
 
-        {/* PORTION 4: Trending Wholesale Picks */}
-        {liveLayout.sections_visibility?.trending_picks !== false && trendingProducts.length > 0 && (
-          <section className="store-portion-section portion-trending-gadgets py-8 bg-[#f0f9fa]" id="trendingPicks">
-            <div className="site-container">
-              <div className="portion-header-bar mb-6">
-                <div className="portion-title-group flex items-center gap-3">
-                  <span className="portion-pill-tag bg-[#007382] text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">
-                    {liveLayout.sections_config?.trending_picks?.tag || '🌟 TRENDING PICKS'}
-                  </span>
-                  <div>
-                    <h2 className="portion-heading-text text-xl font-black text-[#00363d]">
-                      {liveLayout.sections_config?.trending_picks?.title || 'Trending Wholesale Picks'}
-                    </h2>
-                    <p className="portion-subtitle-text text-xs text-slate-500">
-                      {liveLayout.sections_config?.trending_picks?.subtitle || 'Most demanded smart watches, organizers & lifestyle essentials'}
-                    </p>
+            case 'trending_picks':
+              if (trendingProducts.length === 0) return null;
+              return (
+                <section key="trending_picks" className="store-portion-section portion-trending-gadgets py-8 bg-[#f0f9fa]" id="trendingPicks">
+                  <div className="site-container">
+                    <div className="portion-header-bar mb-6">
+                      <div className="portion-title-group flex items-center gap-3">
+                        <span className="portion-pill-tag bg-[#007382] text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">
+                          {liveLayout.sections_config?.trending_picks?.tag || '🌟 TRENDING PICKS'}
+                        </span>
+                        <div>
+                          <h2 className="portion-heading-text text-xl font-black text-[#00363d]">
+                            {liveLayout.sections_config?.trending_picks?.title || 'Trending Wholesale Picks'}
+                          </h2>
+                          <p className="portion-subtitle-text text-xs text-slate-500">
+                            {liveLayout.sections_config?.trending_picks?.subtitle || 'Most demanded smart watches, organizers & lifestyle essentials'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="products-grid">
+                      {trendingProducts.slice(0, liveLayout.sections_config?.trending_picks?.limit || 4).map(product => (
+                        <ProductCard key={`trend-${product.id}`} product={product} />
+                      ))}
+                    </div>
+                    <div className="portion-bottom-action flex justify-center mt-6">
+                      <a href="#products" onClick={() => setActiveTab('all')} className="portion-view-all px-5 py-2 rounded-full border border-[#007382] text-[#007382] text-xs font-bold hover:bg-[#007382] hover:text-white transition">
+                        See All Trending →
+                      </a>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div className="products-grid">
-                {trendingProducts.slice(0, liveLayout.sections_config?.trending_picks?.limit || 4).map(product => (
-                  <ProductCard key={`trend-${product.id}`} product={product} />
-                ))}
-              </div>
-              <div className="portion-bottom-action flex justify-center mt-6">
-                <a href="#products" onClick={() => setActiveTab('all')} className="portion-view-all px-5 py-2 rounded-full border border-[#007382] text-[#007382] text-xs font-bold hover:bg-[#007382] hover:text-white transition">
-                  See All Trending →
-                </a>
-              </div>
-            </div>
-          </section>
-        )}
+                </section>
+              );
 
-        {/* PORTION 5: Main Products Catalog */}
-        {liveLayout.sections_visibility?.main_catalog !== false && (
-          <section id="products" className="py-8">
-            <div className="site-container">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-xl font-black text-[#00363d]">
-                    {liveLayout.sections_config?.main_catalog?.title || 'Trending Wholesale Catalog'}
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    {liveLayout.sections_config?.main_catalog?.subtitle || `Showing ${filteredProducts.length} verified products in stock`}
-                  </p>
-                </div>
-              </div>
+            case 'main_catalog':
+              return (
+                <section key="main_catalog" id="products" className="py-8">
+                  <div className="site-container">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h2 className="text-xl font-black text-[#00363d]">
+                          {liveLayout.sections_config?.main_catalog?.title || 'Trending Wholesale Catalog'}
+                        </h2>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {liveLayout.sections_config?.main_catalog?.subtitle || `Showing ${filteredProducts.length} verified products in stock`}
+                        </p>
+                      </div>
+                    </div>
 
-              <div className="products-grid">
-                {filteredProducts.map(product => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
+                    <div className="products-grid">
+                      {filteredProducts.map(product => (
+                        <ProductCard key={product.id} product={product} />
+                      ))}
+                    </div>
 
-              {filteredProducts.length === 0 && (
-                <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
-                  <span className="text-3xl">🔍</span>
-                  <p className="text-sm font-bold text-slate-700 mt-2">No products found matching your search.</p>
-                  <button
-                    onClick={() => { setActiveTab('all'); setSearchQuery(''); }}
-                    className="mt-3 px-4 py-1.5 bg-[#007382] text-white rounded-lg text-xs font-bold"
-                  >
-                    Clear Filters
-                  </button>
-                </div>
-              )}
-            </div>
-          </section>
-        )}
+                    {filteredProducts.length === 0 && (
+                      <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
+                        <span className="text-3xl">🔍</span>
+                        <p className="text-sm font-bold text-slate-700 mt-2">No products found matching your search.</p>
+                        <button
+                          onClick={() => { setActiveTab('all'); setSearchQuery(''); }}
+                          className="mt-3 px-4 py-1.5 bg-[#007382] text-white rounded-lg text-xs font-bold"
+                        >
+                          Clear Filters
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              );
 
-        {/* Quick Finder Search Hero */}
-        {liveLayout.sections_visibility?.search_hero !== false && (
-          <SearchHero onSearch={(q) => {
-            setSearchQuery(q);
-            const el = document.getElementById('products');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }} />
-        )}
+            case 'search_hero':
+              return (
+                <SearchHero
+                  key="search_hero"
+                  onSearch={(q) => {
+                    setSearchQuery(q);
+                    const el = document.getElementById('products');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                />
+              );
 
-        {/* PORTION 6: Watch & Shop Video Reels */}
-        {liveLayout.sections_visibility?.video_reels !== false && <VideoReels />}
+            case 'video_reels':
+              return <VideoReels key="video_reels" />;
 
-        {/* PORTION 7: Verified Client Reviews */}
-        {liveLayout.sections_visibility?.testimonials !== false && <Reviews />}
+            case 'testimonials':
+              return <Reviews key="testimonials" />;
+
+            default:
+              return null;
+          }
+        })}
       </main>
 
 

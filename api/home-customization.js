@@ -228,17 +228,23 @@ async function handler(req, res) {
 
   // 1. GET: Public Homepage & Hero Customization
   if (req.method === 'GET') {
+    // 1. Always prioritize persistent file first for zero-lag and offline reliability
+    const fileConfig = readHomeConfig();
+    if (fileConfig && (fileConfig.hero_slides || fileConfig.sections_visibility)) {
+      return res.status(200).json({ success: true, config: fileConfig });
+    }
+
     if (sql) {
       try {
         const rows = await sql`SELECT config_data FROM home_customization WHERE id = 1 LIMIT 1`;
         if (rows && rows.length > 0 && rows[0].config_data) {
+          writeHomeConfig(rows[0].config_data);
           return res.status(200).json({ success: true, config: rows[0].config_data });
         }
       } catch (e) {}
     }
 
-    const config = readHomeConfig();
-    return res.status(200).json({ success: true, config });
+    return res.status(200).json({ success: true, config: DEFAULT_HOME_CONFIG });
   }
 
   // 2. POST: Save Homepage Customization

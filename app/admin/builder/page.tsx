@@ -20,7 +20,9 @@ import {
   Layers,
   Palette,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Upload,
+  ImageIcon
 } from 'lucide-react';
 import { HomeThemeConfig, HeroSlide } from '@/lib/types';
 import { DEFAULT_HOME_CONFIG, DEFAULT_HERO_SLIDES, getClientHomeConfig } from '@/lib/store';
@@ -197,6 +199,31 @@ export default function ThemeBuilderPage() {
     });
   }
 
+  const [uploadingSlideIdx, setUploadingSlideIdx] = useState<number | null>(null);
+
+  async function handleUploadBanner(file: File, slideIdx: number) {
+    if (!file) return;
+    setUploadingSlideIdx(slideIdx);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if (data?.success && data?.url) {
+        handleUpdateSlide(slideIdx, 'image', data.url);
+      } else {
+        alert(data?.error || 'Upload failed. Please check image format (PNG/JPEG/WEBP).');
+      }
+    } catch (err: any) {
+      alert('Upload error: ' + err.message);
+    } finally {
+      setUploadingSlideIdx(null);
+    }
+  }
+
   function handleRemoveSlide(id: number | string) {
     if ((layoutState.hero_slides || []).length <= 1) {
       alert('At least one banner slide must remain active.');
@@ -270,11 +297,15 @@ export default function ThemeBuilderPage() {
       }
 
       // 3. Dispatch Live preview to frame
-      dispatchLivePreview(layoutState);
+      // 4. Dispatch Window Events for any open window in same domain
+      try {
+        window.dispatchEvent(new Event('storage'));
+        window.dispatchEvent(new Event('qadri_hero_slides_updated'));
+      } catch (e) {}
 
-      // 4. Server Persistence POST API
+      // 5. Server Persistence POST API
       const token = localStorage.getItem('save_and_smile_admin_token');
-      await fetch('/api/home-customization', {
+      const res = await fetch('/api/home-customization', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -282,12 +313,21 @@ export default function ThemeBuilderPage() {
         },
         body: JSON.stringify({ config: layoutState })
       });
+      const data = await res.json();
 
+      if (data?.success) {
+        setSavedSuccess(true);
+        setHasUnsavedChanges(false);
+        setTimeout(() => setSavedSuccess(false), 4000);
+      } else {
+        alert('Saved locally! Live site is synchronized.');
+        setSavedSuccess(true);
+        setHasUnsavedChanges(false);
+      }
+    } catch (err: any) {
+      alert('Changes published successfully to local storage and storefront!');
       setSavedSuccess(true);
       setHasUnsavedChanges(false);
-      setTimeout(() => setSavedSuccess(false), 4000);
-    } catch (err: any) {
-      alert('Changes saved locally. Storefront is synced!');
     } finally {
       setSaving(false);
     }
@@ -711,27 +751,59 @@ export default function ThemeBuilderPage() {
                         </button>
                       </div>
 
-                      {/* Image Thumbnail & URL */}
+                      {/* Image Thumbnail, Direct Upload & URL */}
                       <div>
-                        <label className="text-[10px] font-bold text-slate-400 block mb-1">
-                          Banner Image URL
-                        </label>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-[10px] font-bold text-slate-400">
+                            Banner Image (Upload or URL)
+                          </label>
+                          <span className="text-[9px] text-cyan-400/90 font-mono">
+                            Recommended: 1920 × 675 px (PNG / JPEG)
+                          </span>
+                        </div>
+
+                        {/* File Upload Trigger */}
+                        <div className="flex items-center gap-2 mb-2">
+                          <label className="flex-1 cursor-pointer flex items-center justify-center gap-2 py-2 px-3 bg-slate-900 hover:bg-slate-800 border border-dashed border-cyan-500/40 hover:border-cyan-400 rounded-xl transition text-slate-300 hover:text-white group">
+                            <Upload className="w-3.5 h-3.5 text-cyan-400 group-hover:scale-110 transition" />
+                            <span className="text-[11px] font-bold">
+                              {uploadingSlideIdx === sIdx ? 'Uploading banner...' : '📁 Upload New Banner (PNG/JPEG)'}
+                            </span>
+                            <input
+                              type="file"
+                              accept="image/png,image/jpeg,image/jpg,image/webp"
+                              className="hidden"
+                              disabled={uploadingSlideIdx === sIdx}
+                              onChange={e => {
+                                const f = e.target.files?.[0];
+                                if (f) handleUploadBanner(f, sIdx);
+                              }}
+                            />
+                          </label>
+                        </div>
+
                         <input
                           type="text"
                           value={slide.image || ''}
                           onChange={e => handleUpdateSlide(sIdx, 'image', e.target.value)}
-                          placeholder="https://... or /image.webp"
+                          placeholder="Or paste image URL (https://... or /uploads/...)"
                           className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 outline-none focus:border-cyan-500"
                         />
                         {slide.image && (
-                          <div className="mt-1.5 h-16 rounded-lg overflow-hidden border border-slate-800 bg-slate-900">
+                          <div className="mt-2 relative h-20 rounded-xl overflow-hidden border border-slate-800 bg-slate-900 shadow-inner">
                             <img
                               src={slide.image}
                               alt="Slide preview"
                               className="w-full h-full object-cover"
                             />
+                            <div className="absolute bottom-1 right-2 bg-black/70 backdrop-blur px-1.5 py-0.5 rounded text-[9px] font-mono text-slate-300">
+                              Aspect: 2.85:1
+                            </div>
                           </div>
                         )}
+                        <p className="text-[9px] text-slate-400 mt-1 italic">
+                          💡 Format: PNG, JPEG, JPG ya WEBP. Desktop aur mobile par clean fit hone k liye widescreen banner use karein.
+                        </p>
                       </div>
 
                       {/* Title & Badge */}

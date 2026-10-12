@@ -4,11 +4,11 @@ import React from 'react';
 
 export default function AdminPage() {
   return (
-    <div className="w-full h-screen overflow-hidden">
+    <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 999999, overflow: 'hidden', background: '#0f172a' }}>
       <iframe
         src="/admin.html"
         title="Save & Smile Wholesale Admin Suite"
-        className="w-full h-full border-none"
+        style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
       />
     </div>
   );

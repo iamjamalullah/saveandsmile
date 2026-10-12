@@ -30,13 +30,18 @@ module.exports = async function handler(req, res) {
 
     // Fallback to static products.json (always read fresh from disk, avoid require.cache)
     try {
-      const fallbackPath = path.join(__dirname, '..', 'products.json');
-      const publicPath = path.join(__dirname, '..', 'public', 'products.json');
+      const candidates = [
+        path.join(process.cwd(), 'products.json'),
+        path.join(process.cwd(), 'public', 'products.json'),
+        path.join(__dirname, '..', 'products.json'),
+        path.join(__dirname, '..', 'public', 'products.json')
+      ];
       let staticData = [];
-      if (fs.existsSync(fallbackPath)) {
-        staticData = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
-      } else if (fs.existsSync(publicPath)) {
-        staticData = JSON.parse(fs.readFileSync(publicPath, 'utf8'));
+      for (const p of candidates) {
+        if (fs.existsSync(p)) {
+          staticData = JSON.parse(fs.readFileSync(p, 'utf8'));
+          if (Array.isArray(staticData) && staticData.length > 0) break;
+        }
       }
       return res.status(200).json({ source: 'fallback', count: staticData.length, products: staticData });
     } catch (err) {

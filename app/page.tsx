@@ -195,26 +195,42 @@ export default function HomePage() {
 
             case 'hot_selling':
               if (hotSellingProducts.length === 0) return null;
+              const hotCfg = liveLayout.sections_config?.hot_selling;
               return (
                 <section key="hot_selling" className="store-portion-section portion-hot-selling py-8 bg-[#fff9f5]" id="hotSelling">
                   <div className="site-container">
-                    <div className="portion-header-bar mb-6">
+                    <div className="portion-header-bar mb-6 flex-wrap gap-4 justify-between">
                       <div className="portion-title-group flex items-center gap-3">
                         <span className="portion-pill-tag bg-orange-600 text-white font-black text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">
-                          {liveLayout.sections_config?.hot_selling?.tag || '🔥 HOT SELLING'}
+                          {hotCfg?.tag || '🔥 HOT SELLING'}
                         </span>
                         <div>
                           <h2 className="portion-heading-text text-xl font-black text-slate-900">
-                            {liveLayout.sections_config?.hot_selling?.title || 'Hot Selling Wholesale Gadgets'}
+                            {hotCfg?.title || 'Hot Selling Wholesale Gadgets'}
                           </h2>
                           <p className="portion-subtitle-text text-xs text-slate-500">
-                            {liveLayout.sections_config?.hot_selling?.subtitle || 'Fast moving products with highest reseller profit margins'}
+                            {hotCfg?.subtitle || 'Fast moving products with highest reseller profit margins'}
                           </p>
                         </div>
                       </div>
+
+                      {/* Optional Interactive Coupon Badge */}
+                      {hotCfg?.show_coupon && (
+                        <div className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white px-3.5 py-1.5 rounded-xl shadow-xs border border-orange-400">
+                          <span className="text-base">🎟️</span>
+                          <div>
+                            <div className="text-[10px] font-medium opacity-90 leading-tight">
+                              {hotCfg.coupon_text || 'Use code at checkout for bulk discount:'}
+                            </div>
+                            <div className="text-xs font-black tracking-wider font-mono">
+                              {hotCfg.coupon_code || 'SAVE500'}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="products-grid">
-                      {hotSellingProducts.slice(0, liveLayout.sections_config?.hot_selling?.limit || 4).map(product => (
+                      {hotSellingProducts.slice(0, hotCfg?.limit || 4).map(product => (
                         <ProductCard key={`hot-${product.id}`} product={product} />
                       ))}
                     </div>
@@ -355,8 +371,137 @@ export default function HomePage() {
             case 'testimonials':
               return <Reviews key="testimonials" />;
 
-            default:
+            default: {
+              // Check if secKey matches any custom section
+              const customSec = (liveLayout.custom_sections || []).find(cs => cs.id === secKey);
+              if (!customSec) return null;
+
+              if (customSec.type === 'promo_banner') {
+                return (
+                  <section key={customSec.id} className="py-6 bg-white">
+                    <div className="site-container">
+                      {customSec.title && (
+                        <div className="mb-4 text-center">
+                          {customSec.tag && (
+                            <span className="inline-block bg-[#007382]/10 text-[#007382] font-black text-[11px] px-3 py-0.5 rounded-full uppercase tracking-wider mb-1">
+                              {customSec.tag}
+                            </span>
+                          )}
+                          <h2 className="text-xl font-black text-slate-900">{customSec.title}</h2>
+                          {customSec.subtitle && <p className="text-xs text-slate-500 mt-1">{customSec.subtitle}</p>}
+                        </div>
+                      )}
+                      <a
+                        href={customSec.banner_link || '#products'}
+                        className="block relative rounded-2xl overflow-hidden border border-slate-200/80 shadow-md group hover:shadow-xl transition"
+                      >
+                        <img
+                          src={customSec.banner_image || 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1600&q=80'}
+                          alt={customSec.title || 'Promotional Banner'}
+                          className="w-full h-auto max-h-[380px] object-cover group-hover:scale-[1.01] transition duration-500"
+                        />
+                      </a>
+                    </div>
+                  </section>
+                );
+              }
+
+              if (customSec.type === 'two_column') {
+                return (
+                  <section key={customSec.id} className="py-8 bg-slate-50 border-y border-slate-200/60">
+                    <div className="site-container">
+                      {customSec.title && (
+                        <div className="text-center mb-6">
+                          {customSec.tag && (
+                            <span className="inline-block bg-[#007382]/10 text-[#007382] font-black text-[11px] px-3 py-0.5 rounded-full uppercase tracking-wider mb-1">
+                              {customSec.tag}
+                            </span>
+                          )}
+                          <h2 className="text-xl font-black text-[#00363d]">{customSec.title}</h2>
+                          {customSec.subtitle && <p className="text-xs text-slate-500 mt-1">{customSec.subtitle}</p>}
+                        </div>
+                      )}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Column 1 */}
+                        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                          <div>
+                            {customSec.col1_image && (
+                              <div className="h-44 w-full rounded-xl overflow-hidden mb-4 bg-slate-100">
+                                <img src={customSec.col1_image} alt={customSec.col1_title || 'Column 1'} className="w-full h-full object-cover" />
+                              </div>
+                            )}
+                            <h3 className="text-lg font-black text-slate-900 mb-2">{customSec.col1_title || 'Wholesale Deals'}</h3>
+                            <p className="text-xs text-slate-600 leading-relaxed mb-4">{customSec.col1_text || 'Get the lowest bulk prices direct from importers across Pakistan.'}</p>
+                          </div>
+                          <div>
+                            <a
+                              href={customSec.col1_btn_link || '#products'}
+                              className="inline-block px-5 py-2 rounded-xl bg-[#007382] text-white text-xs font-bold hover:bg-[#005a66] transition shadow-sm"
+                            >
+                              {customSec.col1_btn_text || 'Shop Now →'}
+                            </a>
+                          </div>
+                        </div>
+
+                        {/* Column 2 */}
+                        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                          <div>
+                            {customSec.col2_image && (
+                              <div className="h-44 w-full rounded-xl overflow-hidden mb-4 bg-slate-100">
+                                <img src={customSec.col2_image} alt={customSec.col2_title || 'Column 2'} className="w-full h-full object-cover" />
+                              </div>
+                            )}
+                            <h3 className="text-lg font-black text-slate-900 mb-2">{customSec.col2_title || 'Fast Bulk Dispatch'}</h3>
+                            <p className="text-xs text-slate-600 leading-relaxed mb-4">{customSec.col2_text || 'Reliable 24-48 hours delivery with full cash on delivery verification.'}</p>
+                          </div>
+                          <div>
+                            <a
+                              href={customSec.col2_btn_link || '#products'}
+                              className="inline-block px-5 py-2 rounded-xl bg-orange-600 text-white text-xs font-bold hover:bg-orange-700 transition shadow-sm"
+                            >
+                              {customSec.col2_btn_text || 'Learn More →'}
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                );
+              }
+
+              if (customSec.type === 'custom_coupon') {
+                return (
+                  <section key={customSec.id} className="py-6 bg-gradient-to-r from-teal-900 via-[#00505b] to-emerald-900 text-white shadow-inner">
+                    <div className="site-container flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="flex items-center gap-3 text-center sm:text-left">
+                        <span className="text-3xl">🎁</span>
+                        <div>
+                          <div className="text-sm font-black uppercase tracking-wider text-cyan-200">
+                            {customSec.title || 'Special Reseller Discount'}
+                          </div>
+                          <div className="text-xs text-slate-200">
+                            {customSec.coupon_text || 'Use code at checkout to claim wholesale discount:'}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 px-4 py-2 rounded-xl">
+                        <span className="text-xs text-slate-200 font-medium">Coupon:</span>
+                        <span className="text-sm font-black font-mono tracking-widest text-amber-300">
+                          {customSec.coupon_code || 'SAVE500'}
+                        </span>
+                        {customSec.coupon_discount && (
+                          <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full ml-1">
+                            {customSec.coupon_discount}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </section>
+                );
+              }
+
               return null;
+            }
           }
         })}
       </main>

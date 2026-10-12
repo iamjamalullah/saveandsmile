@@ -79,13 +79,6 @@ export interface HomeThemeConfig {
       title?: string;
       selected_categories?: string[];
     };
-    hot_selling?: {
-      title?: string;
-      subtitle?: string;
-      tag?: string;
-      limit?: number;
-      category_filter?: string;
-    };
     new_arrivals?: {
       title?: string;
       subtitle?: string;
@@ -130,12 +123,49 @@ export interface HomeThemeConfig {
       subtitle?: string;
       tag?: string;
     };
+    hot_selling?: {
+      title?: string;
+      subtitle?: string;
+      tag?: string;
+      limit?: number;
+      category_filter?: string;
+      coupon_code?: string;
+      coupon_text?: string;
+      show_coupon?: boolean;
+    };
   };
+  custom_sections?: CustomSection[];
   theme?: {
     primary_color?: string;
     gradient_from?: string;
     gradient_to?: string;
   };
   updated_at?: string;
+}
+
+export interface CustomSection {
+  id: string;
+  type: 'promo_banner' | 'two_column' | 'custom_coupon';
+  title?: string;
+  subtitle?: string;
+  tag?: string;
+  // For promo_banner
+  banner_image?: string;
+  banner_link?: string;
+  // For custom_coupon
+  coupon_code?: string;
+  coupon_text?: string;
+  coupon_discount?: string;
+  // For two_column
+  col1_title?: string;
+  col1_text?: string;
+  col1_btn_text?: string;
+  col1_btn_link?: string;
+  col1_image?: string;
+  col2_title?: string;
+  col2_text?: string;
+  col2_btn_text?: string;
+  col2_btn_link?: string;
+  col2_image?: string;
 }
 

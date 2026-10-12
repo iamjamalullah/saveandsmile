@@ -29,39 +29,6 @@ import { DEFAULT_HOME_CONFIG, DEFAULT_HERO_SLIDES, getClientHomeConfig } from '@
 
 type DeviceMode = 'desktop' | 'tablet' | 'mobile';
 
-const PRESET_BANNERS = [
-  {
-    title: "Wholesale Online Mega Sale",
-    image: "https://www.qadrigadgets.pk/images/banners/6a91c696b7d39.webp",
-    badge: "MEGA SALE"
-  },
-  {
-    title: "Electric Insect Killers & Summer Gadgets",
-    image: "https://www.qadrigadgets.pk/images/banners/6a7af65669503.webp",
-    badge: "SUMMER DEALS"
-  },
-  {
-    title: "Trending Water Bottles & Sippers",
-    image: "https://www.qadrigadgets.pk/images/banners/6a7af65669d26.webp",
-    badge: "POPULAR"
-  },
-  {
-    title: "Store it Beautifully - Storage & Racks",
-    image: "https://www.qadrigadgets.pk/images/banners/6a7af6566a0fa.webp",
-    badge: "STORAGE & RACKS"
-  },
-  {
-    title: "Toys & Kids Collection",
-    image: "https://www.qadrigadgets.pk/images/banners/6a6e1db8c4ccd.webp",
-    badge: "KIDS SPECIAL"
-  },
-  {
-    title: "Fashion Mobile Accessories & Tech",
-    image: "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
-    badge: "GADGETS"
-  }
-];
-
 export default function ThemeBuilderPage() {
   const [device, setDevice] = useState<DeviceMode>('desktop');
   const [activeInspector, setActiveInspector] = useState<string>('hero_slider');
@@ -69,6 +36,8 @@ export default function ThemeBuilderPage() {
   const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isAddSectionOpen, setIsAddSectionOpen] = useState(false);
+  const [uploadingCustomSecImage, setUploadingCustomSecImage] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // 1. Initial Load & Hydration
@@ -175,13 +144,13 @@ export default function ThemeBuilderPage() {
   }
 
   // Hero Slide Management
-  function handleAddSlide(preset?: { title: string; image: string; badge: string }) {
+  function handleAddSlide() {
     const newSlide: HeroSlide = {
       id: Date.now(),
-      title: preset?.title || "New Wholesale Mega Deal",
+      title: "New Wholesale Mega Deal",
       subtitle: "Unbeatable wholesale factory rates across Pakistan",
-      image: preset?.image || PRESET_BANNERS[0].image,
-      badge: preset?.badge || "MEGA SALE",
+      image: "https://www.qadrigadgets.pk/images/banners/6a91c696b7d39.webp",
+      badge: "MEGA SALE",
       link: "#products"
     };
 
@@ -276,6 +245,97 @@ export default function ThemeBuilderPage() {
     });
   }
 
+  // Custom Sections Management
+  function handleAddCustomSection(type: 'promo_banner' | 'two_column' | 'custom_coupon') {
+    const newId = `custom_${type}_${Date.now()}`;
+    const newSection: any = {
+      id: newId,
+      type,
+      title: type === 'promo_banner' ? 'Exclusive Wholesale Offer' : type === 'two_column' ? 'Wholesale Features & Deals' : 'Special Discount Voucher',
+      subtitle: type === 'promo_banner' ? 'Limited time bulk pricing across Pakistan' : type === 'two_column' ? 'Factory direct rates and super-fast nationwide delivery' : 'Claim instant discount on checkout',
+      tag: type === 'promo_banner' ? '🔥 SPECIAL PROMO' : type === 'two_column' ? '⚡ WHOLESALE ADVANTAGE' : '🎟️ COUPON CODE',
+      ...(type === 'promo_banner'
+        ? {
+            banner_image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1600&q=80',
+            banner_link: '#products'
+          }
+        : type === 'two_column'
+        ? {
+            col1_title: 'Bulk Importer Deals',
+            col1_text: 'Get direct factory wholesale prices with guaranteed stock availability.',
+            col1_btn_text: 'View Catalog →',
+            col1_btn_link: '#products',
+            col1_image: 'https://images.unsplash.com/photo-1556742049-0a67e5572240?w=800&q=80',
+            col2_title: 'Nationwide Delivery',
+            col2_text: 'Safe courier dispatch across Karachi, Lahore, Islamabad, and all cities.',
+            col2_btn_text: 'Order Now →',
+            col2_btn_link: '#products',
+            col2_image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80'
+          }
+        : {
+            coupon_code: 'SAVE500',
+            coupon_text: 'Use code at checkout to claim Rs. 500 flat wholesale discount:',
+            coupon_discount: 'Rs. 500 OFF'
+          })
+    };
+
+    updateLayout(prev => ({
+      ...prev,
+      sections_order: [...(prev.sections_order || []), newId],
+      custom_sections: [...(prev.custom_sections || []), newSection],
+      sections_visibility: {
+        ...(prev.sections_visibility || {}),
+        [newId]: true
+      }
+    }));
+
+    setIsAddSectionOpen(false);
+    setActiveInspector(newId);
+  }
+
+  function handleUpdateCustomSection(id: string, field: string, value: any) {
+    updateLayout(prev => {
+      const list = [...(prev.custom_sections || [])];
+      const idx = list.findIndex(cs => cs.id === id);
+      if (idx !== -1) {
+        list[idx] = { ...list[idx], [field]: value };
+      }
+      return { ...prev, custom_sections: list };
+    });
+  }
+
+  function handleRemoveCustomSection(id: string) {
+    updateLayout(prev => ({
+      ...prev,
+      sections_order: (prev.sections_order || []).filter(secId => secId !== id),
+      custom_sections: (prev.custom_sections || []).filter(cs => cs.id !== id)
+    }));
+    setActiveInspector('tree');
+  }
+
+  async function handleUploadCustomImage(file: File, id: string, field: string) {
+    if (!file) return;
+    setUploadingCustomSecImage(`${id}_${field}`);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if (data?.success && data?.url) {
+        handleUpdateCustomSection(id, field, data.url);
+      } else {
+        alert(data?.error || 'Upload failed. Please check image format.');
+      }
+    } catch (err: any) {
+      alert('Upload error: ' + err.message);
+    } finally {
+      setUploadingCustomSecImage(null);
+    }
+  }
+
   // Publish Changes to Backend
   async function handlePublish() {
     setSaving(true);
@@ -361,6 +421,23 @@ export default function ThemeBuilderPage() {
     video_reels: { title: 'Watch & Shop Video Reels', icon: '🎬' },
     testimonials: { title: 'Customer Reviews', icon: '💬' }
   };
+
+  function getSectionLabel(secKey: string) {
+    if (sectionLabels[secKey]) return sectionLabels[secKey];
+    const custom = (layoutState.custom_sections || []).find(cs => cs.id === secKey);
+    if (custom) {
+      if (custom.type === 'promo_banner') {
+        return { title: custom.title || 'Promo Banner', icon: '🖼️' };
+      }
+      if (custom.type === 'two_column') {
+        return { title: custom.title || '2-Column Features', icon: '📑' };
+      }
+      if (custom.type === 'custom_coupon') {
+        return { title: custom.title || 'Coupon Voucher', icon: '🎁' };
+      }
+    }
+    return { title: secKey, icon: '📄' };
+  }
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-950 text-slate-100 font-sans">
@@ -555,13 +632,85 @@ export default function ThemeBuilderPage() {
                       Storefront Sections
                     </h2>
                     <p className="text-[11px] text-slate-400">
-                      Toggle visibility or reorder sections up/down
+                      Toggle visibility, reorder, or add new sections
                     </p>
                   </div>
-                  <span className="text-[10px] bg-slate-800 text-slate-400 font-bold px-2 py-0.5 rounded-full">
-                    {sectionsList.length} Sections
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddSectionOpen(!isAddSectionOpen)}
+                    className="flex items-center gap-1 px-2.5 py-1 bg-[#007382] hover:bg-[#008a9c] text-white text-[11px] font-bold rounded-lg transition shadow-sm"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>+ Add Section</span>
+                  </button>
                 </div>
+
+                {/* Add Section Drawer */}
+                {isAddSectionOpen && (
+                  <div className="p-3 bg-slate-900 rounded-xl border border-cyan-500/30 space-y-2.5 shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black text-cyan-300 uppercase tracking-wide">
+                        Choose Section Type to Add
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsAddSectionOpen(false)}
+                        className="text-slate-400 hover:text-white text-xs"
+                      >
+                        ✕ Close
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleAddCustomSection('promo_banner')}
+                        className="flex items-center gap-3 p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 hover:border-cyan-500 text-left transition group"
+                      >
+                        <span className="text-2xl">🖼️</span>
+                        <div>
+                          <div className="text-xs font-bold text-slate-200 group-hover:text-cyan-300">
+                            Promotional Banner Strip
+                          </div>
+                          <div className="text-[10px] text-slate-400">
+                            Full-width banner image with clickable URL and custom heading
+                          </div>
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleAddCustomSection('two_column')}
+                        className="flex items-center gap-3 p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 hover:border-cyan-500 text-left transition group"
+                      >
+                        <span className="text-2xl">📑</span>
+                        <div>
+                          <div className="text-xs font-bold text-slate-200 group-hover:text-cyan-300">
+                            2-Column Feature / Banner Block
+                          </div>
+                          <div className="text-[10px] text-slate-400">
+                            Two customizable side-by-side cards with pictures, headlines and CTA buttons
+                          </div>
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleAddCustomSection('custom_coupon')}
+                        className="flex items-center gap-3 p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 hover:border-cyan-500 text-left transition group"
+                      >
+                        <span className="text-2xl">🎁</span>
+                        <div>
+                          <div className="text-xs font-bold text-slate-200 group-hover:text-cyan-300">
+                            Discount Coupon Strip
+                          </div>
+                          <div className="text-[10px] text-slate-400">
+                            Voucher code strip encouraging customer wholesale orders
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Announcement Bar Dedicated Control */}
                 <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800 flex items-center justify-between group hover:border-slate-700 transition">
@@ -607,8 +756,9 @@ export default function ThemeBuilderPage() {
                 {/* Reorderable Section Tree */}
                 <div className="space-y-1.5">
                   {sectionsList.map((secKey, idx) => {
-                    const info = sectionLabels[secKey] || { title: secKey, icon: '📄' };
+                    const info = getSectionLabel(secKey);
                     const isVisible = layoutState.sections_visibility?.[secKey] !== false;
+                    const isCustom = secKey.startsWith('custom_');
 
                     return (
                       <div
@@ -625,8 +775,13 @@ export default function ThemeBuilderPage() {
                         >
                           <span className="text-base">{info.icon}</span>
                           <div>
-                            <div className="text-xs font-bold text-slate-200 hover:text-cyan-400 transition">
-                              {info.title}
+                            <div className="text-xs font-bold text-slate-200 hover:text-cyan-400 transition flex items-center gap-1.5">
+                              <span>{info.title}</span>
+                              {isCustom && (
+                                <span className="text-[9px] bg-cyan-950 text-cyan-300 font-bold px-1.5 py-0.2 rounded border border-cyan-800/50">
+                                  Custom
+                                </span>
+                              )}
                             </div>
                             <div className="text-[10px] text-slate-500 capitalize">
                               Position #{idx + 1}
@@ -634,7 +789,7 @@ export default function ThemeBuilderPage() {
                           </div>
                         </div>
 
-                        {/* Actions: Move Up / Down / Visibility / Edit */}
+                        {/* Actions: Move Up / Down / Visibility / Edit / Delete for custom */}
                         <div className="flex items-center gap-1">
                           <button
                             type="button"
@@ -666,6 +821,16 @@ export default function ThemeBuilderPage() {
                               <EyeOff className="w-3.5 h-3.5 text-rose-400" />
                             )}
                           </button>
+                          {isCustom && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveCustomSection(secKey)}
+                              className="p-1 rounded text-slate-400 hover:text-rose-400 hover:bg-slate-800"
+                              title="Delete Custom Section"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                           <button
                             type="button"
                             onClick={() => setActiveInspector(secKey)}
@@ -704,30 +869,11 @@ export default function ThemeBuilderPage() {
                   </button>
                 </div>
 
-                {/* Quick Preset Banner Picker */}
-                <div className="bg-slate-950/60 p-3 rounded-xl border border-slate-800">
-                  <div className="text-[11px] font-bold text-slate-300 mb-2">
-                    ⚡ Quick Insert Authentic Banners:
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {PRESET_BANNERS.map((preset, pIdx) => (
-                      <button
-                        key={pIdx}
-                        type="button"
-                        onClick={() => handleAddSlide(preset)}
-                        className="text-left p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-cyan-500/50 hover:bg-slate-800/80 transition group"
-                      >
-                        <img
-                          src={preset.image}
-                          alt={preset.title}
-                          className="w-full h-12 object-cover rounded-md mb-1"
-                        />
-                        <div className="text-[10px] font-bold text-slate-300 group-hover:text-cyan-300 truncate">
-                          {preset.badge}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
+                <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+                  <span>✨ Easy Slider Controls: Add banners, upload WebP/PNG/JPEG, or change text.</span>
+                  <span className="text-[10px] bg-slate-800 text-cyan-400 font-bold px-2 py-0.5 rounded">
+                    {(layoutState.hero_slides || []).length} Active Slides
+                  </span>
                 </div>
 
                 {/* Active Slide Items List */}
@@ -1221,6 +1367,87 @@ export default function ThemeBuilderPage() {
                       />
                     </div>
                   )}
+
+                  {/* Hot Selling Coupon Controls */}
+                  {activeInspector === 'hot_selling' && (
+                    <div className="p-3 bg-slate-950/80 rounded-xl border border-amber-500/30 space-y-2.5 mt-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm">🎟️</span>
+                          <span className="text-xs font-bold text-amber-300">Discount Coupon Badge</span>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={layoutState.sections_config?.hot_selling?.show_coupon ?? true}
+                          onChange={e =>
+                            updateLayout(prev => ({
+                              ...prev,
+                              sections_config: {
+                                ...prev.sections_config,
+                                hot_selling: {
+                                  ...prev.sections_config?.hot_selling,
+                                  show_coupon: e.target.checked
+                                }
+                              }
+                            }))
+                          }
+                          className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
+                        />
+                      </div>
+
+                      {(layoutState.sections_config?.hot_selling?.show_coupon ?? true) && (
+                        <>
+                          <div>
+                            <label className="text-[10px] font-bold text-slate-400 block mb-1">
+                              Coupon Code (e.g. SAVE500, WHOLESALE10)
+                            </label>
+                            <input
+                              type="text"
+                              value={layoutState.sections_config?.hot_selling?.coupon_code || 'SAVE500'}
+                              onChange={e =>
+                                updateLayout(prev => ({
+                                  ...prev,
+                                  sections_config: {
+                                    ...prev.sections_config,
+                                    hot_selling: {
+                                      ...prev.sections_config?.hot_selling,
+                                      coupon_code: e.target.value
+                                    }
+                                  }
+                                }))
+                              }
+                              placeholder="SAVE500"
+                              className="w-full text-xs font-mono font-bold bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-amber-300 outline-none focus:border-amber-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-[10px] font-bold text-slate-400 block mb-1">
+                              Coupon Subtitle / Instructions
+                            </label>
+                            <input
+                              type="text"
+                              value={layoutState.sections_config?.hot_selling?.coupon_text || 'Use code at checkout for bulk discount:'}
+                              onChange={e =>
+                                updateLayout(prev => ({
+                                  ...prev,
+                                  sections_config: {
+                                    ...prev.sections_config,
+                                    hot_selling: {
+                                      ...prev.sections_config?.hot_selling,
+                                      coupon_text: e.target.value
+                                    }
+                                  }
+                                }))
+                              }
+                              placeholder="Use code at checkout for bulk discount:"
+                              className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 outline-none focus:border-amber-500"
+                            />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1408,6 +1635,278 @@ export default function ThemeBuilderPage() {
                 </div>
               </div>
             )}
+
+            {/* VIEW H: DYNAMIC CUSTOM SECTION INSPECTOR */}
+            {activeInspector.startsWith('custom_') && (() => {
+              const customSec = (layoutState.custom_sections || []).find(cs => cs.id === activeInspector);
+              if (!customSec) return null;
+
+              return (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-black uppercase tracking-wider bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded border border-cyan-800/40">
+                          {customSec.type === 'promo_banner' ? 'Promo Banner' : customSec.type === 'two_column' ? '2-Column Block' : 'Coupon Strip'}
+                        </span>
+                      </div>
+                      <h2 className="text-xs font-black uppercase tracking-wider text-slate-200 mt-1">
+                        {customSec.title || 'Custom Section Settings'}
+                      </h2>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveCustomSection(customSec.id)}
+                        className="text-rose-400 hover:text-rose-300 text-xs flex items-center gap-1 p-1 hover:bg-slate-800 rounded"
+                        title="Delete Section"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveInspector('tree')}
+                        className="text-xs text-slate-400 hover:text-white"
+                      >
+                        ← Back
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* General Header Settings */}
+                  <div className="space-y-3 p-3 bg-slate-950/60 rounded-xl border border-slate-800">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">Section Heading & Tag</span>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 block mb-1">Badge Tag</label>
+                      <input
+                        type="text"
+                        value={customSec.tag || ''}
+                        onChange={e => handleUpdateCustomSection(customSec.id, 'tag', e.target.value)}
+                        placeholder="e.g. 🔥 SPECIAL OFFER"
+                        className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 outline-none focus:border-cyan-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 block mb-1">Main Heading</label>
+                      <input
+                        type="text"
+                        value={customSec.title || ''}
+                        onChange={e => handleUpdateCustomSection(customSec.id, 'title', e.target.value)}
+                        placeholder="Heading text"
+                        className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 outline-none focus:border-cyan-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 block mb-1">Subtitle</label>
+                      <input
+                        type="text"
+                        value={customSec.subtitle || ''}
+                        onChange={e => handleUpdateCustomSection(customSec.id, 'subtitle', e.target.value)}
+                        placeholder="Subtitle or description text"
+                        className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 outline-none focus:border-cyan-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* SPECIFIC: PROMO BANNER */}
+                  {customSec.type === 'promo_banner' && (
+                    <div className="space-y-3 p-3 bg-slate-950/60 rounded-xl border border-slate-800">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase">Banner Image & Link</span>
+                      <label className="cursor-pointer flex items-center justify-center gap-2 py-2 px-3 bg-slate-900 hover:bg-slate-800 border border-dashed border-cyan-500/40 hover:border-cyan-400 rounded-xl transition text-slate-300 hover:text-white">
+                        <Upload className="w-3.5 h-3.5 text-cyan-400" />
+                        <span className="text-[11px] font-bold">
+                          {uploadingCustomSecImage === `${customSec.id}_banner_image` ? 'Uploading...' : '📁 Upload Banner (Auto-WebP)'}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/webp"
+                          className="hidden"
+                          onChange={e => {
+                            const f = e.target.files?.[0];
+                            if (f) handleUploadCustomImage(f, customSec.id, 'banner_image');
+                          }}
+                        />
+                      </label>
+                      <input
+                        type="text"
+                        value={customSec.banner_image || ''}
+                        onChange={e => handleUpdateCustomSection(customSec.id, 'banner_image', e.target.value)}
+                        placeholder="Banner Image URL"
+                        className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 outline-none focus:border-cyan-500"
+                      />
+                      {customSec.banner_image && (
+                        <div className="h-24 rounded-lg overflow-hidden border border-slate-800">
+                          <img src={customSec.banner_image} alt="Banner Preview" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-400 block mb-1">Clickable Link Destination</label>
+                        <input
+                          type="text"
+                          value={customSec.banner_link || '#products'}
+                          onChange={e => handleUpdateCustomSection(customSec.id, 'banner_link', e.target.value)}
+                          placeholder="#products or /categories/..."
+                          className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 outline-none focus:border-cyan-500"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SPECIFIC: TWO COLUMN */}
+                  {customSec.type === 'two_column' && (
+                    <div className="space-y-4">
+                      {/* Column 1 */}
+                      <div className="space-y-2.5 p-3 bg-slate-950/60 rounded-xl border border-slate-800">
+                        <span className="text-[10px] font-bold text-cyan-400 uppercase">Column 1 (Left Card)</span>
+                        <label className="cursor-pointer flex items-center justify-center gap-2 py-1.5 px-3 bg-slate-900 hover:bg-slate-800 border border-dashed border-cyan-500/40 rounded-xl transition text-slate-300 text-[11px] font-bold">
+                          <Upload className="w-3.5 h-3.5 text-cyan-400" />
+                          <span>{uploadingCustomSecImage === `${customSec.id}_col1_image` ? 'Uploading...' : '📁 Upload Col 1 Image'}</span>
+                          <input
+                            type="file"
+                            accept="image/png,image/jpeg,image/jpg,image/webp"
+                            className="hidden"
+                            onChange={e => {
+                              const f = e.target.files?.[0];
+                              if (f) handleUploadCustomImage(f, customSec.id, 'col1_image');
+                            }}
+                          />
+                        </label>
+                        <input
+                          type="text"
+                          value={customSec.col1_image || ''}
+                          onChange={e => handleUpdateCustomSection(customSec.id, 'col1_image', e.target.value)}
+                          placeholder="Image URL"
+                          className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-slate-200"
+                        />
+                        <input
+                          type="text"
+                          value={customSec.col1_title || ''}
+                          onChange={e => handleUpdateCustomSection(customSec.id, 'col1_title', e.target.value)}
+                          placeholder="Column 1 Title"
+                          className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-slate-200"
+                        />
+                        <textarea
+                          value={customSec.col1_text || ''}
+                          onChange={e => handleUpdateCustomSection(customSec.id, 'col1_text', e.target.value)}
+                          placeholder="Column 1 Text / Description"
+                          rows={2}
+                          className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-slate-200"
+                        />
+                        <div className="grid grid-cols-2 gap-2">
+                          <input
+                            type="text"
+                            value={customSec.col1_btn_text || 'Shop Now →'}
+                            onChange={e => handleUpdateCustomSection(customSec.id, 'col1_btn_text', e.target.value)}
+                            placeholder="Button Text"
+                            className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-slate-200"
+                          />
+                          <input
+                            type="text"
+                            value={customSec.col1_btn_link || '#products'}
+                            onChange={e => handleUpdateCustomSection(customSec.id, 'col1_btn_link', e.target.value)}
+                            placeholder="Button Link"
+                            className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-slate-200"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Column 2 */}
+                      <div className="space-y-2.5 p-3 bg-slate-950/60 rounded-xl border border-slate-800">
+                        <span className="text-[10px] font-bold text-orange-400 uppercase">Column 2 (Right Card)</span>
+                        <label className="cursor-pointer flex items-center justify-center gap-2 py-1.5 px-3 bg-slate-900 hover:bg-slate-800 border border-dashed border-orange-500/40 rounded-xl transition text-slate-300 text-[11px] font-bold">
+                          <Upload className="w-3.5 h-3.5 text-orange-400" />
+                          <span>{uploadingCustomSecImage === `${customSec.id}_col2_image` ? 'Uploading...' : '📁 Upload Col 2 Image'}</span>
+                          <input
+                            type="file"
+                            accept="image/png,image/jpeg,image/jpg,image/webp"
+                            className="hidden"
+                            onChange={e => {
+                              const f = e.target.files?.[0];
+                              if (f) handleUploadCustomImage(f, customSec.id, 'col2_image');
+                            }}
+                          />
+                        </label>
+                        <input
+                          type="text"
+                          value={customSec.col2_image || ''}
+                          onChange={e => handleUpdateCustomSection(customSec.id, 'col2_image', e.target.value)}
+                          placeholder="Image URL"
+                          className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-slate-200"
+                        />
+                        <input
+                          type="text"
+                          value={customSec.col2_title || ''}
+                          onChange={e => handleUpdateCustomSection(customSec.id, 'col2_title', e.target.value)}
+                          placeholder="Column 2 Title"
+                          className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-slate-200"
+                        />
+                        <textarea
+                          value={customSec.col2_text || ''}
+                          onChange={e => handleUpdateCustomSection(customSec.id, 'col2_text', e.target.value)}
+                          placeholder="Column 2 Text / Description"
+                          rows={2}
+                          className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-slate-200"
+                        />
+                        <div className="grid grid-cols-2 gap-2">
+                          <input
+                            type="text"
+                            value={customSec.col2_btn_text || 'Learn More →'}
+                            onChange={e => handleUpdateCustomSection(customSec.id, 'col2_btn_text', e.target.value)}
+                            placeholder="Button Text"
+                            className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-slate-200"
+                          />
+                          <input
+                            type="text"
+                            value={customSec.col2_btn_link || '#products'}
+                            onChange={e => handleUpdateCustomSection(customSec.id, 'col2_btn_link', e.target.value)}
+                            placeholder="Button Link"
+                            className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-slate-200"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SPECIFIC: CUSTOM COUPON STRIP */}
+                  {customSec.type === 'custom_coupon' && (
+                    <div className="space-y-3 p-3 bg-slate-950/60 rounded-xl border border-amber-500/30">
+                      <span className="text-[10px] font-bold text-amber-300 uppercase">Coupon Settings</span>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-400 block mb-1">Coupon Code</label>
+                        <input
+                          type="text"
+                          value={customSec.coupon_code || 'SAVE500'}
+                          onChange={e => handleUpdateCustomSection(customSec.id, 'coupon_code', e.target.value)}
+                          placeholder="e.g. SAVE500"
+                          className="w-full text-xs font-mono font-bold bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-amber-300 outline-none focus:border-amber-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-400 block mb-1">Discount Tag (e.g. Rs. 500 OFF or 10% OFF)</label>
+                        <input
+                          type="text"
+                          value={customSec.coupon_discount || 'Rs. 500 OFF'}
+                          onChange={e => handleUpdateCustomSection(customSec.id, 'coupon_discount', e.target.value)}
+                          placeholder="e.g. Rs. 500 OFF"
+                          className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 outline-none focus:border-amber-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-400 block mb-1">Instructions / Description</label>
+                        <input
+                          type="text"
+                          value={customSec.coupon_text || 'Use code at checkout to claim instant wholesale discount:'}
+                          onChange={e => handleUpdateCustomSection(customSec.id, 'coupon_text', e.target.value)}
+                          placeholder="Instructions text"
+                          className="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 outline-none focus:border-amber-500"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         </aside>
 

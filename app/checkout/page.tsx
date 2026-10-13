@@ -40,12 +40,17 @@ export default function CheckoutPage() {
 
     const orderPayload = {
       trackingId,
+      customerName: formData.name,
+      customerPhone: formData.phone,
+      customerAddress: formData.address,
+      customerCity: formData.city,
       customer: formData,
       paymentMethod,
       items: cart,
       subtotal,
-      shipping,
+      shippingFee: shipping,
       grandTotal,
+      notes: formData.notes,
       status: 'Processing',
       date: new Date().toISOString()
     };
@@ -58,8 +63,12 @@ export default function CheckoutPage() {
         body: JSON.stringify(orderPayload)
       });
       const data = await res.json();
-      setOrderSuccess({ ...orderPayload, serverId: data.orderId || trackingId });
+      if (!res.ok) throw new Error(data?.error || 'Server error saving order');
+      const finalOrderId = data.orderId || data.order?.orderCode || trackingId;
+      setOrderSuccess({ ...orderPayload, trackingId: finalOrderId, serverId: finalOrderId });
       saveCart([]); // Clear cart
+      window.dispatchEvent(new Event('qadri_orders_updated'));
+      window.dispatchEvent(new Event('storage'));
     } catch (err) {
       // Fallback local persistence
       const orders = JSON.parse(localStorage.getItem('qadri_orders') || '[]');
@@ -67,6 +76,8 @@ export default function CheckoutPage() {
       localStorage.setItem('qadri_orders', JSON.stringify(orders));
       setOrderSuccess(orderPayload);
       saveCart([]);
+      window.dispatchEvent(new Event('qadri_orders_updated'));
+      window.dispatchEvent(new Event('storage'));
     } finally {
       setIsSubmitting(false);
     }

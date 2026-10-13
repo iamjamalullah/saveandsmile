@@ -35,6 +35,9 @@ const DEFAULT_GLOBAL_SETTINGS = {
   org_name: 'Save & Smile Pakistan',
   logo_url: '/images/save-and-smile-logo.png',
   helpline_phone: '0316-2323616',
+  whatsapp: '923162323616',
+  shipping_fee: 200,
+  free_shipping_threshold: 3000,
   business_address: 'Wholesale Market, Karachi / Lahore, Pakistan',
   gsc_verification_code: '',
   ga4_measurement_id: '',
@@ -507,15 +510,16 @@ module.exports = async function handler(req, res) {
     const { action } = body || {};
 
     // 8A. Save Global Settings
-    if (action === 'save_settings') {
-      const payload = body.settings || {};
+    if (action === 'save_settings' || !action || body.settings || body.default_title || body.org_name || body.helpline_phone) {
+      const payload = body.settings || body || {};
       if (payload.gsc_verification_tag && !payload.gsc_verification_code) {
         payload.gsc_verification_code = payload.gsc_verification_tag;
       }
       if (payload.gsc_verification_code && !payload.gsc_verification_tag) {
         payload.gsc_verification_tag = payload.gsc_verification_code;
       }
-      const merged = { ...DEFAULT_GLOBAL_SETTINGS, ...payload, updated_at: new Date().toISOString() };
+      const existingSettings = await getGlobalSeoSettings();
+      const merged = { ...existingSettings, ...payload, updated_at: new Date().toISOString() };
       
       const sql = getDb();
       if (sql) {

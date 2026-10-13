@@ -27,8 +27,8 @@ export default function AdminPage() {
       setOrders([]);
     }
 
-    // Also fetch live from /api/products
-    fetch('/api/products')
+    // Fetch live products from /api/products
+    fetch('/api/products?t=' + Date.now(), { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         if (data && Array.isArray(data.products) && data.products.length > 0) {
@@ -39,16 +39,31 @@ export default function AdminPage() {
         }
       })
       .catch(() => {});
+
+    // Fetch live orders from /api/orders
+    fetch('/api/orders?t=' + Date.now(), { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => {
+        if (data?.orders && Array.isArray(data.orders)) {
+          setOrders(data.orders);
+          try {
+            localStorage.setItem('qadri_orders', JSON.stringify(data.orders));
+          } catch (e) {}
+        }
+      })
+      .catch(() => {});
   }
 
   useEffect(() => {
     loadData();
 
     window.addEventListener('qadri_products_updated', loadData);
+    window.addEventListener('qadri_orders_updated', loadData);
     window.addEventListener('storage', loadData);
 
     return () => {
       window.removeEventListener('qadri_products_updated', loadData);
+      window.removeEventListener('qadri_orders_updated', loadData);
       window.removeEventListener('storage', loadData);
     };
   }, []);

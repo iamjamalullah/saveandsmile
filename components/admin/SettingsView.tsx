@@ -19,6 +19,22 @@ export default function SettingsView() {
       if (branding.shippingFee) setShippingFee(String(branding.shippingFee));
       if (branding.freeShippingThreshold) setFreeShippingThreshold(String(branding.freeShippingThreshold));
     } catch (e) {}
+
+    // Live Server Settings Fetch
+    fetch('/api/seo?type=settings&t=' + Date.now(), { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => {
+        if (data?.settings) {
+          const s = data.settings;
+          if (s.org_name) setStoreName(s.org_name);
+          if (s.helpline_phone || s.whatsapp) setWhatsapp(s.helpline_phone || s.whatsapp);
+          if (s.shipping_fee !== undefined) setShippingFee(String(s.shipping_fee));
+          if (s.free_shipping_threshold !== undefined) setFreeShippingThreshold(String(s.free_shipping_threshold));
+          if (s.default_title) setMetaTitle(s.default_title);
+          if (s.default_description) setMetaDesc(s.default_description);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   async function handleSaveSettings(e: React.FormEvent) {
@@ -32,16 +48,21 @@ export default function SettingsView() {
       freeShippingThreshold: Number(freeShippingThreshold)
     };
 
-    const seoData = {
-      default_title: metaTitle,
-      default_description: metaDesc
+    const serverPayload = {
+      action: 'save_settings',
+      settings: {
+        org_name: storeName,
+        helpline_phone: whatsapp,
+        whatsapp: whatsapp,
+        shipping_fee: Number(shippingFee),
+        free_shipping_threshold: Number(freeShippingThreshold),
+        default_title: metaTitle,
+        default_description: metaDesc
+      }
     };
 
     try {
-      localStorage.setItem('qadri_store_branding', JSON.stringify(brandingData));
-      window.dispatchEvent(new Event('qadri_branding_updated'));
-
-      // Also persist to API if token exists
+      // 1. Server Persistence FIRST
       const token = localStorage.getItem('save_and_smile_admin_token');
       await fetch('/api/seo', {
         method: 'POST',
@@ -49,10 +70,23 @@ export default function SettingsView() {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify(seoData)
+        body: JSON.stringify(serverPayload)
       });
 
-      alert('✅ Store settings updated successfully!');
+      // 2. Local Storage Sync
+      localStorage.setItem('qadri_store_branding', JSON.stringify(brandingData));
+
+      // 3. Dispatch Live Events
+      window.dispatchEvent(new Event('qadri_branding_updated'));
+      window.dispatchEvent(new Event('storage'));
+
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const channel = new BroadcastChannel('qadri_store_sync');
+        channel.postMessage({ type: 'branding_updated', branding: brandingData });
+        channel.close();
+      }
+
+      alert('✅ Store settings and SEO updated successfully! Changes are live across storefront.');
     } catch (err: any) {
       alert('Settings saved locally. Server sync: ' + err.message);
     } finally {

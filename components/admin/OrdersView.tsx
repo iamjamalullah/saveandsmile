@@ -24,19 +24,33 @@ export default function OrdersView({ orders, onRefresh }: OrdersViewProps) {
     return matchesSearch && matchesStatus;
   });
 
-  function handleUpdateStatus(orderId: string, newStatus: string) {
+  async function handleUpdateStatus(orderId: string, newStatus: string) {
+    try {
+      const token = localStorage.getItem('save_and_smile_admin_token');
+      await fetch('/api/orders', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ orderId, status: newStatus })
+      });
+    } catch (e) {}
+
     const all = JSON.parse(localStorage.getItem('qadri_orders') || '[]');
     const updated = all.map((o: any) => {
-      if (String(o.trackingId || o.id) === String(orderId)) {
+      if (String(o.trackingId || o.orderCode || o.id) === String(orderId)) {
         return { ...o, status: newStatus };
       }
       return o;
     });
 
     localStorage.setItem('qadri_orders', JSON.stringify(updated));
-    if (selectedOrder && String(selectedOrder.trackingId || selectedOrder.id) === String(orderId)) {
+    if (selectedOrder && String(selectedOrder.trackingId || selectedOrder.orderCode || selectedOrder.id) === String(orderId)) {
       setSelectedOrder({ ...selectedOrder, status: newStatus });
     }
+    window.dispatchEvent(new Event('qadri_orders_updated'));
+    window.dispatchEvent(new Event('storage'));
     onRefresh();
   }
 

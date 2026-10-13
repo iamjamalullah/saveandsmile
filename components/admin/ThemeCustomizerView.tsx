@@ -35,6 +35,7 @@ export default function ThemeCustomizerView() {
   const [newSlideBadge, setNewSlideBadge] = useState('WHOLESALE DEAL');
 
   useEffect(() => {
+    // 1. Initial quick load from local storage
     try {
       const stored = localStorage.getItem('qadri_hero_slides') || localStorage.getItem('qadri_custom_banners');
       if (stored) {
@@ -42,6 +43,46 @@ export default function ThemeCustomizerView() {
         if (Array.isArray(parsed) && parsed.length > 0) setSlides(parsed);
       }
     } catch (e) {}
+
+    // 2. Authoritative live fetch from server API
+    fetch('/api/home-customization?t=' + Date.now(), { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => {
+        if (data?.config) {
+          const cfg = data.config;
+          if (Array.isArray(cfg.hero_slides) && cfg.hero_slides.length > 0) {
+            setSlides(cfg.hero_slides);
+          }
+
+          // Announcements
+          const items = cfg.announcement_ticker?.items || cfg.announcements || [];
+          if (items[0]) setAnnounce1(items[0].replace(/<[^>]+>/g, ''));
+          if (items[1]) setAnnounce2(items[1].replace(/<[^>]+>/g, ''));
+          if (items[2]) setAnnounce3(items[2].replace(/<[^>]+>/g, ''));
+
+          // Flash sale
+          const flash = cfg.sections_config?.flash_sale || cfg.flash_sale;
+          if (flash?.title) setFlashTitle(flash.title);
+          if (flash?.subtitle) setFlashSubtitle(flash.subtitle);
+          if (flash?.countdown_hours || flash?.hours) {
+            setFlashTargetHours(String(flash.countdown_hours || flash.hours));
+          }
+
+          // Portion Headings
+          const hot = cfg.sections_config?.hot_selling || cfg.portions?.hotSelling;
+          if (hot?.title) setHotTitle(hot.title);
+          if (hot?.subtitle) setHotSubtitle(hot.subtitle);
+
+          const newArr = cfg.sections_config?.new_arrivals || cfg.portions?.newArrivals;
+          if (newArr?.title) setNewTitle(newArr.title);
+          if (newArr?.subtitle) setNewSubtitle(newArr.subtitle);
+
+          const trend = cfg.sections_config?.trending_picks || cfg.portions?.trendingPicks;
+          if (trend?.title) setTrendTitle(trend.title);
+          if (trend?.subtitle) setTrendSubtitle(trend.subtitle);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   function handleAddSlide() {
@@ -74,9 +115,45 @@ export default function ThemeCustomizerView() {
 
   async function handlePublishTheme() {
     setSaving(true);
+
+    const announcementItems = [announce1, announce2, announce3].filter(Boolean);
+
     const themeConfig = {
       hero_slides: slides,
-      announcements: [announce1, announce2, announce3],
+      announcement_ticker: {
+        enabled: true,
+        speed: 32,
+        bgColor: '#ffffff',
+        textColor: '#004d57',
+        items: announcementItems
+      },
+      sections_config: {
+        hot_selling: {
+          title: hotTitle,
+          subtitle: hotSubtitle,
+          tag: '🔥 HOT SELLING',
+          limit: 8
+        },
+        new_arrivals: {
+          title: newTitle,
+          subtitle: newSubtitle,
+          tag: '✨ NEW ARRIVALS',
+          limit: 8
+        },
+        trending_picks: {
+          title: trendTitle,
+          subtitle: trendSubtitle,
+          tag: '🌟 TRENDING PICKS',
+          limit: 8
+        },
+        flash_sale: {
+          title: flashTitle,
+          subtitle: flashSubtitle,
+          countdown_hours: Number(flashTargetHours) || 14
+        }
+      },
+      // Backward-compatibility keys
+      announcements: announcementItems,
       flash_sale: {
         title: flashTitle,
         subtitle: flashSubtitle,
@@ -90,23 +167,7 @@ export default function ThemeCustomizerView() {
     };
 
     try {
-      // 1. Local Cache Updates
-      localStorage.setItem('qadri_hero_slides', JSON.stringify(slides));
-      localStorage.setItem('qadri_custom_banners', JSON.stringify(slides));
-      localStorage.setItem('qadri_theme_config', JSON.stringify(themeConfig));
-
-      // 2. Dispatch Local Window Events
-      window.dispatchEvent(new Event('qadri_hero_slides_updated'));
-      window.dispatchEvent(new Event('storage'));
-
-      // 3. Broadcast to other open browser tabs
-      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-        const channel = new BroadcastChannel('qadri_store_sync');
-        channel.postMessage({ type: 'theme_updated', config: themeConfig });
-        channel.close();
-      }
-
-      // 4. Server API Persistence
+      // 1. Server API Persistence FIRST
       const token = localStorage.getItem('save_and_smile_admin_token');
       await fetch('/api/home-customization', {
         method: 'POST',
@@ -116,6 +177,24 @@ export default function ThemeCustomizerView() {
         },
         body: JSON.stringify({ config: themeConfig })
       });
+
+      // 2. Local Cache Updates
+      localStorage.setItem('qadri_hero_slides', JSON.stringify(slides));
+      localStorage.setItem('qadri_custom_banners', JSON.stringify(slides));
+      localStorage.setItem('qadri_home_config', JSON.stringify(themeConfig));
+      localStorage.setItem('qadri_theme_config', JSON.stringify(themeConfig));
+      localStorage.setItem('save_and_smile_home_config', JSON.stringify(themeConfig));
+
+      // 3. Dispatch Local Window Events
+      window.dispatchEvent(new Event('qadri_hero_slides_updated'));
+      window.dispatchEvent(new Event('storage'));
+
+      // 4. Broadcast to other open browser tabs
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const channel = new BroadcastChannel('qadri_store_sync');
+        channel.postMessage({ type: 'theme_updated', config: themeConfig });
+        channel.close();
+      }
 
       alert('🎉 Homepage Customization published! Website updated in real-time.');
     } catch (err: any) {

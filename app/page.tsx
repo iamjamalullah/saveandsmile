@@ -95,8 +95,19 @@ export default function HomePage() {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         channel = new BroadcastChannel('qadri_store_sync');
         channel.onmessage = (ev) => {
-          if (ev.data?.type === 'theme_updated') {
-            setLiveLayout(ev.data.config);
+          if (ev.data?.type === 'theme_updated' && ev.data.config) {
+            setLiveLayout(prev => ({
+              ...prev,
+              ...ev.data.config,
+              sections_visibility: {
+                ...prev.sections_visibility,
+                ...(ev.data.config.sections_visibility || {})
+              },
+              sections_config: {
+                ...prev.sections_config,
+                ...(ev.data.config.sections_config || {})
+              }
+            }));
           } else {
             fetchLiveProducts();
             fetchLiveTheme();

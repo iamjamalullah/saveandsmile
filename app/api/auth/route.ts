@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(req: NextRequest): Promise<Response> {
   try {
     const body = await req.json();
-    const handler = require('@/api/auth');
+    const handler = require('@/lib/legacy-api/auth');
     return await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'POST',

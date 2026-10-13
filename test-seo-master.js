@@ -15,7 +15,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const jwt = require('jsonwebtoken');
-const seoHandler = require('./api/seo');
+const seoHandler = require('./lib/legacy-api/seo');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'saveandsmile_dev_jwt_secret_2026';
 const adminAuthHeader = `Bearer ${jwt.sign({ id: 1, username: 'admin', role: 'admin' }, JWT_SECRET, { expiresIn: '1h' })}`;

@@ -6,6 +6,7 @@ const nextConfig = {
   },
   async rewrites() {
     return [
+      { source: '/track', destination: '/track-order' },
       { source: '/sitemap.xml', destination: '/api/seo?type=sitemap' },
       { source: '/robots.txt', destination: '/api/seo?type=robots' }
     ];

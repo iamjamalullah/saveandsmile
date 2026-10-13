@@ -60,9 +60,17 @@ export interface WooCommerceOrderPayload {
     phone: string;
   };
   line_items: Array<{
-    product_id: number | string;
+    name?: string;
+    product_id?: number | string;
     quantity: number;
+    subtotal?: string;
+    total?: string;
     variation_id?: number | string;
+  }>;
+  shipping_lines?: Array<{
+    method_id: string;
+    method_title: string;
+    total: string;
   }>;
   customer_note?: string;
 }

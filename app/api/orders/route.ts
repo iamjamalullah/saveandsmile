@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest): Promise<Response> {
   try {
-    const handler = require('@/api/orders');
+    const handler = require('@/lib/legacy-api/orders');
     return await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'GET',
@@ -36,6 +36,8 @@ export async function POST(req: NextRequest): Promise<Response> {
       const custCity = body.customerCity || body.customer?.city || 'Karachi';
       const orderItems = body.items || [];
 
+      const shippingCost = Number(body.shippingFee ?? body.shipping ?? 0);
+
       const wooPayload = {
         payment_method: (body.paymentMethod || 'cod').toLowerCase(),
         payment_method_title: (body.paymentMethod || 'cod').toUpperCase() === 'COD' ? 'Cash on Delivery' : 'Direct Payment',
@@ -52,10 +54,27 @@ export async function POST(req: NextRequest): Promise<Response> {
           city: custCity,
           phone: custPhone
         },
-        line_items: orderItems.map((item: any) => ({
-          product_id: item.id || item.code,
-          quantity: item.qty || 1
-        })),
+        line_items: orderItems.map((item: any) => {
+          const qty = Math.max(1, parseInt(item.qty, 10) || 1);
+          const price = parseFloat(item.price) || 0;
+          const lineTotal = (price * qty).toFixed(2);
+          const isNumericId = !isNaN(Number(item.id)) && Number(item.id) > 0 && Number(item.id) < 100000;
+          
+          return {
+            name: item.title || item.name || 'Store Product',
+            ...(isNumericId ? { product_id: Number(item.id) } : {}),
+            quantity: qty,
+            subtotal: lineTotal,
+            total: lineTotal
+          };
+        }),
+        shipping_lines: shippingCost > 0 ? [
+          {
+            method_id: 'flat_rate',
+            method_title: 'Nationwide Delivery',
+            total: shippingCost.toFixed(2)
+          }
+        ] : [],
         customer_note: body.notes || body.customer?.notes || ''
       };
 
@@ -73,7 +92,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       }
     }
 
-    const handler = require('@/api/orders');
+    const handler = require('@/lib/legacy-api/orders');
     return await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'POST',
@@ -99,7 +118,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 export async function PUT(req: NextRequest): Promise<Response> {
   try {
     const body = await req.json();
-    const handler = require('@/api/orders');
+    const handler = require('@/lib/legacy-api/orders');
     return await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'PUT',

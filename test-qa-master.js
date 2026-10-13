@@ -105,9 +105,9 @@ async function runTestSuite() {
   // PHASE 4: ADMIN AUTHENTICATION & AUTHORIZATION TESTS
   // ----------------------------------------------------
   console.log('\n--- Phase 4: Admin Auth & Security Tests ---');
-  const authHandler = require('./api/auth');
-  const productsHandler = require('./api/products');
-  const ordersHandler = require('./api/orders');
+  const authHandler = require('./lib/legacy-api/auth');
+  const productsHandler = require('./lib/legacy-api/products');
+  const ordersHandler = require('./lib/legacy-api/orders');
 
   // 4.1 Valid Admin Login
   let adminToken = null;
@@ -207,7 +207,7 @@ async function runTestSuite() {
   console.log('\n--- Phase 5: Checkout & Price Recalculation Tests ---');
   
   // Setup Isolated In-Memory Database Mock for Persistence & Recalculation
-  const dbModule = require('./api/db');
+  const dbModule = require('./lib/legacy-api/db');
   const storedOrders = [];
   const storedItems = [];
 
@@ -282,8 +282,8 @@ async function runTestSuite() {
   dbModule.getDb = () => mockDbSql;
 
   // Clear module cache
-  delete require.cache[require.resolve('./api/orders')];
-  const freshOrdersHandler = require('./api/orders');
+  delete require.cache[require.resolve('./lib/legacy-api/orders')];
+  const freshOrdersHandler = require('./lib/legacy-api/orders');
 
   // 5.1 Tampered Price Protection & Calculation
   const testProd = products[0];
@@ -426,8 +426,8 @@ async function runTestSuite() {
   console.log('\n--- Phase 7: Database Unavailability Behavior ---');
   // Explicitly simulate database outage / offline adapter
   dbModule.getDb = () => null;
-  delete require.cache[require.resolve('./api/orders')];
-  const offlineOrdersHandler = require('./api/orders');
+  delete require.cache[require.resolve('./lib/legacy-api/orders')];
+  const offlineOrdersHandler = require('./lib/legacy-api/orders');
 
   const reqDbDown = {
     method: 'POST',

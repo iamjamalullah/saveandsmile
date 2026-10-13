@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const handler = require('@/api/chat');
+    const handler = require('@/lib/legacy-api/chat');
     return await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'POST',

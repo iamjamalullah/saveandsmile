@@ -6,6 +6,21 @@ export const revalidate = 0;
 
 export async function GET(req: NextRequest): Promise<Response> {
   try {
+    const { isWooConfigured, fetchWooProducts } = await import('@/lib/woocommerce');
+    if (isWooConfigured()) {
+      const wooProducts = await fetchWooProducts({
+        search: req.nextUrl.searchParams.get('search') || undefined,
+        category: req.nextUrl.searchParams.get('category') || undefined
+      });
+      if (wooProducts && wooProducts.length > 0) {
+        return NextResponse.json({
+          source: 'woocommerce',
+          count: wooProducts.length,
+          products: wooProducts
+        });
+      }
+    }
+
     const handler = require('@/api/products');
     return await new Promise<Response>((resolve) => {
       const mockReq = {

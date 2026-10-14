@@ -8,7 +8,8 @@ const nextConfig = {
     return [
       { source: '/track', destination: '/track-order' },
       { source: '/sitemap.xml', destination: '/api/seo?type=sitemap' },
-      { source: '/robots.txt', destination: '/api/seo?type=robots' }
+      { source: '/robots.txt', destination: '/api/seo?type=robots' },
+      { source: '/admin-dashboard', destination: '/admin-dashboard.html' }
     ];
   }
 };

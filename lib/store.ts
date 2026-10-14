@@ -219,6 +219,14 @@ export function getClientHomeConfig(): HomeThemeConfig {
             ...DEFAULT_HOME_CONFIG.sections_config,
             ...(parsed.sections_config || {})
           },
+          sections_order: (() => {
+            const list = Array.isArray(parsed.sections_order) && parsed.sections_order.length > 0
+              ? parsed.sections_order
+              : DEFAULT_HOME_CONFIG.sections_order;
+            const res = [...list];
+            if (!res.includes('main_catalog') && !res.includes('shop_by_category')) res.push('main_catalog');
+            return res;
+          })(),
           hero_slides: (Array.isArray(parsed.hero_slides) && parsed.hero_slides.length > 0)
             ? parsed.hero_slides
             : DEFAULT_HOME_CONFIG.hero_slides

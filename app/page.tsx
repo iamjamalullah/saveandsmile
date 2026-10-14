@@ -101,6 +101,17 @@ export default function HomePage() {
     window.addEventListener('qadri_products_updated', handleSync);
     window.addEventListener('qadri_hero_slides_updated', fetchLiveTheme);
 
+    // Live continuous polling: Refresh products every 6s and whenever tab is focused
+    const pollInterval = setInterval(() => {
+      fetchLiveProducts();
+    }, 6000);
+
+    const handleFocus = () => {
+      fetchLiveProducts();
+      fetchLiveTheme();
+    };
+    window.addEventListener('focus', handleFocus);
+
     let channel: BroadcastChannel | null = null;
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
@@ -135,6 +146,8 @@ export default function HomePage() {
     } catch (e) {}
 
     return () => {
+      clearInterval(pollInterval);
+      window.removeEventListener('focus', handleFocus);
       window.removeEventListener('message', handleSync);
       window.removeEventListener('storage', handleSync);
       window.removeEventListener('qadri_products_updated', handleSync);
@@ -187,19 +200,28 @@ export default function HomePage() {
 
       <main className="flex-1">
         {/* Dynamic Reorderable Sections based on liveLayout.sections_order */}
-        {(liveLayout.sections_order || [
-          'hero_slider',
-          'categories_strip',
-          'trust_badges',
-          'hot_selling',
-          'new_arrivals',
-          'flash_sale',
-          'trending_picks',
-          'main_catalog',
-          'search_hero',
-          'video_reels',
-          'testimonials'
-        ]).map((secKey) => {
+        {(() => {
+          const raw = liveLayout.sections_order && liveLayout.sections_order.length > 0
+            ? liveLayout.sections_order
+            : [
+                'hero_slider',
+                'categories_strip',
+                'trust_badges',
+                'hot_selling',
+                'new_arrivals',
+                'flash_sale',
+                'trending_picks',
+                'main_catalog',
+                'search_hero',
+                'video_reels',
+                'testimonials'
+              ];
+          const list = [...raw];
+          if (!list.includes('main_catalog') && !list.includes('shop_by_category')) {
+            list.push('main_catalog');
+          }
+          return list;
+        })().map((secKey) => {
           // Check visibility
           if (liveLayout.sections_visibility?.[secKey] === false) return null;
 
@@ -230,6 +252,7 @@ export default function HomePage() {
               );
 
             case 'hot_selling':
+            case 'featured_products':
               if (hotSellingProducts.length === 0) return null;
               const hotCfg = liveLayout.sections_config?.hot_selling;
               return (
@@ -280,6 +303,7 @@ export default function HomePage() {
               );
 
             case 'new_arrivals':
+            case 'front_tabs':
               if (newArrivalProducts.length === 0) return null;
               return (
                 <section key="new_arrivals" className="store-portion-section portion-new-arrivals py-8 bg-[#f5fbf6]" id="newArrivals">
@@ -314,6 +338,7 @@ export default function HomePage() {
               );
 
             case 'flash_sale':
+            case 'flash_deals':
               return (
                 <FlashSaleTimer key="flash_sale" config={liveLayout.sections_config?.flash_sale} />
               );
@@ -353,6 +378,7 @@ export default function HomePage() {
               );
 
             case 'main_catalog':
+            case 'shop_by_category':
               return (
                 <section key="main_catalog" id="products" className="py-8">
                   <div className="site-container">
@@ -405,6 +431,7 @@ export default function HomePage() {
               return <VideoReels key="video_reels" />;
 
             case 'testimonials':
+            case 'customer_reviews':
               return <Reviews key="testimonials" />;
 
             default: {

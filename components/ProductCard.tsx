@@ -69,9 +69,10 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
 
   const origPrice = product.originalPrice || product.original_price;
   const pIdStr = String(product.id);
-  const imgSrc = product.image.startsWith('http') || product.image.startsWith('/')
-    ? product.image
-    : `/${product.image}`;
+  const rawImg = product.image || (product.images && product.images[0]) || '/images/placeholder.jpg';
+  const imgSrc = rawImg.startsWith('http') || rawImg.startsWith('/')
+    ? rawImg
+    : `/${rawImg}`;
 
   return (
     <div className={`product-card cat-${product.category || 'storage'}`}>

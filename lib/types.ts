@@ -19,6 +19,7 @@ export interface Product {
   image: string;
   images?: string[];
   category: string;
+  tab?: string;
   code?: string;
   rating?: number;
   reviews?: number;

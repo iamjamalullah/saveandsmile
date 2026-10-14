@@ -17,18 +17,21 @@ import AiAssistant from '@/components/AiAssistant';
 import QuickViewModal from '@/components/QuickViewModal';
 import { Product, HomeThemeConfig } from '@/lib/types';
 
-import { getClientProducts, getClientHomeConfig, DEFAULT_HOME_CONFIG } from '@/lib/store';
+import { getClientProducts, getClientHomeConfig, DEFAULT_HOME_CONFIG, DEFAULT_PRODUCTS } from '@/lib/store';
 
 export default function HomePage() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>(DEFAULT_PRODUCTS);
   const [liveLayout, setLiveLayout] = useState<HomeThemeConfig>(DEFAULT_HOME_CONFIG);
   const [activeTab, setActiveTab] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [cartOpen, setCartOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    // Clean up partial server cache if it had fewer than 10 products
+    // Clean up any stale or corrupted localStorage keys from old prototype
     try {
+      localStorage.removeItem('qadri_deleted_products');
+      localStorage.removeItem('qadri_product_overrides');
+      localStorage.removeItem('qadri_custom_products');
       const cached = JSON.parse(localStorage.getItem('save_and_smile_server_products') || '[]');
       if (Array.isArray(cached) && cached.length < 10) {
         localStorage.removeItem('save_and_smile_server_products');
@@ -151,15 +154,29 @@ export default function HomePage() {
   ];
 
   const filteredProducts = products.filter(p => {
-    const matchesTab = activeTab === 'all' || (p.category && p.category.toLowerCase().includes(activeTab.toLowerCase()));
-    const matchesSearch = !searchQuery || p.title.toLowerCase().includes(searchQuery.toLowerCase()) || (p.category && p.category.toLowerCase().includes(searchQuery.toLowerCase()));
+    const pCat = (p.category || p.tab || '').toLowerCase();
+    const targetTab = activeTab.toLowerCase();
+    const matchesTab = targetTab === 'all' || pCat.includes(targetTab) || targetTab.includes(pCat);
+    const q = searchQuery.toLowerCase().trim();
+    const matchesSearch = !q || p.title.toLowerCase().includes(q) || pCat.includes(q) || (p.code && p.code.toLowerCase().includes(q));
     return matchesTab && matchesSearch;
   });
 
   // Categorized sections for rich storefront display
-  const hotSellingProducts = products.filter(p => p.badge?.toLowerCase().includes('hot') || p.isFlashSale).slice(0, 4);
-  const newArrivalProducts = products.slice(0, 4);
-  const trendingProducts = products.filter(p => p.badge?.toLowerCase().includes('trending') || p.badge?.toLowerCase().includes('sale') || Number(p.price) > 300).slice(0, 4);
+  const hotSellingProducts = (products.filter(p => p.badge?.toLowerCase().includes('hot') || p.badge?.toLowerCase().includes('deal') || p.isFlashSale).length > 0
+    ? products.filter(p => p.badge?.toLowerCase().includes('hot') || p.badge?.toLowerCase().includes('deal') || p.isFlashSale)
+    : products.slice(0, 4)
+  ).slice(0, 4);
+
+  const newArrivalProducts = (products.filter(p => p.badge?.toLowerCase().includes('new') || p.badge?.toLowerCase().includes('arrival')).length > 0
+    ? products.filter(p => p.badge?.toLowerCase().includes('new') || p.badge?.toLowerCase().includes('arrival'))
+    : products.slice(4, 8)
+  ).slice(0, 4);
+
+  const trendingProducts = (products.filter(p => p.badge?.toLowerCase().includes('trend') || p.badge?.toLowerCase().includes('sale') || Number(p.price) > 300).length > 0
+    ? products.filter(p => p.badge?.toLowerCase().includes('trend') || p.badge?.toLowerCase().includes('sale') || Number(p.price) > 300)
+    : products.slice(8, 12)
+  ).slice(0, 4);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">

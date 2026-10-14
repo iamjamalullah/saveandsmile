@@ -58,28 +58,11 @@ export function getClientProducts(): Product[] {
   if (typeof window === 'undefined') return DEFAULT_PRODUCTS;
   try {
     const serverCached = JSON.parse(localStorage.getItem('save_and_smile_server_products') || 'null');
-    const custom = JSON.parse(localStorage.getItem('qadri_custom_products') || '[]');
-    const overrides = JSON.parse(localStorage.getItem('qadri_product_overrides') || '{}');
-    const deleted = JSON.parse(localStorage.getItem('qadri_deleted_products') || '[]');
-
-    // Prioritize server data as base only if full catalog is loaded, fallback to DEFAULT_PRODUCTS
-    const isServerAuthoritative = Array.isArray(serverCached) && serverCached.length >= 10;
-    const baseSource = isServerAuthoritative ? serverCached : DEFAULT_PRODUCTS;
-
-    // Filter out deleted and apply overrides only if not server cached
-    const base = baseSource
-      .filter(p => !deleted.some((d: any) => String(d) === String(p.id)))
-      .map(p => {
-        if (isServerAuthoritative) return p;
-        const override = overrides[p.id] || overrides[String(p.id)] || overrides[Number(p.id)];
-        return override ? { ...p, ...override } : p;
-      });
-
-    // Merge custom products, ensuring no duplicates with base
-    const customFiltered = custom.filter((cp: any) => !base.some(bp => String(bp.id) === String(cp.id)));
-    return [...customFiltered, ...base];
+    if (Array.isArray(serverCached) && serverCached.length >= 10) {
+      return serverCached;
+    }
+    return DEFAULT_PRODUCTS;
   } catch (err) {
-    console.warn('Error reading products state:', err);
     return DEFAULT_PRODUCTS;
   }
 }

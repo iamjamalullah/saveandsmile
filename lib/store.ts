@@ -62,8 +62,8 @@ export function getClientProducts(): Product[] {
     const overrides = JSON.parse(localStorage.getItem('qadri_product_overrides') || '{}');
     const deleted = JSON.parse(localStorage.getItem('qadri_deleted_products') || '[]');
 
-    // Prioritize server data as base, fallback to DEFAULT_PRODUCTS
-    const isServerAuthoritative = Array.isArray(serverCached) && serverCached.length > 0;
+    // Prioritize server data as base only if full catalog is loaded, fallback to DEFAULT_PRODUCTS
+    const isServerAuthoritative = Array.isArray(serverCached) && serverCached.length >= 10;
     const baseSource = isServerAuthoritative ? serverCached : DEFAULT_PRODUCTS;
 
     // Filter out deleted and apply overrides only if not server cached

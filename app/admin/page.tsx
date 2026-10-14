@@ -31,7 +31,7 @@ export default function AdminPage() {
     fetch('/api/products?t=' + Date.now(), { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
-        if (data && Array.isArray(data.products) && data.products.length > 0) {
+        if (data && Array.isArray(data.products) && data.products.length >= 10) {
           try {
             localStorage.setItem('save_and_smile_server_products', JSON.stringify(data.products));
           } catch (e) {}

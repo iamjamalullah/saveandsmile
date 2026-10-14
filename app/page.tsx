@@ -27,6 +27,14 @@ export default function HomePage() {
   const [cartOpen, setCartOpen] = useState<boolean>(false);
 
   useEffect(() => {
+    // Clean up partial server cache if it had fewer than 10 products
+    try {
+      const cached = JSON.parse(localStorage.getItem('save_and_smile_server_products') || '[]');
+      if (Array.isArray(cached) && cached.length < 10) {
+        localStorage.removeItem('save_and_smile_server_products');
+      }
+    } catch (e) {}
+
     // 1. Instant hydration from client cache
     setProducts(getClientProducts());
     setLiveLayout(getClientHomeConfig());
@@ -36,7 +44,7 @@ export default function HomePage() {
       fetch('/api/products', { cache: 'no-store' })
         .then(res => res.json())
         .then(data => {
-          if (data && Array.isArray(data.products) && data.products.length > 0) {
+          if (data && Array.isArray(data.products) && data.products.length >= 10) {
             try {
               localStorage.setItem('save_and_smile_server_products', JSON.stringify(data.products));
             } catch (e) {}

@@ -32,7 +32,9 @@ module.exports = async function handler(req, res) {
     try {
       const candidates = [
         path.join(process.cwd(), 'products.json'),
-        path.join(process.cwd(), 'public', 'products.json')
+        path.join(process.cwd(), 'public', 'products.json'),
+        path.join(__dirname, '..', 'products.json'),
+        path.join(__dirname, '..', 'public', 'products.json')
       ];
       let staticData = [];
       for (const p of candidates) {
@@ -157,8 +159,8 @@ module.exports = async function handler(req, res) {
       }
 
       // Synchronize with JSON persistence files (both root and public)
-      const fallbackPath = path.join(process.cwd(), 'products.json');
-      const publicFallbackPath = path.join(process.cwd(), 'public', 'products.json');
+      const fallbackPath = path.join(__dirname, '..', 'products.json');
+      const publicFallbackPath = path.join(__dirname, '..', 'public', 'products.json');
       let productsList = [];
       try {
         productsList = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
@@ -207,6 +209,9 @@ module.exports = async function handler(req, res) {
         console.warn('Failed to write public products fallback file:', pubWriteErr.message);
       }
 
+      try {
+        delete require.cache[require.resolve('../products.json')];
+      } catch (e) {}
 
       return res.status(req.method === 'PUT' ? 200 : 201).json({
         success: true,
@@ -241,8 +246,8 @@ module.exports = async function handler(req, res) {
         }
       }
 
-      const fallbackPath = path.join(process.cwd(), 'products.json');
-      const publicFallbackPath = path.join(process.cwd(), 'public', 'products.json');
+      const fallbackPath = path.join(__dirname, '..', 'products.json');
+      const publicFallbackPath = path.join(__dirname, '..', 'public', 'products.json');
       try {
         let productsList = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
         productsList = productsList.filter(p => String(p.id) !== String(id));
@@ -260,6 +265,9 @@ module.exports = async function handler(req, res) {
         console.warn('Public fallback delete warning:', pubErr.message);
       }
 
+      try {
+        delete require.cache[require.resolve('../products.json')];
+      } catch (e) {}
 
       return res.status(200).json({ success: true, message: 'Product deleted successfully', id });
     } catch (err) {

@@ -6,7 +6,7 @@ export const revalidate = 0;
 
 export async function GET(req: NextRequest): Promise<Response> {
   try {
-    const handler = require('@/lib/legacy-api/seo');
+    const handler = require('@/api/seo');
     return await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'GET',
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest): Promise<Response> {
 export async function POST(req: NextRequest): Promise<Response> {
   try {
     const body = await req.json();
-    const handler = require('@/lib/legacy-api/seo');
+    const handler = require('@/api/seo');
     const res = await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'POST',

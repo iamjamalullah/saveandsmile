@@ -6,22 +6,7 @@ export const revalidate = 0;
 
 export async function GET(req: NextRequest): Promise<Response> {
   try {
-    const { isWooConfigured, fetchWooProducts } = await import('@/lib/woocommerce');
-    if (isWooConfigured()) {
-      const wooProducts = await fetchWooProducts({
-        search: req.nextUrl.searchParams.get('search') || undefined,
-        category: req.nextUrl.searchParams.get('category') || undefined
-      });
-      if (wooProducts && wooProducts.length > 0) {
-        return NextResponse.json({
-          source: 'woocommerce',
-          count: wooProducts.length,
-          products: wooProducts
-        });
-      }
-    }
-
-    const handler = require('@/lib/legacy-api/products');
+    const handler = require('@/api/products');
     return await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'GET',
@@ -46,7 +31,7 @@ export async function GET(req: NextRequest): Promise<Response> {
 export async function POST(req: NextRequest): Promise<Response> {
   try {
     const body = await req.json();
-    const handler = require('@/lib/legacy-api/products');
+    const handler = require('@/api/products');
     const res = await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'POST',
@@ -79,7 +64,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 export async function PUT(req: NextRequest): Promise<Response> {
   try {
     const body = await req.json();
-    const handler = require('@/lib/legacy-api/products');
+    const handler = require('@/api/products');
     const res = await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'PUT',
@@ -111,7 +96,7 @@ export async function PUT(req: NextRequest): Promise<Response> {
 
 export async function DELETE(req: NextRequest): Promise<Response> {
   try {
-    const handler = require('@/lib/legacy-api/products');
+    const handler = require('@/api/products');
     const res = await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'DELETE',

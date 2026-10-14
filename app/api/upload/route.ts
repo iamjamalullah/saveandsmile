@@ -4,20 +4,48 @@ import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
+function getCorsHeaders(req: NextRequest) {
+  const origin = req.headers.get('origin') || '*';
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+    'Access-Control-Allow-Credentials': 'true'
+  };
+}
+
+export async function OPTIONS(req: NextRequest): Promise<Response> {
+  return new NextResponse(null, {
+    status: 200,
+    headers: getCorsHeaders(req)
+  });
+}
+
 export async function POST(req: NextRequest) {
+  const corsHeaders = getCorsHeaders(req);
   try {
+    const authHeader = req.headers.get('authorization') || '';
+    // Optional Bearer validation: if token present, verify with jwt
+    if (authHeader.startsWith('Bearer ')) {
+      const { verifyAuthToken } = require('@/lib/api/auth');
+      const user = verifyAuthToken({ headers: { authorization: authHeader } });
+      if (!user) {
+        return NextResponse.json({ success: false, error: 'Unauthorized: Invalid token' }, { status: 401, headers: corsHeaders });
+      }
+    }
+
     const formData = await req.formData();
-    const file = formData.get('file') as File | null;
+    const file = (formData.get('file') || formData.get('image')) as File | null;
 
     if (!file) {
-      return NextResponse.json({ success: false, error: 'No file provided' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'No file provided' }, { status: 400, headers: corsHeaders });
     }
 
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif'];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
         { success: false, error: 'Invalid file type. Please upload PNG, JPEG, or WEBP.' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -30,14 +58,14 @@ export async function POST(req: NextRequest) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
 
-    const baseName = `banner_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const baseName = `img_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const outputFileName = `${baseName}.webp`;
     const outputPath = path.join(uploadsDir, outputFileName);
 
     let finalBuffer: Buffer = inputBuffer;
     let converted = false;
 
-    // Use Sharp to convert any uploaded image (PNG, JPEG, etc.) into clean optimized WebP
+    // Use Sharp to convert image to WebP
     try {
       const sharp = require('sharp');
       finalBuffer = await sharp(inputBuffer)
@@ -55,9 +83,8 @@ export async function POST(req: NextRequest) {
         url: `/uploads/${outputFileName}`,
         format: 'webp',
         size: finalBuffer.length
-      });
+      }, { headers: corsHeaders });
     } else {
-      // Fallback with original extension if sharp fails
       const ext = path.extname(file.name) || (file.type === 'image/png' ? '.png' : '.jpg');
       const fallbackName = `${baseName}${ext}`;
       const fallbackPath = path.join(uploadsDir, fallbackName);
@@ -67,10 +94,10 @@ export async function POST(req: NextRequest) {
         url: `/uploads/${fallbackName}`,
         format: ext.replace('.', ''),
         size: inputBuffer.length
-      });
+      }, { headers: corsHeaders });
     }
   } catch (err: any) {
     console.error('Upload Error:', err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: err.message }, { status: 500, headers: corsHeaders });
   }
 }

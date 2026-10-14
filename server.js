@@ -49,25 +49,25 @@ async function handleApiRequest(req, res) {
 
     try {
       if (urlPath === '/api/products' || urlPath === '/api/products/') {
-        const handler = require('./api/products');
+        const handler = require('./lib/api/products');
         return await handler(req, res);
       } else if (urlPath.startsWith('/api/orders')) {
-        const handler = require('./api/orders');
+        const handler = require('./lib/api/orders');
         return await handler(req, res);
       } else if (urlPath.startsWith('/api/auth')) {
-        const handler = require('./api/auth');
+        const handler = require('./lib/api/auth');
         return await handler(req, res);
       } else if (urlPath === '/api/health' || urlPath === '/api/health/') {
-        const handler = require('./api/health');
+        const handler = require('./lib/api/health');
         return await handler(req, res);
       } else if (urlPath.startsWith('/api/seo')) {
-        const handler = require('./api/seo');
+        const handler = require('./lib/api/seo');
         return await handler(req, res);
       } else if (urlPath.startsWith('/api/chat')) {
-        const handler = require('./api/chat');
+        const handler = require('./lib/api/chat');
         return await handler(req, res);
       } else if (urlPath.startsWith('/api/home-customization')) {
-        const handler = require('./api/home-customization');
+        const handler = require('./lib/api/home-customization');
         return await handler(req, res);
       } else {
         res.writeHead(404, { 'Content-Type': 'application/json' });

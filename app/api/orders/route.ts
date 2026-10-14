@@ -1,8 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+export async function OPTIONS(): Promise<Response> {
+  const handler = require('@/lib/api/orders');
+  return new Promise<Response>((resolve) => {
+    const mockReq = { method: 'OPTIONS', headers: {} };
+    const mockRes = {
+      setHeader: () => {},
+      status: (code: number) => ({
+        end: () => resolve(new NextResponse(null, { status: code }))
+      })
+    };
+    handler(mockReq, mockRes);
+  });
+}
+
 export async function GET(req: NextRequest): Promise<Response> {
   try {
-    const handler = require('@/api/orders');
+    const handler = require('@/lib/api/orders');
     return await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'GET',
@@ -27,7 +44,7 @@ export async function GET(req: NextRequest): Promise<Response> {
 export async function POST(req: NextRequest): Promise<Response> {
   try {
     const body = await req.json();
-    const handler = require('@/api/orders');
+    const handler = require('@/lib/api/orders');
     return await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'POST',
@@ -53,7 +70,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 export async function PUT(req: NextRequest): Promise<Response> {
   try {
     const body = await req.json();
-    const handler = require('@/api/orders');
+    const handler = require('@/lib/api/orders');
     return await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'PUT',
@@ -74,4 +91,8 @@ export async function PUT(req: NextRequest): Promise<Response> {
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
+}
+
+export async function PATCH(req: NextRequest): Promise<Response> {
+  return PUT(req);
 }

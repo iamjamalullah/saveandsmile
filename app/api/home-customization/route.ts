@@ -4,9 +4,23 @@ import { revalidatePath } from 'next/cache';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+export async function OPTIONS(): Promise<Response> {
+  const handler = require('@/lib/api/home-customization');
+  return new Promise<Response>((resolve) => {
+    const mockReq = { method: 'OPTIONS', headers: {} };
+    const mockRes = {
+      setHeader: () => {},
+      status: (code: number) => ({
+        end: () => resolve(new NextResponse(null, { status: code }))
+      })
+    };
+    handler(mockReq, mockRes);
+  });
+}
+
 export async function GET(req: NextRequest): Promise<Response> {
   try {
-    const handler = require('@/api/home-customization');
+    const handler = require('@/lib/api/home-customization');
     return await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'GET',
@@ -31,7 +45,7 @@ export async function GET(req: NextRequest): Promise<Response> {
 export async function POST(req: NextRequest): Promise<Response> {
   try {
     const body = await req.json();
-    const handler = require('@/api/home-customization');
+    const handler = require('@/lib/api/home-customization');
     const res = await new Promise<Response>((resolve) => {
       const mockReq = {
         method: 'POST',
@@ -60,4 +74,8 @@ export async function POST(req: NextRequest): Promise<Response> {
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
+}
+
+export async function PUT(req: NextRequest): Promise<Response> {
+  return POST(req);
 }

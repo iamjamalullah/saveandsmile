@@ -101,3 +101,78 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500, headers: corsHeaders });
   }
 }
+
+export async function GET(req: NextRequest) {
+  const corsHeaders = getCorsHeaders(req);
+  try {
+    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+    const media: any[] = [];
+
+    if (fs.existsSync(uploadsDir)) {
+      const files = fs.readdirSync(uploadsDir);
+      for (const f of files) {
+        try {
+          const stat = fs.statSync(path.join(uploadsDir, f));
+          if (stat.isFile()) {
+            media.push({
+              name: f,
+              url: `/uploads/${f}`,
+              size: stat.size,
+              updatedAt: stat.mtime.toISOString()
+            });
+          }
+        } catch (e) {}
+      }
+    }
+
+    // Also include logo and banner assets if present
+    const imagesDir = path.join(process.cwd(), 'public', 'images');
+    if (fs.existsSync(imagesDir)) {
+      const imgFiles = fs.readdirSync(imagesDir);
+      for (const f of imgFiles) {
+        try {
+          const stat = fs.statSync(path.join(imagesDir, f));
+          if (stat.isFile()) {
+            media.push({
+              name: f,
+              url: `/images/${f}`,
+              size: stat.size,
+              updatedAt: stat.mtime.toISOString()
+            });
+          }
+        } catch (e) {}
+      }
+    }
+
+    media.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+
+    return NextResponse.json({ success: true, count: media.length, media }, { headers: corsHeaders });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: err.message }, { status: 500, headers: corsHeaders });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const corsHeaders = getCorsHeaders(req);
+  try {
+    const body = await req.json().catch(() => ({}));
+    const fileName = body.name || req.nextUrl.searchParams.get('name');
+
+    if (!fileName) {
+      return NextResponse.json({ success: false, error: 'File name is required' }, { status: 400, headers: corsHeaders });
+    }
+
+    const safeName = path.basename(fileName);
+    const filePath = path.join(process.cwd(), 'public', 'uploads', safeName);
+
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      return NextResponse.json({ success: true, message: 'File deleted successfully' }, { headers: corsHeaders });
+    }
+
+    return NextResponse.json({ success: false, error: 'File not found' }, { status: 404, headers: corsHeaders });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: err.message }, { status: 500, headers: corsHeaders });
+  }
+}
+

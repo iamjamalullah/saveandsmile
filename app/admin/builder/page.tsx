@@ -52,6 +52,16 @@ interface SectionVisibility {
   newsletter: boolean;
 }
 
+interface TrendingPicksBanner {
+  enabled: boolean;
+  title: string;
+  subtitle: string;
+  badge: string;
+  image: string;
+  btn_text: string;
+  link: string;
+}
+
 interface HomeCustomizationConfig {
   announcement?: {
     enabled: boolean;
@@ -61,6 +71,10 @@ interface HomeCustomizationConfig {
   hero_slides: HeroSlide[];
   promo_banners?: PromoBanner[];
   sections_visibility?: SectionVisibility;
+  sections_config?: {
+    trending_picks_banner?: TrendingPicksBanner;
+    [key: string]: any;
+  };
   brand_info?: {
     site_title: string;
     tagline: string;
@@ -88,6 +102,17 @@ export default function WebsiteBuilderPage() {
       trust_badges: true,
       newsletter: true
     },
+    sections_config: {
+      trending_picks_banner: {
+        enabled: true,
+        title: "Save & Smile Wholesale Megastore Deals",
+        subtitle: "Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers",
+        badge: "🔥 EXCLUSIVE RESELLER OFFER",
+        image: "https://www.qadrigadgets.pk/images/banners/6a7af65669503.webp",
+        btn_text: "Explore Trending Deals",
+        link: "#products"
+      }
+    },
     brand_info: {
       site_title: 'Save & Smile',
       tagline: 'Pakistan\'s Premier Wholesale Portal',
@@ -96,7 +121,7 @@ export default function WebsiteBuilderPage() {
     }
   });
 
-  const [activeTab, setActiveTab] = useState<'hero' | 'sections' | 'announcement' | 'branding'>('hero');
+  const [activeTab, setActiveTab] = useState<'hero' | 'trending_banner' | 'sections' | 'announcement' | 'branding'>('hero');
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -114,6 +139,14 @@ export default function WebsiteBuilderPage() {
           sections_visibility: {
             ...prev.sections_visibility,
             ...(data.config.sections_visibility || {})
+          },
+          sections_config: {
+            ...prev.sections_config,
+            ...(data.config.sections_config || {}),
+            trending_picks_banner: {
+              ...prev.sections_config?.trending_picks_banner,
+              ...(data.config.sections_config?.trending_picks_banner || {})
+            }
           },
           announcement: {
             ...prev.announcement,
@@ -228,6 +261,51 @@ export default function WebsiteBuilderPage() {
     }));
   };
 
+  const handleUploadSlideImage = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        handleSlideChange(index, 'image', dataUrl);
+        setNotice({ type: 'success', message: `Slide #${index + 1} picture updated! Click "Save & Publish" to sync.` });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleUploadTrendingBannerImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        setConfig(prev => ({
+          ...prev,
+          sections_config: {
+            ...prev.sections_config,
+            trending_picks_banner: {
+              ...(prev.sections_config?.trending_picks_banner || {
+                enabled: true,
+                title: "Save & Smile Wholesale Megastore Deals",
+                subtitle: "Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers",
+                badge: "🔥 EXCLUSIVE RESELLER OFFER",
+                image: "",
+                btn_text: "Explore Trending Deals",
+                link: "#products"
+              }),
+              image: dataUrl
+            }
+          }
+        }));
+        setNotice({ type: 'success', message: 'Trending picks banner picture updated! Click "Save & Publish" to sync.' });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="space-y-6">
       {/* Top Header */}
@@ -263,6 +341,35 @@ export default function WebsiteBuilderPage() {
         </div>
       </div>
 
+      {/* 🚀 Elementor Live Studio Launch Card */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 text-white p-6 shadow-xl border border-teal-500/30 flex flex-col md:flex-row md:items-center justify-between gap-5">
+        <div className="space-y-2 max-w-2xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/40 text-xs font-black uppercase tracking-wider">
+            <span>✨</span>
+            <span>Elementor-Style Visual Studio</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+            <span>Live Split-Screen Theme Customizer</span>
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Naye full-screen tab mein kholta hai! Ek taraf saray live controls (hero banners, PNG/JPEG images, trending banner, sections reordering) aur doosri taraf realtime live storefront preview — jaise Elementor ya Shopify Customizer.
+          </p>
+        </div>
+
+        <div className="shrink-0 flex flex-col sm:flex-row items-center gap-3">
+          <a
+            href="/live-editor"
+            target="_blank"
+            rel="noreferrer"
+            className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-black text-sm rounded-xl shadow-lg hover:shadow-emerald-500/30 flex items-center justify-center gap-2.5 transition transform active:scale-95"
+          >
+            <span>🚀 Launch Live Studio (Opens New Tab)</span>
+            <ExternalLink className="w-4 h-4" />
+          </a>
+        </div>
+      </div>
+
       {notice && (
         <div
           className={`p-4 rounded-xl flex items-center justify-between text-sm ${
@@ -279,7 +386,7 @@ export default function WebsiteBuilderPage() {
       )}
 
       {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-gray-200 pb-px">
+      <div className="flex flex-wrap items-center gap-2 border-b border-gray-200 pb-px">
         <button
           onClick={() => setActiveTab('hero')}
           className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition ${
@@ -290,6 +397,17 @@ export default function WebsiteBuilderPage() {
         >
           <ImageIcon className="w-4 h-4" />
           Hero Sliders ({config.hero_slides.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('trending_banner')}
+          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition ${
+            activeTab === 'trending_banner'
+              ? 'border-emerald-600 text-emerald-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <Sparkles className="w-4 h-4 text-amber-500" />
+          Trending Banner (After Trending Picks)
         </button>
         <button
           onClick={() => setActiveTab('sections')}
@@ -421,12 +539,23 @@ export default function WebsiteBuilderPage() {
                   </div>
 
                   <div>
-                    <label className="block font-semibold text-gray-700 uppercase mb-1">Background Image URL</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-semibold text-gray-700 uppercase">Banner Picture (PNG, JPEG, WebP)</label>
+                      <label className="cursor-pointer text-emerald-600 hover:text-emerald-700 font-bold flex items-center gap-1 text-[11px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        <input
+                          type="file"
+                          accept="image/png, image/jpeg, image/jpg, image/webp"
+                          className="hidden"
+                          onChange={e => handleUploadSlideImage(idx, e)}
+                        />
+                        <span>📷 Upload PNG / JPG</span>
+                      </label>
+                    </div>
                     <input
                       type="text"
                       value={slide.image}
                       onChange={e => handleSlideChange(idx, 'image', e.target.value)}
-                      placeholder="https://... or /images/..."
+                      placeholder="https://... or upload PNG/JPG picture"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-emerald-500"
                     />
                   </div>
@@ -469,6 +598,289 @@ export default function WebsiteBuilderPage() {
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      ) : activeTab === 'trending_banner' ? (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
+            <div>
+              <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                <span>🎯 Promotional Banner (After Trending Picks)</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-teal-100 text-teal-800">Portion 4B</span>
+              </h3>
+              <p className="text-xs text-gray-500 mt-1">
+                Trending Picks section ke baad aane wala promo banner customize karein. PNG aur JPEG picture upload karein ya direct URL dein.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="flex items-center gap-2 text-xs font-bold text-gray-700 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={config.sections_config?.trending_picks_banner?.enabled !== false}
+                  onChange={e =>
+                    setConfig(prev => ({
+                      ...prev,
+                      sections_config: {
+                        ...prev.sections_config,
+                        trending_picks_banner: {
+                          ...(prev.sections_config?.trending_picks_banner || {
+                            enabled: true,
+                            title: 'Save & Smile Wholesale Megastore Deals',
+                            subtitle: 'Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers',
+                            badge: '🔥 EXCLUSIVE RESELLER OFFER',
+                            image: 'https://www.qadrigadgets.pk/images/banners/6a7af65669503.webp',
+                            btn_text: 'Explore Trending Deals',
+                            link: '#products'
+                          }),
+                          enabled: e.target.checked
+                        }
+                      }
+                    }))
+                  }
+                  className="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4"
+                />
+                <span>Enable on Storefront</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Live Card Preview */}
+          <div className="relative overflow-hidden rounded-2xl border border-slate-300 shadow-md bg-slate-900 text-white min-h-[200px] flex items-center p-6 sm:p-10 group">
+            {config.sections_config?.trending_picks_banner?.image && (
+              <img
+                src={config.sections_config.trending_picks_banner.image}
+                alt={config.sections_config.trending_picks_banner.title || 'Banner'}
+                className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:scale-105 transition-transform duration-500"
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/60 to-transparent pointer-events-none" />
+            <div className="relative z-10 max-w-lg space-y-2">
+              {config.sections_config?.trending_picks_banner?.badge && (
+                <span className="inline-block bg-amber-400 text-slate-950 font-black text-[10px] sm:text-xs px-3 py-0.5 rounded-full uppercase tracking-wider shadow">
+                  {config.sections_config.trending_picks_banner.badge}
+                </span>
+              )}
+              <h2 className="text-xl sm:text-2xl font-black text-white leading-tight">
+                {config.sections_config?.trending_picks_banner?.title || 'Save & Smile Wholesale Megastore Deals'}
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-200 line-clamp-2">
+                {config.sections_config?.trending_picks_banner?.subtitle || 'Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers'}
+              </p>
+              <div className="pt-2">
+                <span className="inline-flex items-center gap-1.5 bg-[#008060] text-white font-black text-xs px-4 py-2 rounded-xl shadow">
+                  <span>{config.sections_config?.trending_picks_banner?.btn_text || 'Explore Trending Deals'}</span>
+                  <span>→</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Form Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div className="md:col-span-2">
+              <div className="flex items-center justify-between mb-1">
+                <label className="block font-semibold text-gray-700 uppercase">Banner Picture (PNG, JPEG, WebP) *</label>
+                <label className="cursor-pointer text-emerald-600 hover:text-emerald-700 font-bold flex items-center gap-1 text-[11px] bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 transition">
+                  <input
+                    type="file"
+                    accept="image/png, image/jpeg, image/jpg, image/webp"
+                    className="hidden"
+                    onChange={handleUploadTrendingBannerImage}
+                  />
+                  <span>📷 Upload PNG / JPEG Picture from Computer</span>
+                </label>
+              </div>
+              <input
+                type="text"
+                value={config.sections_config?.trending_picks_banner?.image || ''}
+                onChange={e =>
+                  setConfig(prev => ({
+                    ...prev,
+                    sections_config: {
+                      ...prev.sections_config,
+                      trending_picks_banner: {
+                        ...(prev.sections_config?.trending_picks_banner || {
+                          enabled: true,
+                          title: '',
+                          subtitle: '',
+                          badge: '',
+                          image: '',
+                          btn_text: 'Explore Deals',
+                          link: '#products'
+                        }),
+                        image: e.target.value
+                      }
+                    }
+                  }))
+                }
+                placeholder="https://... or upload PNG/JPEG picture above"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-emerald-500"
+              />
+              <span className="text-[11px] text-gray-400 mt-1 block">
+                Recommended aspect ratio: <strong>1920 &times; 600 px</strong> or <strong>1200 &times; 400 px</strong>. Supports PNG, JPG, JPEG, and WebP.
+              </span>
+            </div>
+
+            <div>
+              <label className="block font-semibold text-gray-700 uppercase mb-1">Banner Heading Title</label>
+              <input
+                type="text"
+                value={config.sections_config?.trending_picks_banner?.title || ''}
+                onChange={e =>
+                  setConfig(prev => ({
+                    ...prev,
+                    sections_config: {
+                      ...prev.sections_config,
+                      trending_picks_banner: {
+                        ...(prev.sections_config?.trending_picks_banner || {
+                          enabled: true,
+                          title: '',
+                          subtitle: '',
+                          badge: '',
+                          image: '',
+                          btn_text: 'Explore Deals',
+                          link: '#products'
+                        }),
+                        title: e.target.value
+                      }
+                    }
+                  }))
+                }
+                placeholder="e.g. Save & Smile Wholesale Megastore Deals"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold text-gray-700 uppercase mb-1">Badge Tag</label>
+              <input
+                type="text"
+                value={config.sections_config?.trending_picks_banner?.badge || ''}
+                onChange={e =>
+                  setConfig(prev => ({
+                    ...prev,
+                    sections_config: {
+                      ...prev.sections_config,
+                      trending_picks_banner: {
+                        ...(prev.sections_config?.trending_picks_banner || {
+                          enabled: true,
+                          title: '',
+                          subtitle: '',
+                          badge: '',
+                          image: '',
+                          btn_text: 'Explore Deals',
+                          link: '#products'
+                        }),
+                        badge: e.target.value
+                      }
+                    }
+                  }))
+                }
+                placeholder="e.g. 🔥 EXCLUSIVE RESELLER OFFER"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block font-semibold text-gray-700 uppercase mb-1">Subtitle / Promotion Description</label>
+              <input
+                type="text"
+                value={config.sections_config?.trending_picks_banner?.subtitle || ''}
+                onChange={e =>
+                  setConfig(prev => ({
+                    ...prev,
+                    sections_config: {
+                      ...prev.sections_config,
+                      trending_picks_banner: {
+                        ...(prev.sections_config?.trending_picks_banner || {
+                          enabled: true,
+                          title: '',
+                          subtitle: '',
+                          badge: '',
+                          image: '',
+                          btn_text: 'Explore Deals',
+                          link: '#products'
+                        }),
+                        subtitle: e.target.value
+                      }
+                    }
+                  }))
+                }
+                placeholder="e.g. Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold text-gray-700 uppercase mb-1">Button Text</label>
+              <input
+                type="text"
+                value={config.sections_config?.trending_picks_banner?.btn_text || ''}
+                onChange={e =>
+                  setConfig(prev => ({
+                    ...prev,
+                    sections_config: {
+                      ...prev.sections_config,
+                      trending_picks_banner: {
+                        ...(prev.sections_config?.trending_picks_banner || {
+                          enabled: true,
+                          title: '',
+                          subtitle: '',
+                          badge: '',
+                          image: '',
+                          btn_text: 'Explore Deals',
+                          link: '#products'
+                        }),
+                        btn_text: e.target.value
+                      }
+                    }
+                  }))
+                }
+                placeholder="e.g. Explore Trending Deals"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold text-gray-700 uppercase mb-1">Target Link</label>
+              <input
+                type="text"
+                value={config.sections_config?.trending_picks_banner?.link || ''}
+                onChange={e =>
+                  setConfig(prev => ({
+                    ...prev,
+                    sections_config: {
+                      ...prev.sections_config,
+                      trending_picks_banner: {
+                        ...(prev.sections_config?.trending_picks_banner || {
+                          enabled: true,
+                          title: '',
+                          subtitle: '',
+                          badge: '',
+                          image: '',
+                          btn_text: 'Explore Deals',
+                          link: '#products'
+                        }),
+                        link: e.target.value
+                      }
+                    }
+                  }))
+                }
+                placeholder="#products or /category/kitchen"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+          </div>
+
+          <div className="pt-2 flex justify-end">
+            <button
+              onClick={handleSaveAndPublish}
+              disabled={saving}
+              className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition shadow-sm disabled:opacity-50"
+            >
+              {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {saving ? 'Publishing...' : 'Save & Publish Banner to Store'}
+            </button>
           </div>
         </div>
       ) : activeTab === 'sections' ? (

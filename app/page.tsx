@@ -83,9 +83,23 @@ export default function HomePage() {
     fetchLiveTheme();
 
     function handleSync(e: any) {
-      if (e.data && e.data.type === 'LIVE_PREVIEW_UPDATE') {
-        // Instant Live PostMessage synchronization from Admin Customizer
-        setLiveLayout(e.data.payload);
+      if (e.data && (e.data.type === 'LIVE_PREVIEW_UPDATE' || e.data.type === 'HOME_CONFIG_UPDATE')) {
+        // Instant Live PostMessage synchronization from Admin Customizer / Elementor Studio
+        const payload = e.data.payload || e.data.config;
+        if (payload) {
+          setLiveLayout(prev => ({
+            ...prev,
+            ...payload,
+            sections_visibility: {
+              ...prev.sections_visibility,
+              ...(payload.sections_visibility || {})
+            },
+            sections_config: {
+              ...prev.sections_config,
+              ...(payload.sections_config || {})
+            }
+          }));
+        }
       } else if (e.data && e.data.type === 'qadri_sync_hero_slides') {
         setLiveLayout(prev => ({ ...prev, hero_slides: e.data.slides }));
       } else if (e.data && e.data.type === 'qadri_sync_products') {
@@ -220,6 +234,7 @@ export default function HomePage() {
                 'new_arrivals',
                 'flash_sale',
                 'trending_picks',
+                'trending_picks_banner',
                 'main_catalog',
                 'search_hero',
                 'video_reels',
@@ -385,6 +400,68 @@ export default function HomePage() {
                   </div>
                 </section>
               );
+
+            case 'trending_picks_banner':
+            case 'mid_banner': {
+              const bCfg = liveLayout.sections_config?.trending_picks_banner || {
+                enabled: true,
+                title: "Save & Smile Wholesale Megastore Deals",
+                subtitle: "Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers",
+                badge: "🔥 EXCLUSIVE RESELLER OFFER",
+                image: "https://www.qadrigadgets.pk/images/banners/6a7af65669503.webp",
+                btn_text: "Explore Trending Deals",
+                link: "#products"
+              };
+
+              if (liveLayout.sections_visibility?.trending_picks_banner === false || bCfg.enabled === false) {
+                return null;
+              }
+
+              return (
+                <section key="trending_picks_banner" className="py-6 bg-[#f8fafc]">
+                  <div className="site-container">
+                    <div className="relative overflow-hidden rounded-3xl shadow-xl border border-slate-200/80 group bg-slate-900 text-white min-h-[220px] sm:min-h-[290px] md:min-h-[340px] flex items-center">
+                      {bCfg.image && (
+                        <img
+                          src={bCfg.image}
+                          alt={bCfg.title || 'Trending Picks Promotional Banner'}
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80"
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/60 to-transparent sm:w-2/3 pointer-events-none" />
+                      <div className="relative z-10 p-6 sm:p-10 md:p-14 max-w-xl">
+                        {bCfg.badge && (
+                          <span className="inline-block bg-amber-400 text-slate-950 font-black text-[11px] sm:text-xs px-3.5 py-1 rounded-full uppercase tracking-wider mb-3 shadow">
+                            {bCfg.badge}
+                          </span>
+                        )}
+                        {bCfg.title && (
+                          <h2 className="text-xl sm:text-3xl md:text-4xl font-black text-white leading-tight drop-shadow-md">
+                            {bCfg.title}
+                          </h2>
+                        )}
+                        {bCfg.subtitle && (
+                          <p className="text-xs sm:text-sm text-slate-200 mt-2.5 font-medium leading-relaxed drop-shadow">
+                            {bCfg.subtitle}
+                          </p>
+                        )}
+                        {bCfg.btn_text && (
+                          <div className="mt-5 sm:mt-7">
+                            <a
+                              href={bCfg.link || '#products'}
+                              className="inline-flex items-center gap-2 bg-[#008060] hover:bg-emerald-600 text-white font-black text-xs sm:text-sm px-6 py-3 rounded-2xl shadow-lg hover:shadow-xl transition transform active:scale-95"
+                            >
+                              <span>{bCfg.btn_text}</span>
+                              <span className="text-base font-normal">→</span>
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              );
+            }
 
             case 'main_catalog':
             case 'shop_by_category':

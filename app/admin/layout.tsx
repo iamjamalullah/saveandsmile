@@ -46,7 +46,7 @@ const MENU_ITEMS = [
   { name: '7. Orders', href: '/admin/orders', icon: ShoppingCart },
   { name: '8. Customers / CRM', href: '/admin/customers', icon: Users },
   { name: '9. Discounts & Marketing', href: '/admin/discounts', icon: Percent },
-  { name: '10. Website Builder', href: '/admin/builder', icon: Palette },
+  { name: '10. Website Builder', href: '/admin/builder', icon: Palette, isBuilder: true },
   { name: '11. Pages & Content', href: '/admin/pages', icon: FileText },
   { name: '12. Media Library', href: '/admin/media', icon: ImageIcon },
   { name: '13. SEO Control Center', href: '/admin/seo', icon: Globe, highlight: true },
@@ -152,12 +152,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : item.highlight ? 'text-teal-400' : 'text-slate-400'}`} />
                   <span className="truncate">{item.name}</span>
                 </div>
+                {(item as any).isBuilder && (
+                  <span
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      window.open('/live-editor', '_blank');
+                    }}
+                    title="Launch Elementor Live Studio in New Tab"
+                    className="px-1.5 py-0.5 rounded-md bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 text-[9px] font-black tracking-wider flex items-center gap-1 border border-emerald-500/30 transition shadow-2xs cursor-pointer"
+                  >
+                    <span>STUDIO</span>
+                    <ExternalLink className="w-2.5 h-2.5" />
+                  </span>
+                )}
                 {item.highlight && !isActive && (
                   <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">
                     SEO
                   </span>
                 )}
-                {isActive && <ChevronRight className="w-3.5 h-3.5 text-white/70" />}
+                {isActive && !(item as any).isBuilder && <ChevronRight className="w-3.5 h-3.5 text-white/70" />}
               </Link>
             );
           })}

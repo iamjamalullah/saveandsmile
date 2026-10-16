@@ -134,6 +134,16 @@ export interface HomeThemeConfig {
       coupon_text?: string;
       show_coupon?: boolean;
     };
+    trending_picks_banner?: {
+      enabled?: boolean;
+      title?: string;
+      subtitle?: string;
+      badge?: string;
+      image?: string;
+      btn_text?: string;
+      link?: string;
+    };
+    [key: string]: any;
   };
   custom_sections?: CustomSection[];
   theme?: {

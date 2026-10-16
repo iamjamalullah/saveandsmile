@@ -121,6 +121,7 @@ export const DEFAULT_HOME_CONFIG: HomeThemeConfig = {
     new_arrivals: true,
     flash_sale: true,
     trending_picks: true,
+    trending_picks_banner: true,
     main_catalog: true,
     search_hero: true,
     video_reels: true,
@@ -134,6 +135,7 @@ export const DEFAULT_HOME_CONFIG: HomeThemeConfig = {
     'new_arrivals',
     'flash_sale',
     'trending_picks',
+    'trending_picks_banner',
     'main_catalog',
     'search_hero',
     'video_reels',
@@ -165,6 +167,15 @@ export const DEFAULT_HOME_CONFIG: HomeThemeConfig = {
       subtitle: "Most demanded smart watches, organizers & lifestyle essentials",
       tag: "🌟 TRENDING PICKS",
       limit: 8
+    },
+    trending_picks_banner: {
+      enabled: true,
+      title: "Save & Smile Wholesale Megastore Deals",
+      subtitle: "Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers",
+      badge: "🔥 EXCLUSIVE RESELLER OFFER",
+      image: "https://www.qadrigadgets.pk/images/banners/6a7af65669503.webp",
+      btn_text: "Explore Trending Deals",
+      link: "#products"
     },
     main_catalog: {
       title: "Trending Wholesale Catalog",

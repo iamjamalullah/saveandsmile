@@ -4,7 +4,13 @@
     "gradient_from": "#004d57",
     "primary_color": "#008060"
   },
-  "updated_at": "2026-10-16T08:30:57.906Z",
+  "brand_info": {
+    "tagline": "Pakistan's Premier Wholesale Portal",
+    "helpline": "0316-2323616",
+    "whatsapp": "923162323616",
+    "site_title": "Save & Smile"
+  },
+  "updated_at": "2026-10-16T09:41:38.315Z",
   "hero_slides": [
     {
       "id": "slide_1",
@@ -61,6 +67,12 @@
       "subtitle": "Earbuds, Smart Watches, Cables & Fast Chargers"
     }
   ],
+  "announcement": {
+    "link": "#products",
+    "text": "🚚 Free Nationwide Cash on Delivery on Orders Above Rs. 3,000 | Direct Factory Wholesale",
+    "enabled": true
+  },
+  "promo_banners": [],
   "sections_order": [
     "hero_slider",
     "categories_strip",
@@ -74,7 +86,17 @@
     "video_reels",
     "testimonials"
   ],
-  "sections_config": {},
+  "sections_config": {
+    "trending_picks_banner": {
+      "enabled": true,
+      "title": "Save & Smile Wholesale Megastore Deals",
+      "subtitle": "Direct Factory Wholesale Rates in Pakistan — Guaranteed Margin for Resellers",
+      "badge": "🔥 EXCLUSIVE RESELLER OFFER",
+      "image": "https://www.qadrigadgets.pk/images/banners/6a7af65669503.webp",
+      "btn_text": "Explore Trending Deals",
+      "link": "#products"
+    }
+  },
   "announcement_ticker": {
     "items": [
       "🚀 Welcome to Save & Smile Wholesale Portal (Verified Cloud Sync)"
@@ -85,20 +107,25 @@
   "sections_visibility": {
     "flash_sale": true,
     "front_tabs": true,
+    "newsletter": true,
     "flash_deals": true,
     "hero_slider": true,
     "hot_selling": true,
     "search_hero": true,
     "video_reels": true,
+    "all_products": true,
+    "best_sellers": true,
     "main_catalog": true,
     "new_arrivals": true,
     "testimonials": true,
     "trust_badges": true,
     "trending_picks": true,
+    "announcement_bar": true,
     "categories_strip": true,
     "customer_reviews": true,
     "shop_by_category": true,
     "wholesale_banner": true,
-    "featured_products": true
+    "featured_products": true,
+    "featured_categories": true
   }
 }

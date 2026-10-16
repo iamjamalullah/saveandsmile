@@ -24,7 +24,8 @@ import {
   Tag,
   Sliders,
   DollarSign,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Image as ImageIcon
 } from 'lucide-react';
 
 interface Product {
@@ -40,6 +41,8 @@ interface Product {
   sku?: string;
   badge?: string;
   image: string;
+  hover_image?: string;
+  hoverImage?: string;
   images?: string[];
   description?: string;
   isPublished?: boolean;
@@ -66,6 +69,8 @@ export default function AdminProductsPage() {
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [editingProduct, setEditingProduct] = useState<Partial<Product>>({});
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [newImageUrlInput, setNewImageUrlInput] = useState('');
 
   // CSV Import Modal state
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -129,6 +134,115 @@ export default function AdminProductsPage() {
       });
   }, [products, search, selectedCategory, stockFilter, sortBy]);
 
+  // Image Upload & Gallery Handlers
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploadingImage(true);
+    try {
+      const newUrls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success && data.url) {
+          newUrls.push(data.url);
+        } else {
+          showToast(`File upload failed: ${data.error || 'Server error'}`);
+        }
+      }
+      if (newUrls.length > 0) {
+        setEditingProduct((prev) => {
+          const currentImgs = Array.isArray(prev.images)
+            ? [...prev.images]
+            : (prev.image ? [prev.image] : []);
+          const combined = Array.from(new Set([...currentImgs, ...newUrls]));
+          const currentFeatured = prev.image && prev.image.trim() !== '' ? prev.image : combined[0];
+          const currentHover = prev.hover_image && prev.hover_image.trim() !== ''
+            ? prev.hover_image
+            : (combined.length > 1 ? combined[1] : '');
+          return {
+            ...prev,
+            images: combined,
+            image: currentFeatured,
+            hover_image: currentHover
+          };
+        });
+        showToast(`✅ ${newUrls.length} tasveer(ein) upload ho gayin!`);
+      }
+    } catch (err: any) {
+      showToast('Image upload error: ' + err.message);
+    } finally {
+      setUploadingImage(false);
+      if (e.target) e.target.value = '';
+    }
+  };
+
+  const handleAddImageUrl = () => {
+    const url = newImageUrlInput.trim();
+    if (!url) return;
+    setEditingProduct((prev) => {
+      const currentImgs = Array.isArray(prev.images) ? [...prev.images] : (prev.image ? [prev.image] : []);
+      if (!currentImgs.includes(url)) currentImgs.push(url);
+      const feat = prev.image && prev.image.trim() !== '' ? prev.image : url;
+      const hov = prev.hover_image && prev.hover_image.trim() !== ''
+        ? prev.hover_image
+        : (currentImgs.length > 1 ? currentImgs[1] : '');
+      return {
+        ...prev,
+        images: currentImgs,
+        image: feat,
+        hover_image: hov
+      };
+    });
+    setNewImageUrlInput('');
+    showToast('Image URL gallery mein shamil kar di gayi!');
+  };
+
+  const handleSetFeatured = (url: string) => {
+    setEditingProduct((prev) => ({
+      ...prev,
+      image: url
+    }));
+    showToast('⭐ Featured (Main Display) image select ho gayi!');
+  };
+
+  const handleSetHover = (url: string) => {
+    setEditingProduct((prev) => ({
+      ...prev,
+      hover_image: url
+    }));
+    showToast('🔄 Hover Image select ho gayi! Storefront par mouse le jane par ye dikhegi.');
+  };
+
+  const handleRemoveHover = () => {
+    setEditingProduct((prev) => ({
+      ...prev,
+      hover_image: ''
+    }));
+    showToast('Hover image remove kar di gayi.');
+  };
+
+  const handleRemoveImage = (url: string) => {
+    setEditingProduct((prev) => {
+      const filtered = (prev.images || []).filter(img => img !== url);
+      let newFeat = prev.image === url ? (filtered[0] || '') : prev.image;
+      let newHover = prev.hover_image === url ? '' : prev.hover_image;
+      return {
+        ...prev,
+        images: filtered,
+        image: newFeat,
+        hover_image: newHover
+      };
+    });
+    showToast('Tasveer remove kar di gayi.');
+  };
+
   // Open Create Modal
   const handleOpenCreate = () => {
     setModalMode('create');
@@ -142,6 +256,8 @@ export default function AdminProductsPage() {
       code: 'QGW-' + Math.floor(100000 + Math.random() * 900000),
       badge: 'NEW',
       image: '/images/save-and-smile-logo.png',
+      hover_image: '',
+      images: ['/images/save-and-smile-logo.png'],
       description: '',
       isPublished: true,
       seo_title: '',
@@ -154,7 +270,18 @@ export default function AdminProductsPage() {
   // Open Edit Modal
   const handleOpenEdit = (product: Product) => {
     setModalMode('edit');
-    setEditingProduct({ ...product });
+    const existingImgs = Array.isArray(product.images) && product.images.length > 0
+      ? [...product.images]
+      : (product.image ? [product.image] : []);
+    const hImg = product.hover_image || (product as any).hoverImage || '';
+    if (hImg && !existingImgs.includes(hImg)) {
+      existingImgs.push(hImg);
+    }
+    setEditingProduct({
+      ...product,
+      hover_image: hImg,
+      images: existingImgs
+    });
     setIsModalOpen(true);
   };
 
@@ -171,6 +298,7 @@ export default function AdminProductsPage() {
         code: `${p.code || 'SKU'}-COPY`,
         badge: p.badge || 'NEW',
         image: p.image,
+        hover_image: p.hover_image || (p as any).hoverImage || '',
         images: p.images || [p.image],
         description: p.description,
         isPublished: true
@@ -521,17 +649,32 @@ export default function AdminProductsPage() {
                       </td>
                       <td className="p-3.5">
                         <div className="flex items-center gap-3">
-                          <img
-                            src={p.image || '/images/placeholder.jpg'}
-                            alt={p.title}
-                            className="w-10 h-10 rounded-lg object-cover border border-slate-200 bg-slate-100 shrink-0"
-                          />
+                          <div className="relative shrink-0">
+                            <img
+                              src={p.image || '/images/placeholder.jpg'}
+                              alt={p.title}
+                              className="w-10 h-10 rounded-lg object-cover border border-slate-200 bg-slate-100"
+                            />
+                            {(p.hover_image || (p as any).hoverImage) && (
+                              <span
+                                title="Hover Picture Set"
+                                className="absolute -bottom-1 -right-1 w-4 h-4 bg-indigo-600 border border-white text-white rounded-full flex items-center justify-center text-[9px]"
+                              >
+                                🔄
+                              </span>
+                            )}
+                          </div>
                           <div className="min-w-0 max-w-[280px]">
                             <div className="font-bold text-slate-900 truncate" title={p.title}>
                               {p.title}
                             </div>
-                            <div className="text-[10px] text-slate-400 truncate">
-                              ID: {p.id}
+                            <div className="text-[10px] text-slate-400 truncate flex items-center gap-1.5">
+                              <span>ID: {p.id}</span>
+                              {(p.hover_image || (p as any).hoverImage) && (
+                                <span className="text-indigo-600 font-bold bg-indigo-50 px-1 py-0.5 rounded text-[9px] border border-indigo-100">
+                                  Hover Pic
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -724,18 +867,201 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              {/* Image URL */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Primary Image URL
-                </label>
-                <input
-                  type="text"
-                  value={editingProduct.image || ''}
-                  onChange={(e) => setEditingProduct({ ...editingProduct, image: e.target.value })}
-                  placeholder="https://... or /uploads/..."
-                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:outline-hidden focus:border-[#007382]"
-                />
+              {/* PRODUCT IMAGES & MEDIA MANAGER */}
+              <div className="p-4 bg-slate-50/90 rounded-2xl border border-slate-200 space-y-3.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <ImageIcon className="w-4 h-4 text-[#007382]" />
+                      <span>Product Media & Image Upload</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Apne computer se PNG/JPG/WebP upload karein ya direct URL enter karein. Featured aur Hover pictures select karein.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className={`cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#007382] hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition shadow-xs ${uploadingImage ? 'opacity-60 pointer-events-none' : ''}`}>
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>{uploadingImage ? 'Uploading...' : 'Upload from PC'}</span>
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/png, image/jpeg, image/jpg, image/webp"
+                        onChange={handleImageUpload}
+                        disabled={uploadingImage}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {/* Direct URL input bar */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={newImageUrlInput}
+                    onChange={(e) => setNewImageUrlInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddImageUrl(); } }}
+                    placeholder="Ya direct image URL paste karein (https://... or /uploads/...)"
+                    className="flex-1 text-xs px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-hidden focus:border-[#007382]"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddImageUrl}
+                    className="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl transition"
+                  >
+                    + Add URL
+                  </button>
+                </div>
+
+                {/* Active Selection Summary Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {/* Featured Card */}
+                  <div className="p-3 bg-white rounded-xl border-2 border-emerald-300 shadow-xs flex items-center gap-3">
+                    <div className="w-14 h-14 rounded-lg border border-slate-200 bg-slate-50 overflow-hidden shrink-0 flex items-center justify-center">
+                      {editingProduct.image ? (
+                        <img src={editingProduct.image} alt="Featured" className="w-full h-full object-contain p-0.5" />
+                      ) : (
+                        <span className="text-[10px] text-slate-400 text-center px-1">No Image</span>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-black rounded-md flex items-center gap-1">
+                          ⭐ Featured (Main Pic)
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-700 font-medium truncate mt-1" title={editingProduct.image || 'None'}>
+                        {editingProduct.image ? editingProduct.image.substring(editingProduct.image.lastIndexOf('/') + 1) : 'Koi tasveer select nahi'}
+                      </p>
+                      <span className="text-[10px] text-slate-400 block">Storefront par default ye pic nazar aayegi</span>
+                    </div>
+                  </div>
+
+                  {/* Hover Card */}
+                  <div className="p-3 bg-white rounded-xl border-2 border-indigo-300 shadow-xs flex items-center gap-3">
+                    <div className="w-14 h-14 rounded-lg border border-slate-200 bg-slate-50 overflow-hidden shrink-0 flex items-center justify-center">
+                      {editingProduct.hover_image ? (
+                        <img src={editingProduct.hover_image} alt="Hover" className="w-full h-full object-contain p-0.5" />
+                      ) : (
+                        <span className="text-[10px] text-slate-400 text-center px-1">None</span>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-[10px] font-black rounded-md flex items-center gap-1">
+                          🔄 Hover Pic (Mouse Over)
+                        </span>
+                        {editingProduct.hover_image && (
+                          <button
+                            type="button"
+                            onClick={handleRemoveHover}
+                            className="text-[10px] text-rose-500 font-bold hover:underline"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-700 font-medium truncate mt-1" title={editingProduct.hover_image || 'Hover pic set nahi ki'}>
+                        {editingProduct.hover_image ? editingProduct.hover_image.substring(editingProduct.hover_image.lastIndexOf('/') + 1) : 'Hover pic set nahi'}
+                      </p>
+                      <span className="text-[10px] text-slate-400 block">Customer mouse le jayega toh ye pic aayegi</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Uploaded Media Gallery Thumbnails */}
+                <div>
+                  <div className="text-[11px] font-bold text-slate-700 mb-2 flex items-center justify-between">
+                    <span>Uploaded Gallery ({Array.from(new Set([...(editingProduct.images || []), ...(editingProduct.image ? [editingProduct.image] : []), ...(editingProduct.hover_image ? [editingProduct.hover_image] : [])])).filter(Boolean).length} tasaveer)</span>
+                    <span className="text-[10px] text-slate-400">Buttons daba kar Featured ya Hover choose karein</span>
+                  </div>
+
+                  {Array.from(new Set([...(editingProduct.images || []), ...(editingProduct.image ? [editingProduct.image] : []), ...(editingProduct.hover_image ? [editingProduct.hover_image] : [])])).filter(Boolean).length === 0 ? (
+                    <div className="text-center py-6 border border-dashed border-slate-300 rounded-xl bg-white text-xs text-slate-400">
+                      Abhi tak koi tasveer nahi hai. &quot;Upload from PC&quot; button dabayein ya link paste karein.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-56 overflow-y-auto p-1">
+                      {Array.from(new Set([...(editingProduct.images || []), ...(editingProduct.image ? [editingProduct.image] : []), ...(editingProduct.hover_image ? [editingProduct.hover_image] : [])])).filter(Boolean).map((imgUrl, idx) => {
+                        const isFeatured = editingProduct.image === imgUrl;
+                        const isHover = editingProduct.hover_image === imgUrl;
+
+                        return (
+                          <div
+                            key={idx}
+                            className={`group relative bg-white rounded-xl border p-2 transition flex flex-col justify-between ${
+                              isFeatured
+                                ? 'border-emerald-500 ring-2 ring-emerald-200'
+                                : isHover
+                                ? 'border-indigo-500 ring-2 ring-indigo-200'
+                                : 'border-slate-200 hover:border-slate-400'
+                            }`}
+                          >
+                            {/* Badges */}
+                            <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10 pointer-events-none">
+                              {isFeatured && (
+                                <span className="bg-emerald-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow-xs">
+                                  ⭐ Featured
+                                </span>
+                              )}
+                              {isHover && (
+                                <span className="bg-indigo-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow-xs">
+                                  🔄 Hover
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Delete button */}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(imgUrl)}
+                              title="Delete this image"
+                              className="absolute top-2.5 right-2.5 bg-white/90 hover:bg-rose-600 hover:text-white text-slate-500 p-1 rounded-full shadow-xs transition z-10"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* Thumbnail */}
+                            <div className="w-full aspect-square bg-slate-50 rounded-lg overflow-hidden flex items-center justify-center mb-2">
+                              <img
+                                src={imgUrl}
+                                alt="Product preview"
+                                className="w-full h-full object-contain p-1"
+                              />
+                            </div>
+
+                            {/* Buttons */}
+                            <div className="grid grid-cols-2 gap-1 pt-1 border-t border-slate-100">
+                              <button
+                                type="button"
+                                onClick={() => handleSetFeatured(imgUrl)}
+                                className={`text-[10px] font-bold py-1 px-0.5 rounded transition text-center ${
+                                  isFeatured
+                                    ? 'bg-emerald-600 text-white cursor-default'
+                                    : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
+                                }`}
+                              >
+                                {isFeatured ? '✓ Featured' : 'Featured'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleSetHover(imgUrl)}
+                                className={`text-[10px] font-bold py-1 px-0.5 rounded transition text-center ${
+                                  isHover
+                                    ? 'bg-indigo-600 text-white cursor-default'
+                                    : 'bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700'
+                                }`}
+                              >
+                                {isHover ? '✓ Hover' : 'Hover'}
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Description */}

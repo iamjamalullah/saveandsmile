@@ -76,24 +76,37 @@ export async function POST(req: NextRequest) {
       console.warn('Sharp WebP conversion fallback, saving buffer directly:', sharpErr);
     }
 
-    if (converted) {
-      fs.writeFileSync(outputPath, finalBuffer);
+    try {
+      if (converted) {
+        fs.writeFileSync(outputPath, finalBuffer);
+        return NextResponse.json({
+          success: true,
+          url: `/uploads/${outputFileName}`,
+          format: 'webp',
+          size: finalBuffer.length
+        }, { headers: corsHeaders });
+      } else {
+        const ext = path.extname(file.name) || (file.type === 'image/png' ? '.png' : '.jpg');
+        const fallbackName = `${baseName}${ext}`;
+        const fallbackPath = path.join(uploadsDir, fallbackName);
+        fs.writeFileSync(fallbackPath, inputBuffer);
+        return NextResponse.json({
+          success: true,
+          url: `/uploads/${fallbackName}`,
+          format: ext.replace('.', ''),
+          size: inputBuffer.length
+        }, { headers: corsHeaders });
+      }
+    } catch (fsWriteErr: any) {
+      console.warn('Filesystem write failed (likely serverless read-only), returning Data URL:', fsWriteErr.message);
+      const mime = converted ? 'image/webp' : (file.type || 'image/jpeg');
+      const b64 = (converted ? finalBuffer : inputBuffer).toString('base64');
       return NextResponse.json({
         success: true,
-        url: `/uploads/${outputFileName}`,
-        format: 'webp',
-        size: finalBuffer.length
-      }, { headers: corsHeaders });
-    } else {
-      const ext = path.extname(file.name) || (file.type === 'image/png' ? '.png' : '.jpg');
-      const fallbackName = `${baseName}${ext}`;
-      const fallbackPath = path.join(uploadsDir, fallbackName);
-      fs.writeFileSync(fallbackPath, inputBuffer);
-      return NextResponse.json({
-        success: true,
-        url: `/uploads/${fallbackName}`,
-        format: ext.replace('.', ''),
-        size: inputBuffer.length
+        url: `data:${mime};base64,${b64}`,
+        format: mime,
+        size: inputBuffer.length,
+        isDataUrl: true
       }, { headers: corsHeaders });
     }
   } catch (err: any) {

@@ -74,6 +74,11 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
     ? rawImg
     : `/${rawImg}`;
 
+  const rawHoverImg = product.hover_image || (product as any).hoverImage || (product.images && product.images.length > 1 ? product.images[1] : null);
+  const hoverImgSrc = rawHoverImg
+    ? (rawHoverImg.startsWith('http') || rawHoverImg.startsWith('/') ? rawHoverImg : `/${rawHoverImg}`)
+    : null;
+
   return (
     <div className={`product-card cat-${product.category || 'storage'}`}>
       {product.badge && <span className="product-badge">{product.badge}</span>}
@@ -82,7 +87,20 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
         className="product-img-wrapper"
         onClick={() => { window.location.href = `/product-detail?id=${encodeURIComponent(pIdStr)}`; }}
       >
-        <img src={imgSrc} alt={product.title} loading="lazy" />
+        <img
+          src={imgSrc}
+          alt={product.title}
+          loading="lazy"
+          className={`product-primary-img ${hoverImgSrc ? 'has-hover' : ''}`}
+        />
+        {hoverImgSrc && (
+          <img
+            src={hoverImgSrc}
+            alt={`${product.title} hover preview`}
+            loading="lazy"
+            className="product-hover-img"
+          />
+        )}
       </div>
 
       <div className="card-quick-actions">

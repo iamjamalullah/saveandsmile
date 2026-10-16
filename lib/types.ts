@@ -17,6 +17,8 @@ export interface Product {
   originalPrice?: number;
   badge?: string;
   image: string;
+  hover_image?: string;
+  hoverImage?: string;
   images?: string[];
   category: string;
   tab?: string;

@@ -44,10 +44,10 @@ export default function HomePage() {
 
     // 2. Fetch live products and theme customization from backend
     function fetchLiveProducts() {
-      fetch('/api/products', { cache: 'no-store' })
+      fetch('/api/products?t=' + Date.now(), { cache: 'no-store' })
         .then(res => res.json())
         .then(data => {
-          if (data && Array.isArray(data.products) && data.products.length >= 10) {
+          if (data && Array.isArray(data.products) && data.products.length > 0) {
             try {
               localStorage.setItem('save_and_smile_server_products', JSON.stringify(data.products));
             } catch (e) {}
@@ -117,7 +117,15 @@ export default function HomePage() {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         channel = new BroadcastChannel('qadri_store_sync');
         channel.onmessage = (ev) => {
-          if (ev.data?.type === 'theme_updated' && ev.data.config) {
+          if (ev.data?.type === 'product_updated') {
+            if (ev.data.products && Array.isArray(ev.data.products)) {
+              setProducts(ev.data.products);
+            } else if (ev.data.product) {
+              setProducts(prev => prev.map(p => String(p.id) === String(ev.data.product.id) ? { ...p, ...ev.data.product } : p));
+            }
+          } else if (ev.data?.type === 'product_deleted' && ev.data.id) {
+            setProducts(prev => prev.filter(p => String(p.id) !== String(ev.data.id)));
+          } else if (ev.data?.type === 'theme_updated' && ev.data.config) {
             setLiveLayout(prev => ({
               ...prev,
               ...ev.data.config,

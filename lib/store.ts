@@ -58,7 +58,7 @@ export function getClientProducts(): Product[] {
   if (typeof window === 'undefined') return DEFAULT_PRODUCTS;
   try {
     const serverCached = JSON.parse(localStorage.getItem('save_and_smile_server_products') || 'null');
-    if (Array.isArray(serverCached) && serverCached.length >= 10) {
+    if (Array.isArray(serverCached) && serverCached.length > 0) {
       return serverCached;
     }
     return DEFAULT_PRODUCTS;

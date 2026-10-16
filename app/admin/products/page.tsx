@@ -210,6 +210,27 @@ export default function AdminProductsPage() {
         showToast(modalMode === 'edit' ? 'Product updated successfully!' : 'New product created!');
         setIsModalOpen(false);
         loadProducts();
+
+        // Broadcast Live Synchronization for Storefront across tabs and windows
+        try {
+          if (typeof window !== 'undefined') {
+            fetch('/api/products?t=' + Date.now(), { cache: 'no-store' })
+              .then(r => r.json())
+              .then(freshData => {
+                if (freshData?.products && Array.isArray(freshData.products)) {
+                  localStorage.setItem('save_and_smile_server_products', JSON.stringify(freshData.products));
+                  window.dispatchEvent(new Event('storage'));
+                  window.dispatchEvent(new CustomEvent('qadri_products_updated', { detail: data.product }));
+                  if ('BroadcastChannel' in window) {
+                    const bc = new BroadcastChannel('qadri_store_sync');
+                    bc.postMessage({ type: 'product_updated', product: data.product, products: freshData.products });
+                    bc.close();
+                  }
+                }
+              })
+              .catch(() => {});
+          }
+        } catch (syncErr) {}
       } else {
         showToast(data.error || 'Operation failed');
       }
@@ -234,6 +255,27 @@ export default function AdminProductsPage() {
       if (data.success) {
         showToast(`Deleted: ${title}`);
         setProducts(prev => prev.filter(p => String(p.id) !== String(id)));
+
+        // Broadcast deletion
+        try {
+          if (typeof window !== 'undefined') {
+            fetch('/api/products?t=' + Date.now(), { cache: 'no-store' })
+              .then(r => r.json())
+              .then(freshData => {
+                if (freshData?.products && Array.isArray(freshData.products)) {
+                  localStorage.setItem('save_and_smile_server_products', JSON.stringify(freshData.products));
+                  window.dispatchEvent(new Event('storage'));
+                  window.dispatchEvent(new CustomEvent('qadri_products_updated'));
+                  if ('BroadcastChannel' in window) {
+                    const bc = new BroadcastChannel('qadri_store_sync');
+                    bc.postMessage({ type: 'product_deleted', id: String(id), products: freshData.products });
+                    bc.close();
+                  }
+                }
+              })
+              .catch(() => {});
+          }
+        } catch (syncErr) {}
       } else {
         showToast(data.error || 'Failed to delete');
       }

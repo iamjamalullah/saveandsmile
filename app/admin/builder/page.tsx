@@ -150,6 +150,20 @@ export default function WebsiteBuilderPage() {
           type: 'success',
           message: 'Website published successfully! Storefront cache revalidated.'
         });
+
+        // Broadcast to live storefront tabs
+        try {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('save_and_smile_home_config', JSON.stringify(data.config || config));
+            window.dispatchEvent(new Event('storage'));
+            window.dispatchEvent(new CustomEvent('qadri_hero_slides_updated'));
+            if ('BroadcastChannel' in window) {
+              const bc = new BroadcastChannel('qadri_store_sync');
+              bc.postMessage({ type: 'theme_updated', config: data.config || config });
+              bc.close();
+            }
+          }
+        } catch (syncErr) {}
       } else {
         setNotice({ type: 'error', message: data.error || 'Failed to publish changes' });
       }

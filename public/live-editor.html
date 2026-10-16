@@ -1263,6 +1263,15 @@
         const result = await res.json();
         if (result && result.success) {
           showToast('Live Homepage & Hero published successfully!', '🎉');
+          try {
+            if ('BroadcastChannel' in window) {
+              const bc = new BroadcastChannel('qadri_store_sync');
+              bc.postMessage({ type: 'theme_updated', config: result.config || homeConfig });
+              bc.close();
+            }
+            window.dispatchEvent(new Event('storage'));
+            window.dispatchEvent(new CustomEvent('qadri_hero_slides_updated'));
+          } catch (bErr) {}
         } else {
           showToast('Settings saved locally!', '✅');
         }

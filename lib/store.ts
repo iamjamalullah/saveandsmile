@@ -204,7 +204,7 @@ export const DEFAULT_HOME_CONFIG: HomeThemeConfig = {
 export function getClientHomeConfig(): HomeThemeConfig {
   if (typeof window === 'undefined') return DEFAULT_HOME_CONFIG;
   try {
-    const stored = localStorage.getItem('qadri_home_config') || localStorage.getItem('qadri_theme_config');
+    const stored = localStorage.getItem('save_and_smile_home_config') || localStorage.getItem('qadri_home_config') || localStorage.getItem('qadri_theme_config');
     if (stored) {
       const parsed = JSON.parse(stored);
       if (parsed && typeof parsed === 'object') {

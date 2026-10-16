@@ -58,7 +58,7 @@ export default function HomePage() {
     }
 
     function fetchLiveTheme() {
-      fetch('/api/home-customization', { cache: 'no-store' })
+      fetch('/api/home-customization?t=' + Date.now(), { cache: 'no-store' })
         .then(res => res.json())
         .then(data => {
           if (data?.config) {
@@ -101,9 +101,10 @@ export default function HomePage() {
     window.addEventListener('qadri_products_updated', handleSync);
     window.addEventListener('qadri_hero_slides_updated', fetchLiveTheme);
 
-    // Live continuous polling: Refresh products every 6s and whenever tab is focused
+    // Live continuous polling: Refresh products and theme customization every 6s and whenever tab is focused
     const pollInterval = setInterval(() => {
       fetchLiveProducts();
+      fetchLiveTheme();
     }, 6000);
 
     const handleFocus = () => {

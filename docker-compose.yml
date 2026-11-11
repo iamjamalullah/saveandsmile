@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: qadri-gadgets-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-qadri_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-QadriPgSecure2026!}
+      POSTGRES_DB: ${POSTGRES_DB:-qadri_gadgets}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-qadri_user} -d ${POSTGRES_DB:-qadri_gadgets}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - qadri_network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: qadri-gadgets-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgres://${POSTGRES_USER:-qadri_user}:${POSTGRES_PASSWORD:-QadriPgSecure2026!}@postgres:5432/${POSTGRES_DB:-qadri_gadgets}
+      APP_SECRET: ${APP_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@qadrigadgets.pk}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      MANAGER_EMAIL: ${MANAGER_EMAIL:-manager@qadrigadgets.pk}
+      MANAGER_PASSWORD: ${MANAGER_PASSWORD}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://qadrigadgets.pk}
+    volumes:
+      - backup_data:/app/backups
+      - ./db.json:/app/db.json
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3001/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - qadri_network
+
+volumes:
+  pg_data:
+    driver: local
+  backup_data:
+    driver: local
+
+networks:
+  qadri_network:
+    driver: bridge

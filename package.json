@@ -1,0 +1,41 @@
+{
+  "name": "gadget-store",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n API,WEB -c green,cyan \"npm:api\" \"npm:web\"",
+    "web": "vite",
+    "api": "node server.js",
+    "build": "vite build",
+    "preview": "vite preview",
+    "migrate": "node migrate.js",
+    "backup": "node backup.js",
+    "restore": "node restore.js",
+    "pg:backup": "node pg-backup.js",
+    "pg:restore": "node pg-restore.js",
+    "test:integrity": "node tests/order-integrity.test.js",
+    "test:auth": "node tests/auth-migration.test.js",
+    "test:backup": "node tests/backup-restore.test.js",
+    "test:builder": "node tests/homepage-builder.test.js",
+    "test:lens": "node tests/mobile-lens-zoom.test.js",
+    "test:variants": "node tests/product-variants.test.js",
+    "test:all": "node tests/order-integrity.test.js && node tests/auth-migration.test.js && node tests/backup-restore.test.js && node tests/homepage-builder.test.js && node tests/mobile-lens-zoom.test.js && node tests/product-variants.test.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.2",
+    "json-server": "^0.17.4",
+    "pg": "^8.23.1",
+    "pg-mem": "^3.0.14",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router": "^8.5.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
+    "concurrently": "^10.0.6",
+    "vite": "^8.3.5"
+  }
+}

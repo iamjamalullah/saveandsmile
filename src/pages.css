@@ -674,11 +674,15 @@
     overflow: hidden !important;
   }
   .qg-hero-track {
-    border-radius: 12px !important;
-    overflow: hidden !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
     width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    border-radius: 12px !important;
+    overflow: visible !important;
+    will-change: transform;
+    transition: transform .65s cubic-bezier(.25, 1, .5, 1);
   }
   .qg-hero-slide {
     width: 100% !important;
@@ -694,7 +698,7 @@
     aspect-ratio: 1920 / 673 !important;
     object-fit: cover !important;
     width: 100% !important;
-    height: auto !important;
+    height: clamp(130px, 35vw, 440px) !important;
     display: block !important;
     border-radius: 12px !important;
   }

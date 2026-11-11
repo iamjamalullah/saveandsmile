@@ -111,11 +111,6 @@ export default function Footer() {
               </svg>
             </span>
           </div>
-          <div className="qg-foot-bottom-links">
-            <Link to="/manager">MANAGER CONSOLE</Link>
-            <Link to="/admin">ADMIN CONSOLE</Link>
-            <a href={`https://wa.me/${BRAND.whatsapp}`} target="_blank" rel="noreferrer">WHATSAPP</a>
-          </div>
         </div>
       </section>
     </footer>

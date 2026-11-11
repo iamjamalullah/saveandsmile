@@ -9,7 +9,7 @@ const NAV = [
   { label: 'Home', to: '/' },
   { label: 'All Products', to: '/shop' },
   { label: 'Product Categories', to: '/shop', mega: true },
-  { label: 'Wholesale & Bulk Buying', to: '/bulk-order' },
+  { label: 'Wholesale & Bulk Buying', to: '/bulk-order', pill: true },
   { label: 'Reviews', to: '/reviews' },
   { label: 'Contact Us', to: '/contact' },
 ]
@@ -94,7 +94,12 @@ export default function Header({ user, onLogout }) {
           <div className="qh-row">
             <div className="qh-left">
               <button className="qh-menu-btn" type="button" aria-label="Open menu" onClick={() => setMenuOpen(true)}>
-                <img src={BRAND.menuIcon} width="28" height="28" alt="" />
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <circle cx="6" cy="6" r="2.8" />
+                  <circle cx="18" cy="6" r="2.8" />
+                  <circle cx="6" cy="18" r="2.8" />
+                  <circle cx="18" cy="18" r="2.8" />
+                </svg>
               </button>
               <Link to="/" className="qh-logo" aria-label={BRAND.name}>
                 <img
@@ -158,7 +163,7 @@ export default function Header({ user, onLogout }) {
                   </li>
                 ) : (
                   <li key={l.label}>
-                    <Link to={l.to} className="qh-link">{l.label}</Link>
+                    <Link to={l.to} className={`qh-link ${l.pill ? 'qh-link-pill' : ''}`}>{l.label}</Link>
                   </li>
                 ))}
               </ul>

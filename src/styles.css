@@ -606,12 +606,13 @@ img { max-width: 100%; }
 }
 .qg-card-curprice {
   color: #007385;
-  font-size: 17px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 500;
   letter-spacing: -0.01em;
 }
 .qg-card-curprice b {
-  font-weight: 800;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 /* Card Action Row 1: Add + Buy Now + WhatsApp */
@@ -690,8 +691,8 @@ img { max-width: 100%; }
   background: #70b32d;
   color: #ffffff;
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12.5px;
+  font-weight: 500;
   letter-spacing: 0.15px;
   display: flex;
   align-items: center;
@@ -1418,10 +1419,12 @@ img { max-width: 100%; }
     gap: 3px;
   }
   .qg-card-curprice {
-    font-size: 11px;
+    font-size: 9.5px !important;
+    font-weight: 500 !important;
   }
   .qg-card-curprice b {
-    font-size: 12.5px;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
   }
   .qg-card-oldprice {
     font-size: 9.5px;
@@ -1492,11 +1495,11 @@ img { max-width: 100%; }
   .qg-card-btn-buy {
     flex: 1 1 auto !important;
     height: 30px !important;
-    font-size: 12px !important;
+    font-size: 11.5px !important;
     letter-spacing: 0.15px !important;
     line-height: 1 !important;
     font-family: 'Poppins', sans-serif !important;
-    font-weight: 700 !important;
+    font-weight: 500 !important;
     padding-inline: 8px !important;
     white-space: nowrap !important;
     border-radius: 7px !important;

@@ -233,16 +233,8 @@
 .qg-cat-headrow p { margin: 0 0 4px; color: #7d9088; font-size: 12px; }
 .qg-cat-wrap::before,
 .qg-cat-wrap::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 10px;
-  width: 46px;
-  z-index: 2;
-  pointer-events: none;
+  display: none !important;
 }
-.qg-cat-wrap::before { left: 24px; background: linear-gradient(90deg, #fff, transparent); }
-.qg-cat-wrap::after { right: 24px; background: linear-gradient(-90deg, #fff, transparent); }
 .qg-cat-rail { scroll-snap-type: none; }
 .qg-cat {
   flex: 0 0 auto;
@@ -286,14 +278,16 @@
 .qg-cat span {
   text-align: center;
   line-height: 1.25;
-  font-size: 14.5px;
-  font-weight: 700;
-  color: #111827;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #1e293b !important;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   max-width: 130px;
+  transition: color .2s ease;
 }
 @media (max-width: 767px) {
   .qg-cat-circle-wrap {

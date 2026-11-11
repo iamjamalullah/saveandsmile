@@ -212,8 +212,12 @@ export default function Header({ user, onLogout }) {
                 )}
               </div>
 
-              <button className="qh-icon" type="button" aria-label="Cart" onClick={() => setCartOpen(true)}>
-                <img src={HEADER_ICONS.cart} width="24" height="24" alt="" />
+              <button className="qh-icon qh-cart-btn" type="button" aria-label="Cart" onClick={() => setCartOpen(true)}>
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="9" cy="21" r="1.5" />
+                  <circle cx="20" cy="21" r="1.5" />
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg>
                 <Count n={count} />
               </button>
             </div>

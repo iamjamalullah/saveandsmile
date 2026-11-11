@@ -91,55 +91,73 @@
 
 .qh-nav { flex: 1 1 0%; min-width: 0; display: flex; align-items: stretch; justify-content: center; }
 .qh-nav ul {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  padding: 4px 8px;
-  border-radius: 99px;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  padding: 4px 6px;
+  border-radius: 999px;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   margin: 0;
   list-style: none;
 }
 .qh-nav li { display: inline-flex; align-items: center; flex: 0 0 auto; white-space: nowrap; }
+
+/* Enforce pure white text for all nav links and states so Home & All Products never turn black! */
+.qh-nav a,
+.qh-nav a:visited,
+.qh-nav a:hover,
+.qh-nav a:focus,
+.qh-nav a:active,
+.qh-nav button,
+.qh-link,
+.qh-link:visited,
+.qh-link:hover,
+.qh-link:focus,
+.qh-link:active {
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
+
 .qh-link {
   position: relative;
   z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #fff;
+  color: #ffffff !important;
   font-size: 13.5px;
   font-weight: 500;
   font-family: 'Poppins', sans-serif;
   letter-spacing: 0.2px;
-  line-height: 1.2;
-  text-decoration: none;
+  line-height: 1;
+  text-decoration: none !important;
   white-space: nowrap;
-  padding: 6px 14px;
-  border-radius: 99px;
+  padding: 8px 15px;
+  border-radius: 999px;
   transition: all 0.2s ease;
 }
-.qh-link:hover {
-  color: #fff !important;
-  background: rgba(255, 255, 255, 0.22);
+.qh-link:hover,
+.qh-link:focus-visible {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.24);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 .qh-link-pill {
-  background: linear-gradient(135deg, #74b726 0%, #5e9d18 100%) !important;
+  background: #70b32d !important;
   color: #ffffff !important;
   font-weight: 600 !important;
-  box-shadow: 0 3px 10px rgba(116, 183, 38, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(112, 179, 45, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 .qh-link-pill:hover {
-  background: linear-gradient(135deg, #65a31e 0%, #528b14 100%) !important;
-  transform: translateY(-1px) scale(1.02);
+  background: #629e26 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
 }
 .qh-pcat-toggle { background: none; border: 0; cursor: pointer; font-family: inherit; }
 .qh-chev { width: 11px; height: 11px; flex-shrink: 0; transition: transform .22s ease; }
@@ -243,14 +261,32 @@
   transform: translateY(-1px);
 }
 .qh-icon img { display: block; width: 20px; height: 20px; object-fit: contain; }
+.qh-cart-btn {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.48) !important;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15) !important;
+  color: #ffffff !important;
+  width: 40px !important;
+  height: 40px !important;
+}
+.qh-cart-btn:hover {
+  background: rgba(255, 255, 255, 0.34) !important;
+  border-color: rgba(255, 255, 255, 0.7) !important;
+  transform: translateY(-2px) scale(1.04) !important;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.2) !important;
+}
+.qh-cart-btn svg {
+  display: block;
+  stroke: #ffffff;
+}
 .qh-count {
   position: absolute;
-  top: -5px; right: -6px;
-  min-width: 17px; height: 17px;
+  top: -4px; right: -5px;
+  min-width: 18px; height: 18px;
   padding: 0 4px;
   border-radius: 999px;
-  background: #049977;
-  border: 1px solid rgba(255,255,255,.55);
+  background: #f43f5e;
+  border: 1.5px solid #ffffff;
   color: #fff;
   font-size: 10px;
   font-weight: 700;
@@ -258,6 +294,7 @@
   align-items: center;
   justify-content: center;
   line-height: 1;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
 }
 
 .qh-account { position: relative; }
@@ -534,6 +571,11 @@
     padding: 0 !important;
   }
   .qh-icon img { width: 18px !important; height: 18px !important; }
+  .qh-cart-btn {
+    background: rgba(255, 255, 255, 0.22) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
+  }
+  .qh-cart-btn svg { width: 18px !important; height: 18px !important; stroke: #ffffff !important; }
   .qh-search-pop { top: 112px; border-radius: 18px; padding: 5px; }
   .qh-search-form { padding-left: 12px; }
   .qh-suggest { border-radius: 16px; }

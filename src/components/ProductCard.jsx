@@ -65,21 +65,25 @@ export default function ProductCard({ product }) {
             </svg>
           </button>
         </div>
+      </div>
 
-        {/* Actions Overlay: Add to Cart + Buy Now + WhatsApp (Overlaid on bottom of image, just above title) */}
-        <div className="qg-card-row1" onClick={(e) => e.stopPropagation()}>
+      <div className="qg-card-body">
+        <Link className="qg-card-title" to={productPath(product)}>{product.name}</Link>
+        <div className="qg-card-price-row">
+          {off > 0 && <span className="qg-card-oldprice">Rs. {product.oldPrice.toLocaleString()}</span>}
+          <span className="qg-card-curprice">RS. <b>{product.price.toLocaleString()}</b></span>
+        </div>
+
+        {/* Actions: Add to Cart (Trolley) + Buy Now + Direct WhatsApp */}
+        <div className="qg-card-row1">
           <button
             type="button"
             className="qg-card-btn-add"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              add(product)
-            }}
+            onClick={() => add(product)}
             title="Add to cart"
             aria-label="Add to cart"
           >
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="9" cy="21" r="1" />
               <circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
@@ -89,9 +93,7 @@ export default function ProductCard({ product }) {
           <button
             type="button"
             className="qg-card-btn-buy"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
+            onClick={() => {
               buyNow(product, 1)
               navigate('/checkout')
             }}
@@ -104,7 +106,6 @@ export default function ProductCard({ product }) {
             href={`https://wa.me/${BRAND.whatsapp}?text=${whatsappMessage}`}
             target="_blank"
             rel="noreferrer"
-            onClick={(e) => e.stopPropagation()}
             title="Order on WhatsApp"
             aria-label="Order on WhatsApp"
           >
@@ -112,14 +113,6 @@ export default function ProductCard({ product }) {
               <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm0 18.16c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.164 8.164 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c.01 4.54-3.68 8.23-8.22 8.23zm4.52-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.44.06-.66.31-.23.25-.88.86-.88 2.1 0 1.23.9 2.43 1.02 2.6.12.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.61.19 1.16.16 1.6.1.49-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.17-.48-.29z" />
             </svg>
           </a>
-        </div>
-      </div>
-
-      <div className="qg-card-body">
-        <Link className="qg-card-title" to={productPath(product)}>{product.name}</Link>
-        <div className="qg-card-price-row">
-          {off > 0 && <span className="qg-card-oldprice">Rs. {product.oldPrice.toLocaleString()}</span>}
-          <span className="qg-card-curprice">RS. <b>{product.price.toLocaleString()}</b></span>
         </div>
       </div>
     </article>

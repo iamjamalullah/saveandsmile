@@ -1248,7 +1248,7 @@ img { max-width: 100%; }
   .qg-header-left { flex: 1; }
   .qg-actions { flex: none; }
   .qg-logo img { height: 50px; }
-  .qg-hero-slide img { aspect-ratio: 16 / 9; }
+  .qg-hero-slide img { aspect-ratio: 1920 / 673; object-fit: contain; }
   .qg-cat-title { font-size: 26px; }
   .qg-cat img { width: 102px; height: 102px; }
   .qg-cat { width: 118px; }
@@ -1282,10 +1282,10 @@ img { max-width: 100%; }
   .qg-icon-btn { width: 34px; height: 34px; }
   .qg-icon-btn img { width: 18px; height: 18px; }
   .qg-actions { gap: 0; }
-  .qg-hero { padding-inline: 10px; margin-top: 8px; border-radius: 12px; }
+  .qg-hero { padding-inline: 8px; margin-top: 6px; border-radius: 12px; }
   .qg-hero-track { border-radius: 12px; }
   .qg-hero-slide { border-radius: 12px; }
-  .qg-hero-slide img { aspect-ratio: 16 / 8; border-radius: 12px; }
+  .qg-hero-slide img { aspect-ratio: 1920 / 673; object-fit: contain; width: 100%; height: auto; border-radius: 12px; }
   .qg-hero-arrow { display: none; }
   /* Shop By Category mobile enhancements: compact circles with minor gap */
   .qg-categories { padding: 14px 0 2px; }

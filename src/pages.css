@@ -595,7 +595,7 @@
 .qcheckout-steps span.on { color: #17352a; }
 .qcheckout-steps i { flex: 1; height: 1px; background: #e4e4e4; max-width: 90px; }
 .qcheckout-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 26px; align-items: start; }
-.qcheckout-form { border: 1px solid #ececec; border-radius: 10px; padding: 22px; }
+.qcheckout-form { border: 1px solid #ececec; border-radius: 10px; padding: 22px; box-sizing: border-box; }
 .qcheckout-form h2 { font-size: 17px; font-weight: 600; margin-bottom: 14px; }
 .qcheckout-h2 { margin-top: 22px !important; }
 .qcheckout-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -603,15 +603,16 @@
 .qcheckout-form input, .qcheckout-form select, .qcheckout-form textarea {
   width: 100%; margin-top: 5px; border: 1px solid #e2e2e2; border-radius: 6px;
   padding: 10px 11px; font-size: 12.5px; outline: none;
+  box-sizing: border-box;
 }
 .qcheckout-form input:focus, .qcheckout-form select:focus, .qcheckout-form textarea:focus { border-color: #049977; }
-.qcheckout-pay { display: flex !important; align-items: flex-start; gap: 10px; border: 1px solid #dcece5; background: #f8fcfa; border-radius: 8px; padding: 12px; }
+.qcheckout-pay { display: flex !important; align-items: flex-start; gap: 10px; border: 1px solid #dcece5; background: #f8fcfa; border-radius: 8px; padding: 12px; box-sizing: border-box; }
 .qcheckout-pay input { width: auto; margin: 2px 0 0; }
 .qcheckout-pay b { display: block; font-size: 12.5px; color: #17352a; }
 .qcheckout-pay small { font-size: 11px; color: #8a8a8a; }
 .qcheckout-note { font-size: 10.5px; color: #9a9a9a; margin-top: 14px; }
 .qcheckout-note a { color: #049977; }
-.qcheckout-summary { border: 1px solid #ececec; border-radius: 10px; padding: 22px; background: #fbfcfb; position: sticky; top: 100px; }
+.qcheckout-summary { border: 1px solid #ececec; border-radius: 10px; padding: 22px; background: #fbfcfb; position: sticky; top: 100px; box-sizing: border-box; }
 .qcheckout-summary h2 { font-size: 16px; font-weight: 600; margin-bottom: 14px; }
 .qcheckout-sum-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
 .qcheckout-sum-row img { width: 46px; height: 46px; object-fit: cover; border-radius: 6px; }
@@ -663,7 +664,13 @@
   .qauth-card { padding: 22px 26px; }
 }
 @media (max-width: 767px) {
-  .qg-hero-slide img { aspect-ratio: 16 / 8 !important; object-fit: cover !important; border-radius: 12px; }
+  .qg-hero-slide img {
+    aspect-ratio: 1920 / 673 !important;
+    object-fit: contain !important;
+    width: 100% !important;
+    height: auto !important;
+    border-radius: 12px !important;
+  }
   .qcat-price-inputs label { height: 32px; border-color: #cfcfcf; }
   .qcat-price-inputs input { font-size: 12.5px; }
   .qcat-grid, .qcat-grid.cols-3, .qcat-grid.cols-4 { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
@@ -719,6 +726,125 @@
   .qaccount-cards { grid-template-columns: 1fr 1fr; }
   .qaccount-details { grid-template-columns: 1fr; }
   .qcheckout-done-actions { flex-direction: column; }
+  /* Checkout Mobile View Fixes - Prevent Cut-off & Overflow */
+  .qcheckout {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    padding-bottom: 50px !important;
+  }
+  .qcheckout .qg-container {
+    padding-inline: 12px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .qcheckout-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .qcheckout-form,
+  .qcheckout-summary {
+    padding: 14px 12px !important;
+    border-radius: 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+  }
+  .qcheckout-steps {
+    margin: 12px 0 16px !important;
+    font-size: 11px !important;
+    gap: 4px !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .qcheckout-steps span {
+    gap: 4px !important;
+    font-size: 11px !important;
+    white-space: nowrap !important;
+  }
+  .qcheckout-steps span em {
+    font-size: 10px !important;
+  }
+  .qcheckout-steps i {
+    min-width: 8px !important;
+    max-width: 32px !important;
+    flex: 1 1 auto !important;
+  }
+  .qcheckout-row {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .qcheckout-form label {
+    font-size: 11px !important;
+    margin-bottom: 10px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+  .qcheckout-form input,
+  .qcheckout-form select,
+  .qcheckout-form textarea {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+    font-size: 13px !important;
+    padding: 9px 10px !important;
+  }
+  .qcheckout-choice {
+    padding: 9px 10px !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .qcheckout-choice b {
+    font-size: 12px !important;
+  }
+  .qcheckout-choice small {
+    font-size: 10.5px !important;
+    word-break: break-word !important;
+  }
+  .qcheckout-sum-row {
+    gap: 8px !important;
+    padding: 7px 0 !important;
+    box-sizing: border-box !important;
+  }
+  .qcheckout-sum-row img {
+    width: 42px !important;
+    height: 42px !important;
+    flex-shrink: 0 !important;
+  }
+  .qcheckout-sum-row div {
+    min-width: 0 !important;
+  }
+  .qcheckout-sum-row b {
+    font-size: 11.5px !important;
+  }
+  .qcheckout-coupon-row {
+    gap: 6px !important;
+    box-sizing: border-box !important;
+  }
+  .qcheckout-coupon-row input {
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    padding: 8px 10px !important;
+    font-size: 12px !important;
+  }
+  .qcheckout-coupon-row button {
+    flex-shrink: 0 !important;
+    padding: 0 14px !important;
+    font-size: 12px !important;
+  }
+  .qcheckout-done {
+    padding: 20px 14px !important;
+    margin: 12px auto 24px !important;
+  }
+  .qcheckout-done h1 {
+    font-size: 18px !important;
+  }
   .qg-btn { padding: 9px 14px; }
   .qpdp-glass-lens,
   .qpdp-zoom-hint {

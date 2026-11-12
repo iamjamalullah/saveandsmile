@@ -1877,3 +1877,21 @@ img { max-width: 100%; }
   .qg-announcement-subheading { font-size: 13px; margin-bottom: 14px; }
   .qg-announcement-btn { font-size: 13px; padding: 8px 20px; }
 }
+
+/* ==========================================================================
+   PART 2: Global Poppins Typography Enforcement for All Headings & Bold Text
+   ========================================================================== */
+h1, h2, h3, h4, h5, h6,
+b, strong,
+.qg-sec-title, .qg-cat-title, .qg-prod-title, .qg-card-title,
+.qh-nav a, .qh-link, .qh-pcat-toggle, .qh-pcat-head b, .qh-pcat-name,
+.qg-tile-info b, .qg-buy-btn, .qg-badge, .qg-price, .qg-price b,
+.qrev-title, .qrev-author, .qrev-score, .qrev-score b, .qrev-stat-num, .qrev-stat-label,
+.qg-reviews-head h2, .qg-trust-item b, .qg-trust-item p,
+.qg-footer-col h4, .qpdp-price, .qpdp-price b, .qpdp-title,
+.qpdp-rev-score b, .qpdp-rev-title h2, .qpdp-review-form-box h3, .qpdp-feed-title,
+.qpdp-rev-head b, .qpdp-rev-body b, .qpdp-btn-submit-review,
+.qrev-card-head b, .qrev-card-body b, .qrev-bars h2, .qrev-rating-label,
+.qh-pcat-foot a, .qg-pill, .qg-announcement-heading, .qg-announcement-btn {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}

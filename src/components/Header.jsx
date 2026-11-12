@@ -32,6 +32,7 @@ export default function Header({ user, onLogout }) {
   const [sticky, setSticky] = useState(false)
   const searchRef = useRef(null)
   const accountRef = useRef(null)
+  const megaRef = useRef(null)
 
   useEffect(() => {
     if (!searchOpen) return
@@ -42,9 +43,21 @@ export default function Header({ user, onLogout }) {
   useEffect(() => {
     const onDoc = e => {
       if (accountRef.current && !accountRef.current.contains(e.target)) setAccountOpen(false)
+      if (megaRef.current && !megaRef.current.contains(e.target)) setMega(false)
+    }
+    const onKeyDown = e => {
+      if (e.key === 'Escape') {
+        setMega(false)
+        setAccountOpen(false)
+        setSearchOpen(false)
+      }
     }
     document.addEventListener('mousedown', onDoc)
-    return () => document.removeEventListener('mousedown', onDoc)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', onDoc)
+      document.removeEventListener('keydown', onKeyDown)
+    }
   }, [])
 
   useEffect(() => {
@@ -115,6 +128,7 @@ export default function Header({ user, onLogout }) {
                 {NAV.map(l => l.mega ? (
                   <li
                     key={l.label}
+                    ref={megaRef}
                     className={`qh-pcat ${mega ? 'is-open' : ''}`}
                     onMouseEnter={() => setMega(true)}
                     onMouseLeave={() => setMega(false)}
@@ -125,6 +139,12 @@ export default function Header({ user, onLogout }) {
                       aria-haspopup="true"
                       aria-expanded={mega}
                       onClick={() => setMega(v => !v)}
+                      onKeyDown={e => {
+                        if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          setMega(true)
+                        }
+                      }}
                     >
                       {l.label}
                       <svg className="qh-chev" viewBox="0 0 24 24" aria-hidden="true">
@@ -135,7 +155,7 @@ export default function Header({ user, onLogout }) {
                       className="qh-pcat-menu"
                       style={mega ? { opacity: 1, visibility: 'visible', pointerEvents: 'auto', transform: 'translateY(0)' } : undefined}
                     >
-                      <div className="qh-pcat-panel">
+                      <div className="qh-pcat-panel" role="region" aria-label="Product Categories Mega Menu">
                         <div className="qh-pcat-head">
                           <div>
                             <b>Shop by category</b>
@@ -147,16 +167,29 @@ export default function Header({ user, onLogout }) {
                           {categories.map(c => (
                             <li className="qh-pcat-item" key={c.slug}>
                               <Link className="qh-pcat-link" to={`/category/${c.slug}`} onClick={() => setMega(false)}>
-                                <img src={c.image} alt="" loading="lazy" />
-                                <span>{c.name}</span>
-                                <i aria-hidden="true">›</i>
+                                <span className="qh-pcat-icon">
+                                  <img
+                                    src={c.image}
+                                    alt=""
+                                    loading="lazy"
+                                    onError={e => { e.currentTarget.style.display = 'none' }}
+                                  />
+                                </span>
+                                <span className="qh-pcat-name">{c.name}</span>
+                                <i className="qh-pcat-arrow" aria-hidden="true">›</i>
                               </Link>
                             </li>
                           ))}
                         </ul>
                         <div className="qh-pcat-foot">
-                          <Link to="/bulk-order" onClick={() => setMega(false)}><span>📦</span> Wholesale &amp; bulk buying</Link>
-                          <Link to="/shop" onClick={() => setMega(false)}><span>🏷️</span> Best wholesale prices</Link>
+                          <Link to="/bulk-order" onClick={() => setMega(false)}>
+                            <span className="qh-pcat-foot-icon" aria-hidden="true">📦</span>
+                            <span>Wholesale &amp; Bulk Buying</span>
+                          </Link>
+                          <Link to="/shop" onClick={() => setMega(false)}>
+                            <span className="qh-pcat-foot-icon" aria-hidden="true">🏷️</span>
+                            <span>Best Wholesale Prices</span>
+                          </Link>
                         </div>
                       </div>
                     </div>

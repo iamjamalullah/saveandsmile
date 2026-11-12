@@ -684,12 +684,12 @@ img { max-width: 100%; }
   }
 }
 .qg-card-btn-add {
-  width: 32px;
-  min-width: 32px;
-  height: 32px;
-  flex: 0 0 32px;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
   border: 1.5px solid #007385;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #ffffff;
   color: #007385;
   display: flex;
@@ -700,8 +700,8 @@ img { max-width: 100%; }
   padding: 0;
 }
 .qg-card-btn-add svg {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   stroke: #007385;
 }
 .qg-card-btn-add:hover {
@@ -714,14 +714,14 @@ img { max-width: 100%; }
 .qg-card-btn-buy {
   flex: 1 1 auto;
   min-width: 0;
-  height: 32px;
+  height: 28px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #70b32d;
   color: #ffffff;
-  font-family: 'Poppins', sans-serif;
-  font-size: 12.5px;
-  font-weight: 500;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 12px;
+  font-weight: 500 !important;
   letter-spacing: 0.15px;
   display: flex;
   align-items: center;
@@ -740,12 +740,12 @@ img { max-width: 100%; }
   transform: scale(0.98);
 }
 .qg-card-btn-wa {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  flex: 0 0 32px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  flex: 0 0 28px;
   border: 1.5px solid #25d366;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #ffffff;
   color: #25d366;
   display: flex;
@@ -757,8 +757,8 @@ img { max-width: 100%; }
   padding: 0;
 }
 .qg-card-btn-wa svg {
-  width: 17px;
-  height: 17px;
+  width: 16px;
+  height: 16px;
   fill: #25d366;
 }
 .qg-card-btn-wa:hover {
@@ -1416,10 +1416,14 @@ img { max-width: 100%; }
   .qg-cat { width: 66px !important; gap: 4px !important; padding: 2px !important; }
   .qg-cat-circle-wrap {
     width: 60px !important; height: 60px !important; min-width: 60px !important; min-height: 60px !important;
-    padding: 6px !important; border: 1.5px solid #e2e8f0 !important; border-radius: 50% !important;
-    background: #ffffff !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    padding: 0 !important; border: 1px solid #70b32d !important; border-radius: 50% !important;
+    background: #ffffff !important; box-shadow: none !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
-  .qg-cat img { width: 100% !important; height: 100% !important; border-radius: 0 !important; object-fit: contain !important; }
+  .qg-cat img { width: 100% !important; height: 100% !important; border-radius: 50% !important; object-fit: cover !important; }
   .qg-cat span { font-family: 'Poppins', sans-serif !important; font-size: 10.5px !important; min-height: 24px !important; line-height: 1.15 !important; margin-top: 3px; max-width: 66px !important; font-weight: 500 !important; color: #1e293b !important; }
   .qg-cat-arrow { display: none !important; }
 
@@ -1578,35 +1582,35 @@ img { max-width: 100%; }
     display: none !important;
   }
   .qg-card-btn-add {
-    width: 30px !important;
-    min-width: 30px !important;
-    height: 30px !important;
+    width: 26px !important;
+    min-width: 26px !important;
+    height: 26px !important;
     padding: 0 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border-radius: 7px !important;
-    flex: 0 0 30px !important;
+    border-radius: 6px !important;
+    flex: 0 0 26px !important;
     border: 1.5px solid #007385 !important;
     background: #ffffff !important;
     color: #007385 !important;
   }
   .qg-card-btn-add svg {
-    width: 15px !important;
-    height: 15px !important;
+    width: 14px !important;
+    height: 14px !important;
     stroke: #007385 !important;
   }
   .qg-card-btn-buy {
     flex: 1 1 auto !important;
-    height: 30px !important;
-    font-size: 11.5px !important;
+    height: 26px !important;
+    font-size: 11px !important;
     letter-spacing: 0.15px !important;
     line-height: 1 !important;
     font-family: 'Poppins', sans-serif !important;
     font-weight: 500 !important;
-    padding-inline: 8px !important;
+    padding-inline: 6px !important;
     white-space: nowrap !important;
-    border-radius: 7px !important;
+    border-radius: 6px !important;
     border: none !important;
     background: #70b32d !important;
     color: #ffffff !important;
@@ -1616,11 +1620,11 @@ img { max-width: 100%; }
     box-shadow: 0 2px 6px rgba(112, 179, 45, 0.22) !important;
   }
   .qg-card-btn-wa {
-    width: 30px !important;
-    min-width: 30px !important;
-    height: 30px !important;
-    border-radius: 7px !important;
-    flex: 0 0 30px !important;
+    width: 26px !important;
+    min-width: 26px !important;
+    height: 26px !important;
+    border-radius: 6px !important;
+    flex: 0 0 26px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -1630,8 +1634,8 @@ img { max-width: 100%; }
     padding: 0 !important;
   }
   .qg-card-btn-wa svg {
-    width: 16px !important;
-    height: 16px !important;
+    width: 15px !important;
+    height: 15px !important;
     fill: #25d366 !important;
   }
   .qg-card-btn-wholesale {

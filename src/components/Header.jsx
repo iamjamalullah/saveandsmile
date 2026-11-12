@@ -26,7 +26,6 @@ export default function Header({ user, onLogout }) {
   const [q, setQ] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [tab, setTab] = useState('categories')
   const [mega, setMega] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
   const [sticky, setSticky] = useState(false)
@@ -139,7 +138,14 @@ export default function Header({ user, onLogout }) {
                 <img
                   src={BRAND.logo}
                   alt={BRAND.name}
-                  style={{ maxHeight: '46px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
+                  className="qh-logo-desk"
+                  style={{ maxHeight: '46px', width: 'auto', objectFit: 'contain' }}
+                />
+                <img
+                  src={BRAND.logoWhite || '/logo-white.png'}
+                  alt={BRAND.name}
+                  className="qh-logo-mob"
+                  style={{ maxHeight: '38px', width: 'auto', objectFit: 'contain' }}
                 />
               </Link>
             </div>
@@ -151,8 +157,6 @@ export default function Header({ user, onLogout }) {
                     key={l.label}
                     ref={megaRef}
                     className={`qh-pcat ${mega ? 'is-open' : ''}`}
-                    onMouseEnter={() => setMega(true)}
-                    onMouseLeave={() => setMega(false)}
                   >
                     <button
                       type="button"
@@ -333,7 +337,11 @@ export default function Header({ user, onLogout }) {
         <div className="qh-drawer-wrap" onClick={() => setMenuOpen(false)}>
           <aside className="qh-side" onClick={e => e.stopPropagation()}>
             <div className="qh-side-head">
-              <img src={BRAND.logo} alt={BRAND.name} />
+              <img
+                src={BRAND.logoWhite || '/logo-white.png'}
+                alt={BRAND.name}
+                style={{ maxHeight: '38px', width: 'auto', objectFit: 'contain' }}
+              />
               <button className="qh-side-close" onClick={() => setMenuOpen(false)} aria-label="Close menu">✕</button>
             </div>
             <div className="qh-side-auth">
@@ -346,39 +354,67 @@ export default function Header({ user, onLogout }) {
                 </>
               )}
             </div>
-            <div className="qh-side-tabs" role="tablist">
-              <button role="tab" aria-selected={tab === 'categories'} className={tab === 'categories' ? 'on' : ''} onClick={() => setTab('categories')}>CATEGORIES</button>
-              <button role="tab" aria-selected={tab === 'menu'} className={tab === 'menu' ? 'on' : ''} onClick={() => setTab('menu')}>MENU</button>
-            </div>
+
             <div className="qh-side-body">
-              {tab === 'categories' ? (
-                categories.map(c => (
-                  <Link key={c.slug} className="qh-side-cat" to={`/category/${c.slug}`} onClick={() => setMenuOpen(false)}>
-                    <img src={c.image} alt="" />
-                    <span>{c.name}</span>
-                    <b>›</b>
+              {/* FIRST – Main Navigation */}
+              <div className="qh-side-section">
+                <p className="qh-side-section-title">Navigation</p>
+                <div className="qh-side-main-links">
+                  <Link to="/" onClick={() => setMenuOpen(false)}>
+                    <span>🏠</span> Home
                   </Link>
-                ))
-              ) : (
-                <div className="qh-side-links">
-                  <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
-                  <Link to="/shop" onClick={() => setMenuOpen(false)}>All Products</Link>
-                  <Link to="/about-us" onClick={() => setMenuOpen(false)}>About Us</Link>
-                  <Link to="/reviews" onClick={() => setMenuOpen(false)}>Reviews</Link>
-                  <Link to="/contact" onClick={() => setMenuOpen(false)}>Contact Us</Link>
-                  <Link to="/bulk-order" onClick={() => setMenuOpen(false)}>Wholesale &amp; Bulk Buying</Link>
-                  <Link to="/wishlist" onClick={() => setMenuOpen(false)}>My Wishlist</Link>
-                  <Link to="/account?tab=orders" onClick={() => setMenuOpen(false)}>Track Order</Link>
-                  <div className="qh-side-price">
-                    <p>Shop by price</p>
-                    <div>
-                      {[500, 1000, 2000, 5000].map(v => (
-                        <Link key={v} to={`/shop?max=${v}`} onClick={() => setMenuOpen(false)}>Under {v}</Link>
-                      ))}
-                    </div>
+                  <Link to="/shop" onClick={() => setMenuOpen(false)}>
+                    <span>🛍️</span> All Products
+                  </Link>
+                  <Link to="/bulk-order" onClick={() => setMenuOpen(false)}>
+                    <span>📦</span> Wholesale &amp; Bulk Buying
+                  </Link>
+                  <Link to="/reviews" onClick={() => setMenuOpen(false)}>
+                    <span>⭐</span> Reviews
+                  </Link>
+                  <Link to="/contact" onClick={() => setMenuOpen(false)}>
+                    <span>📞</span> Contact Us
+                  </Link>
+                </div>
+              </div>
+
+              {/* SECOND – Product Categories */}
+              <div className="qh-side-section qh-side-cat-section">
+                <div className="qh-side-cat-head">
+                  <span>Product Categories</span>
+                  <small>{categories.length} wholesale departments</small>
+                </div>
+                <div className="qh-side-cats-list">
+                  {categories.map(c => (
+                    <Link
+                      key={c.slug}
+                      className="qh-side-cat"
+                      to={`/category/${c.slug}`}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <img src={c.image} alt="" loading="lazy" />
+                      <span>{c.name}</span>
+                      <b>›</b>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* Auxiliary Quick Links & Price Filters */}
+              <div className="qh-side-section qh-side-aux-section">
+                <div className="qh-side-aux-links">
+                  <Link to="/wishlist" onClick={() => setMenuOpen(false)}><span>❤️</span> My Wishlist</Link>
+                  <Link to="/account?tab=orders" onClick={() => setMenuOpen(false)}><span>🚚</span> Track Order</Link>
+                </div>
+                <div className="qh-side-price">
+                  <p>Shop by price</p>
+                  <div>
+                    {[500, 1000, 2000, 5000].map(v => (
+                      <Link key={v} to={`/shop?max=${v}`} onClick={() => setMenuOpen(false)}>Under {v}</Link>
+                    ))}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </aside>
         </div>

@@ -10,6 +10,7 @@ export const BRAND = {
   name: 'Save & Smile',
   tagline: 'Your Trusted Online Shopping Hub',
   logo: '/LOGO001.png',
+  logoWhite: '/logo-white.png',
   logoFooter: '/LOGO001.png',
   menuIcon: `${CDN}/images/category_icon_mob.svg`,
   phone: '0321-8273588',

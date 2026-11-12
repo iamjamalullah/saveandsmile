@@ -49,7 +49,7 @@ async function runTests() {
   // ── TEST 1: Validate Supported Layouts and Block Types ──
   console.log('\n--- TEST 1: CONTAINER LAYOUTS & BLOCK TYPES ---')
   assert.deepStrictEqual(VALID_CONTAINER_LAYOUTS, ['single', 'two_equal', 'two_70_30', 'two_30_70'])
-  assert.deepStrictEqual(VALID_BLOCK_TYPES, ['products', 'banner', 'announcement'])
+  assert.deepStrictEqual(VALID_BLOCK_TYPES, ['products', 'banner', 'announcement', 'image_text', 'countdown', 'trust_bar'])
   console.log('✓ TEST 1 PASSED: Container layout presets and block types verified.')
 
   // ── TEST 2: Single Column Section Creation ──

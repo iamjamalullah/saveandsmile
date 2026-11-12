@@ -975,6 +975,9 @@ const requireAdmin = (req, res, next) => {
 // 1. Get published sections (Storefront) or draft (Admin)
 const handleGetSections = async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+    res.setHeader('Pragma', 'no-cache')
+    res.setHeader('Expires', '0')
     const mode = req.query.mode || 'published'
     if (mode === 'draft') {
       const draft = await getDraftSections(router.db)
@@ -1044,8 +1047,7 @@ const handleRestoreVersion = async (req, res) => {
   }
 }
 
-server.get('/homepage/sections', handleGetSections)
-server.get('/api/homepage/sections', handleGetSections)
+server.get(['/sections', '/api/sections', '/homepage/sections', '/api/homepage/sections'], handleGetSections)
 server.get('/homepage/draft', requireAdmin, (req, res) => { req.query.mode = 'draft'; return handleGetSections(req, res); })
 server.get('/api/homepage/draft', requireAdmin, (req, res) => { req.query.mode = 'draft'; return handleGetSections(req, res); })
 server.post('/homepage/draft', requireAdmin, handleSaveDraft)

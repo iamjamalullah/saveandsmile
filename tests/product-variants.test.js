@@ -352,18 +352,18 @@ async function runVariantsTestSuite() {
   assert(silver256Rejected, 'Unchecked/inactive combination (Silver 256GB) must be rejected by backend')
   console.log('✓ TEST 7 PASSED: Arbitrary dynamic options (Storage) and selective existence enforced.')
 
-  // ── TEST 8: PRODUCT CARD HOVER ACTION BUTTONS CSS VERIFICATION ──
-  console.log('\n--- TEST 8: PRODUCT CARD HOVER ACTION BUTTONS CSS VERIFICATION ---')
+  // ── TEST 8: PRODUCT CARD ACTION BUTTONS VISIBILITY & HOVER STYLES VERIFICATION ──
+  console.log('\n--- TEST 8: PRODUCT CARD ACTION BUTTONS VISIBILITY & HOVER STYLES VERIFICATION ---')
   const fs = await import('fs')
   const stylesCss = fs.readFileSync('src/styles.css', 'utf-8')
-  assert(stylesCss.includes('@media (hover: hover) and (pointer: fine)'), 'Must contain desktop hover media query')
-  assert(stylesCss.includes('.qg-card .qg-card-row1'), 'Must style .qg-card .qg-card-row1')
-  assert(stylesCss.includes('opacity: 0;'), 'Desktop default must have opacity: 0')
-  assert(stylesCss.includes('pointer-events: none;'), 'Desktop default must have pointer-events: none')
-  assert(stylesCss.includes('.qg-card:hover .qg-card-row1'), 'Hover state must reveal buttons')
-  assert(stylesCss.includes('.qg-card:focus-within .qg-card-row1'), 'Keyboard focus-within must reveal buttons')
-  assert(stylesCss.includes('@media (hover: none), (pointer: coarse), (max-width: 768px)'), 'Mobile media query must be present')
-  console.log('✓ TEST 8 PASSED: Product card action buttons hover, keyboard accessibility, and mobile overrides verified in CSS.')
+  assert(stylesCss.includes('.qg-card-row1'), 'Must style .qg-card-row1')
+  assert(stylesCss.includes('opacity: 1;'), 'Must have opacity: 1 for visible action row')
+  assert(stylesCss.includes('pointer-events: auto;'), 'Must have pointer-events: auto for instant clickability')
+  assert(stylesCss.includes('.qg-card-btn-buy'), 'Must style .qg-card-btn-buy')
+  assert(stylesCss.includes('.qg-card-btn-buy:hover'), 'Must have hover state for Buy Now')
+  assert(stylesCss.includes('.qg-card-btn-add'), 'Must style .qg-card-btn-add')
+  assert(stylesCss.includes('.qg-card-btn-wa'), 'Must style .qg-card-btn-wa')
+  console.log('✓ TEST 8 PASSED: Product card action buttons are always visible, accessible, and interactive with hover styles.')
 
   console.log('\n===============================================================')
   console.log('   ALL 8 PRODUCT VARIANTS & HOVER INTEGRATION TESTS PASSED!    ')

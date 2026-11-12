@@ -22,7 +22,7 @@ export const VALID_CONTAINER_LAYOUTS = ['single', 'two_equal', 'two_70_30', 'two
  * - 'banner': Single or dual promotional banner
  * - 'announcement': Rich text / promotional announcement callout
  */
-export const VALID_BLOCK_TYPES = ['products', 'banner', 'announcement']
+export const VALID_BLOCK_TYPES = ['products', 'banner', 'announcement', 'image_text', 'countdown', 'trust_bar']
 
 /**
  * Normalize and sanitize a section object for storage
@@ -37,8 +37,65 @@ export function normalizeSection(s, index = 0) {
     : 'products'
 
   const id = s.id ? String(s.id) : `sec-${Date.now()}-${Math.floor(Math.random() * 1000)}`
-  const title = String(s.title || '').trim() || (blockType === 'banner' ? 'Promotional Banner' : 'Featured Collection')
+  const title = String(s.title || '').trim() || (
+    blockType === 'banner' ? 'Promotional Banner'
+    : blockType === 'image_text' ? 'Featured Story & Showcase'
+    : blockType === 'countdown' ? 'Limited Time Flash Sale'
+    : blockType === 'trust_bar' ? 'Why Shop With Us'
+    : 'Featured Collection'
+  )
   const order = typeof s.order === 'number' ? s.order : index + 1
+
+  const existingContent = s.content || {}
+
+  const defaultContent = {
+    // 1. Banners
+    banners: s.banners || existingContent.banners || (s.banner ? [s.banner] : []),
+    // 2. Announcement Callout
+    announcement: existingContent.announcement || s.announcement || {
+      heading: s.title || '',
+      subheading: s.subtitle || '',
+      buttonText: s.buttonText || 'Shop Now',
+      buttonLink: s.buttonLink || '/shop',
+      bgColor: s.color || '#049977',
+      textColor: '#ffffff',
+      align: 'center',
+    },
+    // 3. Image + Text Section
+    image_text: existingContent.image_text || s.image_text || {
+      image: s.image || existingContent.image || 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+      imageAlt: s.imageAlt || s.title || 'Featured Showcase',
+      heading: s.title || 'Premium Quality Gadgets & Electronics',
+      text: s.text || s.subtitle || 'Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.',
+      buttonText: s.buttonText || 'Explore Catalog',
+      buttonLink: s.buttonLink || '/shop',
+      imagePosition: s.imagePosition || existingContent.imagePosition || 'left', // 'left' | 'right'
+      bgColor: s.bgColor || '#ffffff',
+      textColor: s.textColor || '#1e293b',
+    },
+    // 4. Countdown Promotion Section
+    countdown: existingContent.countdown || s.countdown || {
+      heading: s.title || 'Mega Flash Sale – Limited Hours Only',
+      subheading: s.subtitle || 'Special discounted wholesale rates available until timer expires!',
+      targetDate: s.targetDate || existingContent.targetDate || new Date(Date.now() + 48 * 3600 * 1000).toISOString(),
+      buttonText: s.buttonText || 'Shop Sale Now',
+      buttonLink: s.buttonLink || '/shop?group=hot',
+      bgColor: s.color || '#0f3c28',
+      textColor: '#ffffff',
+    },
+    // 5. Benefits / Trust Bar Section
+    trust_bar: existingContent.trust_bar || s.trust_bar || {
+      heading: s.title || '',
+      items: (existingContent.trust_bar && existingContent.trust_bar.items) || s.items || [
+        { icon: '🚚', title: 'Free Delivery', subtitle: 'On orders over Rs. 3,000' },
+        { icon: '💬', title: '24/7 WhatsApp Help', subtitle: 'Live chat support anytime' },
+        { icon: '🛡️', title: '100% Genuine Items', subtitle: 'Tested & verified products' },
+        { icon: '💵', title: 'Cash on Delivery', subtitle: 'Pay when your parcel arrives' },
+      ],
+      bgColor: s.color || '#f8fafc',
+      textColor: '#1e293b',
+    },
+  }
 
   return {
     id,
@@ -55,19 +112,9 @@ export function normalizeSection(s, index = 0) {
     group: s.group || null,
     viewAll: Boolean(s.viewAll),
     seeMore: Boolean(s.seeMore),
-    content: s.content || {
-      // Default structure for banner blocks
-      banners: s.banners || (s.banner ? [s.banner] : []),
-      // Default structure for announcement blocks
-      announcement: s.announcement || {
-        heading: s.title || '',
-        subheading: s.subtitle || '',
-        buttonText: s.buttonText || 'Shop Now',
-        buttonLink: s.buttonLink || '/shop',
-        bgColor: s.color || '#049977',
-        textColor: '#ffffff',
-        align: 'center',
-      },
+    content: {
+      ...defaultContent,
+      ...existingContent,
     },
     responsiveSettings: s.responsiveSettings || {
       mobileStack: true,

@@ -196,21 +196,45 @@ export default function ProductPage() {
     return matching.some(v => Number(v.stock) > 0)
   }, [product?.variants, selectedOptions])
 
-  // Floating sticky bar only appears when the main Buy Now button is scrolled off screen
+  // Floating sticky bar only appears when scrolled down and main Buy Now button is off screen
   useEffect(() => {
     const el = mainActionsRef.current
-    if (!el || typeof IntersectionObserver === 'undefined') return
+    if (!el) return
 
-    const observer = new IntersectionObserver(
-      entries => {
-        if (!entries || !entries[0]) return
-        setShowStickyBar(!entries[0].isIntersecting)
-      },
-      { threshold: 0 }
-    )
+    let isMainVisible = false
+    let isPastThreshold = typeof window !== 'undefined' ? window.scrollY > 220 : false
 
-    observer.observe(el)
-    return () => observer.disconnect()
+    const updateVisibility = () => {
+      setShowStickyBar(isPastThreshold && !isMainVisible)
+    }
+
+    const handleScroll = () => {
+      const past = window.scrollY > 220
+      if (past !== isPastThreshold) {
+        isPastThreshold = past
+        updateVisibility()
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    let observer
+    if (typeof IntersectionObserver !== 'undefined') {
+      observer = new IntersectionObserver(
+        entries => {
+          if (!entries || !entries[0]) return
+          isMainVisible = entries[0].isIntersecting
+          updateVisibility()
+        },
+        { threshold: 0 }
+      )
+      observer.observe(el)
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      if (observer) observer.disconnect()
+    }
   }, [product])
 
   const media = product ? mediaList(product, selectedColor) : []
@@ -533,11 +557,76 @@ export default function ProductPage() {
 
           {/* ── Info ────────────────────────────────────── */}
           <div className="qpdp-info">
+            {/* ── Dynamic Color Swatches (Positioned directly under thumbnails on mobile via flex order) ── */}
+            {hasVariants && colorOption && colorOption.values?.length > 0 && (
+              <div className="qpdp-color-picker-wrap">
+                <div className="qpdp-color-header">
+                  <span className="qpdp-color-label">
+                    Color: <strong className="qpdp-color-value-green">{selectedColor}</strong>
+                  </span>
+                </div>
+                <div className="qpdp-color-swatches">
+                  {colorOption.values.map(val => {
+                    const cName = typeof val === 'string' ? val : val.name
+                    const rawHex = typeof val === 'object' && val.hex ? val.hex : null
+                    const cHex = rawHex || KNOWN_COLOR_HEX[cName?.toLowerCase()] || '#475569'
+                    const isSelected = selectedColor?.toLowerCase() === cName?.toLowerCase()
+                    const exists = doesCombinationExist(colorOption.name, cName)
+                    const isAvailable = exists && isValAvailable(colorOption.name, cName)
+
+                    return (
+                      <button
+                        key={cName}
+                        type="button"
+                        onClick={() => {
+                          setSelectedOptions(prev => ({ ...prev, [colorOption.name]: cName }))
+                          setMediaIndex(0)
+                        }}
+                        title={!exists ? `${cName} (Unavailable)` : !isAvailable ? `${cName} (Out of Stock)` : cName}
+                        aria-label={`Select color ${cName}`}
+                        className={`qpdp-color-swatch-btn ${isSelected ? 'active' : ''}`}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          backgroundColor: cHex,
+                          border: cHex.toLowerCase() === '#ffffff' || cHex.toLowerCase() === '#fff' ? '1.5px solid #cbd5e1' : '2px solid #ffffff',
+                          outline: 'none',
+                          boxShadow: isSelected
+                            ? '0 0 0 2px #ffffff, 0 0 0 4px #10b981'
+                            : '0 0 0 1px rgba(0,0,0,0.15)',
+                          cursor: exists ? 'pointer' : 'not-allowed',
+                          padding: 0,
+                          opacity: !exists ? 0.35 : !isAvailable ? 0.6 : 1,
+                          transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+                          transform: isSelected ? 'scale(1.08)' : 'scale(1)',
+                          position: 'relative',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        {!exists && (
+                          <span
+                            style={{
+                              position: 'absolute',
+                              width: '100%',
+                              height: '2px',
+                              backgroundColor: '#ef4444',
+                              transform: 'rotate(-45deg)',
+                            }}
+                          />
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="qpdp-meta">
-              <span>{product.brand || 'Save & Smile'}</span>
-              <i />
-              <span>SKU {currentSku}</span>
-              {category && <><i /><Link to={`/category/${category.slug}`}>{product.category}</Link></>}
+              <span className="qpdp-meta-brand">{product.brand || 'Save & Smile'}</span>
+              {category && <><i /><Link to={`/category/${category.slug}`} className="qpdp-meta-cat">{product.category}</Link></>}
             </div>
             <h1>{product.name}</h1>
             <div className="qpdp-rating">
@@ -552,11 +641,11 @@ export default function ProductPage() {
               ) : (
                 <>
                   <span className="qpdp-stars">{Array.from({ length: 5 }).map((_, i) => <Star key={i} fill={false} />)}</span>
-                  <span style={{ color: '#64748b', fontSize: '13px' }}>No reviews yet</span>
-                  <span style={{ color: '#cbd5e1' }}>•</span>
+                  <span className="qpdp-rating-none">No reviews yet</span>
+                  <span className="qpdp-rating-sep">•</span>
                   <button
                     type="button"
-                    style={{ color: '#00998f', textDecoration: 'underline', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}
+                    className="qpdp-write-review-btn"
                     onClick={() => { document.getElementById('customer-reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }}
                   >
                     Write the first review
@@ -579,76 +668,9 @@ export default function ProductPage() {
             </div>
             {savings > 0 && <p className="qpdp-saving">You save Rs. {savings.toLocaleString()} · wholesale rate</p>}
 
-            {/* ── Dynamic Variant Selectors (Color Swatches & Option Pills) ── */}
-            {hasVariants && (
-              <div className="qpdp-variants-section" style={{ margin: '14px 0 16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                {/* Dynamic Color Swatches */}
-                {colorOption && colorOption.values?.length > 0 && (
-                  <div className="qpdp-variant-group">
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#1e293b' }}>
-                        Color: <strong style={{ color: '#0f766e', fontWeight: 700 }}>{selectedColor}</strong>
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
-                      {colorOption.values.map(val => {
-                        const cName = typeof val === 'string' ? val : val.name
-                        const rawHex = typeof val === 'object' && val.hex ? val.hex : null
-                        const cHex = rawHex || KNOWN_COLOR_HEX[cName?.toLowerCase()] || '#475569'
-                        const isSelected = selectedColor?.toLowerCase() === cName?.toLowerCase()
-                        const exists = doesCombinationExist(colorOption.name, cName)
-                        const isAvailable = exists && isValAvailable(colorOption.name, cName)
-
-                        return (
-                          <button
-                            key={cName}
-                            type="button"
-                            onClick={() => {
-                              setSelectedOptions(prev => ({ ...prev, [colorOption.name]: cName }))
-                              setMediaIndex(0)
-                            }}
-                            title={!exists ? `${cName} (Unavailable)` : !isAvailable ? `${cName} (Out of Stock)` : cName}
-                            aria-label={`Select color ${cName}`}
-                            style={{
-                              width: '30px',
-                              height: '30px',
-                              borderRadius: '50%',
-                              backgroundColor: cHex,
-                              border: cHex.toLowerCase() === '#ffffff' || cHex.toLowerCase() === '#fff' ? '1.5px solid #cbd5e1' : '2px solid #ffffff',
-                              outline: 'none',
-                              boxShadow: isSelected
-                                ? '0 0 0 2px #ffffff, 0 0 0 4.5px #0d9488'
-                                : '0 0 0 1px rgba(0,0,0,0.15)',
-                              cursor: exists ? 'pointer' : 'not-allowed',
-                              padding: 0,
-                              opacity: !exists ? 0.35 : !isAvailable ? 0.6 : 1,
-                              transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
-                              transform: isSelected ? 'scale(1.1)' : 'scale(1)',
-                              position: 'relative',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            }}
-                          >
-                            {!exists && (
-                              <span
-                                style={{
-                                  position: 'absolute',
-                                  width: '100%',
-                                  height: '2px',
-                                  backgroundColor: '#ef4444',
-                                  transform: 'rotate(-45deg)',
-                                }}
-                              />
-                            )}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* All Dynamic Other Options (Size, Storage, Material, etc.) */}
+            {/* ── Dynamic Other Options (Size, Storage, Material, etc.) ── */}
+            {hasVariants && otherOptions.length > 0 && (
+              <div className="qpdp-other-options-wrap" style={{ margin: '14px 0 16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {otherOptions.map(opt => {
                   const currentVal = selectedOptions[opt.name] || ''
                   return (

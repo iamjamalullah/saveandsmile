@@ -181,19 +181,141 @@
   letter-spacing: 0.02em;
 }
 
-.qpdp-info { min-width: 0; }
+.qpdp-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.qpdp-meta {
+  order: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+.qpdp-meta-brand {
+  font-weight: 600;
+  color: #475569;
+}
+.qpdp-meta-sep {
+  color: #cbd5e1;
+}
+.qpdp-meta-cat {
+  color: #0d9488;
+  text-decoration: none;
+  font-weight: 500;
+}
+.qpdp-meta-cat:hover {
+  text-decoration: underline;
+}
 .qpdp-cat { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: #8a8a8a; margin-bottom: 8px; }
-.qpdp-info h1 { font-size: 24px; line-height: 1.3; font-weight: 600; color: #1d1d1d; margin: 0 0 8px; }
-.qpdp-rating { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.qpdp-info h1 {
+  order: 2;
+  font-size: 24px;
+  line-height: 1.3;
+  font-weight: 600;
+  color: #1d1d1d;
+  margin: 0 0 8px;
+}
+.qpdp-rating {
+  order: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
 .qpdp-stars { display: inline-flex; gap: 1px; }
 .qpdp-rating a { font-size: 12px; color: #049977; text-decoration: none; }
-.qpdp-price { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-bottom: 16px; border-bottom: 1px solid #efefef; }
+.qpdp-rating-none {
+  color: #64748b;
+  font-size: 13px;
+}
+.qpdp-rating-sep {
+  color: #cbd5e1;
+}
+.qpdp-write-review-btn {
+  color: #0d9488;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.qpdp-price {
+  order: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #efefef;
+}
 .qpdp-price b { font-size: 25px; font-weight: 600; color: #1c1c1c; }
 .qpdp-price del { font-size: 14px; color: #9b9b9b; }
 .qpdp-off { background: #e9f7f1; color: #047a63; border-radius: 5px; padding: 3px 8px; font-size: 10.5px; font-weight: 600; }
 .qpdp-stock { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: #4a4a4a; }
 .qpdp-stock i { width: 7px; height: 7px; border-radius: 50%; background: #2fb36c; display: block; }
 .qpdp-share { width: 32px; height: 32px; border: 1px solid #e2e2e2; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; color: #444; }
+.qpdp-saving {
+  order: 5;
+  margin: 6px 0 12px;
+  font-size: 13px;
+  color: #059669;
+  font-weight: 500;
+}
+.qpdp-color-picker-wrap {
+  order: 6;
+  margin: 12px 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.qpdp-color-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.qpdp-color-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1e293b;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.qpdp-color-value-green {
+  color: #10b981 !important; /* Fresh light green / emerald tone as requested */
+  font-weight: 700;
+}
+.qpdp-color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.qpdp-other-options-wrap {
+  order: 7;
+  margin: 8px 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.qpdp-highlights {
+  order: 8;
+}
+.qpdp-actions-container {
+  order: 9;
+}
+.qpdp-delivery {
+  order: 10;
+}
 
 .qpdp-buyrow { display: flex; gap: 10px; margin-top: 16px; }
 .qpdp-qty { display: flex; align-items: center; border: 1px solid #e2e2e2; border-radius: 8px; height: 44px; width: 124px; flex-shrink: 0; }
@@ -723,41 +845,120 @@
   .qcat-foot { display: none; }
   .qpdp { background: #fff; }
   .qpdp-top { padding: 12px; gap: 16px; box-shadow: none; border-radius: 0; }
+  /* Color Option placed directly under small thumbnail pictures in mobile view */
+  .qpdp-color-picker-wrap {
+    order: 0 !important;
+    margin: 8px 0 12px 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+  }
+  .qpdp-color-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 6px !important;
+  }
+  .qpdp-color-label {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #334155 !important;
+  }
+  .qpdp-color-value-green {
+    color: #10b981 !important; /* Fresh light green */
+    font-weight: 700 !important;
+  }
+  .qpdp-color-swatches {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+  .qpdp-meta {
+    order: 1 !important;
+    margin: 2px 0 6px 0 !important;
+    font-size: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
   .qpdp-info h1 {
-    font-size: 15px !important;
+    order: 2 !important;
+    font-size: 17px !important;
     line-height: 1.35 !important;
     font-weight: 600 !important;
     margin: 0 0 6px !important;
   }
+  .qpdp-rating {
+    order: 3 !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin-bottom: 10px !important;
+  }
+  .qpdp-rating-none, .qpdp-write-review-btn {
+    font-size: 12px !important;
+    white-space: nowrap !important;
+  }
   .qpdp-price {
+    order: 4 !important;
     gap: 8px !important;
-    padding-bottom: 10px !important;
+    padding-bottom: 8px !important;
   }
   .qpdp-price b {
-    font-size: 17px !important;
+    font-size: 19px !important;
     font-weight: 700 !important;
     color: #1c1c1c !important;
   }
   .qpdp-price del {
-    font-size: 11.5px !important;
+    font-size: 12px !important;
   }
   .qpdp-off {
-    font-size: 9.5px !important;
-    padding: 2px 6px !important;
+    font-size: 10.5px !important;
+    padding: 2.5px 7px !important;
+    font-weight: 700 !important;
   }
   .qpdp-stock {
-    font-size: 10px !important;
-    gap: 4px !important;
+    font-size: 11px !important;
+    gap: 5px !important;
   }
   .qpdp-stock i {
-    width: 5px !important;
-    height: 5px !important;
+    width: 6px !important;
+    height: 6px !important;
+  }
+  .qpdp-saving {
+    order: 5 !important;
+    font-size: 12px !important;
+    margin: 4px 0 10px !important;
+  }
+  .qpdp-other-options-wrap {
+    order: 6 !important;
+    margin: 8px 0 12px !important;
+  }
+  .qpdp-highlights {
+    order: 7 !important;
+    margin: 8px 0 14px !important;
+  }
+  .qpdp-actions-container {
+    order: 8 !important;
+  }
+  .qpdp-delivery {
+    order: 9 !important;
   }
   .qpdp-rev-grid, .qrev-grid { grid-template-columns: 1fr; }
   .qpdp-rev-top { flex-wrap: wrap; gap: 14px; }
   .qpdp-rev-title { flex: 1 1 60%; }
   .qpdp-form-row, .qrev-row, .qcontact-row, .qcheckout-row { grid-template-columns: 1fr; }
-  .qpdp-trust { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .qpdp-trust {
+  order: 11;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #f1f5f9;
+}
   .qpdp-thumbs { overflow-x: auto; }
   .qrev-summary { flex-direction: column; gap: 18px; }
   .qcontact-card { padding: 16px; }
@@ -1157,6 +1358,14 @@
 }
 .qg-quick-more:hover { text-decoration: underline; }
 
+/* Disable generic floating contact on mobile product pages to prevent collision with PDP sticky action bar */
+@media (max-width: 767px) {
+  body:has(.qpdp) .qg-float,
+  .qg-app:has(.qpdp) .qg-float {
+    display: none !important;
+  }
+}
+
 /* ── Fixed Floating Action Bar for Product Detail Page ──── */
 .qpdp-sticky-bar {
   position: fixed;
@@ -1297,53 +1506,132 @@
 }
 
 @media (max-width: 640px) {
-  .qpdp-sticky-bar {
-    bottom: 8px;
-    gap: 4px;
-    padding: 3px 6px;
-    width: calc(100% - 16px);
-    max-width: 440px;
-    justify-content: space-between;
+  /* In-page action buttons: clean single row, balanced buttons, no awkward wrapping */
+  .qpdp-action-row1 {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+    align-items: center !important;
+    width: 100% !important;
   }
-  .qpdp-sticky-btn-cart {
-    height: 34px;
-    padding: 0 10px;
-    font-family: 'Poppins', sans-serif !important;
-    font-size: 11px !important;
-    font-weight: 500 !important;
-    border-radius: 16px;
+  .qpdp-qty {
+    width: 84px !important;
+    height: 42px !important;
+    flex-shrink: 0 !important;
+    border-radius: 8px !important;
   }
-  .qpdp-sticky-btn-buynow {
-    height: 34px;
-    padding: 0 12px;
-    font-family: 'Poppins', sans-serif !important;
+  .qpdp-qty button {
+    width: 25px !important;
+    font-size: 15px !important;
+  }
+  .qpdp-qty span {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+  }
+  .qpdp-btn-cart-teal {
+    flex: 1 !important;
+    min-width: 0 !important;
+    height: 42px !important;
+    padding: 0 6px !important;
     font-size: 12px !important;
-    letter-spacing: 0.15px;
-    font-weight: 500 !important;
-    flex: 1;
-    justify-content: center;
-    border-radius: 16px;
+    font-weight: 600 !important;
+    border-radius: 21px !important;
+    white-space: nowrap !important;
+    gap: 4px !important;
+    justify-content: center !important;
+  }
+  .qpdp-btn-cart-teal svg {
+    width: 15px !important;
+    height: 15px !important;
+    flex-shrink: 0 !important;
+  }
+  .qpdp-btn-buynow-lime {
+    flex: 1 !important;
+    min-width: 0 !important;
+    height: 42px !important;
+    padding: 0 6px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    border-radius: 21px !important;
+    white-space: nowrap !important;
+    gap: 4px !important;
+    justify-content: center !important;
+  }
+  .qpdp-btn-wholesale-pill {
+    height: 40px !important;
+    font-size: 12px !important;
+  }
+  .qpdp-wish {
+    width: 42px !important;
+    height: 40px !important;
+    min-width: 42px !important;
+  }
+
+  /* Floating Sticky Bar: elevated above mobile bottom trigger & symmetric action buttons */
+  .qpdp-sticky-bar {
+    bottom: max(22px, env(safe-area-inset-bottom, 22px)) !important;
+    gap: 6px !important;
+    padding: 5px 8px !important;
+    width: calc(100% - 20px) !important;
+    max-width: 440px !important;
+    border-radius: 999px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+    justify-content: space-between !important;
   }
   .qpdp-sticky-qty {
-    height: 32px;
-    border-radius: 16px;
+    height: 38px !important;
+    border-radius: 999px !important;
+    padding: 0 2px !important;
+    flex-shrink: 0 !important;
   }
   .qpdp-sticky-qty button {
-    width: 24px;
-    height: 24px;
-    font-size: 13px;
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 14px !important;
   }
   .qpdp-sticky-qty span {
-    min-width: 18px;
-    font-size: 11.5px;
+    min-width: 18px !important;
+    font-size: 12px !important;
+  }
+  .qpdp-sticky-btn-cart {
+    flex: 1 !important;
+    min-width: 0 !important;
+    height: 38px !important;
+    padding: 0 6px !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    border-radius: 999px !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    white-space: nowrap !important;
+  }
+  .qpdp-sticky-btn-cart svg {
+    width: 14px !important;
+    height: 14px !important;
+    flex-shrink: 0 !important;
+  }
+  .qpdp-sticky-btn-buynow {
+    flex: 1 !important;
+    min-width: 0 !important;
+    height: 38px !important;
+    padding: 0 6px !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 12px !important;
+    letter-spacing: 0.15px !important;
+    font-weight: 600 !important;
+    border-radius: 999px !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    white-space: nowrap !important;
   }
   .qpdp-sticky-wa {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
   }
   .qpdp-sticky-wa svg {
-    width: 16px;
-    height: 16px;
+    width: 18px !important;
+    height: 18px !important;
   }
 }

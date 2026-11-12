@@ -99,7 +99,43 @@ Stop and request approval before proceeding if:
 - The requested change conflicts with existing functionality.
 - The exact source of a production issue is not established.
 
-## FINAL RULE
+## 10. PRODUCTION AUTHORIZATION, ROLLBACK & VERIFICATION SAFEGUARDS
+
+### A. Explicit Deployment Authorization
+- Never push to `origin main` or trigger production deployment without explicit user approval.
+- Complete local implementation, testing and review before requesting deployment approval.
+- Never assume that a successful build authorizes production deployment.
+
+### B. Mandatory Rollback Readiness
+- Record the last known stable Git commit before significant changes.
+- Preserve affected database records before modifications.
+- Document the exact rollback procedure.
+- Verify that the previous stable application version can be restored.
+- Never perform destructive rollback operations on production data without explicit authorization.
+
+### C. Test Integrity
+- Verify that each required test file exists before execution.
+- Report actual test results, including skipped, unavailable or failed tests.
+- Never claim 100% test coverage based only on passing test suites.
+- Never fabricate screenshots, deployment status, API responses or production verification.
+
+### D. Production and Local Environment Separation
+- Clearly distinguish local, staging and production environments.
+- Never assume local database records match production.
+- Never use local environment variables or database credentials in production.
+- Verify the deployed commit and production API independently.
+
+### E. Mandatory Approval Before High-Risk Actions
+Obtain explicit user approval before:
+- Production deployment.
+- Destructive database operations.
+- Database schema changes with potential data loss.
+- Changes to shared components affecting multiple routes.
+- Replacing or removing existing production content.
+- Major architectural refactoring.
+
+## FINAL RULE & PRINCIPLE
 Implement the smallest safe change that completely solves the requested problem.
 Do not improve, redesign, optimize, refactor, or modify unrelated features without explicit approval.
 Existing working functionality is protected and must remain working after every change.
+Protect the last known stable production state. A new feature is not successful if it compromises existing functionality, data integrity, or unrelated user experiences.

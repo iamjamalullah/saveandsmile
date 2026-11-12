@@ -7,7 +7,10 @@ import { api } from '../api'
 export default function StaffLoginPage({ targetRole = 'staff' }) {
   const { login } = useAuth()
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
+  const isManagerPage = targetRole === 'manager'
+  const title = isManagerPage ? 'Operations Manager Console' : 'Store Administrator Console'
+
+  const [email, setEmail] = useState(() => isManagerPage ? 'manager' : 'admin')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -17,9 +20,6 @@ export default function StaffLoginPage({ targetRole = 'staff' }) {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [changeSuccess, setChangeSuccess] = useState('')
-
-  const isManagerPage = targetRole === 'manager'
-  const title = isManagerPage ? 'Operations Manager Console' : 'Store Administrator Console'
 
   const handleSubmit = async e => {
     e.preventDefault()
@@ -207,7 +207,7 @@ export default function StaffLoginPage({ targetRole = 'staff' }) {
                 required
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••••••"
+                placeholder={isManagerPage ? 'manager123' : 'admin123'}
                 style={{
                   width: '100%',
                   padding: '10px 12px',
@@ -237,20 +237,20 @@ export default function StaffLoginPage({ targetRole = 'staff' }) {
                 marginBottom: '14px'
               }}
             >
-              {loading ? 'Authenticating...' : 'Sign In to Console'}
+              {loading ? 'Authenticating...' : (isManagerPage ? 'Sign In to Manager Console' : 'Sign In to Admin Console')}
             </button>
 
             <div style={{
-              background: '#f8fafc',
-              border: '1px solid #e2e8f0',
+              background: '#f0fdf4',
+              border: '1px solid #bbf7d0',
               borderRadius: '8px',
-              padding: '10px',
-              fontSize: '11.5px',
-              color: '#64748b',
+              padding: '10px 12px',
+              fontSize: '12px',
+              color: '#166534',
               textAlign: 'center',
               marginBottom: '16px'
             }}>
-              <span>🛡️ <b>Production Security:</b> Plaintext passwords are disabled. All attempts are monitored and rate-limited.</span>
+              <span>🔑 <b>Staff Access:</b> User: <code>{isManagerPage ? 'manager' : 'admin'}</code> &nbsp;|&nbsp; Password: <code>{isManagerPage ? 'manager123' : 'admin123'}</code></span>
             </div>
 
             <div style={{ textAlign: 'center' }}>

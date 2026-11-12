@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
 import ProductSection from './ProductSection'
-import CategoryStrip from './CategoryStrip'
+import Hero from './Hero'
+import { CategoryCirclesSection, TrustBarSection as StoreTrustBar } from './CategoryStrip'
 import WatchAndShop from './WatchAndShop'
 import Reviews from './Reviews'
 import CategoryTabs from './CategoryTabs'
@@ -371,7 +372,7 @@ export function TrustBarSection({ section }) {
 /**
  * Universal Dynamic Section Switcher
  */
-export default function DynamicHomeSection({ section, onViewAll, onSeeMore }) {
+export default function DynamicHomeSection({ section, onShopCategory, onViewAll, onSeeMore }) {
   if (!section || section.enabled === false || section.isVisible === false) {
     return null
   }
@@ -381,6 +382,17 @@ export default function DynamicHomeSection({ section, onViewAll, onSeeMore }) {
 
   try {
     switch (blockType) {
+      case 'hero':
+      case 'hero_slider':
+        return <Hero section={section} />
+
+      case 'categories':
+        return <CategoryCirclesSection section={section} onShopCategory={onShopCategory} />
+
+      case 'trust_bar':
+      case 'benefits':
+        return <StoreTrustBar section={section} />
+
       case 'banner':
       case 'banner_single':
         if (containerLayout !== 'single') {
@@ -400,22 +412,15 @@ export default function DynamicHomeSection({ section, onViewAll, onSeeMore }) {
       case 'countdown':
         return <CountdownSection section={section} />
 
-      case 'trust_bar':
-      case 'benefits':
-        return <TrustBarSection section={section} />
-
-      case 'categories':
-        return <CategoryStrip />
-
       case 'reels':
       case 'watch_and_shop':
-        return <WatchAndShop onShopAll={onSeeMore} />
+        return <WatchAndShop section={section} onShopAll={onSeeMore} />
 
       case 'reviews':
-        return <Reviews />
+        return <Reviews section={section} />
 
       case 'category_tabs':
-        return <CategoryTabs onShopAll={onSeeMore} />
+        return <CategoryTabs section={section} onShopAll={onSeeMore} />
 
       case 'products':
       default:

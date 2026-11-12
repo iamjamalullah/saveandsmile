@@ -4640,8 +4640,83 @@
   ],
   "sections": [
     {
-      "id": "1",
+      "id": "sec-hero",
       "order": 1,
+      "title": "Hero Banner Slider",
+      "subtitle": "Dynamic full-width image slider showcase",
+      "containerLayout": "single",
+      "blockType": "hero",
+      "enabled": true,
+      "isPublished": true,
+      "color": "#00998f",
+      "bg": "",
+      "content": {
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        }
+      }
+    },
+    {
+      "id": "sec-categories",
+      "order": 2,
+      "title": "Shop By Categories",
+      "subtitle": "Endless smooth carousel of product categories",
+      "containerLayout": "single",
+      "blockType": "categories",
+      "enabled": true,
+      "isPublished": true,
+      "color": "#00998f",
+      "bg": "",
+      "content": {
+        "categories": {
+          "heading": "Shop By Categories",
+          "showAll": true,
+          "categorySlugs": []
+        }
+      }
+    },
+    {
+      "id": "sec-trust-bar",
+      "order": 3,
+      "title": "Why Shop With Us / Trust Bar",
+      "subtitle": "Customer confidence badges and guarantees",
+      "containerLayout": "single",
+      "blockType": "trust_bar",
+      "enabled": true,
+      "isPublished": true,
+      "color": "#00998f",
+      "bg": "",
+      "content": {
+        "trust_bar": {
+          "heading": "",
+          "bgColor": "transparent",
+          "textColor": "#1e293b",
+          "items": [
+            {
+              "title": "Support 24/7",
+              "image": "https://www.qadrigadgets.pk/images/banners/68ecda0c96323.webp",
+              "subtitle": "Live customer support"
+            },
+            {
+              "title": "Best Prices",
+              "image": "https://www.qadrigadgets.pk/images/banners/68ecda0c969b4.webp",
+              "subtitle": "Direct wholesale rates"
+            },
+            {
+              "title": "Secure Payment",
+              "image": "https://www.qadrigadgets.pk/images/banners/68ecda0c96cd0.webp",
+              "subtitle": "100% Cash on Delivery"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "1",
+      "order": 4,
       "title": "New Arrivals",
       "subtitle": "",
       "containerLayout": "single",
@@ -4650,30 +4725,20 @@
       "isPublished": true,
       "color": "#cf9c44",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69e3673551452.png",
-      "category": null,
       "group": "new",
       "viewAll": true,
       "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "New Arrivals",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#cf9c44",
-          "textColor": "#ffffff",
-          "align": "center"
-        }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+        "group": "new",
+        "color": "#cf9c44",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/69e3673551452.png",
+        "viewAll": true,
+        "seeMore": true
       }
     },
     {
       "id": "2",
-      "order": 2,
+      "order": 5,
       "title": "Hot Selling Products",
       "subtitle": "",
       "containerLayout": "single",
@@ -4682,30 +4747,20 @@
       "isPublished": true,
       "color": "#00998f",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69e367452a403.png",
-      "category": null,
       "group": "hot",
-      "viewAll": false,
-      "seeMore": false,
+      "viewAll": true,
+      "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "Hot Selling Products",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#00998f",
-          "textColor": "#ffffff",
-          "align": "center"
-        }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+        "group": "hot",
+        "color": "#00998f",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/69e367452a403.png",
+        "viewAll": true,
+        "seeMore": true
       }
     },
     {
       "id": "3",
-      "order": 3,
+      "order": 6,
       "title": "Home Essentials Organizers",
       "subtitle": "",
       "containerLayout": "single",
@@ -4714,30 +4769,20 @@
       "isPublished": true,
       "color": "#6980c3",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/694aac30cb418.png",
-      "category": null,
       "group": "home",
-      "viewAll": false,
-      "seeMore": false,
+      "viewAll": true,
+      "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "Home Essentials Organizers",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#6980c3",
-          "textColor": "#ffffff",
-          "align": "center"
-        }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+        "group": "home",
+        "color": "#6980c3",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/694aac30cb418.png",
+        "viewAll": true,
+        "seeMore": true
       }
     },
     {
       "id": "4",
-      "order": 4,
+      "order": 7,
       "title": "You May Also Like",
       "subtitle": "",
       "containerLayout": "single",
@@ -4746,30 +4791,20 @@
       "isPublished": true,
       "color": "#cf9c44",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1cfb86d85.png",
-      "category": null,
       "group": "like",
-      "viewAll": false,
-      "seeMore": false,
+      "viewAll": true,
+      "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "You May Also Like",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#cf9c44",
-          "textColor": "#ffffff",
-          "align": "center"
-        }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+        "group": "like",
+        "color": "#cf9c44",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1cfb86d85.png",
+        "viewAll": true,
+        "seeMore": true
       }
     },
     {
       "id": "5",
-      "order": 5,
+      "order": 8,
       "title": "Top Picks Fragrances",
       "subtitle": "",
       "containerLayout": "single",
@@ -4778,30 +4813,20 @@
       "isPublished": true,
       "color": "#6980c3",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69e36752dd560.png",
-      "category": null,
       "group": "perfume",
-      "viewAll": false,
-      "seeMore": false,
+      "viewAll": true,
+      "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "Top Picks Fragrances",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#6980c3",
-          "textColor": "#ffffff",
-          "align": "center"
-        }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+        "group": "perfume",
+        "color": "#6980c3",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/69e36752dd560.png",
+        "viewAll": true,
+        "seeMore": true
       }
     },
     {
       "id": "6",
-      "order": 6,
+      "order": 9,
       "title": "Trending Now",
       "subtitle": "",
       "containerLayout": "single",
@@ -4810,30 +4835,20 @@
       "isPublished": true,
       "color": "#00998f",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1ce2b376d.png",
-      "category": null,
       "group": "trending",
-      "viewAll": false,
-      "seeMore": false,
+      "viewAll": true,
+      "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "Trending Now",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#00998f",
-          "textColor": "#ffffff",
-          "align": "center"
-        }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+        "group": "trending",
+        "color": "#00998f",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1ce2b376d.png",
+        "viewAll": true,
+        "seeMore": true
       }
     },
     {
       "id": "7",
-      "order": 7,
+      "order": 10,
       "title": "Elegant Jewelry & Accessories",
       "subtitle": "",
       "containerLayout": "single",
@@ -4842,60 +4857,43 @@
       "isPublished": true,
       "color": "#cf9c44",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c7309e3f.png",
-      "category": null,
       "group": "jewelry",
-      "viewAll": false,
-      "seeMore": false,
+      "viewAll": true,
+      "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "Elegant Jewelry & Accessories",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#cf9c44",
-          "textColor": "#ffffff",
-          "align": "center"
-        }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+        "group": "jewelry",
+        "color": "#cf9c44",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c7309e3f.png",
+        "viewAll": true,
+        "seeMore": true
       }
     },
     {
       "id": "sec-1794173571404-997",
-      "order": 8,
+      "order": 11,
       "title": "Promotional Showcase",
-      "subtitle": "",
+      "subtitle": "Exclusive seasonal savings & wholesale deals",
       "containerLayout": "single",
       "blockType": "banner",
       "enabled": true,
       "isPublished": true,
       "color": "#00998f",
       "bg": "",
-      "category": null,
-      "group": "new",
-      "viewAll": false,
-      "seeMore": false,
       "content": {
         "banners": [
           {
-            "image": "/uploads/products/prod_1794173566637_Save___Smile_Shopping_Adventure_v1ugs.webp",
+            "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
             "link": "/shop",
-            "title": "",
-            "badge": ""
+            "title": "Special Promotion",
+            "alt": "Promotional Offer",
+            "badge": "Special Offer"
           }
         ]
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
       }
     },
     {
       "id": "8",
-      "order": 9,
+      "order": 12,
       "title": "Exclusive Watches",
       "subtitle": "",
       "containerLayout": "single",
@@ -4904,25 +4902,99 @@
       "isPublished": true,
       "color": "#6980c3",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c4780d7b.png",
-      "category": null,
       "group": "watch",
       "viewAll": true,
-      "seeMore": false,
+      "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "Exclusive Watches",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#6980c3",
-          "textColor": "#ffffff",
-          "align": "center"
+        "group": "watch",
+        "color": "#6980c3",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c4780d7b.png",
+        "viewAll": true,
+        "seeMore": true
+      }
+    },
+    {
+      "id": "sec-watch-shop",
+      "order": 13,
+      "title": "Watch & Shop",
+      "subtitle": "In motion",
+      "containerLayout": "single",
+      "blockType": "reels",
+      "enabled": true,
+      "isPublished": true,
+      "color": "#00998f",
+      "bg": "",
+      "content": {
+        "reels": {
+          "heading": "Watch & Shop",
+          "subtitle": "In motion",
+          "maxItems": 8
         }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+      }
+    },
+    {
+      "id": "sec-reviews",
+      "order": 14,
+      "title": "What Our Clients Say",
+      "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+      "containerLayout": "single",
+      "blockType": "reviews",
+      "enabled": true,
+      "isPublished": true,
+      "color": "#00998f",
+      "bg": "",
+      "content": {
+        "reviews": {
+          "heading": "What Our Clients Say",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        }
+      }
+    },
+    {
+      "id": "sec-category-tabs",
+      "order": 15,
+      "title": "Category Tabs + Product Grid",
+      "subtitle": "Tabbed collections with category-specific products",
+      "containerLayout": "single",
+      "blockType": "category_tabs",
+      "enabled": true,
+      "isPublished": true,
+      "color": "#00998f",
+      "bg": "",
+      "content": {
+        "category_tabs": {
+          "heading": "Category Tabs",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        }
       }
     }
   ],
@@ -5954,8 +6026,83 @@
   ],
   "homepageDraftSections": [
     {
-      "id": "1",
+      "id": "sec-hero",
       "order": 1,
+      "title": "Hero Banner Slider",
+      "subtitle": "Dynamic full-width image slider showcase",
+      "containerLayout": "single",
+      "blockType": "hero",
+      "enabled": true,
+      "isPublished": true,
+      "color": "#00998f",
+      "bg": "",
+      "content": {
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        }
+      }
+    },
+    {
+      "id": "sec-categories",
+      "order": 2,
+      "title": "Shop By Categories",
+      "subtitle": "Endless smooth carousel of product categories",
+      "containerLayout": "single",
+      "blockType": "categories",
+      "enabled": true,
+      "isPublished": true,
+      "color": "#00998f",
+      "bg": "",
+      "content": {
+        "categories": {
+          "heading": "Shop By Categories",
+          "showAll": true,
+          "categorySlugs": []
+        }
+      }
+    },
+    {
+      "id": "sec-trust-bar",
+      "order": 3,
+      "title": "Why Shop With Us / Trust Bar",
+      "subtitle": "Customer confidence badges and guarantees",
+      "containerLayout": "single",
+      "blockType": "trust_bar",
+      "enabled": true,
+      "isPublished": true,
+      "color": "#00998f",
+      "bg": "",
+      "content": {
+        "trust_bar": {
+          "heading": "",
+          "bgColor": "transparent",
+          "textColor": "#1e293b",
+          "items": [
+            {
+              "title": "Support 24/7",
+              "image": "https://www.qadrigadgets.pk/images/banners/68ecda0c96323.webp",
+              "subtitle": "Live customer support"
+            },
+            {
+              "title": "Best Prices",
+              "image": "https://www.qadrigadgets.pk/images/banners/68ecda0c969b4.webp",
+              "subtitle": "Direct wholesale rates"
+            },
+            {
+              "title": "Secure Payment",
+              "image": "https://www.qadrigadgets.pk/images/banners/68ecda0c96cd0.webp",
+              "subtitle": "100% Cash on Delivery"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "1",
+      "order": 4,
       "title": "New Arrivals",
       "subtitle": "",
       "containerLayout": "single",
@@ -5964,30 +6111,20 @@
       "isPublished": true,
       "color": "#cf9c44",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69e3673551452.png",
-      "category": null,
       "group": "new",
       "viewAll": true,
       "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "New Arrivals",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#cf9c44",
-          "textColor": "#ffffff",
-          "align": "center"
-        }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+        "group": "new",
+        "color": "#cf9c44",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/69e3673551452.png",
+        "viewAll": true,
+        "seeMore": true
       }
     },
     {
       "id": "2",
-      "order": 2,
+      "order": 5,
       "title": "Hot Selling Products",
       "subtitle": "",
       "containerLayout": "single",
@@ -5996,30 +6133,20 @@
       "isPublished": true,
       "color": "#00998f",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69e367452a403.png",
-      "category": null,
       "group": "hot",
-      "viewAll": false,
-      "seeMore": false,
+      "viewAll": true,
+      "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "Hot Selling Products",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#00998f",
-          "textColor": "#ffffff",
-          "align": "center"
-        }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+        "group": "hot",
+        "color": "#00998f",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/69e367452a403.png",
+        "viewAll": true,
+        "seeMore": true
       }
     },
     {
       "id": "3",
-      "order": 3,
+      "order": 6,
       "title": "Home Essentials Organizers",
       "subtitle": "",
       "containerLayout": "single",
@@ -6028,30 +6155,20 @@
       "isPublished": true,
       "color": "#6980c3",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/694aac30cb418.png",
-      "category": null,
       "group": "home",
-      "viewAll": false,
-      "seeMore": false,
+      "viewAll": true,
+      "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "Home Essentials Organizers",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#6980c3",
-          "textColor": "#ffffff",
-          "align": "center"
-        }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+        "group": "home",
+        "color": "#6980c3",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/694aac30cb418.png",
+        "viewAll": true,
+        "seeMore": true
       }
     },
     {
       "id": "4",
-      "order": 4,
+      "order": 7,
       "title": "You May Also Like",
       "subtitle": "",
       "containerLayout": "single",
@@ -6060,30 +6177,20 @@
       "isPublished": true,
       "color": "#cf9c44",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1cfb86d85.png",
-      "category": null,
       "group": "like",
-      "viewAll": false,
-      "seeMore": false,
+      "viewAll": true,
+      "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "You May Also Like",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#cf9c44",
-          "textColor": "#ffffff",
-          "align": "center"
-        }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+        "group": "like",
+        "color": "#cf9c44",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1cfb86d85.png",
+        "viewAll": true,
+        "seeMore": true
       }
     },
     {
       "id": "5",
-      "order": 5,
+      "order": 8,
       "title": "Top Picks Fragrances",
       "subtitle": "",
       "containerLayout": "single",
@@ -6092,30 +6199,20 @@
       "isPublished": true,
       "color": "#6980c3",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69e36752dd560.png",
-      "category": null,
       "group": "perfume",
-      "viewAll": false,
-      "seeMore": false,
+      "viewAll": true,
+      "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "Top Picks Fragrances",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#6980c3",
-          "textColor": "#ffffff",
-          "align": "center"
-        }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+        "group": "perfume",
+        "color": "#6980c3",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/69e36752dd560.png",
+        "viewAll": true,
+        "seeMore": true
       }
     },
     {
       "id": "6",
-      "order": 6,
+      "order": 9,
       "title": "Trending Now",
       "subtitle": "",
       "containerLayout": "single",
@@ -6124,30 +6221,20 @@
       "isPublished": true,
       "color": "#00998f",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1ce2b376d.png",
-      "category": null,
       "group": "trending",
-      "viewAll": false,
-      "seeMore": false,
+      "viewAll": true,
+      "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "Trending Now",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#00998f",
-          "textColor": "#ffffff",
-          "align": "center"
-        }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+        "group": "trending",
+        "color": "#00998f",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1ce2b376d.png",
+        "viewAll": true,
+        "seeMore": true
       }
     },
     {
       "id": "7",
-      "order": 7,
+      "order": 10,
       "title": "Elegant Jewelry & Accessories",
       "subtitle": "",
       "containerLayout": "single",
@@ -6156,60 +6243,43 @@
       "isPublished": true,
       "color": "#cf9c44",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c7309e3f.png",
-      "category": null,
       "group": "jewelry",
-      "viewAll": false,
-      "seeMore": false,
+      "viewAll": true,
+      "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "Elegant Jewelry & Accessories",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#cf9c44",
-          "textColor": "#ffffff",
-          "align": "center"
-        }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+        "group": "jewelry",
+        "color": "#cf9c44",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c7309e3f.png",
+        "viewAll": true,
+        "seeMore": true
       }
     },
     {
       "id": "sec-1794173571404-997",
-      "order": 8,
+      "order": 11,
       "title": "Promotional Showcase",
-      "subtitle": "",
+      "subtitle": "Exclusive seasonal savings & wholesale deals",
       "containerLayout": "single",
       "blockType": "banner",
       "enabled": true,
       "isPublished": true,
       "color": "#00998f",
       "bg": "",
-      "category": null,
-      "group": "new",
-      "viewAll": false,
-      "seeMore": false,
       "content": {
         "banners": [
           {
-            "image": "/uploads/products/prod_1794173566637_Save___Smile_Shopping_Adventure_v1ugs.webp",
+            "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
             "link": "/shop",
-            "title": "",
-            "badge": ""
+            "title": "Special Promotion",
+            "alt": "Promotional Offer",
+            "badge": "Special Offer"
           }
         ]
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
       }
     },
     {
       "id": "8",
-      "order": 9,
+      "order": 12,
       "title": "Exclusive Watches",
       "subtitle": "",
       "containerLayout": "single",
@@ -6218,25 +6288,99 @@
       "isPublished": true,
       "color": "#6980c3",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c4780d7b.png",
-      "category": null,
       "group": "watch",
       "viewAll": true,
-      "seeMore": false,
+      "seeMore": true,
       "content": {
-        "banners": [],
-        "announcement": {
-          "heading": "Exclusive Watches",
-          "subheading": "",
-          "buttonText": "Shop Now",
-          "buttonLink": "/shop",
-          "bgColor": "#6980c3",
-          "textColor": "#ffffff",
-          "align": "center"
+        "group": "watch",
+        "color": "#6980c3",
+        "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c4780d7b.png",
+        "viewAll": true,
+        "seeMore": true
+      }
+    },
+    {
+      "id": "sec-watch-shop",
+      "order": 13,
+      "title": "Watch & Shop",
+      "subtitle": "In motion",
+      "containerLayout": "single",
+      "blockType": "reels",
+      "enabled": true,
+      "isPublished": true,
+      "color": "#00998f",
+      "bg": "",
+      "content": {
+        "reels": {
+          "heading": "Watch & Shop",
+          "subtitle": "In motion",
+          "maxItems": 8
         }
-      },
-      "responsiveSettings": {
-        "mobileStack": true,
-        "hideOnMobile": false
+      }
+    },
+    {
+      "id": "sec-reviews",
+      "order": 14,
+      "title": "What Our Clients Say",
+      "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+      "containerLayout": "single",
+      "blockType": "reviews",
+      "enabled": true,
+      "isPublished": true,
+      "color": "#00998f",
+      "bg": "",
+      "content": {
+        "reviews": {
+          "heading": "What Our Clients Say",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        }
+      }
+    },
+    {
+      "id": "sec-category-tabs",
+      "order": 15,
+      "title": "Category Tabs + Product Grid",
+      "subtitle": "Tabbed collections with category-specific products",
+      "containerLayout": "single",
+      "blockType": "category_tabs",
+      "enabled": true,
+      "isPublished": true,
+      "color": "#00998f",
+      "bg": "",
+      "content": {
+        "category_tabs": {
+          "heading": "Category Tabs",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        }
       }
     }
   ],

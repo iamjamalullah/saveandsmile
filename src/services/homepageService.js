@@ -22,7 +22,7 @@ export const VALID_CONTAINER_LAYOUTS = ['single', 'two_equal', 'two_70_30', 'two
  * - 'banner': Single or dual promotional banner
  * - 'announcement': Rich text / promotional announcement callout
  */
-export const VALID_BLOCK_TYPES = ['products', 'banner', 'announcement', 'image_text', 'countdown', 'trust_bar', 'categories', 'reels', 'reviews', 'category_tabs']
+export const VALID_BLOCK_TYPES = ['products', 'banner', 'announcement', 'image_text', 'countdown', 'trust_bar', 'categories', 'reels', 'reviews', 'category_tabs', 'hero']
 
 /**
  * Normalize and sanitize a section object for storage
@@ -42,6 +42,11 @@ export function normalizeSection(s, index = 0) {
     : blockType === 'image_text' ? 'Featured Story & Showcase'
     : blockType === 'countdown' ? 'Limited Time Flash Sale'
     : blockType === 'trust_bar' ? 'Why Shop With Us'
+    : blockType === 'hero' ? 'Hero Banner Slider'
+    : blockType === 'categories' ? 'Shop By Categories'
+    : blockType === 'reels' ? 'Watch & Shop'
+    : blockType === 'reviews' ? 'What Our Clients Say'
+    : blockType === 'category_tabs' ? 'Category Tabs + Product Grid'
     : 'Featured Collection'
   )
   const order = typeof s.order === 'number' ? s.order : index + 1
@@ -104,6 +109,43 @@ export function normalizeSection(s, index = 0) {
       ],
       bgColor: color || '#f8fafc',
       textColor: '#1e293b',
+    },
+    // 6. Hero Slider
+    hero: existingContent.hero || s.hero || {
+      autoplay: true,
+      duration: 5200,
+      showArrows: true,
+      showDots: true,
+    },
+    // 7. Categories Carousel
+    categories: existingContent.categories || s.categories || {
+      heading: s.title || 'Shop By Categories',
+      showAll: true,
+      categorySlugs: [],
+    },
+    // 8. Watch & Shop Reels
+    reels: existingContent.reels || s.reels || {
+      heading: s.title || 'Watch & Shop',
+      subtitle: s.subtitle || 'In motion',
+      maxItems: 8,
+    },
+    // 9. Reviews / Testimonials
+    reviews: existingContent.reviews || s.reviews || {
+      heading: s.title || 'What Our Clients Say',
+      tag: 'Reviews',
+      subtitle: s.subtitle || 'Trusted by thousands of resellers and shopkeepers across Pakistan.',
+      maxItems: 12,
+    },
+    // 10. Category Tabs
+    category_tabs: existingContent.category_tabs || s.category_tabs || {
+      heading: s.title || 'Category Tabs',
+      defaultActive: 'storage',
+      maxProducts: 8,
+      tabs: [
+        { key: 'storage', label: ['Storage &', 'Organization'], group: 'home' },
+        { key: 'jewelry', label: ['Jewelry &', 'Accessories'], group: 'jewelry' },
+        { key: 'bags', label: ['Fashion Bags &', 'Travel'], group: 'like' },
+      ],
     },
   }
 

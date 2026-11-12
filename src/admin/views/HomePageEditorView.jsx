@@ -833,21 +833,19 @@ export default function HomePageEditorView() {
          ════════════════════════════════════════════════════════════ */}
       {activeTab === 'sections' && (
         <div>
-          {/* Pinned Storefront Header Notice */}
-          <div className="card border-0 bg-info-subtle border-start border-4 border-info rounded-3 p-3 mb-3 shadow-sm">
+          {/* Global Pinned Storefront Header */}
+          <div className="card border-0 bg-dark text-white rounded-3 p-3 mb-3 shadow-sm border-start border-4 border-info">
             <div className="d-flex align-items-center justify-content-between">
               <div className="d-flex align-items-center gap-2">
-                <i className="bi bi-pin-angle-fill text-info fs-5"></i>
+                <i className="bi bi-window-dock text-info fs-5"></i>
                 <div>
-                  <div className="fw-bold text-dark small">
-                    Storefront Structure: Pinned Top Components
-                  </div>
-                  <div className="text-muted" style={{ fontSize: '0.8rem' }}>
-                    1. Hero Image Slider (tab above) &rarr; 2. &quot;Shop By Categories&quot; &amp; Trust Bar (&quot;Support 24/7&quot;) &rarr; 3. Custom Sections below (#1 to #{localSections.length}).
+                  <div className="fw-bold text-white small">Global Site Header &amp; Navigation (Pinned Top)</div>
+                  <div className="text-secondary" style={{ fontSize: '0.8rem' }}>
+                    Header, White Logo, Top Notice Bar, Search Bar, Mega Menu, and Mobile Header are global non-movable components rendered across all pages.
                   </div>
                 </div>
               </div>
-              <span className="badge bg-info text-dark">Storefront Flow</span>
+              <span className="badge bg-info text-dark">Pinned Global Component</span>
             </div>
           </div>
 
@@ -915,12 +913,17 @@ export default function HomePageEditorView() {
                               {layout === 'two_30_70' && '30/70 Split'}
                             </span>
                             <span className="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
+                              {bType === 'hero' && '🎠 Hero Slider'}
+                              {bType === 'categories' && '📁 Categories'}
+                              {bType === 'trust_bar' && '🛡️ Trust Bar'}
                               {bType === 'products' && '🛒 Product Feed'}
                               {bType === 'banner' && '🖼️ Banner'}
                               {bType === 'announcement' && '📢 Announcement'}
                               {bType === 'image_text' && '🖼️📝 Image + Text'}
                               {bType === 'countdown' && '⏱️ Countdown Sale'}
-                              {bType === 'trust_bar' && '🛡️ Trust Bar'}
+                              {bType === 'reels' && '🎥 Watch & Shop'}
+                              {bType === 'reviews' && '⭐ Customer Reviews'}
+                              {bType === 'category_tabs' && '📑 Category Tabs'}
                             </span>
                           </div>
                           <input
@@ -1049,15 +1052,90 @@ export default function HomePageEditorView() {
                             </div>
                           )}
 
+                          {bType === 'hero' && (
+                            <div className="small text-muted">
+                              <div><i className="bi bi-images me-1"></i>Hero Carousel: <strong>{localHeroSlides.length} active slides</strong></div>
+                              <div className="d-flex gap-2">
+                                <button
+                                  type="button"
+                                  className="btn btn-link btn-sm p-0 text-success text-decoration-none fw-semibold"
+                                  onClick={() => setEditingSection({ sec: JSON.parse(JSON.stringify(sec)), idx })}
+                                >
+                                  Edit Slider Settings →
+                                </button>
+                                <span className="text-secondary">|</span>
+                                <button
+                                  type="button"
+                                  className="btn btn-link btn-sm p-0 text-primary text-decoration-none fw-semibold"
+                                  onClick={() => setActiveTab('slides')}
+                                >
+                                  Manage Slides ({localHeroSlides.length})
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {bType === 'categories' && (
+                            <div className="small text-muted">
+                              <div><i className="bi bi-grid me-1"></i>Categories Carousel: <strong>{categories.length} total categories</strong></div>
+                              <button
+                                type="button"
+                                className="btn btn-link btn-sm p-0 text-success text-decoration-none fw-semibold"
+                                onClick={() => setEditingSection({ sec: JSON.parse(JSON.stringify(sec)), idx })}
+                              >
+                                Edit Categories Heading &amp; Display →
+                              </button>
+                            </div>
+                          )}
+
                           {bType === 'trust_bar' && (
                             <div className="small text-muted">
-                              <div><i className="bi bi-shield-check me-1"></i>Benefits: <strong>{sec.content?.trust_bar?.items?.length || 4} items</strong></div>
+                              <div><i className="bi bi-shield-check me-1"></i>Benefits / Trust: <strong>{sec.content?.trust_bar?.items?.length || 3} items</strong></div>
                               <button
                                 type="button"
                                 className="btn btn-link btn-sm p-0 text-success text-decoration-none fw-semibold"
                                 onClick={() => setEditingSection({ sec: JSON.parse(JSON.stringify(sec)), idx })}
                               >
                                 Edit Benefits / Trust Bar →
+                              </button>
+                            </div>
+                          )}
+
+                          {bType === 'reels' && (
+                            <div className="small text-muted">
+                              <div><i className="bi bi-camera-reels me-1"></i>Watch &amp; Shop: <strong>{sec.content?.reels?.maxItems || 8} video items</strong></div>
+                              <button
+                                type="button"
+                                className="btn btn-link btn-sm p-0 text-success text-decoration-none fw-semibold"
+                                onClick={() => setEditingSection({ sec: JSON.parse(JSON.stringify(sec)), idx })}
+                              >
+                                Edit Watch &amp; Shop Settings →
+                              </button>
+                            </div>
+                          )}
+
+                          {bType === 'reviews' && (
+                            <div className="small text-muted">
+                              <div><i className="bi bi-chat-quote me-1"></i>Customer Testimonials: <strong>{sec.content?.reviews?.maxItems || 12} reviews</strong></div>
+                              <button
+                                type="button"
+                                className="btn btn-link btn-sm p-0 text-success text-decoration-none fw-semibold"
+                                onClick={() => setEditingSection({ sec: JSON.parse(JSON.stringify(sec)), idx })}
+                              >
+                                Edit Testimonials Heading &amp; Count →
+                              </button>
+                            </div>
+                          )}
+
+                          {bType === 'category_tabs' && (
+                            <div className="small text-muted">
+                              <div><i className="bi bi-folder2-open me-1"></i>Category Tabs: <strong>{sec.content?.category_tabs?.tabs?.length || 3} tabs</strong></div>
+                              <button
+                                type="button"
+                                className="btn btn-link btn-sm p-0 text-success text-decoration-none fw-semibold"
+                                onClick={() => setEditingSection({ sec: JSON.parse(JSON.stringify(sec)), idx })}
+                              >
+                                Edit Category Tabs &amp; Products →
                               </button>
                             </div>
                           )}
@@ -2473,6 +2551,210 @@ export default function HomePageEditorView() {
                             }}
                           />
                         </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* HERO SLIDER */}
+                  {editingSection.sec.blockType === 'hero' && (
+                    <div className="bg-light p-3.5 rounded-3 border">
+                      <div className="d-flex align-items-center justify-content-between mb-3">
+                        <h6 className="fw-bold text-dark mb-0">Hero Banner Slider Controls</h6>
+                        <button
+                          type="button"
+                          className="btn btn-primary btn-sm rounded-pill px-3"
+                          onClick={() => {
+                            setShowAddSlideModal(false)
+                            setEditingSection(null)
+                            setActiveTab('slides')
+                          }}
+                        >
+                          <i className="bi bi-images me-1"></i> Manage Hero Slides Carousel ({localHeroSlides.length}) →
+                        </button>
+                      </div>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <label className="form-label small fw-semibold">Auto-slide Transition Time (ms)</label>
+                          <input
+                            type="number"
+                            className="form-control form-control-sm"
+                            value={editingSection.sec.content?.hero?.duration || 5200}
+                            step="500"
+                            min="2000"
+                            max="15000"
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.hero) nextSec.content.hero = {}
+                              nextSec.content.hero.duration = Number(e.target.value) || 5200
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                          />
+                        </div>
+                        <div className="col-md-6 d-flex align-items-center pt-3">
+                          <div className="form-check form-switch fs-6">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              checked={editingSection.sec.content?.hero?.autoplay !== false}
+                              onChange={e => {
+                                const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                                if (!nextSec.content) nextSec.content = {}
+                                if (!nextSec.content.hero) nextSec.content.hero = {}
+                                nextSec.content.hero.autoplay = e.target.checked
+                                setEditingSection({ ...editingSection, sec: nextSec })
+                              }}
+                            />
+                            <label className="form-check-label fw-semibold small ms-1">Enable Automatic Sliding</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* CATEGORIES */}
+                  {editingSection.sec.blockType === 'categories' && (
+                    <div className="bg-light p-3.5 rounded-3 border">
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Section Heading</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={editingSection.sec.content?.categories?.heading || editingSection.sec.title || 'Shop By Categories'}
+                          onChange={e => {
+                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                            if (!nextSec.content) nextSec.content = {}
+                            if (!nextSec.content.categories) nextSec.content.categories = {}
+                            nextSec.content.categories.heading = e.target.value
+                            nextSec.title = e.target.value
+                            setEditingSection({ ...editingSection, sec: nextSec })
+                          }}
+                        />
+                      </div>
+                      <div className="alert alert-info py-2 px-3 small mb-0">
+                        <i className="bi bi-info-circle me-1"></i> Renders all active categories ({categories.length} loaded) in an infinite smooth continuous right-to-left marquee carousel with verified image containment.
+                      </div>
+                    </div>
+                  )}
+
+                  {/* REELS / WATCH & SHOP */}
+                  {editingSection.sec.blockType === 'reels' && (
+                    <div className="bg-light p-3.5 rounded-3 border">
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Section Heading</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={editingSection.sec.content?.reels?.heading || editingSection.sec.title || 'Watch & Shop'}
+                          onChange={e => {
+                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                            if (!nextSec.content) nextSec.content = {}
+                            if (!nextSec.content.reels) nextSec.content.reels = {}
+                            nextSec.content.reels.heading = e.target.value
+                            nextSec.title = e.target.value
+                            setEditingSection({ ...editingSection, sec: nextSec })
+                          }}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Subtitle / Callout</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={editingSection.sec.content?.reels?.subtitle || 'In motion'}
+                          onChange={e => {
+                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                            if (!nextSec.content) nextSec.content = {}
+                            if (!nextSec.content.reels) nextSec.content.reels = {}
+                            nextSec.content.reels.subtitle = e.target.value
+                            setEditingSection({ ...editingSection, sec: nextSec })
+                          }}
+                        />
+                      </div>
+                      <div className="alert alert-secondary py-2 px-3 small mb-0">
+                        <i className="bi bi-camera-reels me-1"></i> Video reels with audio toggle and direct cart buttons are synchronized from the Watch &amp; Shop module.
+                      </div>
+                    </div>
+                  )}
+
+                  {/* REVIEWS */}
+                  {editingSection.sec.blockType === 'reviews' && (
+                    <div className="bg-light p-3.5 rounded-3 border">
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Section Heading</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={editingSection.sec.content?.reviews?.heading || editingSection.sec.title || 'What Our Clients Say'}
+                          onChange={e => {
+                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                            if (!nextSec.content) nextSec.content = {}
+                            if (!nextSec.content.reviews) nextSec.content.reviews = {}
+                            nextSec.content.reviews.heading = e.target.value
+                            nextSec.title = e.target.value
+                            setEditingSection({ ...editingSection, sec: nextSec })
+                          }}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Subheading / Description</label>
+                        <textarea
+                          className="form-control"
+                          rows="2"
+                          value={editingSection.sec.content?.reviews?.subtitle || 'Trusted by thousands of resellers and shopkeepers across Pakistan.'}
+                          onChange={e => {
+                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                            if (!nextSec.content) nextSec.content = {}
+                            if (!nextSec.content.reviews) nextSec.content.reviews = {}
+                            nextSec.content.reviews.subtitle = e.target.value
+                            setEditingSection({ ...editingSection, sec: nextSec })
+                          }}
+                        />
+                      </div>
+                      <div className="alert alert-secondary py-2 px-3 small mb-0">
+                        <i className="bi bi-star-fill text-warning me-1"></i> Displays approved customer feedback and 5-star ratings in an auto-scrolling marquee slider.
+                      </div>
+                    </div>
+                  )}
+
+                  {/* CATEGORY TABS */}
+                  {editingSection.sec.blockType === 'category_tabs' && (
+                    <div className="bg-light p-3.5 rounded-3 border">
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Section Title</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={editingSection.sec.content?.category_tabs?.heading || editingSection.sec.title || 'Category Tabs'}
+                          onChange={e => {
+                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                            if (!nextSec.content) nextSec.content = {}
+                            if (!nextSec.content.category_tabs) nextSec.content.category_tabs = {}
+                            nextSec.content.category_tabs.heading = e.target.value
+                            nextSec.title = e.target.value
+                            setEditingSection({ ...editingSection, sec: nextSec })
+                          }}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Max Products Per Tab</label>
+                        <input
+                          type="number"
+                          className="form-control form-control-sm"
+                          value={editingSection.sec.content?.category_tabs?.maxProducts || 8}
+                          min="4"
+                          max="24"
+                          onChange={e => {
+                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                            if (!nextSec.content) nextSec.content = {}
+                            if (!nextSec.content.category_tabs) nextSec.content.category_tabs = {}
+                            nextSec.content.category_tabs.maxProducts = Number(e.target.value) || 8
+                            setEditingSection({ ...editingSection, sec: nextSec })
+                          }}
+                        />
+                      </div>
+                      <div className="alert alert-success py-2 px-3 small mb-0">
+                        <i className="bi bi-folder2-open me-1"></i> Renders tabbed navigation pills (Storage &amp; Organization, Jewelry &amp; Accessories, Fashion Bags) with interactive live product filtering and instant switching.
                       </div>
                     </div>
                   )}

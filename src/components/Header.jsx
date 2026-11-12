@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import { BRAND, HEADER_ICONS, SEARCH_BANNER } from '../data'
 import { productPath } from '../content'
@@ -33,6 +33,27 @@ export default function Header({ user, onLogout }) {
   const searchRef = useRef(null)
   const accountRef = useRef(null)
   const megaRef = useRef(null)
+  const barRef = useRef(null)
+  const [menuTop, setMenuTop] = useState(68)
+
+  const updateMenuPos = useCallback(() => {
+    if (barRef.current) {
+      const rect = barRef.current.getBoundingClientRect()
+      setMenuTop(Math.round(rect.bottom + 4))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (mega) {
+      updateMenuPos()
+      window.addEventListener('resize', updateMenuPos)
+      window.addEventListener('scroll', updateMenuPos, { passive: true })
+      return () => {
+        window.removeEventListener('resize', updateMenuPos)
+        window.removeEventListener('scroll', updateMenuPos)
+      }
+    }
+  }, [mega, updateMenuPos])
 
   useEffect(() => {
     if (!searchOpen) return
@@ -103,7 +124,7 @@ export default function Header({ user, onLogout }) {
       </div>
 
       <header className={`qh-section ${sticky ? 'is-sticky' : ''}`}>
-        <div className="qh-bar">
+        <div className="qh-bar" ref={barRef}>
           <div className="qh-row">
             <div className="qh-left">
               <button className="qh-menu-btn" type="button" aria-label="Open menu" onClick={() => setMenuOpen(true)}>
@@ -151,48 +172,57 @@ export default function Header({ user, onLogout }) {
                         <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </button>
-                    <div
-                      className="qh-pcat-menu"
-                      style={mega ? { opacity: 1, visibility: 'visible', pointerEvents: 'auto', transform: 'translateY(0)' } : undefined}
-                    >
-                      <div className="qh-pcat-panel" role="region" aria-label="Product Categories Mega Menu">
-                        <div className="qh-pcat-head">
-                          <div>
-                            <b>Shop by category</b>
-                            <span>{categories.length} wholesale departments</span>
-                          </div>
-                          <Link to="/shop" onClick={() => setMega(false)}>View all products <em>→</em></Link>
-                        </div>
-                        <ul className="qh-pcat-list">
-                          {categories.map(c => (
-                            <li className="qh-pcat-item" key={c.slug}>
-                              <Link className="qh-pcat-link" to={`/category/${c.slug}`} onClick={() => setMega(false)}>
-                                <span className="qh-pcat-icon">
-                                  <img
-                                    src={c.image}
-                                    alt=""
-                                    loading="lazy"
-                                    onError={e => { e.currentTarget.style.display = 'none' }}
-                                  />
-                                </span>
-                                <span className="qh-pcat-name">{c.name}</span>
-                                <i className="qh-pcat-arrow" aria-hidden="true">›</i>
+                    {mega && (
+                      <>
+                        <div
+                          className="qh-mega-backdrop"
+                          onClick={() => setMega(false)}
+                          aria-hidden="true"
+                        />
+                        <div
+                          className="qh-pcat-menu"
+                          style={{ top: `${menuTop}px` }}
+                        >
+                          <div className="qh-pcat-panel" role="region" aria-label="Product Categories Mega Menu">
+                            <div className="qh-pcat-head">
+                              <div>
+                                <b>Shop by category</b>
+                                <span>{categories.length} wholesale departments</span>
+                              </div>
+                              <Link to="/shop" onClick={() => setMega(false)}>View all products <em>→</em></Link>
+                            </div>
+                            <ul className="qh-pcat-list">
+                              {categories.map(c => (
+                                <li className="qh-pcat-item" key={c.slug}>
+                                  <Link className="qh-pcat-link" to={`/category/${c.slug}`} onClick={() => setMega(false)}>
+                                    <span className="qh-pcat-icon">
+                                      <img
+                                        src={c.image}
+                                        alt=""
+                                        loading="lazy"
+                                        onError={e => { e.currentTarget.style.display = 'none' }}
+                                      />
+                                    </span>
+                                    <span className="qh-pcat-name">{c.name}</span>
+                                    <i className="qh-pcat-arrow" aria-hidden="true">›</i>
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                            <div className="qh-pcat-foot">
+                              <Link to="/bulk-order" onClick={() => setMega(false)}>
+                                <span className="qh-pcat-foot-icon" aria-hidden="true">📦</span>
+                                <span>Wholesale &amp; Bulk Buying</span>
                               </Link>
-                            </li>
-                          ))}
-                        </ul>
-                        <div className="qh-pcat-foot">
-                          <Link to="/bulk-order" onClick={() => setMega(false)}>
-                            <span className="qh-pcat-foot-icon" aria-hidden="true">📦</span>
-                            <span>Wholesale &amp; Bulk Buying</span>
-                          </Link>
-                          <Link to="/shop" onClick={() => setMega(false)}>
-                            <span className="qh-pcat-foot-icon" aria-hidden="true">🏷️</span>
-                            <span>Best Wholesale Prices</span>
-                          </Link>
+                              <Link to="/shop" onClick={() => setMega(false)}>
+                                <span className="qh-pcat-foot-icon" aria-hidden="true">🏷️</span>
+                                <span>Best Wholesale Prices</span>
+                              </Link>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
+                      </>
+                    )}
                   </li>
                 ) : (
                   <li key={l.label}>

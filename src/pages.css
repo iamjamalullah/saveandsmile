@@ -226,9 +226,11 @@
   border-radius: 22px;
   background: #007385;
   color: #fff;
-  font-size: 13.5px;
-  font-weight: 500;
-  letter-spacing: .02em;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  letter-spacing: .03em;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -248,9 +250,11 @@
   border-radius: 22px;
   background: #7cb324;
   color: #fff;
-  font-size: 13.5px;
-  font-weight: 500;
-  letter-spacing: .02em;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  letter-spacing: .03em;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -408,7 +412,12 @@
 .qpdp-rev-foot, .qrev-card-foot { display: flex; justify-content: space-between; font-size: 10px; color: #9a9a9a; }
 .qpdp-rev-foot span:last-child, .qrev-card-foot span:last-child { color: #049977; }
 .qpdp-related { margin-top: 30px; }
-.qpdp-related h2 { font-size: 20px; margin-bottom: 16px; }
+.qpdp-related h2 {
+  font-size: 20px;
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+  margin-bottom: 16px;
+}
 
 /* info pages */
 .qpage .qcat-crumbs { margin-bottom: 0; }
@@ -1005,7 +1014,8 @@
 }
 .qpdp-reviews-section .qpdp-rev-title h2 {
   font-size: 18px;
-  font-weight: 700;
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
   margin: 0 0 2px;
 }
 .qpdp-reviews-section .qpdp-rev-title p {
@@ -1063,7 +1073,8 @@
 }
 .qpdp-review-form-box h3 {
   font-size: 15px;
-  font-weight: 700;
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
   color: #0f172a;
   margin: 0 0 4px;
 }
@@ -1209,9 +1220,11 @@
   border: 1.5px solid #d1ded8;
   background: #ffffff;
   color: #17352a;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1236,9 +1249,11 @@
   border: none;
   background: linear-gradient(135deg, #1b4d3e 0%, #0d3224 100%);
   color: #ffffff;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1291,18 +1306,20 @@
     justify-content: space-between;
   }
   .qpdp-sticky-btn-cart {
-    height: 32px;
-    padding: 0 8px;
-    font-size: 10px;
-    font-weight: 600;
+    height: 34px;
+    padding: 0 10px;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
     border-radius: 16px;
   }
   .qpdp-sticky-btn-buynow {
-    height: 32px;
-    padding: 0 10px;
-    font-size: 11.5px;
+    height: 34px;
+    padding: 0 12px;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 12px !important;
     letter-spacing: 0.15px;
-    font-weight: 600;
+    font-weight: 500 !important;
     flex: 1;
     justify-content: center;
     border-radius: 16px;

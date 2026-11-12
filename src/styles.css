@@ -1879,19 +1879,96 @@ img { max-width: 100%; }
 }
 
 /* ==========================================================================
-   PART 2: Global Poppins Typography Enforcement for All Headings & Bold Text
+   PART 2 & 3: Refined Light Poppins Typography Enforcement (Light Headings & Clean CTAs)
    ========================================================================== */
-h1, h2, h3, h4, h5, h6,
-b, strong,
-.qg-sec-title, .qg-cat-title, .qg-prod-title, .qg-card-title,
-.qh-nav a, .qh-link, .qh-pcat-toggle, .qh-pcat-head b, .qh-pcat-name,
-.qg-tile-info b, .qg-buy-btn, .qg-badge, .qg-price, .qg-price b,
-.qrev-title, .qrev-author, .qrev-score, .qrev-score b, .qrev-stat-num, .qrev-stat-label,
-.qg-reviews-head h2, .qg-trust-item b, .qg-trust-item p,
-.qg-footer-col h4, .qpdp-price, .qpdp-price b, .qpdp-title,
-.qpdp-rev-score b, .qpdp-rev-title h2, .qpdp-review-form-box h3, .qpdp-feed-title,
-.qpdp-rev-head b, .qpdp-rev-body b, .qpdp-btn-submit-review,
-.qrev-card-head b, .qrev-card-body b, .qrev-bars h2, .qrev-rating-label,
-.qh-pcat-foot a, .qg-pill, .qg-announcement-heading, .qg-announcement-btn {
+h1, h2, h3, h4, h5, h6 {
   font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.01em;
+}
+
+/* Section Headings, Product Details & Tab Headings */
+.qg-sec-title,
+.qg-cat-title,
+.qpdp-related h2,
+.qpdp-tabpanel h2,
+.qpdp-desc h2,
+.qpdp-desc h3,
+.qg-reviews-head h2,
+.qrev-bars h2,
+.qrev-form h1,
+.qg-footer-col h4,
+.qfoot-col h4 {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+/* Customer Reviews & Feedback Headings */
+.qpdp-reviews-section .qpdp-rev-title h2,
+.qpdp-feed-title,
+.qpdp-review-form-box h3,
+.qrev-title,
+.qrev-author {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+/* Reviewer Names & Review Body Titles */
+.qpdp-rev-head b,
+.qpdp-rev-body b,
+.qrev-card-head b,
+.qrev-card-body b {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+/* Review Scores: Moderate, elegant weight */
+.qpdp-rev-score b,
+.qrev-score b {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 600 !important;
+}
+
+/* Form Labels & Secondary Descriptions */
+.qpdp-form-field label,
+.qpdp-form label,
+.qrev-form label,
+.qrev-rating-label {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 400 !important;
+  color: #475569;
+}
+
+/* Navigation & Mega Menu Typography */
+.qh-link,
+.qh-pcat-toggle,
+.qh-pcat-head b,
+.qh-pcat-name,
+.qh-pcat-foot a,
+.qg-pill {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+/* Product Titles & Cards */
+.qg-prod-title,
+.qg-card-title,
+.qpdp-title {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+/* Buttons: Light, Clean & Premium 500 Weight (Add to Cart & Buy Now) */
+.qpdp-sticky-btn-cart,
+.qpdp-sticky-btn-buynow,
+.qpdp-btn-cart-teal,
+.qpdp-btn-buynow-lime,
+.qpdp-btn-wholesale-pill,
+.qpdp-btn-submit-review,
+.qg-buy-btn,
+.qg-btn,
+.qg-announcement-btn {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.03em;
 }

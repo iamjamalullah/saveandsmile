@@ -90,7 +90,7 @@
 .qh-logo img { display: block; width: 140px; height: 44px; object-fit: contain; }
 
 .qh-nav { flex: 1 1 0%; min-width: 0; display: flex; align-items: stretch; justify-content: center; }
-.qh-nav ul {
+.qh-nav > ul {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -105,7 +105,7 @@
   margin: 0;
   list-style: none;
 }
-.qh-nav li { display: inline-flex; align-items: center; flex: 0 0 auto; white-space: nowrap; }
+.qh-nav > ul > li { display: inline-flex; align-items: center; flex: 0 0 auto; white-space: nowrap; }
 
 /* Enforce pure white text for top-level navbar links so Home & All Products never turn dark! */
 .qh-nav > ul > li > a,

@@ -136,7 +136,7 @@ export default function Header({ user, onLogout }) {
               </button>
               <Link to="/" className="qh-logo" aria-label={BRAND.name}>
                 <img
-                  src={BRAND.logo}
+                  src={BRAND.logoWhite || '/logo-white.png'}
                   alt={BRAND.name}
                   className="qh-logo-desk"
                   style={{ maxHeight: '46px', width: 'auto', objectFit: 'contain' }}

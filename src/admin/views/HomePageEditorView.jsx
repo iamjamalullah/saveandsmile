@@ -808,6 +808,16 @@ export default function HomePageEditorView() {
               <div className="text-center text-muted small pb-2 border-bottom mb-3">
                 <i className="bi bi-eye me-1"></i> Interactive Draft Preview Mode (Exact Storefront Appearance)
               </div>
+              {/* Pinned Hero Preview */}
+              <div className="rounded-3 overflow-hidden mb-3 border text-center p-2.5 bg-dark text-white">
+                <span className="badge bg-secondary mb-1">Pinned Storefront Header</span>
+                <div className="small fw-semibold">Hero Slider ({localHeroSlides.length} slides active)</div>
+              </div>
+              {/* Pinned Category Strip Preview */}
+              <div className="rounded-3 overflow-hidden mb-3 border text-center p-2.5 bg-light text-dark">
+                <span className="badge bg-secondary mb-1">Pinned Storefront Component</span>
+                <div className="small fw-semibold">Shop By Categories &amp; Trust Bar (Support 24/7, Best Prices, Secure Payment)</div>
+              </div>
               {localSections.map((sec, idx) => (
                 <div key={sec.id || idx} className="mb-4">
                   <DynamicHomeSection section={sec} />
@@ -823,6 +833,24 @@ export default function HomePageEditorView() {
          ════════════════════════════════════════════════════════════ */}
       {activeTab === 'sections' && (
         <div>
+          {/* Pinned Storefront Header Notice */}
+          <div className="card border-0 bg-info-subtle border-start border-4 border-info rounded-3 p-3 mb-3 shadow-sm">
+            <div className="d-flex align-items-center justify-content-between">
+              <div className="d-flex align-items-center gap-2">
+                <i className="bi bi-pin-angle-fill text-info fs-5"></i>
+                <div>
+                  <div className="fw-bold text-dark small">
+                    Storefront Structure: Pinned Top Components
+                  </div>
+                  <div className="text-muted" style={{ fontSize: '0.8rem' }}>
+                    1. Hero Image Slider (tab above) &rarr; 2. &quot;Shop By Categories&quot; &amp; Trust Bar (&quot;Support 24/7&quot;) &rarr; 3. Custom Sections below (#1 to #{localSections.length}).
+                  </div>
+                </div>
+              </div>
+              <span className="badge bg-info text-dark">Storefront Flow</span>
+            </div>
+          </div>
+
           {/* Top Insert Divider */}
           <div className="d-flex align-items-center justify-content-center my-3">
             <button

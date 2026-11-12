@@ -22,7 +22,7 @@ export const VALID_CONTAINER_LAYOUTS = ['single', 'two_equal', 'two_70_30', 'two
  * - 'banner': Single or dual promotional banner
  * - 'announcement': Rich text / promotional announcement callout
  */
-export const VALID_BLOCK_TYPES = ['products', 'banner', 'announcement', 'image_text', 'countdown', 'trust_bar']
+export const VALID_BLOCK_TYPES = ['products', 'banner', 'announcement', 'image_text', 'countdown', 'trust_bar', 'categories', 'reels', 'reviews', 'category_tabs']
 
 /**
  * Normalize and sanitize a section object for storage
@@ -48,6 +48,16 @@ export function normalizeSection(s, index = 0) {
 
   const existingContent = s.content || {}
 
+  // Bidirectional resolution: extract attributes from top-level, content, or legacy group_name
+  const group = s.group || existingContent.group || (
+    s.group_name && !String(s.group_name).startsWith('custom-') ? s.group_name : null
+  ) || null
+  const category = s.category || existingContent.category || null
+  const color = s.color || existingContent.color || '#00998f'
+  const bg = s.bg !== undefined ? s.bg : (existingContent.bg !== undefined ? existingContent.bg : '')
+  const viewAll = s.viewAll !== undefined ? Boolean(s.viewAll) : Boolean(existingContent.viewAll)
+  const seeMore = s.seeMore !== undefined ? Boolean(s.seeMore) : Boolean(existingContent.seeMore)
+
   const defaultContent = {
     // 1. Banners
     banners: s.banners || existingContent.banners || (s.banner ? [s.banner] : []),
@@ -57,7 +67,7 @@ export function normalizeSection(s, index = 0) {
       subheading: s.subtitle || '',
       buttonText: s.buttonText || 'Shop Now',
       buttonLink: s.buttonLink || '/shop',
-      bgColor: s.color || '#049977',
+      bgColor: color || '#049977',
       textColor: '#ffffff',
       align: 'center',
     },
@@ -80,7 +90,7 @@ export function normalizeSection(s, index = 0) {
       targetDate: s.targetDate || existingContent.targetDate || new Date(Date.now() + 48 * 3600 * 1000).toISOString(),
       buttonText: s.buttonText || 'Shop Sale Now',
       buttonLink: s.buttonLink || '/shop?group=hot',
-      bgColor: s.color || '#0f3c28',
+      bgColor: color || '#0f3c28',
       textColor: '#ffffff',
     },
     // 5. Benefits / Trust Bar Section
@@ -92,7 +102,7 @@ export function normalizeSection(s, index = 0) {
         { icon: '🛡️', title: '100% Genuine Items', subtitle: 'Tested & verified products' },
         { icon: '💵', title: 'Cash on Delivery', subtitle: 'Pay when your parcel arrives' },
       ],
-      bgColor: s.color || '#f8fafc',
+      bgColor: color || '#f8fafc',
       textColor: '#1e293b',
     },
   }
@@ -106,15 +116,21 @@ export function normalizeSection(s, index = 0) {
     blockType,
     enabled: s.enabled !== false && s.isVisible !== false && s.is_visible !== false,
     isPublished: s.isPublished !== false && s.is_published !== false,
-    color: s.color || '#00998f',
-    bg: s.bg || '',
-    category: s.category || null,
-    group: s.group || null,
-    viewAll: Boolean(s.viewAll),
-    seeMore: Boolean(s.seeMore),
+    color,
+    bg,
+    category,
+    group,
+    viewAll,
+    seeMore,
     content: {
       ...defaultContent,
       ...existingContent,
+      group,
+      category,
+      color,
+      bg,
+      viewAll,
+      seeMore,
     },
     responsiveSettings: s.responsiveSettings || {
       mobileStack: true,
@@ -123,9 +139,6 @@ export function normalizeSection(s, index = 0) {
   }
 }
 
-/**
- * Fetch published sections currently visible on storefront
- */
 export async function getPublishedSections(routerDb) {
   try {
     const res = await query(
@@ -138,6 +151,13 @@ export async function getPublishedSections(routerDb) {
         let responsiveSettings = {}
         try { responsiveSettings = typeof row.responsive_settings_json === 'string' ? JSON.parse(row.responsive_settings_json) : (row.responsive_settings_json || {}) } catch (_) {}
 
+        const groupVal = content.group || (row.group_name && !String(row.group_name).startsWith('custom-') ? row.group_name : null) || null
+        const categoryVal = content.category || null
+        const colorVal = content.color || '#00998f'
+        const bgVal = content.bg !== undefined ? content.bg : ''
+        const viewAllVal = content.viewAll !== undefined ? Boolean(content.viewAll) : false
+        const seeMoreVal = content.seeMore !== undefined ? Boolean(content.seeMore) : false
+
         return normalizeSection({
           id: row.id,
           order: row.sort_order || idx + 1,
@@ -147,9 +167,22 @@ export async function getPublishedSections(routerDb) {
           blockType: row.block_type,
           enabled: row.is_visible,
           isPublished: row.is_published,
-          content,
+          group: groupVal,
+          category: categoryVal,
+          color: colorVal,
+          bg: bgVal,
+          viewAll: viewAllVal,
+          seeMore: seeMoreVal,
+          content: {
+            ...content,
+            group: groupVal,
+            category: categoryVal,
+            color: colorVal,
+            bg: bgVal,
+            viewAll: viewAllVal,
+            seeMore: seeMoreVal,
+          },
           responsiveSettings,
-          ...content, // Preserve legacy keys (color, bg, category, group, etc.)
         }, idx)
       })
     }
@@ -165,9 +198,6 @@ export async function getPublishedSections(routerDb) {
     .map(normalizeSection)
 }
 
-/**
- * Fetch draft working sections for admin builder
- */
 export async function getDraftSections(routerDb) {
   // Check if draft exists in db.json first
   const draftList = routerDb.get('homepageDraftSections').value()
@@ -233,6 +263,16 @@ export async function publishSections({ sections, label, staffUser, routerDb }) 
       for (let i = 0; i < normalized.length; i++) {
         const s = normalized[i]
         const numId = i + 1
+        const effectiveGroup = s.group || s.content?.group || `custom-${numId}`
+        const fullContent = {
+          ...(s.content || {}),
+          group: s.group || null,
+          category: s.category || null,
+          color: s.color || '#00998f',
+          bg: s.bg || '',
+          viewAll: Boolean(s.viewAll),
+          seeMore: Boolean(s.seeMore),
+        }
         await client.query(
           `INSERT INTO sections (
              id, group_name, title, subtitle, sort_order,
@@ -241,6 +281,7 @@ export async function publishSections({ sections, label, staffUser, routerDb }) 
              has_unpublished_changes
            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
            ON CONFLICT (id) DO UPDATE SET
+             group_name = EXCLUDED.group_name,
              title = EXCLUDED.title,
              sort_order = EXCLUDED.sort_order,
              container_layout = EXCLUDED.container_layout,
@@ -250,13 +291,13 @@ export async function publishSections({ sections, label, staffUser, routerDb }) 
              is_published = EXCLUDED.is_published`,
           [
             numId,
-            s.group || `custom-${numId}`,
+            effectiveGroup,
             s.title,
             s.subtitle || '',
             s.order || i + 1,
             s.containerLayout,
             s.blockType,
-            JSON.stringify(s.content || s),
+            JSON.stringify(fullContent),
             JSON.stringify(s.responsiveSettings || {}),
             s.enabled !== false,
             true,

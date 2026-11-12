@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
 import ProductSection from './ProductSection'
+import CategoryStrip from './CategoryStrip'
+import WatchAndShop from './WatchAndShop'
+import Reviews from './Reviews'
+import CategoryTabs from './CategoryTabs'
 
 /**
  * 1. Single Column Promotional Banner (100% Full-Width / Boxed)
@@ -399,6 +403,19 @@ export default function DynamicHomeSection({ section, onViewAll, onSeeMore }) {
       case 'trust_bar':
       case 'benefits':
         return <TrustBarSection section={section} />
+
+      case 'categories':
+        return <CategoryStrip />
+
+      case 'reels':
+      case 'watch_and_shop':
+        return <WatchAndShop onShopAll={onSeeMore} />
+
+      case 'reviews':
+        return <Reviews />
+
+      case 'category_tabs':
+        return <CategoryTabs onShopAll={onSeeMore} />
 
       case 'products':
       default:

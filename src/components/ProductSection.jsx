@@ -14,15 +14,30 @@ export default function ProductSection({ section, onViewAll, onSeeMore }) {
   const railHot2 = useRef(null)
   const isHoveredHot = useRef(false)
 
+  const effectiveGroup = section?.group || section?.content?.group || (
+    section?.title?.toLowerCase().includes('new arrival') ? 'new'
+    : section?.title?.toLowerCase().includes('hot selling') ? 'hot'
+    : section?.title?.toLowerCase().includes('home essential') ? 'home'
+    : section?.title?.toLowerCase().includes('you may also like') ? 'like'
+    : (section?.title?.toLowerCase().includes('fragrance') || section?.title?.toLowerCase().includes('perfume')) ? 'perfume'
+    : section?.title?.toLowerCase().includes('trending') ? 'trending'
+    : section?.title?.toLowerCase().includes('jewelry') ? 'jewelry'
+    : section?.title?.toLowerCase().includes('watch') ? 'watch'
+    : null
+  )
+
+  const effectiveCategory = section?.category || section?.content?.category || null
+  const effectiveCategoryId = section?.categoryId || section?.content?.categoryId || null
+
   const items = products.filter(p => {
-    if (section?.category && (p.category === section.category || p.categorySlug === section.category)) return true
-    if (section?.categoryId && (p.categoryId === section.categoryId || p.category_id === section.categoryId)) return true
-    if (section?.group && p.group === section.group) return true
+    if (effectiveCategory && (p.category === effectiveCategory || p.categorySlug === effectiveCategory)) return true
+    if (effectiveCategoryId && (p.categoryId === effectiveCategoryId || p.category_id === effectiveCategoryId)) return true
+    if (effectiveGroup && p.group === effectiveGroup) return true
     return false
   })
 
-  const isNewArrivals = section?.group === 'new'
-  const isHotSelling = section?.group === 'hot' || section?.id === '2' || (section?.title && section.title.toLowerCase().includes('hot selling'))
+  const isNewArrivals = effectiveGroup === 'new'
+  const isHotSelling = effectiveGroup === 'hot' || section?.id === '2' || (section?.title && section.title.toLowerCase().includes('hot selling'))
   const isFourGrid = !isNewArrivals && !isHotSelling
 
   // For New Arrivals: duplicate list 3 times for endless seamless looping conveyor belt
@@ -132,7 +147,12 @@ export default function ProductSection({ section, onViewAll, onSeeMore }) {
     setTimeout(() => { isHoveredNew.current = false }, 500)
   }
 
-  if (!items.length) return null
+  if (!items.length) {
+    if (typeof window !== 'undefined' && console && console.warn) {
+      console.warn('[ProductSection] No matching products found for section:', section?.id, section?.title, 'effectiveGroup:', effectiveGroup, 'effectiveCategory:', effectiveCategory)
+    }
+    return null
+  }
 
   return (
     <section className="qg-prod-section" style={{ backgroundImage: `url(${section.bg})` }}>
@@ -140,7 +160,7 @@ export default function ProductSection({ section, onViewAll, onSeeMore }) {
         <div className="qg-sec-head">
           <h2 className="qg-sec-title" style={{ color: section.color }}>
             <span className="qg-line" style={{ background: section.color }} />
-            <button type="button" className="qg-sec-link" onClick={() => onViewAll?.(section.group)}>{section.title}</button>
+            <button type="button" className="qg-sec-link" onClick={() => onViewAll?.(effectiveGroup)}>{section.title}</button>
             <span className="qg-line" style={{ background: section.color }} />
           </h2>
           {section.viewAll && !isNewArrivals && (
@@ -228,7 +248,7 @@ export default function ProductSection({ section, onViewAll, onSeeMore }) {
 
         {/* Compact, beautiful "See All Products" button */}
         <div className="qg-see-more">
-          <button onClick={() => (onViewAll ? onViewAll(section.group) : onSeeMore?.())}>
+          <button onClick={() => (onViewAll ? onViewAll(effectiveGroup) : onSeeMore?.())}>
             See All Products <span>→</span>
           </button>
         </div>

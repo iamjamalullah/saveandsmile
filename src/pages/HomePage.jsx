@@ -16,27 +16,16 @@ export default function HomePage() {
     navigate(cat ? '/category/' + cat.slug : '/shop')
   }
 
+  // Authoritative Single Source of Truth: only published, enabled, visible sections
   const displaySections = [...sections]
     .filter(s => s.enabled !== false && s.isVisible !== false)
     .sort((a, b) => (Number(a.order) || Number(a.id) || 0) - (Number(b.order) || Number(b.id) || 0))
 
-  // Defense-in-depth fallback detection in case of legacy sections without new block types
-  const hasRegisteredHero = sections.some(s => s.blockType === 'hero' || s.blockType === 'hero_slider')
-  const hasRegisteredCategories = sections.some(s => s.blockType === 'categories')
-  const hasRegisteredTrustBar = sections.some(s => s.blockType === 'trust_bar' || s.blockType === 'benefits')
-  const hasRegisteredReels = sections.some(s => s.blockType === 'reels' || s.blockType === 'watch_and_shop')
-  const hasRegisteredReviews = sections.some(s => s.blockType === 'reviews')
-  const hasRegisteredCategoryTabs = sections.some(s => s.blockType === 'category_tabs')
+  // True catastrophic fallback ONLY if sections array failed to load from API/DB completely
+  const isCompletelyEmptyConfig = !loading && sections.length === 0
 
   return (
     <main>
-      {/* Fallback Hero if not registered in sections */}
-      {!hasRegisteredHero && <Hero />}
-
-      {/* Fallback Category Strip if not registered in sections */}
-      {!hasRegisteredCategories && <CategoryCirclesSection onShopCategory={shopCategory} />}
-      {!hasRegisteredTrustBar && <TrustBarSection />}
-
       {loading && !displaySections.length && (
         <div className="qg-container qg-home-loading" aria-live="polite">
           <span /> <span /> <span />
@@ -44,7 +33,19 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* All Dynamic Homepage Builder Sections (Sections #1 to #15) */}
+      {/* Catastrophic cold-start fallback only when DB/API returned zero sections */}
+      {isCompletelyEmptyConfig && (
+        <>
+          <Hero />
+          <CategoryCirclesSection onShopCategory={shopCategory} />
+          <TrustBarSection />
+          <WatchAndShop onShopAll={() => navigate('/shop')} />
+          <Reviews />
+          <CategoryTabs onShopAll={() => navigate('/shop')} />
+        </>
+      )}
+
+      {/* All Dynamic Homepage Builder Sections (Strict Single Source of Truth) */}
       {displaySections.map((s, idx) => (
         <div key={s.id || s.group || idx}>
           <DynamicHomeSection
@@ -55,11 +56,6 @@ export default function HomePage() {
           />
         </div>
       ))}
-
-      {/* Fallback bottom sections if not registered in sections */}
-      {!hasRegisteredReels && <WatchAndShop onShopAll={() => navigate('/shop')} />}
-      {!hasRegisteredReviews && <Reviews />}
-      {!hasRegisteredCategoryTabs && <CategoryTabs onShopAll={() => navigate('/shop')} />}
     </main>
   )
 }

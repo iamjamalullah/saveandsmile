@@ -14,12 +14,159 @@ const PRESET_GROUPS = [
   { key: 'watch', label: 'Catalog Group: Exclusive Watches' },
 ]
 
+export function createDefaultContentForBlockType(blockType, existingSec = {}) {
+  const title = existingSec.title || 'Section'
+  const subtitle = existingSec.subtitle || ''
+  const color = existingSec.color || '#00998f'
+
+  switch (blockType) {
+    case 'products':
+      return {
+        group: existingSec.group || 'new',
+        category: existingSec.category || null,
+        color,
+        bg: existingSec.bg || '',
+        viewAll: false,
+        seeMore: false,
+      }
+    case 'banner':
+      return {
+        banners: (existingSec.content?.banners && existingSec.content.banners.length > 0)
+          ? existingSec.content.banners
+          : [
+            {
+              image: existingSec.image || 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+              link: '/shop',
+              title,
+              badge: 'Exclusive',
+              ctaText: 'Shop Now',
+            }
+          ]
+      }
+    case 'reels':
+      return {
+        reels: {
+          heading: title || 'Watch & Shop',
+          subtitle: subtitle || 'In motion',
+          maxVideos: 8,
+          items: existingSec.content?.reels?.items || [],
+        }
+      }
+    case 'reviews':
+      return {
+        reviews: {
+          heading: title || 'What Our Clients Say',
+          subtitle: subtitle || 'Trusted by thousands of resellers and shopkeepers across Pakistan.',
+          maxReviews: 12,
+          selectedReviewIds: existingSec.content?.reviews?.selectedReviewIds || [],
+        }
+      }
+    case 'category_tabs':
+      return {
+        category_tabs: {
+          heading: title || 'Category Tabs + Product Grid',
+          defaultActive: 'storage',
+          maxProducts: 8,
+          tabs: [
+            { key: 'storage', label: ['Storage &', 'Organization'], group: 'home' },
+            { key: 'jewelry', label: ['Jewelry &', 'Accessories'], group: 'jewelry' },
+            { key: 'bags', label: ['Fashion Bags &', 'Travel'], group: 'like' },
+          ],
+        }
+      }
+    case 'image_text':
+      return {
+        image_text: {
+          image: existingSec.content?.image_text?.image || 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+          heading: title || 'Premium Quality Gadgets',
+          text: subtitle || 'Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability.',
+          buttonText: 'Explore Catalog',
+          buttonLink: '/shop',
+          imagePosition: 'left',
+          bgColor: '#ffffff',
+          textColor: '#1e293b',
+        }
+      }
+    case 'countdown':
+      return {
+        countdown: {
+          heading: title || 'Limited Time Flash Sale',
+          subheading: subtitle || 'Special wholesale rates available until timer expires!',
+          targetDate: new Date(Date.now() + 48 * 3600 * 1000).toISOString(),
+          buttonText: 'Shop Deals Now',
+          buttonLink: '/shop?group=hot',
+          bgColor: '#0f3c28',
+          textColor: '#ffffff',
+        }
+      }
+    case 'trust_bar':
+      return {
+        trust_bar: {
+          heading: title || 'Why Shop With Us',
+          items: [
+            { icon: '🚚', title: 'Free Delivery', subtitle: 'On orders over Rs. 3,000' },
+            { icon: '💬', title: '24/7 WhatsApp Help', subtitle: 'Live chat support anytime' },
+            { icon: '🛡️', title: '100% Genuine Items', subtitle: 'Tested & verified products' },
+            { icon: '💵', title: 'Cash on Delivery', subtitle: 'Pay when your parcel arrives' },
+          ],
+          bgColor: '#f8fafc',
+          textColor: '#1e293b',
+        }
+      }
+    case 'announcement':
+      return {
+        announcement: {
+          heading: title || 'Special Announcement',
+          subheading: subtitle || 'Wholesale rates nationwide!',
+          buttonText: 'Shop Now',
+          buttonLink: '/shop',
+          bgColor: color || '#049977',
+          textColor: '#ffffff',
+          align: 'center',
+        }
+      }
+    case 'categories':
+      return {
+        categories: {
+          heading: title || 'Shop By Categories',
+          showAll: true,
+          categorySlugs: [],
+        }
+      }
+    case 'hero':
+      return {
+        hero: {
+          autoplay: true,
+          duration: 5200,
+          showArrows: true,
+          showDots: true,
+        }
+      }
+    default:
+      return {}
+  }
+}
+
+export function convertSectionBlockType(sec, newBlockType) {
+  const newContent = createDefaultContentForBlockType(newBlockType, sec)
+  return {
+    ...sec,
+    blockType: newBlockType,
+    content: {
+      ...(sec.content || {}),
+      ...newContent,
+    }
+  }
+}
+
 export default function HomePageEditorView() {
   const {
     heroSlides = [],
     sections = [],
     categories = [],
     products = [],
+    reviews = [],
+    watchShop = [],
     addHeroSlide,
     deleteHeroSlide,
     reorderHeroSlides,
@@ -49,6 +196,8 @@ export default function HomePageEditorView() {
 
   // ── Sections Builder State ─────────────────────────────────
   const [localSections, setLocalSections] = useState([])
+  const localSectionsRef = useRef(localSections)
+  localSectionsRef.current = localSections
   const [hasUnpublishedChanges, setHasUnpublishedChanges] = useState(false)
   const [savingDraft, setSavingDraft] = useState(false)
   const [publishing, setPublishing] = useState(false)
@@ -126,6 +275,27 @@ export default function HomePageEditorView() {
   // Edit Existing Section Modal
   const [editingSection, setEditingSection] = useState(null)
 
+  // Helper for YouTube Video ID extraction
+  const extractYouTubeId = (url) => {
+    if (!url || typeof url !== 'string') return null
+    const match = url.trim().match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?\/\s]{11})/i)
+    return match ? match[1] : null
+  }
+
+  // YouTube Video Manager state inside section editor
+  const [ytVideoForm, setYtVideoForm] = useState({
+    title: '',
+    youtubeUrl: '',
+    videoId: '',
+    image: '',
+    productId: '',
+    order: 1,
+    active: true,
+    description: '',
+  })
+  const [editingYtIdx, setEditingYtIdx] = useState(null)
+  const [ytUploadLoading, setYtUploadLoading] = useState(false)
+
   // Sync heroSlides
   useEffect(() => {
     if (heroSlides && heroSlides.length) {
@@ -142,6 +312,7 @@ export default function HomePageEditorView() {
           const draft = await loadDraftSections()
           if (draft && draft.length > 0) {
             const sorted = [...draft].sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
+            localSectionsRef.current = sorted
             setLocalSections(sorted)
             return
           }
@@ -149,6 +320,7 @@ export default function HomePageEditorView() {
       }
       if (sections && sections.length) {
         const sorted = [...sections].sort((a, b) => (Number(a.order) || Number(a.id) || 0) - (Number(b.order) || Number(b.id) || 0))
+        localSectionsRef.current = sorted
         setLocalSections(sorted)
       }
     }
@@ -213,8 +385,10 @@ export default function HomePageEditorView() {
       setLocalHeroSlides(prev => prev.filter(s => s.id !== slideToDelete.id))
       setSlideToDelete(null)
       if (reload) reload()
+      if (showToast) showToast('Hero slide deleted successfully.', 'success')
     } catch (err) {
       console.error('Delete slide error:', err)
+      if (showToast) showToast('Failed to delete slide: ' + err.message, 'danger')
     }
   }
 
@@ -237,30 +411,42 @@ export default function HomePageEditorView() {
       await reorderHeroSlides(localHeroSlides)
       setHasUnsavedHeroSlides(false)
       if (reload) reload()
+      if (showToast) showToast('Hero slides order saved successfully!', 'success')
     } catch (err) {
       console.error('Save hero slides error:', err)
+      if (showToast) showToast('Failed to save slides order: ' + err.message, 'danger')
     } finally {
       setSavingHeroSlides(false)
     }
   }
 
   // ── Sections Management Handlers ───────────────────────────
-  const handleMoveSection = (index, direction) => {
+  const handleMoveSection = async (index, direction) => {
+    const currentSections = localSectionsRef.current
     const targetIndex = index + direction
-    if (targetIndex < 0 || targetIndex >= localSections.length) return
+    if (targetIndex < 0 || targetIndex >= currentSections.length) return
 
-    const updated = [...localSections]
+    const updated = [...currentSections]
     const temp = updated[index]
     updated[index] = updated[targetIndex]
     updated[targetIndex] = temp
 
     const renumbered = updated.map((s, idx) => ({ ...s, order: idx + 1 }))
+    localSectionsRef.current = renumbered
     setLocalSections(renumbered)
     setHasUnpublishedChanges(true)
+    try {
+      if (saveDraftSections) await saveDraftSections(renumbered)
+      if (showToast) showToast(`Section moved ${direction < 0 ? 'up' : 'down'} and draft saved.`, 'info')
+    } catch (err) {
+      console.error('Move section save error:', err)
+      if (showToast) showToast('Failed to save section position: ' + err.message, 'danger')
+    }
   }
 
-  const handleDuplicateSection = (index) => {
-    const source = localSections[index]
+  const handleDuplicateSection = async (index) => {
+    const currentSections = localSectionsRef.current
+    const source = currentSections[index]
     if (!source) return
 
     const copy = {
@@ -270,35 +456,84 @@ export default function HomePageEditorView() {
       order: index + 2,
     }
 
-    const updated = [...localSections]
+    const updated = [...currentSections]
     updated.splice(index + 1, 0, copy)
 
     const renumbered = updated.map((s, idx) => ({ ...s, order: idx + 1 }))
+    localSectionsRef.current = renumbered
     setLocalSections(renumbered)
     setHasUnpublishedChanges(true)
-    if (showToast) showToast('Section duplicated successfully! Save Draft or Publish to apply.')
+    try {
+      if (saveDraftSections) await saveDraftSections(renumbered)
+      if (showToast) showToast('Section duplicated and saved to draft! Click "Publish Changes" to go live.', 'success')
+    } catch (err) {
+      console.error('Duplicate section save error:', err)
+      if (showToast) showToast('Failed to save duplicated section: ' + err.message, 'danger')
+    }
   }
 
-  const handleToggleSectionEnabled = (index) => {
-    const updated = [...localSections]
+  const handleToggleSectionEnabled = async (index) => {
+    const currentSections = localSectionsRef.current
+    if (!currentSections[index]) return
+    const updated = [...currentSections]
     const current = updated[index].enabled !== false && updated[index].isVisible !== false
     updated[index] = {
       ...updated[index],
       enabled: !current,
       isVisible: !current,
     }
+    localSectionsRef.current = updated
     setLocalSections(updated)
     setHasUnpublishedChanges(true)
+    try {
+      if (saveDraftSections) await saveDraftSections(updated)
+      if (showToast) showToast(`Section ${!current ? 'enabled' : 'hidden'} in draft. Publish to apply live.`, 'info')
+    } catch (err) {
+      console.error('Toggle visibility save error:', err)
+      if (showToast) showToast('Failed to save visibility: ' + err.message, 'danger')
+    }
   }
 
-  const handleConfirmDeleteSection = () => {
+  const handleConvertBlockType = async (index, targetType) => {
+    const currentSections = localSectionsRef.current
+    const current = currentSections[index]
+    if (!current || current.blockType === targetType) return
+
+    const converted = convertSectionBlockType(current, targetType)
+    const updated = [...currentSections]
+    updated[index] = converted
+    localSectionsRef.current = updated
+    setLocalSections(updated)
+    setHasUnpublishedChanges(true)
+    try {
+      if (saveDraftSections) await saveDraftSections(updated)
+      if (showToast) showToast(`Section converted to ${targetType} and draft saved!`, 'success')
+    } catch (err) {
+      console.error('Convert section save error:', err)
+      if (showToast) showToast('Failed to save converted section: ' + err.message, 'danger')
+    }
+  }
+
+  const handleConfirmDeleteSection = async () => {
     if (!sectionToDelete) return
-    const updated = localSections.filter(s => s.id !== sectionToDelete.id)
+    const deletedTitle = sectionToDelete.title || 'Section'
+    const currentSections = localSectionsRef.current
+    const updated = currentSections.filter(s => s.id !== sectionToDelete.id)
     const renumbered = updated.map((s, idx) => ({ ...s, order: idx + 1 }))
+    localSectionsRef.current = renumbered
     setLocalSections(renumbered)
     setSectionToDelete(null)
     setHasUnpublishedChanges(true)
-    if (showToast) showToast('Section removed from draft layout.')
+
+    try {
+      if (saveDraftSections) {
+        await saveDraftSections(renumbered)
+      }
+      if (showToast) showToast(`"${deletedTitle}" removed from draft layout. Click "Publish Changes" to apply live.`, 'info')
+    } catch (err) {
+      console.error('Delete section draft save error:', err)
+      if (showToast) showToast(`"${deletedTitle}" removed locally. Click "Save Draft" to persist.`, 'warning')
+    }
   }
 
   // ── Draft & Publishing Handlers ────────────────────────────
@@ -306,9 +541,9 @@ export default function HomePageEditorView() {
     setSavingDraft(true)
     try {
       if (saveDraftSections) {
-        await saveDraftSections(localSections)
+        await saveDraftSections(localSectionsRef.current)
       } else {
-        localStorage.setItem('qg_draft_sections', JSON.stringify(localSections))
+        localStorage.setItem('qg_draft_sections', JSON.stringify(localSectionsRef.current))
         if (showToast) showToast('Draft saved successfully!')
       }
       setHasUnpublishedChanges(true) // Still unpublished to live store
@@ -324,9 +559,9 @@ export default function HomePageEditorView() {
     setPublishing(true)
     try {
       if (publishHomepageSections) {
-        await publishHomepageSections(localSections, `Live deployment ${new Date().toLocaleDateString('en-GB')}`)
+        await publishHomepageSections(localSectionsRef.current, `Live deployment ${new Date().toLocaleDateString('en-GB')}`)
       } else {
-        await saveSectionsLayout(localSections)
+        await saveSectionsLayout(localSectionsRef.current)
       }
       setHasUnpublishedChanges(false)
       if (reload) reload()
@@ -492,6 +727,10 @@ export default function HomePageEditorView() {
             if (!nextSec.content.banners) nextSec.content.banners = []
             if (!nextSec.content.banners[1]) nextSec.content.banners[1] = {}
             nextSec.content.banners[1].image = urls[0]
+          } else if (targetPath === 'banner1_mobile') {
+            if (!nextSec.content.banners) nextSec.content.banners = []
+            if (!nextSec.content.banners[0]) nextSec.content.banners[0] = {}
+            nextSec.content.banners[0].mobileImage = urls[0]
           } else if (targetPath === 'image_text') {
             if (!nextSec.content.image_text) nextSec.content.image_text = {}
             nextSec.content.image_text.image = urls[0]
@@ -504,17 +743,54 @@ export default function HomePageEditorView() {
     }
   }
 
-  const handleSaveEditingSection = () => {
+  const handleUploadYtThumbnail = async (e) => {
+    const files = e.target.files
+    if (!files || !files.length) return
+    setYtUploadLoading(true)
+    try {
+      const webp = await convertFileToWebp(files[0], 1280, 0.85)
+      const urls = await uploadWebpImages([webp])
+      if (urls && urls[0]) {
+        setYtVideoForm(prev => ({ ...prev, image: urls[0] }))
+      }
+    } catch (err) {
+      alert('Thumbnail upload failed: ' + err.message)
+    } finally {
+      setYtUploadLoading(false)
+    }
+  }
+
+  const handleSaveEditingSection = async () => {
     if (!editingSection) return
-    const updated = [...localSections]
-    updated[editingSection.idx] = editingSection.sec
+    const currentSec = JSON.parse(JSON.stringify(editingSection.sec))
+    if (currentSec.blockType === 'reviews') {
+      const headingInput = document.querySelector('.modal input[data-review-heading="true"]') || Array.from(document.querySelectorAll('.modal input[type="text"]')).find(i => i.labels?.[0]?.innerText?.includes('Section Heading') || i.parentElement?.querySelector('label')?.innerText?.includes('Section Heading'))
+      if (headingInput && headingInput.value.trim()) {
+        if (!currentSec.content) currentSec.content = {}
+        if (!currentSec.content.reviews) currentSec.content.reviews = {}
+        currentSec.content.reviews.heading = headingInput.value.trim()
+        currentSec.title = headingInput.value.trim()
+      }
+    }
+    const currentSections = localSectionsRef.current
+    const updated = [...currentSections]
+    updated[editingSection.idx] = currentSec
+    localSectionsRef.current = updated
     setLocalSections(updated)
     setHasUnpublishedChanges(true)
     setEditingSection(null)
-    if (showToast) showToast('Section updated in draft! Click "Publish Changes" to apply to live storefront.')
+    try {
+      if (saveDraftSections) {
+        await saveDraftSections(updated)
+      }
+      if (showToast) showToast('Section updated and draft saved! Click "Publish Changes" to apply live.', 'success')
+    } catch (err) {
+      console.error('Save draft error after edit:', err)
+      if (showToast) showToast('Failed to save draft after editing: ' + err.message, 'danger')
+    }
   }
 
-  const handleFinishWizard = () => {
+  const handleFinishWizard = async () => {
     const newId = `sec-${Date.now()}-${Math.floor(Math.random() * 1000)}`
     let content = {}
 
@@ -570,16 +846,27 @@ export default function HomePageEditorView() {
           textColor: wizardData.trust_bar.textColor || '#1e293b',
         },
       }
+    } else {
+      content = createDefaultContentForBlockType(wizardBlockType, {
+        title: wizardData.title,
+        subtitle: wizardData.subtitle,
+        color: wizardData.color,
+      })
     }
 
     const createdSection = {
       id: newId,
       title: wizardData.title || (
-        wizardBlockType === 'banner' ? 'Promotional Showcase'
-        : wizardBlockType === 'image_text' ? 'Featured Story & Showcase'
-        : wizardBlockType === 'countdown' ? 'Limited Time Flash Sale'
-        : wizardBlockType === 'trust_bar' ? 'Why Shop With Us'
-        : wizardBlockType === 'announcement' ? 'Special Announcement'
+        wizardBlockType === 'banner' ? (wizardData.banner1?.title || 'Promotional Showcase')
+        : wizardBlockType === 'image_text' ? (wizardData.image_text?.heading || 'Featured Story & Showcase')
+        : wizardBlockType === 'countdown' ? (wizardData.countdown?.heading || 'Limited Time Flash Sale')
+        : wizardBlockType === 'trust_bar' ? (wizardData.trust_bar?.heading || 'Why Shop With Us')
+        : wizardBlockType === 'announcement' ? (wizardData.announcement?.heading || 'Special Announcement')
+        : wizardBlockType === 'reels' ? 'Watch & Shop'
+        : wizardBlockType === 'reviews' ? 'What Our Clients Say'
+        : wizardBlockType === 'category_tabs' ? 'Category Tabs + Product Grid'
+        : wizardBlockType === 'categories' ? 'Shop By Categories'
+        : wizardBlockType === 'hero' ? 'Hero Slider'
         : 'Special Collection'
       ),
       subtitle: wizardData.subtitle || '',
@@ -599,7 +886,8 @@ export default function HomePageEditorView() {
       },
     }
 
-    const updated = [...localSections]
+    const currentSections = localSectionsRef.current
+    const updated = [...currentSections]
     if (insertTargetIndex !== null && insertTargetIndex >= 0) {
       updated.splice(insertTargetIndex, 0, createdSection)
     } else {
@@ -607,10 +895,17 @@ export default function HomePageEditorView() {
     }
 
     const renumbered = updated.map((s, idx) => ({ ...s, order: idx + 1 }))
+    localSectionsRef.current = renumbered
     setLocalSections(renumbered)
     setHasUnpublishedChanges(true)
     setShowWizardModal(false)
-    if (showToast) showToast('New section added to layout! Save Draft or Publish Changes to go live.')
+    try {
+      if (saveDraftSections) await saveDraftSections(renumbered)
+      if (showToast) showToast('New section added to layout and draft saved! Publish Changes to go live.', 'success')
+    } catch (err) {
+      console.error('Wizard draft save error:', err)
+      if (showToast) showToast('Failed to save new section: ' + err.message, 'danger')
+    }
   }
 
   // Count matching products helper
@@ -808,16 +1103,6 @@ export default function HomePageEditorView() {
               <div className="text-center text-muted small pb-2 border-bottom mb-3">
                 <i className="bi bi-eye me-1"></i> Interactive Draft Preview Mode (Exact Storefront Appearance)
               </div>
-              {/* Pinned Hero Preview */}
-              <div className="rounded-3 overflow-hidden mb-3 border text-center p-2.5 bg-dark text-white">
-                <span className="badge bg-secondary mb-1">Pinned Storefront Header</span>
-                <div className="small fw-semibold">Hero Slider ({localHeroSlides.length} slides active)</div>
-              </div>
-              {/* Pinned Category Strip Preview */}
-              <div className="rounded-3 overflow-hidden mb-3 border text-center p-2.5 bg-light text-dark">
-                <span className="badge bg-secondary mb-1">Pinned Storefront Component</span>
-                <div className="small fw-semibold">Shop By Categories &amp; Trust Bar (Support 24/7, Best Prices, Secure Payment)</div>
-              </div>
               {localSections.map((sec, idx) => (
                 <div key={sec.id || idx} className="mb-4">
                   <DynamicHomeSection section={sec} />
@@ -931,13 +1216,51 @@ export default function HomePageEditorView() {
                             className="form-control form-control-sm fw-bold text-dark"
                             value={sec.title || ''}
                             onChange={(e) => {
-                              const updated = [...localSections]
+                              const updated = [...localSectionsRef.current]
                               updated[idx] = { ...updated[idx], title: e.target.value }
+                              localSectionsRef.current = updated
                               setLocalSections(updated)
                               setHasUnpublishedChanges(true)
                             }}
+                            onBlur={async (e) => {
+                              const trimmed = e.target.value.trim()
+                              const updated = [...localSectionsRef.current]
+                              updated[idx] = { ...updated[idx], title: trimmed }
+                              localSectionsRef.current = updated
+                              setLocalSections(updated)
+                              try {
+                                if (saveDraftSections) await saveDraftSections(updated)
+                              } catch (err) {
+                                if (showToast) showToast('Failed to auto-save title: ' + err.message, 'danger')
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') e.target.blur()
+                            }}
                             placeholder="Section Title"
                           />
+                          <div className="mt-1 d-flex align-items-center gap-1">
+                            <span className="text-muted" style={{ fontSize: '0.72rem' }}>Type:</span>
+                            <select
+                              className="form-select form-select-sm py-0 px-1 border-light-subtle text-muted"
+                              style={{ fontSize: '0.75rem', height: '24px' }}
+                              value={bType}
+                              onChange={(e) => handleConvertBlockType(idx, e.target.value)}
+                              title="Replace or convert this section to another block type"
+                            >
+                              <option value="products">🛒 Products Feed</option>
+                              <option value="banner">🖼️ Promo Banner</option>
+                              <option value="reels">🎥 Watch &amp; Shop</option>
+                              <option value="reviews">⭐ Customer Reviews</option>
+                              <option value="category_tabs">📑 Category Tabs</option>
+                              <option value="image_text">🖼️📝 Image + Text</option>
+                              <option value="countdown">⏱️ Countdown Sale</option>
+                              <option value="trust_bar">🛡️ Trust Bar</option>
+                              <option value="announcement">📢 Announcement</option>
+                              <option value="categories">📁 Categories</option>
+                              <option value="hero">🎠 Hero Slider</option>
+                            </select>
+                          </div>
                         </div>
 
                         {/* 3. Block Target / Configuration */}
@@ -947,9 +1270,9 @@ export default function HomePageEditorView() {
                               <select
                                 className="form-select form-select-sm mb-1"
                                 value={currentValue}
-                                onChange={(e) => {
+                                onChange={async (e) => {
                                   const val = e.target.value
-                                  const updated = [...localSections]
+                                  const updated = [...localSectionsRef.current]
                                   if (val.startsWith('category:')) {
                                     updated[idx] = {
                                       ...updated[idx],
@@ -963,8 +1286,14 @@ export default function HomePageEditorView() {
                                       category: null,
                                     }
                                   }
+                                  localSectionsRef.current = updated
                                   setLocalSections(updated)
                                   setHasUnpublishedChanges(true)
+                                  try {
+                                    if (saveDraftSections) await saveDraftSections(updated)
+                                  } catch (err) {
+                                    if (showToast) showToast('Failed to auto-save product target: ' + err.message, 'danger')
+                                  }
                                 }}
                               >
                                 <optgroup label="Catalog Groups">
@@ -987,11 +1316,30 @@ export default function HomePageEditorView() {
                                   type="color"
                                   className="form-control form-control-color form-control-sm p-0 border-0"
                                   value={sec.color || '#00998f'}
-                                  onChange={(e) => {
-                                    const updated = [...localSections]
-                                    updated[idx] = { ...updated[idx], color: e.target.value }
+                                  onChange={async (e) => {
+                                    const newColor = e.target.value
+                                    const updated = [...localSectionsRef.current]
+                                    updated[idx] = { ...updated[idx], color: newColor }
+                                    localSectionsRef.current = updated
                                     setLocalSections(updated)
                                     setHasUnpublishedChanges(true)
+                                    try {
+                                      if (saveDraftSections) await saveDraftSections(updated)
+                                    } catch (err) {
+                                      if (showToast) showToast('Failed to auto-save color: ' + err.message, 'danger')
+                                    }
+                                  }}
+                                  onBlur={async (e) => {
+                                    const newColor = e.target.value
+                                    const updated = [...localSectionsRef.current]
+                                    updated[idx] = { ...updated[idx], color: newColor }
+                                    localSectionsRef.current = updated
+                                    setLocalSections(updated)
+                                    try {
+                                      if (saveDraftSections) await saveDraftSections(updated)
+                                    } catch (err) {
+                                      if (showToast) showToast('Failed to auto-save color: ' + err.message, 'danger')
+                                    }
                                   }}
                                   title="Theme color"
                                   style={{ width: '22px', height: '22px', cursor: 'pointer' }}
@@ -1067,7 +1415,7 @@ export default function HomePageEditorView() {
                                 <button
                                   type="button"
                                   className="btn btn-link btn-sm p-0 text-primary text-decoration-none fw-semibold"
-                                  onClick={() => setActiveTab('slides')}
+                                  onClick={() => setActiveTab('hero')}
                                 >
                                   Manage Slides ({localHeroSlides.length})
                                 </button>
@@ -1141,8 +1489,17 @@ export default function HomePageEditorView() {
                           )}
                         </div>
 
-                        {/* 4. Actions: Duplicate, Visibility Toggle, Delete */}
+                        {/* 4. Actions: Edit, Duplicate, Visibility Toggle, Delete */}
                         <div className="col-auto ms-auto d-flex align-items-center gap-2">
+                          <button
+                            type="button"
+                            className="btn btn-outline-primary btn-sm rounded-pill p-1.5 px-2.5"
+                            onClick={() => setEditingSection({ sec: JSON.parse(JSON.stringify(sec)), idx })}
+                            title="Configure section details, images, texts, links & colors"
+                          >
+                            <i className="bi bi-pencil-square me-1"></i> Edit
+                          </button>
+
                           <button
                             type="button"
                             className="btn btn-outline-secondary btn-sm rounded-pill p-1.5 px-2.5"
@@ -1418,6 +1775,51 @@ export default function HomePageEditorView() {
                           onClick={() => setWizardBlockType('announcement')}
                         >
                           <i className="bi bi-megaphone me-1"></i> Announcement
+                        </button>
+                      </div>
+                      <div className="col-6 col-md-4">
+                        <button
+                          type="button"
+                          className={`btn w-100 py-2.5 fw-semibold ${wizardBlockType === 'reels' ? 'btn-success text-white' : 'btn-outline-secondary'}`}
+                          onClick={() => setWizardBlockType('reels')}
+                        >
+                          <i className="bi bi-camera-reels me-1"></i> Watch &amp; Shop
+                        </button>
+                      </div>
+                      <div className="col-6 col-md-4">
+                        <button
+                          type="button"
+                          className={`btn w-100 py-2.5 fw-semibold ${wizardBlockType === 'reviews' ? 'btn-success text-white' : 'btn-outline-secondary'}`}
+                          onClick={() => setWizardBlockType('reviews')}
+                        >
+                          <i className="bi bi-chat-quote me-1"></i> Customer Reviews
+                        </button>
+                      </div>
+                      <div className="col-6 col-md-4">
+                        <button
+                          type="button"
+                          className={`btn w-100 py-2.5 fw-semibold ${wizardBlockType === 'category_tabs' ? 'btn-success text-white' : 'btn-outline-secondary'}`}
+                          onClick={() => setWizardBlockType('category_tabs')}
+                        >
+                          <i className="bi bi-folder2-open me-1"></i> Category Tabs
+                        </button>
+                      </div>
+                      <div className="col-6 col-md-4">
+                        <button
+                          type="button"
+                          className={`btn w-100 py-2.5 fw-semibold ${wizardBlockType === 'categories' ? 'btn-success text-white' : 'btn-outline-secondary'}`}
+                          onClick={() => setWizardBlockType('categories')}
+                        >
+                          <i className="bi bi-grid me-1"></i> Categories
+                        </button>
+                      </div>
+                      <div className="col-6 col-md-4">
+                        <button
+                          type="button"
+                          className={`btn w-100 py-2.5 fw-semibold ${wizardBlockType === 'hero' ? 'btn-success text-white' : 'btn-outline-secondary'}`}
+                          onClick={() => setWizardBlockType('hero')}
+                        >
+                          <i className="bi bi-images me-1"></i> Hero Slider
                         </button>
                       </div>
                     </div>
@@ -1878,6 +2280,120 @@ export default function HomePageEditorView() {
                         </div>
                       </div>
                     )}
+                    {/* Form for Watch & Shop Reels */}
+                    {wizardBlockType === 'reels' && (
+                      <div className="bg-light p-3.5 rounded-3 border">
+                        <div className="mb-3">
+                          <label className="form-label fw-semibold small">Section Heading / Title</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={wizardData.title}
+                            onChange={e => setWizardData({ ...wizardData, title: e.target.value })}
+                            placeholder="e.g. Watch &amp; Shop"
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label fw-semibold small">Subtitle / Tagline</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={wizardData.subtitle}
+                            onChange={e => setWizardData({ ...wizardData, subtitle: e.target.value })}
+                            placeholder="e.g. In motion"
+                          />
+                        </div>
+                        <div className="alert alert-info py-2 px-3 small mb-0">
+                          <i className="bi bi-info-circle me-1"></i> Videos and YouTube links can be added, edited, or reordered anytime inside the Watch &amp; Shop video manager.
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Form for Customer Reviews */}
+                    {wizardBlockType === 'reviews' && (
+                      <div className="bg-light p-3.5 rounded-3 border">
+                        <div className="mb-3">
+                          <label className="form-label fw-semibold small">Section Heading / Title</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={wizardData.title}
+                            onChange={e => setWizardData({ ...wizardData, title: e.target.value })}
+                            placeholder="e.g. What Our Clients Say"
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label fw-semibold small">Subtitle / Tagline</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={wizardData.subtitle}
+                            onChange={e => setWizardData({ ...wizardData, subtitle: e.target.value })}
+                            placeholder="e.g. Trusted by thousands of resellers across Pakistan."
+                          />
+                        </div>
+                        <div className="alert alert-info py-2 px-3 small mb-0">
+                          <i className="bi bi-info-circle me-1"></i> Renders customer review quotes and verified ratings dynamically from the store database.
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Form for Category Tabs */}
+                    {wizardBlockType === 'category_tabs' && (
+                      <div className="bg-light p-3.5 rounded-3 border">
+                        <div className="mb-3">
+                          <label className="form-label fw-semibold small">Section Heading / Title</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={wizardData.title}
+                            onChange={e => setWizardData({ ...wizardData, title: e.target.value })}
+                            placeholder="e.g. Featured Category Collections"
+                          />
+                        </div>
+                        <div className="alert alert-info py-2 px-3 small mb-0">
+                          <i className="bi bi-info-circle me-1"></i> Pre-configured with dynamic category tabs. You can customize tabs and targets inside Section Configuration.
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Form for Categories Carousel */}
+                    {wizardBlockType === 'categories' && (
+                      <div className="bg-light p-3.5 rounded-3 border">
+                        <div className="mb-3">
+                          <label className="form-label fw-semibold small">Section Heading / Title</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={wizardData.title}
+                            onChange={e => setWizardData({ ...wizardData, title: e.target.value })}
+                            placeholder="e.g. Shop By Categories"
+                          />
+                        </div>
+                        <div className="alert alert-info py-2 px-3 small mb-0">
+                          <i className="bi bi-info-circle me-1"></i> Automatically displays all active categories with icons and direct category links.
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Form for Hero Slider */}
+                    {wizardBlockType === 'hero' && (
+                      <div className="bg-light p-3.5 rounded-3 border">
+                        <div className="mb-3">
+                          <label className="form-label fw-semibold small">Section Heading / Title</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={wizardData.title}
+                            onChange={e => setWizardData({ ...wizardData, title: e.target.value })}
+                            placeholder="e.g. Main Promotional Slider"
+                          />
+                        </div>
+                        <div className="alert alert-info py-2 px-3 small mb-0">
+                          <i className="bi bi-info-circle me-1"></i> Hero banners and slides can be uploaded and reordered under the &ldquo;Hero Slides Carousel&rdquo; tab.
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -2078,6 +2594,35 @@ export default function HomePageEditorView() {
                       />
                     </div>
                     <div className="col-12 col-md-6">
+                      <label className="form-label fw-semibold small text-primary d-flex align-items-center gap-1">
+                        <i className="bi bi-arrow-repeat"></i> Section Block Type (Convert / Replace)
+                      </label>
+                      <select
+                        className="form-select border-primary-subtle"
+                        value={editingSection.sec.blockType || 'products'}
+                        onChange={e => {
+                          const newType = e.target.value
+                          const converted = convertSectionBlockType(editingSection.sec, newType)
+                          setEditingSection({
+                            ...editingSection,
+                            sec: converted,
+                          })
+                        }}
+                      >
+                        <option value="products">🛒 Products Feed / Carousel</option>
+                        <option value="banner">🖼️ Promotional Banner</option>
+                        <option value="reels">🎥 Watch &amp; Shop (YouTube Reels)</option>
+                        <option value="reviews">⭐ Customer Reviews / Testimonials</option>
+                        <option value="category_tabs">📑 Category Tabs Grid</option>
+                        <option value="image_text">🖼️📝 Image + Text Feature Story</option>
+                        <option value="countdown">⏱️ Limited-Time Countdown Flash Sale</option>
+                        <option value="trust_bar">🛡️ Trust Bar &amp; Benefits</option>
+                        <option value="announcement">📢 Promotional Announcement Bar</option>
+                        <option value="categories">📁 Shop By Categories Carousel</option>
+                        <option value="hero">🎠 Hero Banner Slider</option>
+                      </select>
+                    </div>
+                    <div className="col-12 col-md-6">
                       <label className="form-label fw-semibold small">Theme Accent Color</label>
                       <input
                         type="color"
@@ -2127,8 +2672,37 @@ export default function HomePageEditorView() {
                           </label>
                         </div>
                       </div>
+                      <div className="mb-2">
+                        <label className="form-label small fw-semibold">Banner 1 Mobile Image URL (Optional - Responsive)</label>
+                        <div className="input-group">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Optional separate mobile banner image"
+                            value={editingSection.sec.content?.banners?.[0]?.mobileImage || ''}
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.banners) nextSec.content.banners = []
+                              if (!nextSec.content.banners[0]) nextSec.content.banners[0] = {}
+                              nextSec.content.banners[0].mobileImage = e.target.value
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                          />
+                          <label className="btn btn-outline-secondary">
+                            <i className="bi bi-upload me-1"></i> Upload Mobile
+                            <input
+                              type="file"
+                              accept="image/*"
+                              hidden
+                              onChange={e => handleEditSectionImageUpload('banner1_mobile', e)}
+                            />
+                          </label>
+                        </div>
+                      </div>
                       <div className="row g-2 mb-3">
-                        <div className="col-md-6">
+                        <div className="col-md-4">
+                          <label className="form-label small text-muted mb-1">Destination Link</label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
@@ -2144,7 +2718,8 @@ export default function HomePageEditorView() {
                             placeholder="Destination Link"
                           />
                         </div>
-                        <div className="col-md-6">
+                        <div className="col-md-4">
+                          <label className="form-label small text-muted mb-1">Floating Badge</label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
@@ -2158,6 +2733,23 @@ export default function HomePageEditorView() {
                               setEditingSection({ ...editingSection, sec: nextSec })
                             }}
                             placeholder="Floating Badge (e.g. HOT DEAL)"
+                          />
+                        </div>
+                        <div className="col-md-4">
+                          <label className="form-label small text-muted mb-1">CTA Button Text (Optional)</label>
+                          <input
+                            type="text"
+                            className="form-control form-control-sm"
+                            value={editingSection.sec.content?.banners?.[0]?.ctaText || ''}
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.banners) nextSec.content.banners = []
+                              if (!nextSec.content.banners[0]) nextSec.content.banners[0] = {}
+                              nextSec.content.banners[0].ctaText = e.target.value
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                            placeholder="Button Text (e.g. Shop Now)"
                           />
                         </div>
                       </div>
@@ -2566,7 +3158,7 @@ export default function HomePageEditorView() {
                           onClick={() => {
                             setShowAddSlideModal(false)
                             setEditingSection(null)
-                            setActiveTab('slides')
+                            setActiveTab('hero')
                           }}
                         >
                           <i className="bi bi-images me-1"></i> Manage Hero Slides Carousel ({localHeroSlides.length}) →
@@ -2638,84 +3230,567 @@ export default function HomePageEditorView() {
                   )}
 
                   {/* REELS / WATCH & SHOP */}
-                  {editingSection.sec.blockType === 'reels' && (
-                    <div className="bg-light p-3.5 rounded-3 border">
-                      <div className="mb-3">
-                        <label className="form-label small fw-semibold">Section Heading</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={editingSection.sec.content?.reels?.heading || editingSection.sec.title || 'Watch & Shop'}
-                          onChange={e => {
-                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
-                            if (!nextSec.content) nextSec.content = {}
-                            if (!nextSec.content.reels) nextSec.content.reels = {}
-                            nextSec.content.reels.heading = e.target.value
-                            nextSec.title = e.target.value
-                            setEditingSection({ ...editingSection, sec: nextSec })
-                          }}
-                        />
+                  {editingSection.sec.blockType === 'reels' && (() => {
+                    const currentItems = editingSection.sec.content?.reels?.items || watchShop || []
+                    const handleAddOrUpdateYtVideo = (e) => {
+                      e.preventDefault()
+                      const domUrl = document.querySelector('.modal input[data-yt-url="true"]')?.value || document.querySelector('.modal input[placeholder*="youtube.com"]')?.value || ''
+                      const domTitle = document.querySelector('.modal input[data-yt-title="true"]')?.value || document.querySelector('.modal input[placeholder*="Unboxing"]')?.value || ''
+                      const finalUrl = (ytVideoForm.youtubeUrl || domUrl || '').trim()
+                      const finalTitle = (ytVideoForm.title || domTitle || '').trim()
+
+                      const extractedId = ytVideoForm.videoId || extractYouTubeId(finalUrl)
+                      if (!extractedId) {
+                        alert('Invalid or missing YouTube URL. Please provide a standard watch, share, shorts, or embed URL.')
+                        return
+                      }
+                      const finalItem = {
+                        id: editingYtIdx !== null && currentItems[editingYtIdx]?.id ? currentItems[editingYtIdx].id : `yt-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+                        title: finalTitle || 'Watch & Shop Feature',
+                        youtubeUrl: finalUrl,
+                        videoId: extractedId,
+                        image: ytVideoForm.image.trim() || `https://img.youtube.com/vi/${extractedId}/hqdefault.jpg`,
+                        productId: ytVideoForm.productId ? Number(ytVideoForm.productId) : null,
+                        active: ytVideoForm.active !== false,
+                        description: ytVideoForm.description.trim() || '',
+                        order: editingYtIdx !== null ? (editingYtIdx + 1) : (currentItems.length + 1),
+                      }
+
+                      const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                      if (!nextSec.content) nextSec.content = {}
+                      if (!nextSec.content.reels) nextSec.content.reels = {}
+                      const itemsCopy = [...(nextSec.content.reels.items || currentItems)]
+                      if (editingYtIdx !== null && editingYtIdx >= 0 && editingYtIdx < itemsCopy.length) {
+                        itemsCopy[editingYtIdx] = finalItem
+                      } else {
+                        itemsCopy.push(finalItem)
+                      }
+                      nextSec.content.reels.items = itemsCopy
+                      setEditingSection({ ...editingSection, sec: nextSec })
+                      setEditingYtIdx(null)
+                      setYtVideoForm({
+                        title: '',
+                        youtubeUrl: '',
+                        videoId: '',
+                        image: '',
+                        productId: '',
+                        order: 1,
+                        active: true,
+                        description: '',
+                      })
+                      const domUrlEl = document.querySelector('.modal input[data-yt-url="true"]') || document.querySelector('.modal input[placeholder*="youtube.com"]')
+                      if (domUrlEl) domUrlEl.value = ''
+                      const domTitleEl = document.querySelector('.modal input[data-yt-title="true"]') || document.querySelector('.modal input[placeholder*="Unboxing"]')
+                      if (domTitleEl) domTitleEl.value = ''
+                    }
+
+                    const handleDeleteYtItem = (idx) => {
+                      const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                      if (!nextSec.content) nextSec.content = {}
+                      if (!nextSec.content.reels) nextSec.content.reels = {}
+                      const itemsCopy = [...(nextSec.content.reels.items || currentItems)]
+                      itemsCopy.splice(idx, 1)
+                      nextSec.content.reels.items = itemsCopy
+                      setEditingSection({ ...editingSection, sec: nextSec })
+                      if (editingYtIdx === idx) {
+                        setEditingYtIdx(null)
+                        setYtVideoForm({ title: '', youtubeUrl: '', videoId: '', image: '', productId: '', order: 1, active: true, description: '' })
+                      }
+                    }
+
+                    const handleMoveYtItem = (idx, dir) => {
+                      const target = idx + dir
+                      if (target < 0 || target >= currentItems.length) return
+                      const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                      if (!nextSec.content) nextSec.content = {}
+                      if (!nextSec.content.reels) nextSec.content.reels = {}
+                      const itemsCopy = [...(nextSec.content.reels.items || currentItems)]
+                      const temp = itemsCopy[idx]
+                      itemsCopy[idx] = itemsCopy[target]
+                      itemsCopy[target] = temp
+                      nextSec.content.reels.items = itemsCopy
+                      setEditingSection({ ...editingSection, sec: nextSec })
+                    }
+
+                    const handleToggleYtActive = (idx) => {
+                      const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                      if (!nextSec.content) nextSec.content = {}
+                      if (!nextSec.content.reels) nextSec.content.reels = {}
+                      const itemsCopy = [...(nextSec.content.reels.items || currentItems)]
+                      itemsCopy[idx] = { ...itemsCopy[idx], active: itemsCopy[idx].active === false ? true : false }
+                      nextSec.content.reels.items = itemsCopy
+                      setEditingSection({ ...editingSection, sec: nextSec })
+                    }
+
+                    const detectedId = extractYouTubeId(ytVideoForm.youtubeUrl)
+
+                    return (
+                      <div className="bg-light p-3.5 rounded-3 border">
+                        <div className="row g-3 mb-3">
+                          <div className="col-md-4">
+                            <label className="form-label small fw-semibold">Section Heading</label>
+                            <input
+                              type="text"
+                              className="form-control form-control-sm"
+                              value={editingSection.sec.content?.reels?.heading || editingSection.sec.title || 'Watch & Shop'}
+                              onChange={e => {
+                                const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                                if (!nextSec.content) nextSec.content = {}
+                                if (!nextSec.content.reels) nextSec.content.reels = {}
+                                nextSec.content.reels.heading = e.target.value
+                                nextSec.title = e.target.value
+                                setEditingSection({ ...editingSection, sec: nextSec })
+                              }}
+                            />
+                          </div>
+                          <div className="col-md-4">
+                            <label className="form-label small fw-semibold">Subtitle / Callout</label>
+                            <input
+                              type="text"
+                              className="form-control form-control-sm"
+                              value={editingSection.sec.content?.reels?.subtitle || 'In motion'}
+                              onChange={e => {
+                                const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                                if (!nextSec.content) nextSec.content = {}
+                                if (!nextSec.content.reels) nextSec.content.reels = {}
+                                nextSec.content.reels.subtitle = e.target.value
+                                setEditingSection({ ...editingSection, sec: nextSec })
+                              }}
+                            />
+                          </div>
+                          <div className="col-md-4">
+                            <label className="form-label small fw-semibold">Max Visible Videos</label>
+                            <input
+                              type="number"
+                              className="form-control form-control-sm"
+                              min="1"
+                              max="24"
+                              value={editingSection.sec.content?.reels?.maxVideos || ''}
+                              placeholder="Default (All active)"
+                              onChange={e => {
+                                const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                                if (!nextSec.content) nextSec.content = {}
+                                if (!nextSec.content.reels) nextSec.content.reels = {}
+                                nextSec.content.reels.maxVideos = e.target.value ? Number(e.target.value) : ''
+                                setEditingSection({ ...editingSection, sec: nextSec })
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Add / Edit YouTube Video Form */}
+                        <div className="card mb-4 border-success-subtle shadow-sm">
+                          <div className="card-header bg-success-subtle py-2 d-flex justify-content-between align-items-center">
+                            <span className="fw-bold text-success-emphasis small">
+                              <i className="bi bi-youtube me-1 text-danger"></i>
+                              {editingYtIdx !== null ? `Edit Video #${editingYtIdx + 1}` : 'Add New YouTube Video'}
+                            </span>
+                            {editingYtIdx !== null && (
+                              <button
+                                type="button"
+                                className="btn btn-link btn-sm p-0 text-muted"
+                                onClick={() => {
+                                  setEditingYtIdx(null)
+                                  setYtVideoForm({ title: '', youtubeUrl: '', videoId: '', image: '', productId: '', order: 1, active: true, description: '' })
+                                }}
+                              >
+                                Cancel Edit
+                              </button>
+                            )}
+                          </div>
+                          <div className="card-body p-3">
+                            <div className="row g-2 mb-2">
+                              <div className="col-md-6">
+                                <label className="form-label small fw-semibold mb-1">YouTube URL (Watch, Shorts, youtu.be)</label>
+                                <input
+                                  type="text"
+                                  data-yt-url="true"
+                                  className="form-control form-control-sm"
+                                  placeholder="e.g. https://www.youtube.com/watch?v=..."
+                                  value={ytVideoForm.youtubeUrl}
+                                  onChange={e => {
+                                    const val = e.target.value
+                                    const exId = extractYouTubeId(val)
+                                    setYtVideoForm(prev => ({
+                                      ...prev,
+                                      youtubeUrl: val,
+                                      videoId: exId || prev.videoId,
+                                      image: exId && (!prev.image || prev.image.includes('youtube.com')) ? `https://img.youtube.com/vi/${exId}/hqdefault.jpg` : prev.image,
+                                    }))
+                                  }}
+                                />
+                                {detectedId && (
+                                  <span className="badge bg-success-subtle text-success border border-success mt-1 small">
+                                    ✓ Video ID: {detectedId}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="col-md-6">
+                                <label className="form-label small fw-semibold mb-1">Video Title / Caption</label>
+                                <input
+                                  type="text"
+                                  data-yt-title="true"
+                                  className="form-control form-control-sm"
+                                  placeholder="e.g. Smart Watch Ultra 2 Unboxing"
+                                  value={ytVideoForm.title}
+                                  onChange={e => setYtVideoForm({ ...ytVideoForm, title: e.target.value })}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="row g-2 mb-2">
+                              <div className="col-md-6">
+                                <label className="form-label small fw-semibold mb-1">Thumbnail Preview / Image URL</label>
+                                <div className="input-group input-group-sm">
+                                  <input
+                                    type="text"
+                                    className="form-control form-control-sm"
+                                    placeholder="Auto-resolved from YouTube or custom"
+                                    value={ytVideoForm.image}
+                                    onChange={e => setYtVideoForm({ ...ytVideoForm, image: e.target.value })}
+                                  />
+                                  <label className="btn btn-outline-secondary btn-sm">
+                                    <i className="bi bi-upload"></i>
+                                    <input type="file" accept="image/*" hidden onChange={handleUploadYtThumbnail} />
+                                  </label>
+                                </div>
+                              </div>
+                              <div className="col-md-6">
+                                <label className="form-label small fw-semibold mb-1">Associated Store Product (Optional)</label>
+                                <select
+                                  className="form-select form-select-sm"
+                                  value={ytVideoForm.productId || ''}
+                                  onChange={e => setYtVideoForm({ ...ytVideoForm, productId: e.target.value })}
+                                >
+                                  <option value="">-- No Linked Product --</option>
+                                  {products.map(p => (
+                                    <option key={p.id} value={p.id}>
+                                      {p.name.slice(0, 40)}... (Rs. {Number(p.price).toLocaleString()})
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+
+                            <div className="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                              <div className="form-check form-switch">
+                                <input
+                                  className="form-check-input"
+                                  type="checkbox"
+                                  id="ytActiveSwitch"
+                                  checked={ytVideoForm.active !== false}
+                                  onChange={e => setYtVideoForm({ ...ytVideoForm, active: e.target.checked })}
+                                />
+                                <label className="form-check-label small" htmlFor="ytActiveSwitch">Active on Live Store</label>
+                              </div>
+                              <button
+                                type="button"
+                                className="btn btn-success btn-sm px-3 shadow-sm fw-semibold"
+                                onClick={handleAddOrUpdateYtVideo}
+                              >
+                                <i className="bi bi-plus-circle me-1"></i>
+                                {editingYtIdx !== null ? 'Update Video in List' : 'Add Video to Watch & Shop'}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* List of Configured Videos */}
+                        <h6 className="fw-bold small mb-2 text-dark">
+                          Configured Videos ({currentItems.length} items):
+                        </h6>
+                        {currentItems.length === 0 ? (
+                          <div className="text-muted small p-3 bg-white rounded border text-center">
+                            No videos configured yet. Use the form above to add YouTube videos.
+                          </div>
+                        ) : (
+                          <div className="table-responsive bg-white rounded border">
+                            <table className="table table-sm table-hover align-middle mb-0 small">
+                              <thead className="table-light">
+                                <tr>
+                                  <th style={{ width: '40px' }}>#</th>
+                                  <th style={{ width: '60px' }}>Thumb</th>
+                                  <th>Title &amp; Source</th>
+                                  <th>Linked Product</th>
+                                  <th style={{ width: '80px' }}>Status</th>
+                                  <th style={{ width: '130px' }} className="text-end">Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {currentItems.map((item, idx) => {
+                                  const ytId = item.videoId || extractYouTubeId(item.youtubeUrl)
+                                  const displayImg = item.image || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '')
+                                  const linkedProd = products.find(p => String(p.id) === String(item.productId))
+
+                                  return (
+                                    <tr key={item.id || idx}>
+                                      <td className="text-muted fw-bold">{idx + 1}</td>
+                                      <td>
+                                        {displayImg ? (
+                                          <img
+                                            src={displayImg}
+                                            alt=""
+                                            width="48"
+                                            height="36"
+                                            className="rounded border object-fit-cover"
+                                            onError={e => { e.target.src = 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp' }}
+                                          />
+                                        ) : (
+                                          <div className="bg-secondary text-white rounded text-center py-1" style={{ width: 48, height: 36 }}>🎬</div>
+                                        )}
+                                      </td>
+                                      <td>
+                                        <div className="fw-semibold text-truncate" style={{ maxWidth: '240px' }}>
+                                          {item.title || item.name || 'Untitled Video'}
+                                        </div>
+                                        <div className="text-muted text-truncate" style={{ maxWidth: '240px', fontSize: '11px' }}>
+                                          {ytId ? (
+                                            <span className="badge bg-danger-subtle text-danger border border-danger-subtle me-1">
+                                              YouTube: {ytId}
+                                            </span>
+                                          ) : item.video ? (
+                                            <span className="badge bg-secondary-subtle text-secondary me-1">MP4 Reel</span>
+                                          ) : null}
+                                          {item.youtubeUrl || item.video || ''}
+                                        </div>
+                                      </td>
+                                      <td>
+                                        {linkedProd ? (
+                                          <span className="badge bg-light text-dark border">
+                                            {linkedProd.name.slice(0, 20)}... (Rs. {Number(linkedProd.price).toLocaleString()})
+                                          </span>
+                                        ) : (
+                                          <span className="text-muted">—</span>
+                                        )}
+                                      </td>
+                                      <td>
+                                        <button
+                                          type="button"
+                                          className={`badge border-0 ${item.active !== false ? 'bg-success text-white' : 'bg-secondary text-white'}`}
+                                          onClick={() => handleToggleYtActive(idx)}
+                                          title="Click to toggle status"
+                                        >
+                                          {item.active !== false ? 'Active' : 'Hidden'}
+                                        </button>
+                                      </td>
+                                      <td className="text-end">
+                                        <div className="btn-group btn-group-sm">
+                                          <button
+                                            type="button"
+                                            className="btn btn-outline-secondary px-1.5"
+                                            disabled={idx === 0}
+                                            onClick={() => handleMoveYtItem(idx, -1)}
+                                            title="Move Up"
+                                          >
+                                            ▲
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="btn btn-outline-secondary px-1.5"
+                                            disabled={idx === currentItems.length - 1}
+                                            onClick={() => handleMoveYtItem(idx, 1)}
+                                            title="Move Down"
+                                          >
+                                            ▼
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="btn btn-outline-primary px-2"
+                                            onClick={() => {
+                                              setEditingYtIdx(idx)
+                                              setYtVideoForm({
+                                                title: item.title || item.name || '',
+                                                youtubeUrl: item.youtubeUrl || (item.videoId ? `https://www.youtube.com/watch?v=${item.videoId}` : ''),
+                                                videoId: item.videoId || '',
+                                                image: item.image || '',
+                                                productId: item.productId ? String(item.productId) : '',
+                                                order: idx + 1,
+                                                active: item.active !== false,
+                                                description: item.description || '',
+                                              })
+                                            }}
+                                            title="Edit Video"
+                                          >
+                                            <i className="bi bi-pencil"></i>
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="btn btn-outline-danger px-2"
+                                            onClick={() => handleDeleteYtItem(idx)}
+                                            title="Delete Video"
+                                          >
+                                            <i className="bi bi-trash"></i>
+                                          </button>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  )
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
                       </div>
-                      <div className="mb-3">
-                        <label className="form-label small fw-semibold">Subtitle / Callout</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={editingSection.sec.content?.reels?.subtitle || 'In motion'}
-                          onChange={e => {
-                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
-                            if (!nextSec.content) nextSec.content = {}
-                            if (!nextSec.content.reels) nextSec.content.reels = {}
-                            nextSec.content.reels.subtitle = e.target.value
-                            setEditingSection({ ...editingSection, sec: nextSec })
-                          }}
-                        />
-                      </div>
-                      <div className="alert alert-secondary py-2 px-3 small mb-0">
-                        <i className="bi bi-camera-reels me-1"></i> Video reels with audio toggle and direct cart buttons are synchronized from the Watch &amp; Shop module.
-                      </div>
-                    </div>
-                  )}
+                    )
+                  })()}
 
                   {/* REVIEWS */}
-                  {editingSection.sec.blockType === 'reviews' && (
-                    <div className="bg-light p-3.5 rounded-3 border">
-                      <div className="mb-3">
-                        <label className="form-label small fw-semibold">Section Heading</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={editingSection.sec.content?.reviews?.heading || editingSection.sec.title || 'What Our Clients Say'}
-                          onChange={e => {
-                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
-                            if (!nextSec.content) nextSec.content = {}
-                            if (!nextSec.content.reviews) nextSec.content.reviews = {}
-                            nextSec.content.reviews.heading = e.target.value
-                            nextSec.title = e.target.value
-                            setEditingSection({ ...editingSection, sec: nextSec })
-                          }}
-                        />
+                  {editingSection.sec.blockType === 'reviews' && (() => {
+                    const selectedIds = editingSection.sec.content?.reviews?.selectedReviewIds || []
+                    const handleToggleReviewSelection = (id) => {
+                      const idStr = String(id)
+                      const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                      if (!nextSec.content) nextSec.content = {}
+                      if (!nextSec.content.reviews) nextSec.content.reviews = {}
+                      let currentSelected = nextSec.content.reviews.selectedReviewIds
+                      if (!Array.isArray(currentSelected) || currentSelected.length === 0) {
+                        currentSelected = reviews.map(r => String(r.id)).filter(rId => rId !== idStr)
+                      } else if (currentSelected.includes(idStr)) {
+                        currentSelected = currentSelected.filter(rId => rId !== idStr)
+                      } else {
+                        currentSelected = [...currentSelected, idStr]
+                      }
+                      nextSec.content.reviews.selectedReviewIds = currentSelected
+                      setEditingSection({ ...editingSection, sec: nextSec })
+                    }
+
+                    const handleSelectAllReviews = () => {
+                      const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                      if (!nextSec.content) nextSec.content = {}
+                      if (!nextSec.content.reviews) nextSec.content.reviews = {}
+                      nextSec.content.reviews.selectedReviewIds = reviews.map(r => String(r.id))
+                      setEditingSection({ ...editingSection, sec: nextSec })
+                    }
+
+                    const handleClearAllReviews = () => {
+                      const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                      if (!nextSec.content) nextSec.content = {}
+                      if (!nextSec.content.reviews) nextSec.content.reviews = {}
+                      nextSec.content.reviews.selectedReviewIds = []
+                      setEditingSection({ ...editingSection, sec: nextSec })
+                    }
+
+                    const isAllSelected = !Array.isArray(selectedIds) || selectedIds.length === 0 || selectedIds.length === reviews.length
+
+                    return (
+                      <div className="bg-light p-3.5 rounded-3 border">
+                        <div className="row g-3 mb-3">
+                          <div className="col-md-6">
+                            <label className="form-label small fw-semibold">Section Heading</label>
+                            <input
+                              type="text"
+                              data-review-heading="true"
+                              className="form-control form-control-sm"
+                              value={editingSection.sec.content?.reviews?.heading || editingSection.sec.title || 'What Our Clients Say'}
+                              onChange={e => {
+                                const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                                if (!nextSec.content) nextSec.content = {}
+                                if (!nextSec.content.reviews) nextSec.content.reviews = {}
+                                nextSec.content.reviews.heading = e.target.value
+                                nextSec.title = e.target.value
+                                setEditingSection({ ...editingSection, sec: nextSec })
+                              }}
+                            />
+                          </div>
+                          <div className="col-md-6">
+                            <label className="form-label small fw-semibold">Maximum Visible Reviews</label>
+                            <input
+                              type="number"
+                              className="form-control form-control-sm"
+                              min="1"
+                              max="30"
+                              placeholder="Default (All approved)"
+                              value={editingSection.sec.content?.reviews?.maxReviews || ''}
+                              onChange={e => {
+                                const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                                if (!nextSec.content) nextSec.content = {}
+                                if (!nextSec.content.reviews) nextSec.content.reviews = {}
+                                nextSec.content.reviews.maxReviews = e.target.value ? Number(e.target.value) : ''
+                                setEditingSection({ ...editingSection, sec: nextSec })
+                              }}
+                            />
+                          </div>
+                          <div className="col-12">
+                            <label className="form-label small fw-semibold">Subheading / Description</label>
+                            <textarea
+                              className="form-control form-control-sm"
+                              rows="2"
+                              value={editingSection.sec.content?.reviews?.subtitle || 'Trusted by thousands of resellers and shopkeepers across Pakistan.'}
+                              onChange={e => {
+                                const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                                if (!nextSec.content) nextSec.content = {}
+                                if (!nextSec.content.reviews) nextSec.content.reviews = {}
+                                nextSec.content.reviews.subtitle = e.target.value
+                                setEditingSection({ ...editingSection, sec: nextSec })
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Customer Reviews Selection Checklist */}
+                        <div className="card border">
+                          <div className="card-header bg-white py-2 d-flex justify-content-between align-items-center">
+                            <span className="fw-bold small text-dark">
+                              <i className="bi bi-star-fill text-warning me-1"></i>
+                              Select Customer Reviews to Display ({Array.isArray(selectedIds) && selectedIds.length > 0 ? selectedIds.length : reviews.length} / {reviews.length} selected)
+                            </span>
+                            <div className="btn-group btn-group-sm">
+                              <button
+                                type="button"
+                                className="btn btn-outline-secondary py-0.5 px-2"
+                                onClick={handleSelectAllReviews}
+                              >
+                                Select All
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-outline-secondary py-0.5 px-2"
+                                onClick={handleClearAllReviews}
+                              >
+                                Clear All
+                              </button>
+                            </div>
+                          </div>
+                          <div className="card-body p-2" style={{ maxHeight: '240px', overflowY: 'auto' }}>
+                            {reviews.length === 0 ? (
+                              <p className="text-muted small p-2 mb-0">No customer reviews loaded.</p>
+                            ) : (
+                              <div className="list-group list-group-flush">
+                                {reviews.map(r => {
+                                  const isChecked = isAllSelected || (Array.isArray(selectedIds) && selectedIds.includes(String(r.id)))
+                                  return (
+                                    <label
+                                      key={r.id}
+                                      className="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-2 small"
+                                      style={{ cursor: 'pointer' }}
+                                    >
+                                      <div className="d-flex align-items-center gap-2">
+                                        <input
+                                          className="form-check-input mt-0"
+                                          type="checkbox"
+                                          checked={isChecked}
+                                          onChange={() => handleToggleReviewSelection(r.id)}
+                                        />
+                                        <div>
+                                          <strong>{r.name}</strong>
+                                          <span className="text-warning ms-1">{'★'.repeat(r.rating || 5)}</span>
+                                          {r.verified && <span className="badge bg-success-subtle text-success ms-1">Verified</span>}
+                                          <div className="text-muted text-truncate" style={{ maxWidth: '420px', fontSize: '11px' }}>
+                                            {r.title ? `"${r.title}" — ` : ''}{r.text}
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <span className="text-muted" style={{ fontSize: '10px' }}>{r.date}</span>
+                                    </label>
+                                  )
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="mb-3">
-                        <label className="form-label small fw-semibold">Subheading / Description</label>
-                        <textarea
-                          className="form-control"
-                          rows="2"
-                          value={editingSection.sec.content?.reviews?.subtitle || 'Trusted by thousands of resellers and shopkeepers across Pakistan.'}
-                          onChange={e => {
-                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
-                            if (!nextSec.content) nextSec.content = {}
-                            if (!nextSec.content.reviews) nextSec.content.reviews = {}
-                            nextSec.content.reviews.subtitle = e.target.value
-                            setEditingSection({ ...editingSection, sec: nextSec })
-                          }}
-                        />
-                      </div>
-                      <div className="alert alert-secondary py-2 px-3 small mb-0">
-                        <i className="bi bi-star-fill text-warning me-1"></i> Displays approved customer feedback and 5-star ratings in an auto-scrolling marquee slider.
-                      </div>
-                    </div>
-                  )}
+                    )
+                  })()}
 
                   {/* CATEGORY TABS */}
                   {editingSection.sec.blockType === 'category_tabs' && (
@@ -2799,21 +3874,35 @@ export default function HomePageEditorView() {
                 </div>
               </div>
 
-              <div className="modal-footer bg-light border-top py-3 px-4 d-flex justify-content-between">
+              <div className="modal-footer bg-light border-top py-3 px-4 d-flex justify-content-between align-items-center">
                 <button
                   type="button"
-                  className="btn btn-secondary px-3"
-                  onClick={() => setEditingSection(null)}
+                  className="btn btn-outline-danger btn-sm"
+                  onClick={() => {
+                    const sec = editingSection.sec
+                    setEditingSection(null)
+                    setSectionToDelete(sec)
+                  }}
+                  title="Remove this section from homepage layout"
                 >
-                  Cancel
+                  <i className="bi bi-trash3 me-1"></i> Delete Section Placement
                 </button>
-                <button
-                  type="button"
-                  className="btn btn-success px-4 fw-semibold shadow"
-                  onClick={handleSaveEditingSection}
-                >
-                  <i className="bi bi-check2-circle me-1"></i> Save Section Changes
-                </button>
+                <div className="d-flex gap-2">
+                  <button
+                    type="button"
+                    className="btn btn-secondary px-3"
+                    onClick={() => setEditingSection(null)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-success px-4 fw-semibold shadow"
+                    onClick={handleSaveEditingSection}
+                  >
+                    <i className="bi bi-check2-circle me-1"></i> Save Section Changes
+                  </button>
+                </div>
               </div>
             </div>
           </div>

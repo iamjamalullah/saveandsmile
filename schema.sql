@@ -232,6 +232,12 @@ CREATE TABLE IF NOT EXISTS homepage_section_versions (
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS homepage_draft (
+    id INT PRIMARY KEY DEFAULT 1,
+    draft_json TEXT NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_sections_order ON sections(sort_order);
 
 -- 12. WATCH & SHOP (REELS)

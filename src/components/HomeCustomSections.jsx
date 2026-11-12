@@ -14,31 +14,43 @@ export function PromoBannerSingle({ section }) {
   const content = section.content || {}
   const banner = (content.banners && content.banners[0]) || content.banner || {
     image: section.image || section.bg || 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+    mobileImage: '',
     link: section.link || '/shop',
     title: section.title || 'Special Promotion',
     alt: section.alt || section.title || 'Promotional Offer',
     badge: content.badge || section.badge || '',
+    ctaText: '',
   }
 
   const imageSrc = banner.image || 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp'
+  const mobileImageSrc = banner.mobileImage || imageSrc
   const linkTo = banner.link || '/shop'
 
   return (
     <section className="qg-custom-section qg-promo-single" id={`sec-${section.id}`}>
       <div className="qg-container">
-        <div className="qg-banner-card single-col shadow-sm">
-          <Link to={linkTo} className="qg-banner-link" aria-label={banner.title || 'Special Offer'}>
-            <img
-              src={imageSrc}
-              alt={banner.alt || banner.title || 'Banner'}
-              loading="lazy"
-              className="qg-banner-img"
-              onError={(e) => { e.target.src = 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp' }}
-            />
+        <div className="qg-banner-card single-col shadow-sm position-relative overflow-hidden rounded-3">
+          <Link to={linkTo} className="qg-banner-link d-block position-relative" aria-label={banner.title || 'Special Offer'}>
+            <picture>
+              {mobileImageSrc && <source media="(max-width: 768px)" srcSet={mobileImageSrc} />}
+              <img
+                src={imageSrc}
+                alt={banner.alt || banner.title || 'Banner'}
+                loading="lazy"
+                className="qg-banner-img w-100 d-block"
+                onError={(e) => { e.target.src = 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp' }}
+              />
+            </picture>
             {banner.badge && (
               <span className="qg-banner-badge-floating">
                 {banner.badge}
               </span>
+            )}
+            {banner.ctaText && (
+              <div className="position-absolute bottom-0 start-0 p-3 p-md-4 w-100 d-flex justify-content-between align-items-center" style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.7))' }}>
+                <span className="text-white fw-bold fs-5">{banner.title || section.title}</span>
+                <span className="btn btn-sm btn-light fw-bold px-3 py-1.5 shadow-sm rounded-pill">{banner.ctaText}</span>
+              </div>
             )}
           </Link>
         </div>

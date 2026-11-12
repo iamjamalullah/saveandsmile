@@ -14,18 +14,32 @@ function Stars({ n }) {
   )
 }
 
-export default function Reviews() {
+export default function Reviews({ section }) {
   const { reviews = [] } = useStoreData()
-  const visible = reviews.filter(r => r.status !== 'hidden')
+
+  const reviewsConfig = section?.content?.reviews || {}
+  const heading = section?.title || reviewsConfig.heading || 'What Our Clients Say'
+  const subtitle = section?.subtitle || reviewsConfig.subtitle || 'Trusted by thousands of resellers and shopkeepers across Pakistan.'
+  const selectedIds = reviewsConfig.selectedReviewIds || null
+  const maxReviews = Number(reviewsConfig.maxReviews) || 0
+
+  let visible = reviews.filter(r => r.status !== 'hidden')
+  if (Array.isArray(selectedIds) && selectedIds.length > 0) {
+    visible = visible.filter(r => selectedIds.includes(String(r.id)) || selectedIds.includes(Number(r.id)))
+  }
+  if (maxReviews > 0) {
+    visible = visible.slice(0, maxReviews)
+  }
+
   const list = [...visible, ...visible]
   if (!visible.length) return null
 
   return (
-    <section className="qg-reviews" id="reviews">
+    <section className="qg-reviews" id={`sec-${section?.id || 'reviews'}`}>
       <div className="qg-reviews-head">
         <span className="qg-tag">Reviews</span>
-        <h2>What Our Clients Say</h2>
-        <p>Trusted by thousands of resellers and shopkeepers across Pakistan.</p>
+        <h2>{heading}</h2>
+        {subtitle && <p>{subtitle}</p>}
       </div>
 
       <div className="qg-marquee">

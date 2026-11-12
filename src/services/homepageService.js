@@ -25,6 +25,16 @@ export const VALID_CONTAINER_LAYOUTS = ['single', 'two_equal', 'two_70_30', 'two
 export const VALID_BLOCK_TYPES = ['products', 'banner', 'announcement', 'image_text', 'countdown', 'trust_bar', 'categories', 'reels', 'reviews', 'category_tabs', 'hero']
 
 /**
+ * Extract 11-character YouTube video ID from standard URLs (watch, share, shorts, embed)
+ */
+export function extractYouTubeId(url) {
+  if (!url || typeof url !== 'string') return null
+  const clean = url.trim()
+  const match = clean.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?\/\s]{11})/i)
+  return match ? match[1] : null
+}
+
+/**
  * Normalize and sanitize a section object for storage
  */
 export function normalizeSection(s, index = 0) {
@@ -241,13 +251,26 @@ export async function getPublishedSections(routerDb) {
 }
 
 export async function getDraftSections(routerDb) {
-  // Check if draft exists in db.json first
+  // 1. Check PostgreSQL homepage_draft table first
+  try {
+    const res = await query('SELECT draft_json FROM homepage_draft WHERE id = 1')
+    if (res && res.rows && res.rows.length > 0 && res.rows[0].draft_json) {
+      const parsed = JSON.parse(res.rows[0].draft_json)
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map(normalizeSection)
+      }
+    }
+  } catch (err) {
+    console.warn('[HOMEPAGE SERVICE] Postgres draft read fallback:', err.message)
+  }
+
+  // 2. Check routerDb / db.json
   const draftList = routerDb.get('homepageDraftSections').value()
   if (Array.isArray(draftList) && draftList.length > 0) {
     return draftList.map(normalizeSection)
   }
 
-  // Otherwise fallback to published sections
+  // 3. Otherwise fallback to published sections
   return getPublishedSections(routerDb)
 }
 
@@ -261,7 +284,20 @@ export async function saveDraftSections({ sections, staffUser, routerDb }) {
 
   const normalized = sections.map((s, idx) => normalizeSection(s, idx))
 
-  // Persist draft in router.db and db.json
+  // 1. Persist to PostgreSQL homepage_draft table
+  try {
+    await query(`
+      INSERT INTO homepage_draft (id, draft_json, updated_at)
+      VALUES (1, $1, CURRENT_TIMESTAMP)
+      ON CONFLICT (id) DO UPDATE SET
+        draft_json = EXCLUDED.draft_json,
+        updated_at = CURRENT_TIMESTAMP
+    `, [JSON.stringify(normalized)])
+  } catch (pgErr) {
+    console.warn('[HOMEPAGE SERVICE] Postgres draft save fallback:', pgErr.message)
+  }
+
+  // 2. Persist draft in router.db and db.json
   routerDb.set('homepageDraftSections', normalized).write()
   try {
     routerDb.set('homepageDraftStatus', { hasUnpublishedSectionChanges: true }).write()
@@ -347,6 +383,16 @@ export async function publishSections({ sections, label, staffUser, routerDb }) 
           ]
         )
       }
+
+      // Also update draft in PostgreSQL to match newly published layout
+      await client.query(
+        `INSERT INTO homepage_draft (id, draft_json, updated_at)
+         VALUES (1, $1, CURRENT_TIMESTAMP)
+         ON CONFLICT (id) DO UPDATE SET
+           draft_json = EXCLUDED.draft_json,
+           updated_at = CURRENT_TIMESTAMP`,
+        [JSON.stringify(normalized)]
+      )
     })
   } catch (pgErr) {
     console.warn('[HOMEPAGE SERVICE] Postgres publish transaction warning:', pgErr.message)

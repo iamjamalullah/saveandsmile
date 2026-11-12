@@ -715,10 +715,10 @@ img { max-width: 100%; }
   flex: 1 1 auto;
   min-width: 0;
   height: 28px;
-  border: none;
+  border: 1.5px solid #70b32d;
   border-radius: 6px;
-  background: #70b32d;
-  color: #ffffff;
+  background: #ffffff;
+  color: #70b32d;
   font-family: 'Poppins', sans-serif !important;
   font-size: 12px;
   font-weight: 500 !important;
@@ -727,16 +727,20 @@ img { max-width: 100%; }
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
   padding-inline: 8px;
   white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(112, 179, 45, 0.25);
+  box-shadow: none;
 }
 .qg-card-btn-buy:hover {
-  background: #629e26;
+  background: #70b32d;
   color: #ffffff;
+  box-shadow: 0 2px 8px rgba(112, 179, 45, 0.35);
 }
 .qg-card-btn-buy:active {
+  background: #629e26;
+  border-color: #629e26;
+  color: #ffffff;
   transform: scale(0.98);
 }
 .qg-card-btn-wa {
@@ -1611,13 +1615,19 @@ img { max-width: 100%; }
     padding-inline: 6px !important;
     white-space: nowrap !important;
     border-radius: 6px !important;
-    border: none !important;
-    background: #70b32d !important;
-    color: #ffffff !important;
+    border: 1.5px solid #70b32d !important;
+    background: #ffffff !important;
+    color: #70b32d !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    box-shadow: 0 2px 6px rgba(112, 179, 45, 0.22) !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease !important;
+  }
+  .qg-card-btn-buy:active,
+  .qg-card-btn-buy:hover {
+    background: #70b32d !important;
+    color: #ffffff !important;
   }
   .qg-card-btn-wa {
     width: 26px !important;

@@ -318,7 +318,7 @@ export default function HomePageEditorView() {
           }
         } catch (_) {}
       }
-      if (sections && sections.length) {
+      if (sections && sections.length && (!localSectionsRef.current || localSectionsRef.current.length === 0)) {
         const sorted = [...sections].sort((a, b) => (Number(a.order) || Number(a.id) || 0) - (Number(b.order) || Number(b.id) || 0))
         localSectionsRef.current = sorted
         setLocalSections(sorted)
@@ -476,18 +476,20 @@ export default function HomePageEditorView() {
     const currentSections = localSectionsRef.current
     if (!currentSections[index]) return
     const updated = [...currentSections]
-    const current = updated[index].enabled !== false && updated[index].isVisible !== false
+    const current = updated[index].enabled !== false && updated[index].isVisible !== false && updated[index].is_visible !== false
+    const nextState = !current
     updated[index] = {
       ...updated[index],
-      enabled: !current,
-      isVisible: !current,
+      enabled: nextState,
+      isVisible: nextState,
+      is_visible: nextState,
     }
     localSectionsRef.current = updated
     setLocalSections(updated)
     setHasUnpublishedChanges(true)
     try {
       if (saveDraftSections) await saveDraftSections(updated)
-      if (showToast) showToast(`Section ${!current ? 'enabled' : 'hidden'} in draft. Publish to apply live.`, 'info')
+      if (showToast) showToast(`Section ${nextState ? 'enabled' : 'hidden'} in draft. Publish to apply live.`, 'info')
     } catch (err) {
       console.error('Toggle visibility save error:', err)
       if (showToast) showToast('Failed to save visibility: ' + err.message, 'danger')

@@ -159,6 +159,8 @@ export function normalizeSection(s, index = 0) {
     },
   }
 
+  const isVis = s.enabled !== false && s.isVisible !== false && s.is_visible !== false
+
   return {
     id,
     order,
@@ -166,7 +168,9 @@ export function normalizeSection(s, index = 0) {
     subtitle: String(s.subtitle || '').trim(),
     containerLayout,
     blockType,
-    enabled: s.enabled !== false && s.isVisible !== false && s.is_visible !== false,
+    enabled: isVis,
+    isVisible: isVis,
+    is_visible: isVis,
     isPublished: s.isPublished !== false && s.is_published !== false,
     color,
     bg,
@@ -245,7 +249,67 @@ export async function getPublishedSections(routerDb) {
   // Fallback to db.json
   const raw = routerDb.get('sections').value() || []
   return raw
-    .filter(s => s.enabled !== false && s.isPublished !== false)
+    .filter(s => s.enabled !== false && s.isVisible !== false && s.is_visible !== false && s.isPublished !== false)
+    .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
+    .map(normalizeSection)
+}
+
+export async function getAllSections(routerDb) {
+  try {
+    const res = await query(
+      `SELECT * FROM sections ORDER BY sort_order ASC`
+    )
+    if (res && res.rows && res.rows.length > 0) {
+      return res.rows.map((row, idx) => {
+        let content = {}
+        try { content = typeof row.content_json === 'string' ? JSON.parse(row.content_json) : (row.content_json || {}) } catch (_) {}
+        let responsiveSettings = {}
+        try { responsiveSettings = typeof row.responsive_settings_json === 'string' ? JSON.parse(row.responsive_settings_json) : (row.responsive_settings_json || {}) } catch (_) {}
+
+        const groupVal = content.group || (row.group_name && !String(row.group_name).startsWith('custom-') ? row.group_name : null) || null
+        const categoryVal = content.category || null
+        const colorVal = content.color || '#00998f'
+        const bgVal = content.bg !== undefined ? content.bg : ''
+        const viewAllVal = content.viewAll !== undefined ? Boolean(content.viewAll) : false
+        const seeMoreVal = content.seeMore !== undefined ? Boolean(content.seeMore) : false
+
+        return normalizeSection({
+          id: row.id,
+          order: row.sort_order || idx + 1,
+          title: row.title,
+          subtitle: row.subtitle,
+          containerLayout: row.container_layout,
+          blockType: row.block_type,
+          enabled: row.is_visible,
+          isVisible: row.is_visible,
+          is_visible: row.is_visible,
+          isPublished: row.is_published,
+          group: groupVal,
+          category: categoryVal,
+          color: colorVal,
+          bg: bgVal,
+          viewAll: viewAllVal,
+          seeMore: seeMoreVal,
+          content: {
+            ...content,
+            group: groupVal,
+            category: categoryVal,
+            color: colorVal,
+            bg: bgVal,
+            viewAll: viewAllVal,
+            seeMore: seeMoreVal,
+          },
+          responsiveSettings,
+        }, idx)
+      })
+    }
+  } catch (err) {
+    console.warn('[HOMEPAGE SERVICE] Postgres getAllSections fallback to db.json:', err.message)
+  }
+
+  // Fallback to db.json
+  const raw = routerDb.get('sections').value() || []
+  return raw
     .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
     .map(normalizeSection)
 }
@@ -270,8 +334,8 @@ export async function getDraftSections(routerDb) {
     return draftList.map(normalizeSection)
   }
 
-  // 3. Otherwise fallback to published sections
-  return getPublishedSections(routerDb)
+  // 3. Otherwise fallback to all sections (preserving inactive/hidden states in the builder)
+  return getAllSections(routerDb)
 }
 
 /**
@@ -377,7 +441,7 @@ export async function publishSections({ sections, label, staffUser, routerDb }) 
             s.blockType,
             JSON.stringify(fullContent),
             JSON.stringify(s.responsiveSettings || {}),
-            s.enabled !== false,
+            s.enabled !== false && s.isVisible !== false && s.is_visible !== false,
             true,
             false,
           ]

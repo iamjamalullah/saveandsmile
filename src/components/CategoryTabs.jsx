@@ -28,7 +28,7 @@ export default function CategoryTabs({ onShopAll }) {
 
         <div className="qg-four-grid" role="tabpanel">
           {items.map(p => (
-            <ProductCard key={p.id} product={p} />
+            <ProductCard key={p.id} product={p} context="home" />
           ))}
         </div>
 

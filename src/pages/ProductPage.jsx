@@ -1043,8 +1043,8 @@ export default function ProductPage() {
         {related.length > 0 && (
           <section className="qpdp-related">
             <h2>You may also like</h2>
-            <div className="qcat-grid cols-4">
-              {related.map(p => <ProductCard key={p.id} product={p} />)}
+            <div className="qcat-grid cols-4 qpdp-related-grid">
+              {related.map(p => <ProductCard key={p.id} product={p} context="related" />)}
             </div>
             <div className="qg-see-more" style={{ marginTop: '22px' }}>
               <button onClick={() => navigate('/shop')}>

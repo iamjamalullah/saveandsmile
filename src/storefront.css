@@ -436,9 +436,9 @@
 .qg-cat-rail { scroll-snap-type: none; }
 .qg-cat {
   flex: 0 0 auto;
-  border: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
+  border: none;
+  background: transparent;
+  box-shadow: none;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -449,24 +449,24 @@
 .qg-cat-circle-wrap {
   width: 96px;
   height: 96px;
-  border-radius: 50% !important;
-  padding: 0 !important;
-  border: 1.5px solid #70b32d !important;
-  background: #ffffff !important;
+  border-radius: 50%;
+  padding: 0;
+  border: 1.5px solid #70b32d;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: none !important;
+  box-shadow: none;
   overflow: hidden;
   transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
 }
 .qg-cat img {
-  width: 100% !important;
-  height: 100% !important;
-  border-radius: 50% !important;
-  border: none !important;
-  padding: 0 !important;
-  object-fit: cover !important;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  object-fit: cover;
   display: block;
 }
 .qg-cat:hover .qg-cat-circle-wrap {

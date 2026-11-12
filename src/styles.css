@@ -339,9 +339,10 @@ img { max-width: 100%; }
   display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 4px;
 }
 .qg-cat img {
-  width: 100%; height: 100%; object-fit: contain;
-  border-radius: 0; border: none; padding: 0; background: transparent;
-  transition: transform .3s ease;
+  width: 100%; height: 100%; object-fit: cover;
+  border-radius: 50%; border: none; padding: 0; background: #ffffff;
+  display: block;
+  transition: transform .25s ease;
 }
 .qg-cat:hover img { transform: scale(1.05); }
 .qg-cat span {
@@ -505,6 +506,14 @@ img { max-width: 100%; }
 }
 
 /* ── product card (Wholesale theme matching screenshot) ─── */
+/* Context-Specific Scoped Modifiers (Ensures Home, Catalog, Wishlist, Related can be styled independently) */
+.qg-card--home,
+.qg-card--catalog,
+.qg-card--wishlist,
+.qg-card--related {
+  box-sizing: border-box;
+}
+
 .qg-card {
   background: #fff;
   border-radius: 14px;

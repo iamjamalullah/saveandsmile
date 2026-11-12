@@ -153,7 +153,7 @@ export default function ProductSection({ section, onViewAll, onSeeMore }) {
             {/* Desktop: 4 products in a row */}
             <div className="qg-four-grid qg-hot-desktop">
               {items.slice(0, 4).map((p, idx) => (
-                <ProductCard key={`${p.id}-${idx}`} product={p} />
+                <ProductCard key={`${p.id}-${idx}`} product={p} context="home" />
               ))}
             </div>
 
@@ -177,7 +177,7 @@ export default function ProductSection({ section, onViewAll, onSeeMore }) {
               >
                 <div className="qg-rail-slider" ref={railHot1}>
                   {hotRow1Items.map((p, idx) => (
-                    <ProductCard key={`h1-${p.id}-${idx}`} product={p} />
+                    <ProductCard key={`h1-${p.id}-${idx}`} product={p} context="home" />
                   ))}
                 </div>
               </div>
@@ -193,7 +193,7 @@ export default function ProductSection({ section, onViewAll, onSeeMore }) {
               >
                 <div className="qg-rail-slider" ref={railHot2}>
                   {hotRow2Items.map((p, idx) => (
-                    <ProductCard key={`h2-${p.id}-${idx}`} product={p} />
+                    <ProductCard key={`h2-${p.id}-${idx}`} product={p} context="home" />
                   ))}
                 </div>
               </div>
@@ -219,7 +219,7 @@ export default function ProductSection({ section, onViewAll, onSeeMore }) {
             <button className="qg-rail-arrow l" onClick={() => scroll(-1)} aria-label="Previous products">‹</button>
             <div className="qg-rail-slider" ref={railNew} onScroll={handleScrollNew}>
               {displayItems.map((p, idx) => (
-                <ProductCard key={`${p.id}-${idx}`} product={p} />
+                <ProductCard key={`${p.id}-${idx}`} product={p} context="home" />
               ))}
             </div>
             <button className="qg-rail-arrow r" onClick={() => scroll(1)} aria-label="Next products">›</button>

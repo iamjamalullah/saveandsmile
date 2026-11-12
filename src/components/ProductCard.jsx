@@ -3,7 +3,7 @@ import { BRAND, UI } from '../data'
 import { productPath } from '../content'
 import { useCart } from '../context/CartContext'
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, context = 'default', className = '' }) {
   const { add, buyNow, toggleWish, wishlist, setQuickView } = useCart()
   const navigate = useNavigate()
   const liked = wishlist.includes(product.id)
@@ -21,7 +21,7 @@ export default function ProductCard({ product }) {
   const isHot = product.featured || product.group === 'hot' || (product.reviewsCount || 0) > 3
 
   return (
-    <article className="qg-card">
+    <article className={`qg-card ${context && context !== 'default' ? `qg-card--${context}` : ''} ${className}`.trim()}>
       <div className="qg-card-media">
         <Link className="qg-card-open" to={productPath(product)} aria-label={product.name}>
           <img src={product.image} alt={product.name} loading="lazy" className="qg-card-img" />

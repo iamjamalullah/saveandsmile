@@ -153,7 +153,7 @@ export default function CatalogPage({ mode = 'shop' }) {
           </div>
         ) : (
           <div className={`qcat-grid cols-${cols}`}>
-            {results.map(p => <ProductCard key={p.id} product={p} />)}
+            {results.map(p => <ProductCard key={p.id} product={p} context="catalog" />)}
           </div>
         )}
 

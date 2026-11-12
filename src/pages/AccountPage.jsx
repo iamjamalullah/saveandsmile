@@ -344,7 +344,7 @@ export default function AccountPage() {
                       <Link className="cp-cta" to="/shop">Discover products</Link>
                     </div>
                   ) : (
-                    <div className="qcat-grid cols-3">{wished.map(product => <ProductCard key={product.id} product={product} />)}</div>
+                    <div className="qcat-grid cols-3 qacc-wishlist-grid">{wished.map(product => <ProductCard key={product.id} product={product} context="wishlist" />)}</div>
                   )}
                 </div>
               </div>

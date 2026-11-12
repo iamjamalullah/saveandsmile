@@ -97,6 +97,61 @@ async function runTests() {
   assert.strictEqual(split3070.containerLayout, 'two_30_70')
   console.log('✓ TEST 3 PASSED: Two-column split layouts (50/50, 70/30, 30/70) verified.')
 
+  // ── TEST 3B: Image + Text, Countdown & Trust Bar Normalization ──
+  console.log('\n--- TEST 3B: IMAGE_TEXT, COUNTDOWN & TRUST_BAR NORMALIZATION ---')
+  const imageTextSec = normalizeSection({
+    title: 'Featured Showcase',
+    containerLayout: 'two_70_30',
+    blockType: 'image_text',
+    content: {
+      image_text: {
+        image: 'https://example.com/gadget.webp',
+        heading: 'Smart Accessories',
+        text: 'Engineered for durability',
+        buttonText: 'Shop Catalog',
+        buttonLink: '/shop',
+        imagePosition: 'left',
+      },
+    },
+  }, 4)
+  assert.strictEqual(imageTextSec.blockType, 'image_text')
+  assert.strictEqual(imageTextSec.containerLayout, 'two_70_30')
+  assert.strictEqual(imageTextSec.content.image_text.heading, 'Smart Accessories')
+
+  const countdownSec = normalizeSection({
+    title: 'Flash Sale Timer',
+    containerLayout: 'single',
+    blockType: 'countdown',
+    content: {
+      countdown: {
+        heading: 'Weekend Flash Sale',
+        targetDate: '2026-11-20T00:00:00.000Z',
+        buttonText: 'Claim Discount',
+        buttonLink: '/shop?group=hot',
+      },
+    },
+  }, 5)
+  assert.strictEqual(countdownSec.blockType, 'countdown')
+  assert.strictEqual(countdownSec.content.countdown.heading, 'Weekend Flash Sale')
+
+  const trustBarSec = normalizeSection({
+    title: 'Store Guarantee Bar',
+    containerLayout: 'single',
+    blockType: 'trust_bar',
+    content: {
+      trust_bar: {
+        heading: 'Why Shop With Us',
+        items: [
+          { icon: '🚚', title: 'Free Delivery', subtitle: 'On orders over Rs. 3,000' },
+          { icon: '💬', title: '24/7 Support', subtitle: 'WhatsApp support' },
+        ],
+      },
+    },
+  }, 6)
+  assert.strictEqual(trustBarSec.blockType, 'trust_bar')
+  assert.strictEqual(trustBarSec.content.trust_bar.items.length, 2)
+  console.log('✓ TEST 3B PASSED: Image + Text, Countdown, and Trust Bar sections normalized.')
+
   // ── TEST 4: Insertion Between Existing Sections ──
   console.log('\n--- TEST 4: INSERTION BETWEEN EXISTING SECTIONS ---')
   const currentSections = [...inMemoryDb.sections]

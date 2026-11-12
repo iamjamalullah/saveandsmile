@@ -15,6 +15,10 @@ import {
   getSectionVersions,
   restoreSectionVersion,
 } from './src/services/homepageService.js'
+import { initDatabase } from './src/db/index.js'
+
+// Initialize PostgreSQL / pg-mem schema on startup
+initDatabase().catch(err => console.error('[POSTGRES INIT ERROR]:', err))
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

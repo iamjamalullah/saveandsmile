@@ -72,7 +72,7 @@ export default function HomePageEditorView() {
 
   // New Section Draft in Wizard
   const [wizardContainerLayout, setWizardContainerLayout] = useState('single') // 'single' | 'two_equal' | 'two_70_30' | 'two_30_70'
-  const [wizardBlockType, setWizardBlockType] = useState('products') // 'products' | 'banner' | 'announcement'
+  const [wizardBlockType, setWizardBlockType] = useState('products') // 'products' | 'banner' | 'announcement' | 'image_text' | 'countdown' | 'trust_bar'
   const [wizardData, setWizardData] = useState({
     title: '',
     subtitle: '',
@@ -89,6 +89,37 @@ export default function HomePageEditorView() {
       buttonLink: '/shop',
       bgColor: '#049977',
       textColor: '#ffffff',
+    },
+    image_text: {
+      image: 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+      imageAlt: 'Featured Showcase',
+      heading: 'Premium Quality Gadgets',
+      text: 'Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability.',
+      buttonText: 'Explore Catalog',
+      buttonLink: '/shop',
+      imagePosition: 'left',
+      bgColor: '#ffffff',
+      textColor: '#1e293b',
+    },
+    countdown: {
+      heading: 'Limited Time Flash Sale',
+      subheading: 'Special wholesale rates available until timer expires!',
+      targetDate: new Date(Date.now() + 48 * 3600 * 1000).toISOString().slice(0, 16),
+      buttonText: 'Shop Deals Now',
+      buttonLink: '/shop?group=hot',
+      bgColor: '#0f3c28',
+      textColor: '#ffffff',
+    },
+    trust_bar: {
+      heading: 'Why Shop With Us',
+      items: [
+        { icon: '🚚', title: 'Free Delivery', subtitle: 'On orders over Rs. 3,000' },
+        { icon: '💬', title: '24/7 WhatsApp Help', subtitle: 'Live chat support anytime' },
+        { icon: '🛡️', title: '100% Genuine Items', subtitle: 'Tested & verified products' },
+        { icon: '💵', title: 'Cash on Delivery', subtitle: 'Pay when your parcel arrives' },
+      ],
+      bgColor: '#ffffff',
+      textColor: '#1e293b',
     },
   })
 
@@ -367,6 +398,37 @@ export default function HomePageEditorView() {
         bgColor: '#049977',
         textColor: '#ffffff',
       },
+      image_text: {
+        image: 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+        imageAlt: 'Featured Showcase',
+        heading: 'Premium Quality Gadgets',
+        text: 'Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability.',
+        buttonText: 'Explore Catalog',
+        buttonLink: '/shop',
+        imagePosition: 'left',
+        bgColor: '#ffffff',
+        textColor: '#1e293b',
+      },
+      countdown: {
+        heading: 'Limited Time Flash Sale',
+        subheading: 'Special wholesale rates available until timer expires!',
+        targetDate: new Date(Date.now() + 48 * 3600 * 1000).toISOString().slice(0, 16),
+        buttonText: 'Shop Deals Now',
+        buttonLink: '/shop?group=hot',
+        bgColor: '#0f3c28',
+        textColor: '#ffffff',
+      },
+      trust_bar: {
+        heading: 'Why Shop With Us',
+        items: [
+          { icon: '🚚', title: 'Free Delivery', subtitle: 'On orders over Rs. 3,000' },
+          { icon: '💬', title: '24/7 WhatsApp Help', subtitle: 'Live chat support anytime' },
+          { icon: '🛡️', title: '100% Genuine Items', subtitle: 'Tested & verified products' },
+          { icon: '💵', title: 'Cash on Delivery', subtitle: 'Pay when your parcel arrives' },
+        ],
+        bgColor: '#ffffff',
+        textColor: '#1e293b',
+      },
     })
     setShowWizardModal(true)
   }
@@ -391,6 +453,67 @@ export default function HomePageEditorView() {
     }
   }
 
+  const handleWizardImageTextUpload = async (e) => {
+    const files = e.target.files
+    if (!files || !files.length) return
+    try {
+      const webp = await convertFileToWebp(files[0], 1920, 0.85)
+      const urls = await uploadWebpImages([webp])
+      if (urls && urls[0]) {
+        setWizardData(prev => ({
+          ...prev,
+          image_text: {
+            ...prev.image_text,
+            image: urls[0],
+          },
+        }))
+      }
+    } catch (err) {
+      alert('Upload failed: ' + err.message)
+    }
+  }
+
+  const handleEditSectionImageUpload = async (targetPath, e) => {
+    const files = e.target.files
+    if (!files || !files.length) return
+    try {
+      const webp = await convertFileToWebp(files[0], 1920, 0.85)
+      const urls = await uploadWebpImages([webp])
+      if (urls && urls[0]) {
+        setEditingSection(prev => {
+          if (!prev) return null
+          const nextSec = JSON.parse(JSON.stringify(prev.sec))
+          if (!nextSec.content) nextSec.content = {}
+          if (targetPath === 'banner1') {
+            if (!nextSec.content.banners) nextSec.content.banners = []
+            if (!nextSec.content.banners[0]) nextSec.content.banners[0] = {}
+            nextSec.content.banners[0].image = urls[0]
+          } else if (targetPath === 'banner2') {
+            if (!nextSec.content.banners) nextSec.content.banners = []
+            if (!nextSec.content.banners[1]) nextSec.content.banners[1] = {}
+            nextSec.content.banners[1].image = urls[0]
+          } else if (targetPath === 'image_text') {
+            if (!nextSec.content.image_text) nextSec.content.image_text = {}
+            nextSec.content.image_text.image = urls[0]
+          }
+          return { ...prev, sec: nextSec }
+        })
+      }
+    } catch (err) {
+      alert('Upload failed: ' + err.message)
+    }
+  }
+
+  const handleSaveEditingSection = () => {
+    if (!editingSection) return
+    const updated = [...localSections]
+    updated[editingSection.idx] = editingSection.sec
+    setLocalSections(updated)
+    setHasUnpublishedChanges(true)
+    setEditingSection(null)
+    if (showToast) showToast('Section updated in draft! Click "Publish Changes" to apply to live storefront.')
+  }
+
   const handleFinishWizard = () => {
     const newId = `sec-${Date.now()}-${Math.floor(Math.random() * 1000)}`
     let content = {}
@@ -412,11 +535,53 @@ export default function HomePageEditorView() {
       content = {
         announcement: wizardData.announcement,
       }
+    } else if (wizardBlockType === 'image_text') {
+      content = {
+        image_text: {
+          image: wizardData.image_text.image || 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+          imageAlt: wizardData.image_text.imageAlt || wizardData.title || 'Showcase',
+          heading: wizardData.image_text.heading || wizardData.title || 'Premium Quality Gadgets',
+          text: wizardData.image_text.text || wizardData.subtitle || 'Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability.',
+          buttonText: wizardData.image_text.buttonText || 'Explore Catalog',
+          buttonLink: wizardData.image_text.buttonLink || '/shop',
+          imagePosition: wizardData.image_text.imagePosition || 'left',
+          bgColor: wizardData.image_text.bgColor || '#ffffff',
+          textColor: wizardData.image_text.textColor || '#1e293b',
+        },
+      }
+    } else if (wizardBlockType === 'countdown') {
+      content = {
+        countdown: {
+          heading: wizardData.countdown.heading || wizardData.title || 'Limited Time Flash Sale',
+          subheading: wizardData.countdown.subheading || wizardData.subtitle || 'Special wholesale rates available until timer expires!',
+          targetDate: wizardData.countdown.targetDate || new Date(Date.now() + 48 * 3600 * 1000).toISOString(),
+          buttonText: wizardData.countdown.buttonText || 'Shop Deals Now',
+          buttonLink: wizardData.countdown.buttonLink || '/shop?group=hot',
+          bgColor: wizardData.countdown.bgColor || '#0f3c28',
+          textColor: wizardData.countdown.textColor || '#ffffff',
+        },
+      }
+    } else if (wizardBlockType === 'trust_bar') {
+      content = {
+        trust_bar: {
+          heading: wizardData.trust_bar.heading || wizardData.title || 'Why Shop With Us',
+          items: wizardData.trust_bar.items,
+          bgColor: wizardData.trust_bar.bgColor || '#ffffff',
+          textColor: wizardData.trust_bar.textColor || '#1e293b',
+        },
+      }
     }
 
     const createdSection = {
       id: newId,
-      title: wizardData.title || (wizardBlockType === 'banner' ? 'Promotional Showcase' : 'Special Collection'),
+      title: wizardData.title || (
+        wizardBlockType === 'banner' ? 'Promotional Showcase'
+        : wizardBlockType === 'image_text' ? 'Featured Story & Showcase'
+        : wizardBlockType === 'countdown' ? 'Limited Time Flash Sale'
+        : wizardBlockType === 'trust_bar' ? 'Why Shop With Us'
+        : wizardBlockType === 'announcement' ? 'Special Announcement'
+        : 'Special Collection'
+      ),
       subtitle: wizardData.subtitle || '',
       containerLayout: wizardContainerLayout,
       blockType: wizardBlockType,
@@ -725,6 +890,9 @@ export default function HomePageEditorView() {
                               {bType === 'products' && '🛒 Product Feed'}
                               {bType === 'banner' && '🖼️ Banner'}
                               {bType === 'announcement' && '📢 Announcement'}
+                              {bType === 'image_text' && '🖼️📝 Image + Text'}
+                              {bType === 'countdown' && '⏱️ Countdown Sale'}
+                              {bType === 'trust_bar' && '🛡️ Trust Bar'}
                             </span>
                           </div>
                           <input
@@ -807,7 +975,7 @@ export default function HomePageEditorView() {
                               <button
                                 type="button"
                                 className="btn btn-link btn-sm p-0 text-success text-decoration-none fw-semibold"
-                                onClick={() => setEditingSection({ sec, idx })}
+                                onClick={() => setEditingSection({ sec: JSON.parse(JSON.stringify(sec)), idx })}
                               >
                                 Edit Banner Images &amp; Links →
                               </button>
@@ -820,9 +988,48 @@ export default function HomePageEditorView() {
                               <button
                                 type="button"
                                 className="btn btn-link btn-sm p-0 text-success text-decoration-none fw-semibold"
-                                onClick={() => setEditingSection({ sec, idx })}
+                                onClick={() => setEditingSection({ sec: JSON.parse(JSON.stringify(sec)), idx })}
                               >
                                 Edit Announcement Callout →
+                              </button>
+                            </div>
+                          )}
+
+                          {bType === 'image_text' && (
+                            <div className="small text-muted">
+                              <div><i className="bi bi-card-text me-1"></i>Story: <strong>{sec.content?.image_text?.heading || sec.title}</strong></div>
+                              <button
+                                type="button"
+                                className="btn btn-link btn-sm p-0 text-success text-decoration-none fw-semibold"
+                                onClick={() => setEditingSection({ sec: JSON.parse(JSON.stringify(sec)), idx })}
+                              >
+                                Edit Image + Text Content →
+                              </button>
+                            </div>
+                          )}
+
+                          {bType === 'countdown' && (
+                            <div className="small text-muted">
+                              <div><i className="bi bi-clock me-1"></i>Sale: <strong>{sec.content?.countdown?.heading || sec.title}</strong></div>
+                              <button
+                                type="button"
+                                className="btn btn-link btn-sm p-0 text-success text-decoration-none fw-semibold"
+                                onClick={() => setEditingSection({ sec: JSON.parse(JSON.stringify(sec)), idx })}
+                              >
+                                Edit Countdown Timer &amp; Deal →
+                              </button>
+                            </div>
+                          )}
+
+                          {bType === 'trust_bar' && (
+                            <div className="small text-muted">
+                              <div><i className="bi bi-shield-check me-1"></i>Benefits: <strong>{sec.content?.trust_bar?.items?.length || 4} items</strong></div>
+                              <button
+                                type="button"
+                                className="btn btn-link btn-sm p-0 text-success text-decoration-none fw-semibold"
+                                onClick={() => setEditingSection({ sec: JSON.parse(JSON.stringify(sec)), idx })}
+                              >
+                                Edit Benefits / Trust Bar →
                               </button>
                             </div>
                           )}
@@ -1052,28 +1259,61 @@ export default function HomePageEditorView() {
                 {wizardStep === 2 && (
                   <div>
                     <h6 className="fw-bold text-dark mb-3">2. Choose Content Block Type:</h6>
-                    <div className="d-flex gap-2 mb-4">
-                      <button
-                        type="button"
-                        className={`btn flex-fill py-2.5 fw-semibold ${wizardBlockType === 'products' ? 'btn-success text-white' : 'btn-outline-secondary'}`}
-                        onClick={() => setWizardBlockType('products')}
-                      >
-                        <i className="bi bi-bag-check me-1"></i> Product Category Feed
-                      </button>
-                      <button
-                        type="button"
-                        className={`btn flex-fill py-2.5 fw-semibold ${wizardBlockType === 'banner' ? 'btn-success text-white' : 'btn-outline-secondary'}`}
-                        onClick={() => setWizardBlockType('banner')}
-                      >
-                        <i className="bi bi-image me-1"></i> Promotional Banner
-                      </button>
-                      <button
-                        type="button"
-                        className={`btn flex-fill py-2.5 fw-semibold ${wizardBlockType === 'announcement' ? 'btn-success text-white' : 'btn-outline-secondary'}`}
-                        onClick={() => setWizardBlockType('announcement')}
-                      >
-                        <i className="bi bi-megaphone me-1"></i> Text Announcement
-                      </button>
+                    <div className="row g-2 mb-4">
+                      <div className="col-6 col-md-4">
+                        <button
+                          type="button"
+                          className={`btn w-100 py-2.5 fw-semibold ${wizardBlockType === 'products' ? 'btn-success text-white' : 'btn-outline-secondary'}`}
+                          onClick={() => setWizardBlockType('products')}
+                        >
+                          <i className="bi bi-bag-check me-1"></i> Product Feed
+                        </button>
+                      </div>
+                      <div className="col-6 col-md-4">
+                        <button
+                          type="button"
+                          className={`btn w-100 py-2.5 fw-semibold ${wizardBlockType === 'banner' ? 'btn-success text-white' : 'btn-outline-secondary'}`}
+                          onClick={() => setWizardBlockType('banner')}
+                        >
+                          <i className="bi bi-image me-1"></i> Promo Banner
+                        </button>
+                      </div>
+                      <div className="col-6 col-md-4">
+                        <button
+                          type="button"
+                          className={`btn w-100 py-2.5 fw-semibold ${wizardBlockType === 'image_text' ? 'btn-success text-white' : 'btn-outline-secondary'}`}
+                          onClick={() => setWizardBlockType('image_text')}
+                        >
+                          <i className="bi bi-card-text me-1"></i> Image + Text
+                        </button>
+                      </div>
+                      <div className="col-6 col-md-4">
+                        <button
+                          type="button"
+                          className={`btn w-100 py-2.5 fw-semibold ${wizardBlockType === 'countdown' ? 'btn-success text-white' : 'btn-outline-secondary'}`}
+                          onClick={() => setWizardBlockType('countdown')}
+                        >
+                          <i className="bi bi-clock me-1"></i> Countdown Sale
+                        </button>
+                      </div>
+                      <div className="col-6 col-md-4">
+                        <button
+                          type="button"
+                          className={`btn w-100 py-2.5 fw-semibold ${wizardBlockType === 'trust_bar' ? 'btn-success text-white' : 'btn-outline-secondary'}`}
+                          onClick={() => setWizardBlockType('trust_bar')}
+                        >
+                          <i className="bi bi-shield-check me-1"></i> Trust Bar
+                        </button>
+                      </div>
+                      <div className="col-6 col-md-4">
+                        <button
+                          type="button"
+                          className={`btn w-100 py-2.5 fw-semibold ${wizardBlockType === 'announcement' ? 'btn-success text-white' : 'btn-outline-secondary'}`}
+                          onClick={() => setWizardBlockType('announcement')}
+                        >
+                          <i className="bi bi-megaphone me-1"></i> Announcement
+                        </button>
+                      </div>
                     </div>
 
                     {/* Form for Product Feed */}
@@ -1302,6 +1542,236 @@ export default function HomePageEditorView() {
                         </div>
                       </div>
                     )}
+
+                    {/* Form for Image + Text */}
+                    {wizardBlockType === 'image_text' && (
+                      <div className="bg-light p-3.5 rounded-3 border">
+                        <div className="mb-3">
+                          <label className="form-label fw-semibold small">Showcase Heading</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={wizardData.image_text.heading}
+                            onChange={e => setWizardData({
+                              ...wizardData,
+                              image_text: { ...wizardData.image_text, heading: e.target.value },
+                            })}
+                            placeholder="e.g. Premium Smart Gadgets Engineered For Life"
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label fw-semibold small">Story / Feature Description</label>
+                          <textarea
+                            className="form-control"
+                            rows="2"
+                            value={wizardData.image_text.text}
+                            onChange={e => setWizardData({
+                              ...wizardData,
+                              image_text: { ...wizardData.image_text, text: e.target.value },
+                            })}
+                            placeholder="Discover innovative accessories tested and guaranteed..."
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label fw-semibold small">Showcase Image URL</label>
+                          <div className="input-group">
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={wizardData.image_text.image}
+                              onChange={e => setWizardData({
+                                ...wizardData,
+                                image_text: { ...wizardData.image_text, image: e.target.value },
+                              })}
+                              placeholder="https://... or upload .WebP"
+                            />
+                            <label className="btn btn-outline-secondary">
+                              <i className="bi bi-upload me-1"></i> Upload Image
+                              <input
+                                type="file"
+                                accept="image/*"
+                                hidden
+                                onChange={handleWizardImageTextUpload}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                        <div className="row g-3">
+                          <div className="col-md-4">
+                            <label className="form-label fw-semibold small">Image Placement</label>
+                            <select
+                              className="form-select form-select-sm"
+                              value={wizardData.image_text.imagePosition}
+                              onChange={e => setWizardData({
+                                ...wizardData,
+                                image_text: { ...wizardData.image_text, imagePosition: e.target.value },
+                              })}
+                            >
+                              <option value="left">Image on Left, Text on Right</option>
+                              <option value="right">Image on Right, Text on Left</option>
+                            </select>
+                          </div>
+                          <div className="col-md-4">
+                            <label className="form-label fw-semibold small">Button Text</label>
+                            <input
+                              type="text"
+                              className="form-control form-control-sm"
+                              value={wizardData.image_text.buttonText}
+                              onChange={e => setWizardData({
+                                ...wizardData,
+                                image_text: { ...wizardData.image_text, buttonText: e.target.value },
+                              })}
+                              placeholder="Explore Catalog"
+                            />
+                          </div>
+                          <div className="col-md-4">
+                            <label className="form-label fw-semibold small">Button Destination Link</label>
+                            <input
+                              type="text"
+                              className="form-control form-control-sm"
+                              value={wizardData.image_text.buttonLink}
+                              onChange={e => setWizardData({
+                                ...wizardData,
+                                image_text: { ...wizardData.image_text, buttonLink: e.target.value },
+                              })}
+                              placeholder="/shop"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Form for Countdown Promotion */}
+                    {wizardBlockType === 'countdown' && (
+                      <div className="bg-light p-3.5 rounded-3 border">
+                        <div className="mb-3">
+                          <label className="form-label fw-semibold small">Flash Sale Title / Headline</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={wizardData.countdown.heading}
+                            onChange={e => setWizardData({
+                              ...wizardData,
+                              countdown: { ...wizardData.countdown, heading: e.target.value },
+                            })}
+                            placeholder="e.g. Ramadan Super Flash Sale – 50% OFF"
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label fw-semibold small">Sale Subtitle / Terms</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={wizardData.countdown.subheading}
+                            onChange={e => setWizardData({
+                              ...wizardData,
+                              countdown: { ...wizardData.countdown, subheading: e.target.value },
+                            })}
+                            placeholder="Limited quantities available at special wholesale prices!"
+                          />
+                        </div>
+                        <div className="row g-3">
+                          <div className="col-md-4">
+                            <label className="form-label fw-semibold small">Deal Expiration Date &amp; Time</label>
+                            <input
+                              type="datetime-local"
+                              className="form-control form-control-sm"
+                              value={wizardData.countdown.targetDate ? wizardData.countdown.targetDate.slice(0, 16) : ''}
+                              onChange={e => setWizardData({
+                                ...wizardData,
+                                countdown: { ...wizardData.countdown, targetDate: new Date(e.target.value).toISOString() },
+                              })}
+                            />
+                          </div>
+                          <div className="col-md-4">
+                            <label className="form-label fw-semibold small">Button Text</label>
+                            <input
+                              type="text"
+                              className="form-control form-control-sm"
+                              value={wizardData.countdown.buttonText}
+                              onChange={e => setWizardData({
+                                ...wizardData,
+                                countdown: { ...wizardData.countdown, buttonText: e.target.value },
+                              })}
+                              placeholder="Shop Flash Deals"
+                            />
+                          </div>
+                          <div className="col-md-4">
+                            <label className="form-label fw-semibold small">Button Destination Link</label>
+                            <input
+                              type="text"
+                              className="form-control form-control-sm"
+                              value={wizardData.countdown.buttonLink}
+                              onChange={e => setWizardData({
+                                ...wizardData,
+                                countdown: { ...wizardData.countdown, buttonLink: e.target.value },
+                              })}
+                              placeholder="/shop?group=hot"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Form for Benefits / Trust Bar */}
+                    {wizardBlockType === 'trust_bar' && (
+                      <div className="bg-light p-3.5 rounded-3 border">
+                        <h6 className="fw-bold mb-3">Configure 4 Benefit Cards:</h6>
+                        <div className="row g-2">
+                          {(wizardData.trust_bar.items || []).map((item, itemIdx) => (
+                            <div className="col-12 col-md-6" key={itemIdx}>
+                              <div className="p-2.5 bg-white border rounded-2">
+                                <div className="d-flex align-items-center gap-2 mb-2">
+                                  <input
+                                    type="text"
+                                    className="form-control form-control-sm text-center"
+                                    style={{ width: '45px' }}
+                                    value={item.icon}
+                                    onChange={e => {
+                                      const newItems = [...wizardData.trust_bar.items]
+                                      newItems[itemIdx] = { ...newItems[itemIdx], icon: e.target.value }
+                                      setWizardData({
+                                        ...wizardData,
+                                        trust_bar: { ...wizardData.trust_bar, items: newItems },
+                                      })
+                                    }}
+                                    title="Icon or Emoji"
+                                  />
+                                  <input
+                                    type="text"
+                                    className="form-control form-control-sm fw-bold"
+                                    value={item.title}
+                                    onChange={e => {
+                                      const newItems = [...wizardData.trust_bar.items]
+                                      newItems[itemIdx] = { ...newItems[itemIdx], title: e.target.value }
+                                      setWizardData({
+                                        ...wizardData,
+                                        trust_bar: { ...wizardData.trust_bar, items: newItems },
+                                      })
+                                    }}
+                                    placeholder={`Benefit #${itemIdx + 1} Title`}
+                                  />
+                                </div>
+                                <input
+                                  type="text"
+                                  className="form-control form-control-sm text-muted"
+                                  value={item.subtitle}
+                                  onChange={e => {
+                                    const newItems = [...wizardData.trust_bar.items]
+                                    newItems[itemIdx] = { ...newItems[itemIdx], subtitle: e.target.value }
+                                    setWizardData({
+                                      ...wizardData,
+                                      trust_bar: { ...wizardData.trust_bar, items: newItems },
+                                    })
+                                  }}
+                                  placeholder="Subtitle (e.g. Free on orders above Rs. 3,000)"
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1425,6 +1895,614 @@ export default function HomePageEditorView() {
                   onClick={() => setShowHistoryModal(false)}
                 >
                   Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════
+          EDIT EXISTING SECTION DRAWER / MODAL
+         ════════════════════════════════════════════════════════════ */}
+      {editingSection && (
+        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.65)', zIndex: 1060 }}>
+          <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+              <div className="modal-header bg-light border-bottom py-3 px-4">
+                <div>
+                  <h5 className="modal-title fw-bold text-dark mb-0">
+                    <i className="bi bi-pencil-square text-success me-2"></i>
+                    Configure Section #{editingSection.idx + 1}: {editingSection.sec.title}
+                  </h5>
+                  <small className="text-muted">
+                    Block Type: <strong className="text-capitalize">{editingSection.sec.blockType || 'products'}</strong> | Layout: <strong>{editingSection.sec.containerLayout || 'single'}</strong>
+                  </small>
+                </div>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setEditingSection(null)}
+                />
+              </div>
+
+              <div className="modal-body p-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                {/* 1. General Settings */}
+                <div className="mb-4 pb-3 border-bottom">
+                  <h6 className="fw-bold text-dark mb-3">General Settings:</h6>
+                  <div className="row g-3">
+                    <div className="col-12 col-md-6">
+                      <label className="form-label fw-semibold small">Section Title</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={editingSection.sec.title || ''}
+                        onChange={e => setEditingSection({
+                          ...editingSection,
+                          sec: { ...editingSection.sec, title: e.target.value }
+                        })}
+                      />
+                    </div>
+                    <div className="col-12 col-md-6">
+                      <label className="form-label fw-semibold small">Container Layout</label>
+                      <select
+                        className="form-select"
+                        value={editingSection.sec.containerLayout || 'single'}
+                        onChange={e => setEditingSection({
+                          ...editingSection,
+                          sec: { ...editingSection.sec, containerLayout: e.target.value }
+                        })}
+                      >
+                        <option value="single">Single Column (100% Full Width)</option>
+                        <option value="two_equal">Two Columns (50 / 50 Equal Split)</option>
+                        <option value="two_70_30">Split Columns (70 / 30)</option>
+                        <option value="two_30_70">Split Columns (30 / 70)</option>
+                      </select>
+                    </div>
+                    <div className="col-12 col-md-6">
+                      <label className="form-label fw-semibold small">Subtitle / Tagline (Optional)</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={editingSection.sec.subtitle || ''}
+                        onChange={e => setEditingSection({
+                          ...editingSection,
+                          sec: { ...editingSection.sec, subtitle: e.target.value }
+                        })}
+                      />
+                    </div>
+                    <div className="col-12 col-md-6">
+                      <label className="form-label fw-semibold small">Theme Accent Color</label>
+                      <input
+                        type="color"
+                        className="form-control form-control-color w-100"
+                        value={editingSection.sec.color || '#00998f'}
+                        onChange={e => setEditingSection({
+                          ...editingSection,
+                          sec: { ...editingSection.sec, color: e.target.value }
+                        })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Block Specific Content */}
+                <div>
+                  <h6 className="fw-bold text-dark mb-3">Content Configuration:</h6>
+
+                  {/* BANNER */}
+                  {editingSection.sec.blockType === 'banner' && (
+                    <div className="bg-light p-3.5 rounded-3 border">
+                      <h6 className="fw-bold mb-2">Column 1 Banner:</h6>
+                      <div className="mb-2">
+                        <label className="form-label small fw-semibold">Banner 1 Image URL</label>
+                        <div className="input-group">
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={editingSection.sec.content?.banners?.[0]?.image || ''}
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.banners) nextSec.content.banners = []
+                              if (!nextSec.content.banners[0]) nextSec.content.banners[0] = {}
+                              nextSec.content.banners[0].image = e.target.value
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                          />
+                          <label className="btn btn-outline-secondary">
+                            <i className="bi bi-upload me-1"></i> Upload
+                            <input
+                              type="file"
+                              accept="image/*"
+                              hidden
+                              onChange={e => handleEditSectionImageUpload('banner1', e)}
+                            />
+                          </label>
+                        </div>
+                      </div>
+                      <div className="row g-2 mb-3">
+                        <div className="col-md-6">
+                          <input
+                            type="text"
+                            className="form-control form-control-sm"
+                            value={editingSection.sec.content?.banners?.[0]?.link || '/shop'}
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.banners) nextSec.content.banners = []
+                              if (!nextSec.content.banners[0]) nextSec.content.banners[0] = {}
+                              nextSec.content.banners[0].link = e.target.value
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                            placeholder="Destination Link"
+                          />
+                        </div>
+                        <div className="col-md-6">
+                          <input
+                            type="text"
+                            className="form-control form-control-sm"
+                            value={editingSection.sec.content?.banners?.[0]?.badge || ''}
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.banners) nextSec.content.banners = []
+                              if (!nextSec.content.banners[0]) nextSec.content.banners[0] = {}
+                              nextSec.content.banners[0].badge = e.target.value
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                            placeholder="Floating Badge (e.g. HOT DEAL)"
+                          />
+                        </div>
+                      </div>
+
+                      {editingSection.sec.containerLayout !== 'single' && (
+                        <div className="pt-3 border-top">
+                          <h6 className="fw-bold mb-2">Column 2 Banner:</h6>
+                          <div className="mb-2">
+                            <label className="form-label small fw-semibold">Banner 2 Image URL</label>
+                            <div className="input-group">
+                              <input
+                                type="text"
+                                className="form-control"
+                                value={editingSection.sec.content?.banners?.[1]?.image || ''}
+                                onChange={e => {
+                                  const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                                  if (!nextSec.content) nextSec.content = {}
+                                  if (!nextSec.content.banners) nextSec.content.banners = []
+                                  if (!nextSec.content.banners[1]) nextSec.content.banners[1] = {}
+                                  nextSec.content.banners[1].image = e.target.value
+                                  setEditingSection({ ...editingSection, sec: nextSec })
+                                }}
+                              />
+                              <label className="btn btn-outline-secondary">
+                                <i className="bi bi-upload me-1"></i> Upload
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  hidden
+                                  onChange={e => handleEditSectionImageUpload('banner2', e)}
+                                />
+                              </label>
+                            </div>
+                          </div>
+                          <div className="row g-2">
+                            <div className="col-md-6">
+                              <input
+                                type="text"
+                                className="form-control form-control-sm"
+                                value={editingSection.sec.content?.banners?.[1]?.link || '/shop'}
+                                onChange={e => {
+                                  const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                                  if (!nextSec.content) nextSec.content = {}
+                                  if (!nextSec.content.banners) nextSec.content.banners = []
+                                  if (!nextSec.content.banners[1]) nextSec.content.banners[1] = {}
+                                  nextSec.content.banners[1].link = e.target.value
+                                  setEditingSection({ ...editingSection, sec: nextSec })
+                                }}
+                                placeholder="Destination Link"
+                              />
+                            </div>
+                            <div className="col-md-6">
+                              <input
+                                type="text"
+                                className="form-control form-control-sm"
+                                value={editingSection.sec.content?.banners?.[1]?.badge || ''}
+                                onChange={e => {
+                                  const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                                  if (!nextSec.content) nextSec.content = {}
+                                  if (!nextSec.content.banners) nextSec.content.banners = []
+                                  if (!nextSec.content.banners[1]) nextSec.content.banners[1] = {}
+                                  nextSec.content.banners[1].badge = e.target.value
+                                  setEditingSection({ ...editingSection, sec: nextSec })
+                                }}
+                                placeholder="Floating Badge (e.g. NEW)"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* IMAGE + TEXT */}
+                  {editingSection.sec.blockType === 'image_text' && (
+                    <div className="bg-light p-3.5 rounded-3 border">
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Showcase Heading</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={editingSection.sec.content?.image_text?.heading || editingSection.sec.title || ''}
+                          onChange={e => {
+                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                            if (!nextSec.content) nextSec.content = {}
+                            if (!nextSec.content.image_text) nextSec.content.image_text = {}
+                            nextSec.content.image_text.heading = e.target.value
+                            setEditingSection({ ...editingSection, sec: nextSec })
+                          }}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Description Text</label>
+                        <textarea
+                          className="form-control"
+                          rows="3"
+                          value={editingSection.sec.content?.image_text?.text || editingSection.sec.subtitle || ''}
+                          onChange={e => {
+                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                            if (!nextSec.content) nextSec.content = {}
+                            if (!nextSec.content.image_text) nextSec.content.image_text = {}
+                            nextSec.content.image_text.text = e.target.value
+                            setEditingSection({ ...editingSection, sec: nextSec })
+                          }}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Showcase Image URL</label>
+                        <div className="input-group">
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={editingSection.sec.content?.image_text?.image || ''}
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.image_text) nextSec.content.image_text = {}
+                              nextSec.content.image_text.image = e.target.value
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                          />
+                          <label className="btn btn-outline-secondary">
+                            <i className="bi bi-upload me-1"></i> Upload
+                            <input
+                              type="file"
+                              accept="image/*"
+                              hidden
+                              onChange={e => handleEditSectionImageUpload('image_text', e)}
+                            />
+                          </label>
+                        </div>
+                      </div>
+                      <div className="row g-3">
+                        <div className="col-md-4">
+                          <label className="form-label small fw-semibold">Image Position</label>
+                          <select
+                            className="form-select form-select-sm"
+                            value={editingSection.sec.content?.image_text?.imagePosition || 'left'}
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.image_text) nextSec.content.image_text = {}
+                              nextSec.content.image_text.imagePosition = e.target.value
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                          >
+                            <option value="left">Image on Left</option>
+                            <option value="right">Image on Right</option>
+                          </select>
+                        </div>
+                        <div className="col-md-4">
+                          <label className="form-label small fw-semibold">Button Text</label>
+                          <input
+                            type="text"
+                            className="form-control form-control-sm"
+                            value={editingSection.sec.content?.image_text?.buttonText || 'Explore Catalog'}
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.image_text) nextSec.content.image_text = {}
+                              nextSec.content.image_text.buttonText = e.target.value
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                          />
+                        </div>
+                        <div className="col-md-4">
+                          <label className="form-label small fw-semibold">Button Link</label>
+                          <input
+                            type="text"
+                            className="form-control form-control-sm"
+                            value={editingSection.sec.content?.image_text?.buttonLink || '/shop'}
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.image_text) nextSec.content.image_text = {}
+                              nextSec.content.image_text.buttonLink = e.target.value
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* COUNTDOWN */}
+                  {editingSection.sec.blockType === 'countdown' && (
+                    <div className="bg-light p-3.5 rounded-3 border">
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Flash Sale Title</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={editingSection.sec.content?.countdown?.heading || editingSection.sec.title || ''}
+                          onChange={e => {
+                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                            if (!nextSec.content) nextSec.content = {}
+                            if (!nextSec.content.countdown) nextSec.content.countdown = {}
+                            nextSec.content.countdown.heading = e.target.value
+                            setEditingSection({ ...editingSection, sec: nextSec })
+                          }}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Sale Subheading</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={editingSection.sec.content?.countdown?.subheading || editingSection.sec.subtitle || ''}
+                          onChange={e => {
+                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                            if (!nextSec.content) nextSec.content = {}
+                            if (!nextSec.content.countdown) nextSec.content.countdown = {}
+                            nextSec.content.countdown.subheading = e.target.value
+                            setEditingSection({ ...editingSection, sec: nextSec })
+                          }}
+                        />
+                      </div>
+                      <div className="row g-3">
+                        <div className="col-md-4">
+                          <label className="form-label small fw-semibold">Target Expiration Date</label>
+                          <input
+                            type="datetime-local"
+                            className="form-control form-control-sm"
+                            value={editingSection.sec.content?.countdown?.targetDate ? editingSection.sec.content.countdown.targetDate.slice(0, 16) : ''}
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.countdown) nextSec.content.countdown = {}
+                              nextSec.content.countdown.targetDate = new Date(e.target.value).toISOString()
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                          />
+                        </div>
+                        <div className="col-md-4">
+                          <label className="form-label small fw-semibold">Button Text</label>
+                          <input
+                            type="text"
+                            className="form-control form-control-sm"
+                            value={editingSection.sec.content?.countdown?.buttonText || 'Shop Flash Deals'}
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.countdown) nextSec.content.countdown = {}
+                              nextSec.content.countdown.buttonText = e.target.value
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                          />
+                        </div>
+                        <div className="col-md-4">
+                          <label className="form-label small fw-semibold">Button Link</label>
+                          <input
+                            type="text"
+                            className="form-control form-control-sm"
+                            value={editingSection.sec.content?.countdown?.buttonLink || '/shop?group=hot'}
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.countdown) nextSec.content.countdown = {}
+                              nextSec.content.countdown.buttonLink = e.target.value
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* TRUST BAR */}
+                  {editingSection.sec.blockType === 'trust_bar' && (
+                    <div className="bg-light p-3.5 rounded-3 border">
+                      <h6 className="fw-bold mb-3">Edit 4 Benefit Cards:</h6>
+                      <div className="row g-2">
+                        {((editingSection.sec.content?.trust_bar?.items) || [
+                          { icon: '🚚', title: 'Free Delivery', subtitle: 'On orders over Rs. 3,000' },
+                          { icon: '💬', title: '24/7 WhatsApp Help', subtitle: 'Live chat support anytime' },
+                          { icon: '🛡️', title: '100% Genuine Items', subtitle: 'Tested & verified products' },
+                          { icon: '💵', title: 'Cash on Delivery', subtitle: 'Pay when your parcel arrives' },
+                        ]).map((item, itemIdx) => (
+                          <div className="col-12 col-md-6" key={itemIdx}>
+                            <div className="p-2.5 bg-white border rounded-2">
+                              <div className="d-flex align-items-center gap-2 mb-2">
+                                <input
+                                  type="text"
+                                  className="form-control form-control-sm text-center"
+                                  style={{ width: '45px' }}
+                                  value={item.icon}
+                                  onChange={e => {
+                                    const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                                    if (!nextSec.content) nextSec.content = {}
+                                    if (!nextSec.content.trust_bar) nextSec.content.trust_bar = {}
+                                    if (!nextSec.content.trust_bar.items) nextSec.content.trust_bar.items = []
+                                    nextSec.content.trust_bar.items[itemIdx] = { ...item, icon: e.target.value }
+                                    setEditingSection({ ...editingSection, sec: nextSec })
+                                  }}
+                                />
+                                <input
+                                  type="text"
+                                  className="form-control form-control-sm fw-bold"
+                                  value={item.title}
+                                  onChange={e => {
+                                    const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                                    if (!nextSec.content) nextSec.content = {}
+                                    if (!nextSec.content.trust_bar) nextSec.content.trust_bar = {}
+                                    if (!nextSec.content.trust_bar.items) nextSec.content.trust_bar.items = []
+                                    nextSec.content.trust_bar.items[itemIdx] = { ...item, title: e.target.value }
+                                    setEditingSection({ ...editingSection, sec: nextSec })
+                                  }}
+                                />
+                              </div>
+                              <input
+                                type="text"
+                                className="form-control form-control-sm text-muted"
+                                value={item.subtitle}
+                                onChange={e => {
+                                  const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                                  if (!nextSec.content) nextSec.content = {}
+                                  if (!nextSec.content.trust_bar) nextSec.content.trust_bar = {}
+                                  if (!nextSec.content.trust_bar.items) nextSec.content.trust_bar.items = []
+                                  nextSec.content.trust_bar.items[itemIdx] = { ...item, subtitle: e.target.value }
+                                  setEditingSection({ ...editingSection, sec: nextSec })
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ANNOUNCEMENT */}
+                  {editingSection.sec.blockType === 'announcement' && (
+                    <div className="bg-light p-3.5 rounded-3 border">
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Main Heading</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={editingSection.sec.content?.announcement?.heading || editingSection.sec.title || ''}
+                          onChange={e => {
+                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                            if (!nextSec.content) nextSec.content = {}
+                            if (!nextSec.content.announcement) nextSec.content.announcement = {}
+                            nextSec.content.announcement.heading = e.target.value
+                            setEditingSection({ ...editingSection, sec: nextSec })
+                          }}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Subtitle / Message</label>
+                        <textarea
+                          className="form-control"
+                          rows="2"
+                          value={editingSection.sec.content?.announcement?.subheading || editingSection.sec.subtitle || ''}
+                          onChange={e => {
+                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                            if (!nextSec.content) nextSec.content = {}
+                            if (!nextSec.content.announcement) nextSec.content.announcement = {}
+                            nextSec.content.announcement.subheading = e.target.value
+                            setEditingSection({ ...editingSection, sec: nextSec })
+                          }}
+                        />
+                      </div>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <label className="form-label small fw-semibold">Button Text</label>
+                          <input
+                            type="text"
+                            className="form-control form-control-sm"
+                            value={editingSection.sec.content?.announcement?.buttonText || 'Shop Now'}
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.announcement) nextSec.content.announcement = {}
+                              nextSec.content.announcement.buttonText = e.target.value
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                          />
+                        </div>
+                        <div className="col-md-6">
+                          <label className="form-label small fw-semibold">Button Link</label>
+                          <input
+                            type="text"
+                            className="form-control form-control-sm"
+                            value={editingSection.sec.content?.announcement?.buttonLink || '/shop'}
+                            onChange={e => {
+                              const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                              if (!nextSec.content) nextSec.content = {}
+                              if (!nextSec.content.announcement) nextSec.content.announcement = {}
+                              nextSec.content.announcement.buttonLink = e.target.value
+                              setEditingSection({ ...editingSection, sec: nextSec })
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* PRODUCTS */}
+                  {editingSection.sec.blockType === 'products' && (
+                    <div className="bg-light p-3.5 rounded-3 border">
+                      <div className="mb-3">
+                        <label className="form-label small fw-semibold">Target Feed</label>
+                        <select
+                          className="form-select form-select-sm"
+                          value={editingSection.sec.category ? `category:${editingSection.sec.category}` : (editingSection.sec.group || 'new')}
+                          onChange={e => {
+                            const val = e.target.value
+                            const nextSec = JSON.parse(JSON.stringify(editingSection.sec))
+                            if (val.startsWith('category:')) {
+                              nextSec.category = val.replace('category:', '')
+                              nextSec.group = null
+                            } else {
+                              nextSec.group = val
+                              nextSec.category = null
+                            }
+                            setEditingSection({ ...editingSection, sec: nextSec })
+                          }}
+                        >
+                          <optgroup label="Catalog Groups">
+                            {PRESET_GROUPS.map(g => (
+                              <option key={g.key} value={g.key}>{g.label}</option>
+                            ))}
+                          </optgroup>
+                          <optgroup label="Store Categories">
+                            {categories.map(c => (
+                              <option key={c.id || c.name} value={`category:${c.name}`}>
+                                Category: {c.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="modal-footer bg-light border-top py-3 px-4 d-flex justify-content-between">
+                <button
+                  type="button"
+                  className="btn btn-secondary px-3"
+                  onClick={() => setEditingSection(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-success px-4 fw-semibold shadow"
+                  onClick={handleSaveEditingSection}
+                >
+                  <i className="bi bi-check2-circle me-1"></i> Save Section Changes
                 </button>
               </div>
             </div>

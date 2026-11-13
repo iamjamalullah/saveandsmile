@@ -10,6 +10,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "migrate": "node migrate.js",
+    "migrate:preview": "node scripts/migration-preview.js",
     "backup": "node backup.js",
     "restore": "node restore.js",
     "pg:backup": "node pg-backup.js",
@@ -21,12 +22,14 @@
     "test:lens": "node tests/mobile-lens-zoom.test.js",
     "test:variants": "node tests/product-variants.test.js",
     "test:homepage": "node tests/homepage-persistence-deletion.test.js",
+    "test:pdp": "node tests/pdp-final-audit.js",
     "test:all": "node tests/order-integrity.test.js && node tests/auth-migration.test.js && node tests/backup-restore.test.js && node tests/homepage-builder.test.js && node tests/mobile-lens-zoom.test.js && node tests/product-variants.test.js && node tests/homepage-persistence-deletion.test.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.2",
+    "dotenv": "^18.0.10",
     "json-server": "^0.17.4",
     "pg": "^8.23.1",
     "pg-mem": "^3.0.14",

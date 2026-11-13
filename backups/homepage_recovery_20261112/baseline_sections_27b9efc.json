@@ -1,0 +1,288 @@
+[
+  {
+    "id": "1",
+    "order": 1,
+    "title": "New Arrivals",
+    "subtitle": "",
+    "containerLayout": "single",
+    "blockType": "products",
+    "enabled": true,
+    "isPublished": true,
+    "color": "#cf9c44",
+    "bg": "https://www.qadrigadgets.pk/images/builder_background/69e3673551452.png",
+    "category": null,
+    "group": "new",
+    "viewAll": true,
+    "seeMore": true,
+    "content": {
+      "banners": [],
+      "announcement": {
+        "heading": "New Arrivals",
+        "subheading": "",
+        "buttonText": "Shop Now",
+        "buttonLink": "/shop",
+        "bgColor": "#cf9c44",
+        "textColor": "#ffffff",
+        "align": "center"
+      }
+    },
+    "responsiveSettings": {
+      "mobileStack": true,
+      "hideOnMobile": false
+    }
+  },
+  {
+    "id": "2",
+    "order": 2,
+    "title": "Hot Selling Products",
+    "subtitle": "",
+    "containerLayout": "single",
+    "blockType": "products",
+    "enabled": true,
+    "isPublished": true,
+    "color": "#00998f",
+    "bg": "https://www.qadrigadgets.pk/images/builder_background/69e367452a403.png",
+    "category": null,
+    "group": "hot",
+    "viewAll": false,
+    "seeMore": false,
+    "content": {
+      "banners": [],
+      "announcement": {
+        "heading": "Hot Selling Products",
+        "subheading": "",
+        "buttonText": "Shop Now",
+        "buttonLink": "/shop",
+        "bgColor": "#00998f",
+        "textColor": "#ffffff",
+        "align": "center"
+      }
+    },
+    "responsiveSettings": {
+      "mobileStack": true,
+      "hideOnMobile": false
+    }
+  },
+  {
+    "id": "3",
+    "order": 3,
+    "title": "Home Essentials Organizers",
+    "subtitle": "",
+    "containerLayout": "single",
+    "blockType": "products",
+    "enabled": true,
+    "isPublished": true,
+    "color": "#6980c3",
+    "bg": "https://www.qadrigadgets.pk/images/builder_background/694aac30cb418.png",
+    "category": null,
+    "group": "home",
+    "viewAll": false,
+    "seeMore": false,
+    "content": {
+      "banners": [],
+      "announcement": {
+        "heading": "Home Essentials Organizers",
+        "subheading": "",
+        "buttonText": "Shop Now",
+        "buttonLink": "/shop",
+        "bgColor": "#6980c3",
+        "textColor": "#ffffff",
+        "align": "center"
+      }
+    },
+    "responsiveSettings": {
+      "mobileStack": true,
+      "hideOnMobile": false
+    }
+  },
+  {
+    "id": "4",
+    "order": 4,
+    "title": "You May Also Like",
+    "subtitle": "",
+    "containerLayout": "single",
+    "blockType": "products",
+    "enabled": true,
+    "isPublished": true,
+    "color": "#cf9c44",
+    "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1cfb86d85.png",
+    "category": null,
+    "group": "like",
+    "viewAll": false,
+    "seeMore": false,
+    "content": {
+      "banners": [],
+      "announcement": {
+        "heading": "You May Also Like",
+        "subheading": "",
+        "buttonText": "Shop Now",
+        "buttonLink": "/shop",
+        "bgColor": "#cf9c44",
+        "textColor": "#ffffff",
+        "align": "center"
+      }
+    },
+    "responsiveSettings": {
+      "mobileStack": true,
+      "hideOnMobile": false
+    }
+  },
+  {
+    "id": "5",
+    "order": 5,
+    "title": "Top Picks Fragrances",
+    "subtitle": "",
+    "containerLayout": "single",
+    "blockType": "products",
+    "enabled": true,
+    "isPublished": true,
+    "color": "#6980c3",
+    "bg": "https://www.qadrigadgets.pk/images/builder_background/69e36752dd560.png",
+    "category": null,
+    "group": "perfume",
+    "viewAll": false,
+    "seeMore": false,
+    "content": {
+      "banners": [],
+      "announcement": {
+        "heading": "Top Picks Fragrances",
+        "subheading": "",
+        "buttonText": "Shop Now",
+        "buttonLink": "/shop",
+        "bgColor": "#6980c3",
+        "textColor": "#ffffff",
+        "align": "center"
+      }
+    },
+    "responsiveSettings": {
+      "mobileStack": true,
+      "hideOnMobile": false
+    }
+  },
+  {
+    "id": "6",
+    "order": 6,
+    "title": "Trending Now",
+    "subtitle": "",
+    "containerLayout": "single",
+    "blockType": "products",
+    "enabled": true,
+    "isPublished": true,
+    "color": "#00998f",
+    "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1ce2b376d.png",
+    "category": null,
+    "group": "trending",
+    "viewAll": false,
+    "seeMore": false,
+    "content": {
+      "banners": [],
+      "announcement": {
+        "heading": "Trending Now",
+        "subheading": "",
+        "buttonText": "Shop Now",
+        "buttonLink": "/shop",
+        "bgColor": "#00998f",
+        "textColor": "#ffffff",
+        "align": "center"
+      }
+    },
+    "responsiveSettings": {
+      "mobileStack": true,
+      "hideOnMobile": false
+    }
+  },
+  {
+    "id": "7",
+    "order": 7,
+    "title": "Elegant Jewelry & Accessories",
+    "subtitle": "",
+    "containerLayout": "single",
+    "blockType": "products",
+    "enabled": true,
+    "isPublished": true,
+    "color": "#cf9c44",
+    "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c7309e3f.png",
+    "category": null,
+    "group": "jewelry",
+    "viewAll": false,
+    "seeMore": false,
+    "content": {
+      "banners": [],
+      "announcement": {
+        "heading": "Elegant Jewelry & Accessories",
+        "subheading": "",
+        "buttonText": "Shop Now",
+        "buttonLink": "/shop",
+        "bgColor": "#cf9c44",
+        "textColor": "#ffffff",
+        "align": "center"
+      }
+    },
+    "responsiveSettings": {
+      "mobileStack": true,
+      "hideOnMobile": false
+    }
+  },
+  {
+    "id": "sec-1794173571404-997",
+    "order": 8,
+    "title": "Promotional Showcase",
+    "subtitle": "",
+    "containerLayout": "single",
+    "blockType": "banner",
+    "enabled": true,
+    "isPublished": true,
+    "color": "#00998f",
+    "bg": "",
+    "category": null,
+    "group": "new",
+    "viewAll": false,
+    "seeMore": false,
+    "content": {
+      "banners": [
+        {
+          "image": "/uploads/products/prod_1794173566637_Save___Smile_Shopping_Adventure_v1ugs.webp",
+          "link": "/shop",
+          "title": "",
+          "badge": ""
+        }
+      ]
+    },
+    "responsiveSettings": {
+      "mobileStack": true,
+      "hideOnMobile": false
+    }
+  },
+  {
+    "id": "8",
+    "order": 9,
+    "title": "Exclusive Watches",
+    "subtitle": "",
+    "containerLayout": "single",
+    "blockType": "products",
+    "enabled": true,
+    "isPublished": true,
+    "color": "#6980c3",
+    "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c4780d7b.png",
+    "category": null,
+    "group": "watch",
+    "viewAll": true,
+    "seeMore": false,
+    "content": {
+      "banners": [],
+      "announcement": {
+        "heading": "Exclusive Watches",
+        "subheading": "",
+        "buttonText": "Shop Now",
+        "buttonLink": "/shop",
+        "bgColor": "#6980c3",
+        "textColor": "#ffffff",
+        "align": "center"
+      }
+    },
+    "responsiveSettings": {
+      "mobileStack": true,
+      "hideOnMobile": false
+    }
+  }
+]

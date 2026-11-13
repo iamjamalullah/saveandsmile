@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -96,6 +97,10 @@ export async function runMigration() {
       )
 
       if (p.hasVariants && Array.isArray(p.variants)) {
+        // Ensure idempotency for product options & variant images on rerun
+        await client.query('DELETE FROM product_options WHERE product_id = $1', [p.id])
+        await client.query('DELETE FROM product_variant_images WHERE product_id = $1', [p.id])
+
         if (Array.isArray(p.options)) {
           for (let optIdx = 0; optIdx < p.options.length; optIdx++) {
             const opt = p.options[optIdx]
@@ -185,9 +190,7 @@ export async function runMigration() {
         await client.query(
           `INSERT INTO customers (id, name, mobile, email, city, address)
            VALUES ($1, $2, $3, $4, $5, $6)
-           ON CONFLICT (mobile) DO UPDATE SET
-             name = EXCLUDED.name,
-             address = EXCLUDED.address`,
+           ON CONFLICT (mobile) DO NOTHING`,
           [customerId, name, mobile, email, city, address]
         )
       }
@@ -200,9 +203,7 @@ export async function runMigration() {
            status, tracking_number, subtotal, discount, coupon_code,
            shipping_fee, total, customer_notes, created_at
          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
-         ON CONFLICT (id) DO UPDATE SET
-           status = EXCLUDED.status,
-           total = EXCLUDED.total`,
+         ON CONFLICT (id) DO NOTHING`,
         [
           o.id,
           customerId,
@@ -227,6 +228,7 @@ export async function runMigration() {
 
       // Insert Order Items
       if (Array.isArray(o.items)) {
+        await client.query('DELETE FROM order_items WHERE order_id = $1', [o.id])
         for (const item of o.items) {
           totalOrderItemsCount++
           const prod = item.product || {}
@@ -288,9 +290,7 @@ export async function runMigration() {
       await client.query(
         `INSERT INTO reviews (id, product_id, name, title, text, rating, whatsapp, status, date_formatted)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-         ON CONFLICT (id) DO UPDATE SET
-           status = EXCLUDED.status,
-           rating = EXCLUDED.rating`,
+         ON CONFLICT (id) DO NOTHING`,
         [
           r.id,
           r.productId || null,
@@ -372,7 +372,10 @@ export async function runMigration() {
       await client.query(
         `INSERT INTO hero_slides (id, image_url, alt_text, sort_order)
          VALUES ($1, $2, $3, $4)
-         ON CONFLICT (id) DO NOTHING`,
+         ON CONFLICT (id) DO UPDATE SET
+           image_url = EXCLUDED.image_url,
+           alt_text = EXCLUDED.alt_text,
+           sort_order = EXCLUDED.sort_order`,
         [i + 1, s.image, s.alt || 'Slide', i]
       )
     }
@@ -409,6 +412,15 @@ export async function runMigration() {
       )
     }
 
+    // ── INITIALIZE HOMEPAGE DRAFT (IF EMPTY) ──
+    const draftCheck = await client.query('SELECT id FROM homepage_draft WHERE id = 1')
+    if (draftCheck.rows.length === 0) {
+      await client.query(
+        'INSERT INTO homepage_draft (id, draft_json, updated_at) VALUES (1, $1, NOW())',
+        [JSON.stringify(sections)]
+      )
+    }
+
     // ── WATCH & SHOP ──
     console.log('[MIGRATION] Migrating Watch & Shop reels...')
     const watchShop = dbData.watchShop || []
@@ -418,7 +430,14 @@ export async function runMigration() {
       await client.query(
         `INSERT INTO watch_shop (id, title, video_url, image_url, views_count, likes_count, product_id, sort_order)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-         ON CONFLICT (id) DO NOTHING`,
+         ON CONFLICT (id) DO UPDATE SET
+           title = EXCLUDED.title,
+           video_url = EXCLUDED.video_url,
+           image_url = EXCLUDED.image_url,
+           views_count = EXCLUDED.views_count,
+           likes_count = EXCLUDED.likes_count,
+           product_id = EXCLUDED.product_id,
+           sort_order = EXCLUDED.sort_order`,
         [w.id || i + 1, w.title || 'Reel', w.video, w.image, w.views || 0, w.likes || 0, w.productId || null, i]
       )
     }
@@ -442,13 +461,40 @@ export async function runMigration() {
        ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash`,
       [managerPassHash]
     )
+
+    // ── SYNCHRONIZE SERIAL SEQUENCES ──
+    const serialTables = [
+      'categories',
+      'products',
+      'hero_slides',
+      'order_items',
+      'coupons',
+      'watch_shop',
+      'staff_accounts',
+      'homepage_section_versions',
+      'product_options',
+      'product_option_values',
+      'product_variants',
+      'product_variant_images',
+    ]
+    for (const tbl of serialTables) {
+      try {
+        await client.query(`SELECT setval(pg_get_serial_sequence('${tbl}', 'id'), COALESCE((SELECT MAX(id) FROM ${tbl}), 1))`)
+      } catch (_) {
+        // Ignored in pg-mem or non-serial environments
+      }
+    }
   })
 
   // 3. Verification & Comparison
-  console.log('\n[MIGRATION VERIFICATION] Auditing migrated record counts...')
+  console.log('\n[MIGRATION VERIFICATION] Auditing migrated record counts across all 21 tables...')
   const tables = [
-    'products',
     'categories',
+    'products',
+    'product_options',
+    'product_option_values',
+    'product_variants',
+    'product_variant_images',
     'customers',
     'orders',
     'order_items',
@@ -458,8 +504,12 @@ export async function runMigration() {
     'store_settings',
     'hero_slides',
     'sections',
+    'homepage_draft',
+    'homepage_section_versions',
     'watch_shop',
     'staff_accounts',
+    'idempotency_keys',
+    'revoked_tokens',
   ]
 
   const report = []
@@ -474,15 +524,15 @@ export async function runMigration() {
       Table: tbl,
       'db.json (Source)': srcCount,
       'PostgreSQL (Target)': count,
-      Status: matched ? 'MATCHED ✓' : 'MISMATCH ⚠',
+      Status: matched ? 'MATCHED ✓' : (srcCount === 0 && count === 0 ? 'EMPTY OK ✓' : 'MISMATCH ⚠'),
     })
   }
 
   console.table(report)
 
-  const allMatched = report.every(r => r.Status.includes('MATCHED'))
+  const allMatched = report.every(r => r.Status.includes('✓'))
   if (allMatched) {
-    console.log('[SUCCESS] All 13 entity collections migrated with 100% data parity!')
+    console.log('[SUCCESS] All 21 schema tables verified with 100% data parity!')
   } else {
     console.warn('[WARNING] Some tables had mismatching record counts.')
   }

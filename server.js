@@ -15,7 +15,8 @@ import {
   getSectionVersions,
   restoreSectionVersion,
 } from './src/services/homepageService.js'
-import { initDatabase } from './src/db/index.js'
+import * as catalogService from './src/services/catalogService.js'
+import { initDatabase, query, isMemoryDb } from './src/db/index.js'
 
 // Initialize PostgreSQL / pg-mem schema on startup
 initDatabase().catch(err => console.error('[POSTGRES INIT ERROR]:', err))
@@ -392,14 +393,24 @@ server.post('/upload/products', handleImageUpload)
 server.post('/api/upload/products', handleImageUpload)
 
 // ── HEALTH CHECK ENDPOINT ───────────────────────────────────
-const healthHandler = (req, res) => {
+const healthHandler = async (req, res) => {
+  let dbStatus = 'connected'
+  let dbEngine = isMemoryDb ? 'pg-mem (in-process fallback)' : 'postgresql (authoritative)'
+  try {
+    await query('SELECT 1 as ping')
+  } catch (err) {
+    dbStatus = 'disconnected'
+    dbEngine = err.message
+  }
+
   res.json({
-    status: 'healthy',
+    status: dbStatus === 'connected' ? 'healthy' : 'degraded',
     uptimeSeconds: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
     environment: NODE_ENV,
-    database: 'connected',
-    version: '1.0.0',
+    database: dbStatus,
+    engine: dbEngine,
+    version: '2.0.0',
   })
 }
 server.get(['/', '/api'], (req, res) => {
@@ -1062,6 +1073,94 @@ server.get('/homepage/versions', requireAdmin, handleGetVersions)
 server.get('/api/homepage/versions', requireAdmin, handleGetVersions)
 server.post('/homepage/restore-version', requireAdmin, handleRestoreVersion)
 server.post('/api/homepage/restore-version', requireAdmin, handleRestoreVersion)
+
+// ── AUTHORITATIVE POSTGRESQL CRUD FOR PRODUCTS & CATEGORIES ──
+if (process.env.DATABASE_URL) {
+  // Products
+  server.get(['/products', '/api/products'], async (req, res, next) => {
+    try {
+      const prods = await catalogService.getProducts(req.query)
+      return res.json(prods)
+    } catch (err) {
+      return next(err)
+    }
+  })
+  server.get(['/products/:id', '/api/products/:id'], async (req, res, next) => {
+    try {
+      const prod = await catalogService.getProductById(req.params.id)
+      if (!prod) return res.status(404).json({ error: 'Product not found' })
+      return res.json(prod)
+    } catch (err) {
+      return next(err)
+    }
+  })
+  server.post(['/products', '/api/products'], requireAdmin, async (req, res, next) => {
+    try {
+      const created = await catalogService.createProduct(req.body)
+      router.db.get('products').push(created).write?.()
+      return res.status(201).json(created)
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to persist product to PostgreSQL: ' + err.message })
+    }
+  })
+  server.patch(['/products/:id', '/api/products/:id'], requireAdmin, async (req, res, next) => {
+    try {
+      const updated = await catalogService.updateProduct(req.params.id, req.body)
+      if (!updated) return res.status(404).json({ error: 'Product not found' })
+      router.db.get('products').find({ id: Number(req.params.id) || req.params.id }).assign(updated).write?.()
+      return res.json(updated)
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to update product in PostgreSQL: ' + err.message })
+    }
+  })
+  server.delete(['/products/:id', '/api/products/:id'], requireAdmin, async (req, res, next) => {
+    try {
+      const ok = await catalogService.deleteProduct(req.params.id)
+      router.db.get('products').remove({ id: Number(req.params.id) || req.params.id }).write?.()
+      return res.json({ success: ok })
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to delete product in PostgreSQL: ' + err.message })
+    }
+  })
+
+  // Categories
+  server.get(['/categories', '/api/categories'], async (req, res, next) => {
+    try {
+      const cats = await catalogService.getCategories()
+      return res.json(cats)
+    } catch (err) {
+      return next(err)
+    }
+  })
+  server.post(['/categories', '/api/categories'], requireAdmin, async (req, res, next) => {
+    try {
+      const created = await catalogService.createCategory(req.body)
+      router.db.get('categories').push(created).write?.()
+      return res.status(201).json(created)
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to persist category to PostgreSQL: ' + err.message })
+    }
+  })
+  server.patch(['/categories/:id', '/api/categories/:id'], requireAdmin, async (req, res, next) => {
+    try {
+      const updated = await catalogService.updateCategory(req.params.id, req.body)
+      if (!updated) return res.status(404).json({ error: 'Category not found' })
+      router.db.get('categories').find({ id: Number(req.params.id) || req.params.id }).assign(updated).write?.()
+      return res.json(updated)
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to update category in PostgreSQL: ' + err.message })
+    }
+  })
+  server.delete(['/categories/:id', '/api/categories/:id'], requireAdmin, async (req, res, next) => {
+    try {
+      const ok = await catalogService.deleteCategory(req.params.id)
+      router.db.get('categories').remove({ id: Number(req.params.id) || req.params.id }).write?.()
+      return res.json({ success: ok })
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to delete category in PostgreSQL: ' + err.message })
+    }
+  })
+}
 
 // ── DEFAULT NEWEST-FIRST SORTING FOR PRODUCTS ──────────────
 server.get(['/products', '/api/products'], (req, res, next) => {

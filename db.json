@@ -4365,8 +4365,8 @@
           "values": [
             {
               "id": "val-1794245730891-a4jw",
-              "name": "Emerald Green",
-              "hex": "#059669"
+              "name": "Light Green",
+              "hex": "#10b981"
             },
             {
               "id": "val-1794245881547-e8hn",
@@ -4379,12 +4379,12 @@
       "variants": [
         {
           "id": 1,
-          "sku": "GS-9556-EME",
-          "title": "Emerald Green",
-          "color": "Emerald Green",
+          "sku": "GS-9556-LG",
+          "title": "Light Green",
+          "color": "Light Green",
           "size": "",
           "options": {
-            "Color": "Emerald Green"
+            "Color": "Light Green"
           },
           "price": 1800,
           "oldPrice": 2300,
@@ -4410,8 +4410,8 @@
       ],
       "colorImages": [
         {
-          "colorName": "Emerald Green",
-          "hex": "#059669",
+          "colorName": "Light Green",
+          "hex": "#10b981",
           "images": [
             "/uploads/products/prod_1794245736785_81sNMpZnPQL_x4op7.webp"
           ],

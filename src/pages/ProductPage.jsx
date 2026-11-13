@@ -15,6 +15,7 @@ const PRESET_COLORS = [
   { name: 'Rose Gold', hex: '#f43f5e' },
   { name: 'Navy Blue', hex: '#1e3a8a' },
   { name: 'Sky Blue', hex: '#0284c7' },
+  { name: 'Light Green', hex: '#10b981' },
   { name: 'Emerald Green', hex: '#059669' },
   { name: 'Red', hex: '#dc2626' },
   { name: 'Purple', hex: '#7c3aed' },
@@ -27,6 +28,7 @@ const KNOWN_COLOR_HEX = {
   red: '#ef4444',
   blue: '#3b82f6',
   green: '#10b981',
+  'light green': '#10b981',
   yellow: '#eab308',
   purple: '#a855f7',
   pink: '#ec4899',
@@ -107,14 +109,41 @@ export default function ProductPage() {
     return synth
   }, [product?.options, product?.variants])
 
-  // Initialize selectedOptions on product/slug change
+  // Initialize selectedOptions on product/slug change with URL param & session persistence
   useEffect(() => {
     if (product && product.hasVariants && effectiveOptions.length > 0) {
       const initial = {}
+      const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
+      let savedStorage = null
+      try {
+        const raw = sessionStorage.getItem(`qg_pdp_opts_${slug}`)
+        if (raw) savedStorage = JSON.parse(raw)
+      } catch (_) {}
+
       effectiveOptions.forEach(opt => {
+        const urlVal = urlParams?.get(opt.name.toLowerCase())
+        const storageVal = savedStorage?.[opt.name]
         const firstVal = opt.values?.[0]
-        const valName = typeof firstVal === 'string' ? firstVal : firstVal?.name
-        if (valName) initial[opt.name] = valName
+        const defaultVal = typeof firstVal === 'string' ? firstVal : firstVal?.name
+
+        // Check if urlVal or storageVal matches an existing option value
+        const candidate = [urlVal, storageVal].find(cand => {
+          if (!cand) return false
+          return opt.values?.some(v => {
+            const vName = typeof v === 'string' ? v : v?.name
+            return vName?.toLowerCase() === cand.toLowerCase()
+          })
+        })
+
+        if (candidate) {
+          const matched = opt.values?.find(v => {
+            const vName = typeof v === 'string' ? v : v?.name
+            return vName?.toLowerCase() === candidate.toLowerCase()
+          })
+          initial[opt.name] = typeof matched === 'string' ? matched : (matched?.name || candidate)
+        } else if (defaultVal) {
+          initial[opt.name] = defaultVal
+        }
       })
       setSelectedOptions(initial)
     } else if (product && product.hasVariants && product.variants?.length > 0) {
@@ -128,6 +157,21 @@ export default function ProductPage() {
       setSelectedOptions({})
     }
   }, [slug, product?.id, effectiveOptions])
+
+  // Sync selectedOptions to URL query params and sessionStorage for persistence after refresh
+  useEffect(() => {
+    if (!product || !product.hasVariants || Object.keys(selectedOptions).length === 0) return
+    try {
+      sessionStorage.setItem(`qg_pdp_opts_${slug}`, JSON.stringify(selectedOptions))
+      if (typeof window !== 'undefined' && window.history?.replaceState) {
+        const url = new URL(window.location.href)
+        Object.entries(selectedOptions).forEach(([k, v]) => {
+          if (v) url.searchParams.set(k.toLowerCase(), v)
+        })
+        window.history.replaceState(null, '', url.pathname + url.search)
+      }
+    } catch (_) {}
+  }, [selectedOptions, slug, product])
 
   const colorOption = useMemo(() => {
     return effectiveOptions.find(o => o.name.toLowerCase() === 'color') || null
@@ -655,16 +699,20 @@ export default function ProductPage() {
             </div>
 
             <div className="qpdp-price">
-              <b>Rs. {currentPrice.toLocaleString()}</b>
-              {off > 0 && <del>Rs. {currentOldPrice.toLocaleString()}</del>}
-              {off > 0 && <span className="qpdp-off">{off}% Off</span>}
-              <span className={`qpdp-stock ${inStock ? '' : 'out'}`}><i />{!isCombinationExisting ? 'Unavailable' : inStock ? (lowStock ? `Only ${currentStock} left` : 'In Stock') : 'Out of Stock'}</span>
-              <button className="qpdp-share" aria-label="Share product" onClick={share}>
-                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.8">
-                  <circle cx="18" cy="5" r="2.4" /><circle cx="6" cy="12" r="2.4" /><circle cx="18" cy="19" r="2.4" />
-                  <path d="M8.2 10.9l7.6-4.5M8.2 13.1l7.6 4.5" />
-                </svg>
-              </button>
+              <div className="qpdp-price-left">
+                <b>Rs. {currentPrice.toLocaleString()}</b>
+                {off > 0 && <del>Rs. {currentOldPrice.toLocaleString()}</del>}
+                {off > 0 && <span className="qpdp-off">{off}% Off</span>}
+              </div>
+              <div className="qpdp-price-right">
+                <span className={`qpdp-stock ${inStock ? '' : 'out'}`}><i />{!isCombinationExisting ? 'Unavailable' : inStock ? (lowStock ? `Only ${currentStock} left` : 'In Stock') : 'Out of Stock'}</span>
+                <button className="qpdp-share" aria-label="Share product" onClick={share}>
+                  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <circle cx="18" cy="5" r="2.4" /><circle cx="6" cy="12" r="2.4" /><circle cx="18" cy="19" r="2.4" />
+                    <path d="M8.2 10.9l7.6-4.5M8.2 13.1l7.6 4.5" />
+                  </svg>
+                </button>
+              </div>
             </div>
             {savings > 0 && <p className="qpdp-saving">You save Rs. {savings.toLocaleString()} · wholesale rate</p>}
 

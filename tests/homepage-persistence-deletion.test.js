@@ -30,6 +30,7 @@ import {
   normalizeSection,
   extractYouTubeId,
 } from '../src/services/homepageService.js'
+import { restoreBaselineDatabase } from './test-safeguards.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DB_JSON_PATH = path.join(__dirname, '..', 'db.json')
@@ -60,6 +61,9 @@ async function runTests() {
 
   const rawDb = JSON.parse(fs.readFileSync(DB_JSON_PATH, 'utf8'))
   let baselineSections = (rawDb.sections || []).map(normalizeSection)
+
+  let routerDb = null
+  try {
 
   // Ensure 15 canonical sections are present for the deletion lifecycle test
   if (!baselineSections.find(s => s.title && s.title.includes('Promotional'))) {
@@ -305,6 +309,11 @@ async function runTests() {
   console.log('\n===============================================================')
   console.log('   ALL HOMEPAGE PERSISTENCE & DELETION TESTS PASSED (6/6)!')
   console.log('===============================================================')
+  } finally {
+    console.log('\n[TEARDOWN] Restoring 15 canonical baseline sections into database...')
+    await restoreBaselineDatabase(routerDb)
+    console.log('[TEARDOWN] Complete. Baseline restored.')
+  }
 }
 
 runTests().catch(err => {

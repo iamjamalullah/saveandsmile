@@ -243,6 +243,10 @@ export async function getPublishedSections(routerDb) {
       })
     }
   } catch (err) {
+    if (process.env.DATABASE_URL) {
+      console.error('[HOMEPAGE SERVICE] PostgreSQL query failed:', err.message)
+      throw new Error('Database query failed: Could not fetch sections from PostgreSQL: ' + err.message)
+    }
     console.warn('[HOMEPAGE SERVICE] Postgres query fallback to db.json:', err.message)
   }
 
@@ -358,6 +362,10 @@ export async function saveDraftSections({ sections, staffUser, routerDb }) {
         updated_at = CURRENT_TIMESTAMP
     `, [JSON.stringify(normalized)])
   } catch (pgErr) {
+    if (process.env.DATABASE_URL) {
+      console.error('[HOMEPAGE SERVICE] PostgreSQL draft save failed:', pgErr.message)
+      throw new Error('Database persistence failed: Could not save draft to PostgreSQL: ' + pgErr.message)
+    }
     console.warn('[HOMEPAGE SERVICE] Postgres draft save fallback:', pgErr.message)
   }
 
@@ -459,6 +467,10 @@ export async function publishSections({ sections, label, staffUser, routerDb }) 
       )
     })
   } catch (pgErr) {
+    if (process.env.DATABASE_URL) {
+      console.error('[HOMEPAGE SERVICE] PostgreSQL publish transaction failed:', pgErr.message)
+      throw new Error('Database publish failed: PostgreSQL transaction error: ' + pgErr.message)
+    }
     console.warn('[HOMEPAGE SERVICE] Postgres publish transaction warning:', pgErr.message)
   }
 

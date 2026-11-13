@@ -11,6 +11,7 @@ import {
   restoreSectionVersion,
 } from '../src/services/homepageService.js'
 import { initDatabase } from '../src/db/index.js'
+import { restoreBaselineDatabase } from './test-safeguards.js'
 
 console.log('===============================================================')
 console.log('   HOMEPAGE DYNAMIC BUILDER & CMS AUTOMATED TEST SUITE')
@@ -45,6 +46,8 @@ async function runTests() {
   }
 
   const mockAdminUser = { id: 1, name: 'Store Administrator', role: 'admin' }
+
+  try {
 
   // ── TEST 1: Validate Supported Layouts and Block Types ──
   console.log('\n--- TEST 1: CONTAINER LAYOUTS & BLOCK TYPES ---')
@@ -283,6 +286,11 @@ async function runTests() {
   console.log('\n===============================================================')
   console.log('   ALL 9 HOMEPAGE BUILDER AUTOMATION TESTS PASSED (100%)!       ')
   console.log('===============================================================')
+  } finally {
+    console.log('\n[TEARDOWN] Restoring 15 canonical baseline sections into database...')
+    await restoreBaselineDatabase(routerDb)
+    console.log('[TEARDOWN] Complete. Baseline restored.')
+  }
 }
 
 runTests().catch(err => {

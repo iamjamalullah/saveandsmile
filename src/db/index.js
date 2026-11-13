@@ -18,19 +18,26 @@ export function getDatabasePool() {
 
   const dbUrl = process.env.DATABASE_URL
   if (dbUrl) {
-    console.log('[POSTGRES] Initializing live connection to PostgreSQL via DATABASE_URL...')
+    console.log('[POSTGRES] Initializing authoritative connection pool to PostgreSQL...')
+    const isLocalhost = dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1')
     pool = new Pool({
       connectionString: dbUrl,
-      ssl: process.env.NODE_ENV === 'production' && !dbUrl.includes('localhost') && !dbUrl.includes('127.0.0.1')
-        ? { rejectUnauthorized: false }
-        : false,
-      max: parseInt(process.env.DB_POOL_MAX || '20', 10),
+      ssl: !isLocalhost ? { rejectUnauthorized: false } : false,
+      max: parseInt(process.env.DB_POOL_MAX || (process.env.VERCEL ? '5' : '15'), 10),
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000,
+      connectionTimeoutMillis: 20000,
+      allowExitOnIdle: Boolean(process.env.VERCEL),
     })
     isMemoryDb = false
   } else {
-    console.log('[POSTGRES] No DATABASE_URL found. Initializing PostgreSQL in-process engine...')
+    // ENFORCE SAFEGUARD: Production MUST have DATABASE_URL configured
+    const isProduction = process.env.NODE_ENV === 'production' && !process.env.ALLOW_PG_MEM && !process.env.TEST_ENV
+    if (isProduction && process.env.VERCEL) {
+      console.error('[DATABASE FATAL]: DATABASE_URL is missing in production environment. In-memory storage is prohibited to prevent data loss.')
+      throw new Error('[DATABASE CONFIGURATION ERROR]: DATABASE_URL must be configured in production Vercel environment.')
+    }
+
+    console.log('[POSTGRES] No DATABASE_URL found. Initializing PostgreSQL in-process engine (TEST/LOCAL ONLY)...')
     pgMemInstance = newDb()
 
     // Register PostgreSQL standard functions
@@ -45,7 +52,7 @@ export function getDatabasePool() {
   }
 
   pool.on('error', err => {
-    console.error('[POSTGRES ERROR] Unexpected idle client error:', err)
+    console.error('[POSTGRES ERROR] Unexpected idle client error:', err.message)
   })
 
   return pool

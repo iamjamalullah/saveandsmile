@@ -16,10 +16,11 @@ import {
   restoreSectionVersion,
 } from './src/services/homepageService.js'
 import * as catalogService from './src/services/catalogService.js'
+import * as mediaService from './src/services/mediaService.js'
 import { initDatabase, query, isMemoryDb } from './src/db/index.js'
 
 // Initialize PostgreSQL / pg-mem schema on startup
-initDatabase().catch(err => console.error('[POSTGRES INIT ERROR]:', err))
+initDatabase().then(() => mediaService.ensureMetadataTables()).catch(err => console.error('[POSTGRES INIT ERROR]:', err))
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -1179,7 +1180,50 @@ server.get(['/products', '/api/products'], (req, res, next) => {
   next()
 })
 
-server.use('/api', router)
+// ── CLEANUP QUEUE & STORAGE LIFECYCLE ADMIN ENDPOINTS ──────────────
+  server.get('/api/cleanup-status', requireAdmin, async (req, res) => {
+    try {
+      const status = await mediaService.getCleanupQueueStatus()
+      return res.json({ success: true, queue: status })
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to fetch cleanup status: ' + err.message })
+    }
+  })
+
+  server.post('/api/cleanup-retry', requireAdmin, async (req, res) => {
+    try {
+      const retried = await mediaService.retryFailedCleanupJobs()
+      const result = await mediaService.processCleanupQueue()
+      return res.json({ success: true, retriedJobs: retried, processed: result })
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to process cleanup queue: ' + err.message })
+    }
+  })
+
+  // Banner / Hero Slide Deletion with Media Protection
+  server.delete(['/hero_slides/:id', '/api/hero_slides/:id'], requireAdmin, async (req, res) => {
+    try {
+      const slideRes = await query('SELECT * FROM hero_slides WHERE id = ', [req.params.id])
+      if (!slideRes.rows.length) return res.status(404).json({ error: 'Hero slide not found' })
+      const slide = slideRes.rows[0]
+      await query('DELETE FROM hero_slides WHERE id = ', [req.params.id])
+      if (slide.image_url) {
+        try {
+          const paths = mediaService.extractImagePaths([slide.image_url])
+          for (const objPath of paths) {
+            await mediaService.enqueueDeletion({ objectPath: objPath, ownerType: 'hero_slide', ownerId: String(req.params.id) })
+          }
+          await mediaService.unregisterMedia({ ownerType: 'hero_slide', ownerId: String(req.params.id) })
+        } catch (mErr) { console.warn('[HERO MEDIA CLEANUP]:', mErr.message) }
+      }
+      router.db.get('hero_slides').remove({ id: Number(req.params.id) || req.params.id }).write?.()
+      return res.json({ success: true })
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to delete hero slide: ' + err.message })
+    }
+  })
+
+  server.use('/api', router)
 server.use(router)
 
 server.use((err, req, res, next) => {

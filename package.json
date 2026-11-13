@@ -26,6 +26,7 @@
     "test:all": "node tests/order-integrity.test.js && node tests/auth-migration.test.js && node tests/backup-restore.test.js && node tests/homepage-builder.test.js && node tests/mobile-lens-zoom.test.js && node tests/product-variants.test.js && node tests/homepage-persistence-deletion.test.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.0",
     "bcryptjs": "^3.0.3",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.2",

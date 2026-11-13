@@ -43,7 +43,7 @@ export function getDatabasePool() {
     // Register PostgreSQL standard functions
     pgMemInstance.public.registerFunction({
       name: 'gen_random_uuid',
-      implementation: () => '00000000-0000-0000-0000-' + Math.random().toString(16).slice(2, 14),
+      implementation: () => '00000000-0000-0000-0000-' + Date.now().toString(16) + '-' + Math.random().toString(16).slice(2, 14),
     })
 
     const adapter = pgMemInstance.adapters.createPg()

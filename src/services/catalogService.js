@@ -11,7 +11,9 @@
  * without relying on ephemeral in-memory storage or temporary /tmp/db.json.
  */
 
-import { query, transaction, isMemoryDb } from '../db/index.js'
+import { query, transaction, isMemoryDb } from '../db/index.js';
+import { handleProductDeletion } from './homepageCleanupService.js';
+import { enqueueDeletion, extractImagePaths, unregisterMedia } from './mediaService.js';
 
 function formatProductRow(row) {
   let images = []
@@ -223,18 +225,18 @@ export async function deleteProduct(id) {
   // 5. Clean up any homepage draft / published section product references
   if (deleted) {
     try {
-      await query(`
-        UPDATE sections 
-        SET content_json = (
-          CASE 
-            WHEN content_json LIKE '%"items"%' OR content_json LIKE '%"products"%'
-            THEN regexp_replace(content_json, '\\b' || $1 || '\\b', '0', 'g')
-            ELSE content_json
-          END
-        )
-      `, [String(id)])
+      await handleProductDeletion(id)
     } catch (cleanErr) {
       console.warn('[HOMEPAGE CLEANUP WARNING]:', cleanErr.message)
+    }
+    try {
+      const storagePaths = extractImagePaths(imagesToCheck)
+      for (const objPath of storagePaths) {
+        await enqueueDeletion({ objectPath: objPath, ownerType: 'product', ownerId: String(id) })
+      }
+      await unregisterMedia({ ownerType: 'product', ownerId: String(id) })
+    } catch (mediaErr) {
+      console.warn('[MEDIA CLEANUP WARNING]:', mediaErr.message)
     }
   }
 
@@ -314,7 +316,19 @@ export async function deleteCategory(id, options = {}) {
 
   // 3. Delete category record
   const res = await query('DELETE FROM categories WHERE id = $1 RETURNING id', [id])
-  return res.rows.length > 0
+  const deleted = res.rows.length > 0
+  if (deleted && cat.image_url) {
+    try {
+      const paths = extractImagePaths([cat.image_url])
+      for (const objPath of paths) {
+        await enqueueDeletion({ objectPath: objPath, ownerType: 'category', ownerId: String(id) })
+      }
+      await unregisterMedia({ ownerType: 'category', ownerId: String(id) })
+    } catch (catMediaErr) {
+      console.warn('[CATEGORY MEDIA CLEANUP WARNING]:', catMediaErr.message)
+    }
+  }
+  return deleted
 }
 
 // ── REVIEWS CRUD & MODERATION ──

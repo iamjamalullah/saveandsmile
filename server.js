@@ -17,6 +17,7 @@ import {
 } from './src/services/homepageService.js'
 import * as catalogService from './src/services/catalogService.js'
 import * as mediaService from './src/services/mediaService.js'
+import { convertToWebP, generateWebPFilename, validateImage } from './src/services/imageProcessingService.js'
 import { initDatabase, query, isMemoryDb } from './src/db/index.js'
 
 // Initialize PostgreSQL / pg-mem schema on startup
@@ -323,8 +324,8 @@ server.use(express.json({ limit: '50mb' }))
 server.use(express.urlencoded({ extended: true, limit: '50mb' }))
 server.use('/uploads', express.static(UPLOADS_DIR))
 
-// ── PRODUCT MULTI-IMAGE WEBP UPLOAD HANDLER ──────────────────
-const handleImageUpload = (req, res) => {
+// ── MANDATORY GLOBAL WEBP IMAGE UPLOAD & CONVERSION HANDLER ──────────────────
+const handleImageUpload = async (req, res) => {
   try {
     const images = req.body?.images
     if (!images || !Array.isArray(images) || images.length === 0) {
@@ -341,34 +342,37 @@ const handleImageUpload = (req, res) => {
       const dataUrl = item.data || item.dataUrl || item.base64 || ''
       if (!dataUrl) continue
 
-      let buffer
+      let rawBuffer
       if (typeof dataUrl === 'string' && dataUrl.startsWith('data:')) {
         const matches = dataUrl.match(/^data:image\/[a-zA-Z0-9.+]+;base64,(.+)$/)
         if (!matches) {
           return res.status(400).json({ error: `Invalid image data format at index ${i}` })
         }
-        buffer = Buffer.from(matches[1], 'base64')
-      } else if (typeof dataUrl === 'string' && dataUrl.startsWith('/uploads/')) {
+        rawBuffer = Buffer.from(matches[1], 'base64')
+      } else if (typeof dataUrl === 'string' && dataUrl.startsWith('/uploads/') && dataUrl.endsWith('.webp')) {
         savedUrls.push(dataUrl)
         continue
       } else {
-        buffer = Buffer.from(dataUrl, 'base64')
+        rawBuffer = Buffer.from(dataUrl, 'base64')
       }
 
-      // Max size limit: 15MB per image
-      if (buffer.length > 15 * 1024 * 1024) {
-        return res.status(400).json({ error: `Image at index ${i} exceeds 15MB limit.` })
+      // Max size limit: 25MB raw payload
+      if (rawBuffer.length > 25 * 1024 * 1024) {
+        return res.status(400).json({ error: `Image at index ${i} exceeds 25MB limit.` })
       }
 
-      const rawName = (item.name || `photo_${i}`)
-        .replace(/\.[^/.]+$/, '')
-        .replace(/[^a-zA-Z0-9-_]/g, '_')
-        .slice(0, 40)
+      // Mandatory WebP conversion & validation via Sharp
+      let webpResult
+      try {
+        webpResult = await convertToWebP(rawBuffer)
+      } catch (convErr) {
+        return res.status(400).json({ error: `Failed to convert image at index ${i} to WebP: ${convErr.message}` })
+      }
 
-      const filename = `prod_${Date.now()}_${rawName}_${Math.random().toString(36).slice(2, 7)}.webp`
+      const filename = generateWebPFilename(item.name || `media_${i}`, 'media')
       const filePath = path.join(PRODUCTS_UPLOADS_DIR, filename)
 
-      fs.writeFileSync(filePath, buffer)
+      fs.writeFileSync(filePath, webpResult.webpBuffer)
       savedUrls.push(`/uploads/products/${filename}`)
     }
 
@@ -380,11 +384,12 @@ const handleImageUpload = (req, res) => {
       success: true,
       urls: savedUrls,
       count: savedUrls.length,
-      message: `${savedUrls.length} image(s) processed and saved as WebP successfully!`,
+      format: 'webp',
+      message: `${savedUrls.length} image(s) converted to WebP and saved successfully!`,
     })
   } catch (err) {
     console.error('[IMAGE UPLOAD ERROR]:', err)
-    return res.status(500).json({ error: 'Server error processing image uploads.' })
+    return res.status(500).json({ error: 'Server error processing image uploads: ' + err.message })
   }
 }
 

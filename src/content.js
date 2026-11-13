@@ -25,7 +25,7 @@ export const SORT_OPTIONS = [
 export const CONTACT_INFO = {
   phone: '03302760775',
   whatsapp: '923302760775',
-  email: 'info@qadrigadgets.pk',
+  email: null,
   address: 'Shop # G-40 - 41 Central Mall ground Floor Near Gul Plaza Saddar Karachi',
   hours: 'MON-SAT 1:00PM-10:00 PM',
   map: 'https://www.openstreetmap.org/export/embed.html?bbox=67.0015%2C24.8530%2C67.0285%2C24.8685&layer=mapnik&marker=24.8607%2C67.0104',
@@ -39,10 +39,10 @@ export const CONTACT_REASONS = [
 export const ABOUT_SECTIONS = [
   {
     title: 'Our Story',
-    text: 'Founded in Karachi, Qadri Gadgets began with a simple idea: to bring quality products to our customers at unbeatable wholesale prices. As a premier Pakistan-based company, we take pride in serving retail and wholesale shoppers with a diverse range of smart lifestyle products. What started in Saddar Karachi has grown into a full-fledged online platform, offering everything from the latest gadgets to everyday home organizers.',
+    text: 'Founded in Karachi, Save & Smile began with a simple idea: to bring quality products to our customers at unbeatable wholesale prices. As a premier Pakistan-based company, we take pride in serving retail and wholesale shoppers with a diverse range of smart lifestyle products. What started in Saddar Karachi has grown into a full-fledged online platform, offering everything from the latest gadgets to everyday home organizers.',
   },
   {
-    title: 'Why Choose Qadri Gadgets ?',
+    title: 'Why Choose Save & Smile ?',
     text: 'We know that modern shoppers demand more than just great products; they expect an experience. That’s why we focus on delivering:',
     bullets: [
       'Quality Products: We carefully curate our inventory to ensure that only the best items make it to your doorstep.',
@@ -53,7 +53,7 @@ export const ABOUT_SECTIONS = [
   },
   {
     title: 'Our Vision',
-    text: 'At Qadri Gadgets, we are driven by a vision to become one of the leading online shopping destinations, providing our customers with a seamless shopping experience. We aim to continually expand our product range, while maintaining the high standards of customer service that our shoppers have come to expect.',
+    text: 'At Save & Smile, we are driven by a vision to become one of the leading online shopping destinations, providing our customers with a seamless shopping experience. We aim to continually expand our product range, while maintaining the high standards of customer service that our shoppers have come to expect.',
   },
   {
     title: 'Our Commitment',
@@ -69,8 +69,8 @@ export const ABOUT_SECTIONS = [
 export const SUPPORT_SECTIONS = [
   {
     title: '1. Contact Our Support Team',
-    text: 'You can reach us via email or WhatsApp:',
-    bullets: ['Email: info@qadrigadgets.pk', 'WhatsApp: +923302760775'],
+    text: 'You can reach us directly via WhatsApp or our online inquiry form:',
+    bullets: ['WhatsApp Support: +92 330 2760775 / +92 321 8273588', 'Help Desk: Submit an inquiry via our Contact Us page'],
     after: 'We aim to respond to all inquiries within 24-48 hours during business days.',
   },
   {
@@ -100,7 +100,7 @@ export const SUPPORT_SECTIONS = [
 export const TERMS_SECTIONS = [
   {
     title: '1. Introduction',
-    text: 'Welcome to Qadri Gadgets. By accessing or using our website and services, you agree to be bound by these Terms & Conditions. Please read them carefully before placing an order.',
+    text: 'Welcome to Save & Smile. By accessing or using our website and services, you agree to be bound by these Terms & Conditions. Please read them carefully before placing an order.',
   },
   {
     title: '2. Products and Pricing',
@@ -128,14 +128,14 @@ export const TERMS_SECTIONS = [
   },
   {
     title: '8. Limitation of Liability',
-    text: 'Qadri Gadgets shall not be liable for any indirect or consequential loss arising from the use of our products or website.',
+    text: 'Save & Smile shall not be liable for any indirect or consequential loss arising from the use of our products or website.',
   },
 ]
 
 export const PRIVACY_SECTIONS = [
   {
     title: '1. Introduction',
-    text: 'At Qadri Gadgets, we respect your privacy and are committed to protecting the personal information you share with us. This policy explains what we collect and how we use it.',
+    text: 'At Save & Smile, we respect your privacy and are committed to protecting the personal information you share with us. This policy explains what we collect and how we use it.',
   },
   {
     title: '2. Information We Collect',
@@ -163,6 +163,6 @@ export const PRIVACY_SECTIONS = [
   },
   {
     title: '8. Your Rights',
-    text: 'You may request access to, correction of, or deletion of your personal information by contacting us at info@qadrigadgets.pk.',
+    text: 'You may request access to, correction of, or deletion of your personal information by contacting us via our verified WhatsApp support or online contact form.',
   },
 ]

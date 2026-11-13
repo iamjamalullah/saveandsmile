@@ -136,7 +136,7 @@ export default function AccountPage() {
               <button
                 type="button"
                 className="cp-guest-demo"
-                onClick={() => onLogin?.({ name: 'Guest Reseller', email: 'guest@qadrigadgets.pk', city: 'Karachi' })}
+                onClick={() => onLogin?.({ name: 'Demo Reseller', email: 'demo-reseller@local.session', city: 'Karachi' })}
               >
                 Continue as demo reseller
               </button>

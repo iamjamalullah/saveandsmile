@@ -184,7 +184,7 @@ export default function StaffLoginPage({ targetRole = 'staff' }) {
                 required
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="admin or admin@qadrigadgets.pk"
+                placeholder="Username (e.g. admin or manager)"
                 style={{
                   width: '100%',
                   padding: '10px 12px',

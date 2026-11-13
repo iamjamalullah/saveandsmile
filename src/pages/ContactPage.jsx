@@ -120,7 +120,7 @@ export default function ContactPage() {
                 <p><b>Business Hours:</b> {CONTACT_INFO.hours}</p>
                 <p><b>Phone:</b> <a href={`tel:${BRAND.tel}`}>{BRAND.phone}</a> / <a href={`tel:${BRAND.tel2}`}>{BRAND.phone2}</a></p>
                 <p><b>WhatsApp:</b> <a href={`https://wa.me/${BRAND.whatsapp}`} target="_blank" rel="noreferrer">Chat on WhatsApp</a></p>
-                <p><b>Email:</b> <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a></p>
+                {BRAND.email && <p><b>Email:</b> <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a></p>}
               </div>
             </div>
           </div>

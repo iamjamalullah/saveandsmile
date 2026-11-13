@@ -99,7 +99,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development'
 const IS_PROD = NODE_ENV === 'production'
 
 // Secure secret generation: fallback to secure secret if not provided in env
-const APP_SECRET = process.env.APP_SECRET || 'qadri-gadgets-secure-auth-secret-key-2026-v2-prod'
+const APP_SECRET = process.env.APP_SECRET || 'saveandsmile-secure-auth-secret-key-2026-v2-prod'
 
 // Token expiration: 8 hours in milliseconds
 const TOKEN_EXPIRY_MS = parseInt(process.env.TOKEN_EXPIRY_MS, 10) || 8 * 60 * 60 * 1000
@@ -123,7 +123,7 @@ const staffCredentials = [
     id: 1,
     name: 'Store Administrator',
     username: 'admin',
-    email: (process.env.ADMIN_EMAIL || 'admin@qadrigadgets.pk').toLowerCase(),
+    email: (process.env.ADMIN_EMAIL || 'admin@saveandsmile.pk').toLowerCase(),
     // bcrypt hash of 'admin123' or custom env password
     passwordHash: bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'admin123', 10),
     role: 'admin',
@@ -133,7 +133,7 @@ const staffCredentials = [
     id: 2,
     name: 'Operations Manager',
     username: 'manager',
-    email: (process.env.MANAGER_EMAIL || 'manager@qadrigadgets.pk').toLowerCase(),
+    email: (process.env.MANAGER_EMAIL || 'manager@saveandsmile.pk').toLowerCase(),
     // bcrypt hash of 'manager123' or custom env password
     passwordHash: bcrypt.hashSync(process.env.MANAGER_PASSWORD || 'manager123', 10),
     role: 'manager',
@@ -1153,10 +1153,18 @@ if (process.env.DATABASE_URL) {
   })
   server.delete(['/categories/:id', '/api/categories/:id'], requireAdmin, async (req, res, next) => {
     try {
-      const ok = await catalogService.deleteCategory(req.params.id)
+      const reassign = req.query.reassign || req.body?.reassignToCategory
+      const ok = await catalogService.deleteCategory(req.params.id, { reassignToCategory: reassign })
       router.db.get('categories').remove({ id: Number(req.params.id) || req.params.id }).write?.()
       return res.json({ success: ok })
     } catch (err) {
+      if (err.code === 'CATEGORY_HAS_PRODUCTS') {
+        return res.status(409).json({
+          error: err.message,
+          code: 'CATEGORY_HAS_PRODUCTS',
+          productCount: err.productCount,
+        })
+      }
       return res.status(500).json({ error: 'Failed to delete category in PostgreSQL: ' + err.message })
     }
   })

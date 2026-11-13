@@ -1,11 +1,11 @@
 // Store-wide settings (also editable from the Admin panel).
 export const STORE = {
-  name: 'Qadri Gadgets',
-  tagline: 'Gadgets Wholesaler',
-  announcement: 'Join Our Community Group Today Send Your Name, City & Area to 0321-8273588',
+  name: 'Save & Smile',
+  tagline: 'Your Trusted Online Shopping Hub',
+  announcement: 'Welcome to Save & Smile — Pakistan\'s Leading Wholesale & Retail Store · Free Nationwide Shipping on Orders Above Rs. 3,000!',
   phone: '0321-8273588',
   whatsapp: '923218273588',
-  email: 'info@qadrigadgets.pk',
+  email: null,
   currency: 'Rs.',
   freeShippingThreshold: 3000,
   shippingFee: 200,

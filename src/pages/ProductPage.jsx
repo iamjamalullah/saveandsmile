@@ -5,6 +5,7 @@ import { productSlug, findProductIn, productPath } from '../content'
 import { useCart } from '../context/CartContext'
 import { useStoreData } from '../context/StoreDataContext'
 import ProductCard from '../components/ProductCard'
+import { setPageSeo } from '../utils/seo'
 
 const PRESET_COLORS = [
   { name: 'Black', hex: '#111827' },
@@ -411,8 +412,67 @@ export default function ProductPage() {
     : 0
 
   useEffect(() => {
-    if (product) document.title = `${product.name} | Save & Smile`
-  }, [product])
+    if (!product) return
+
+    const productImageUrl = product.image?.startsWith('http')
+      ? product.image
+      : `https://saveandsmile.vercel.app${product.image}`
+
+    const schemaObj = {
+      '@context': 'https://schema.org/',
+      '@type': 'Product',
+      name: product.name,
+      image: [productImageUrl],
+      description: product.description || `${product.name} available at best wholesale and retail prices in Pakistan from Save & Smile.`,
+      sku: product.sku || `GS-${product.id}`,
+      brand: {
+        '@type': 'Brand',
+        name: (product.brand === 'Qadri Select' ? 'Save & Smile' : product.brand) || 'Save & Smile',
+      },
+      offers: {
+        '@type': 'Offer',
+        url: `https://saveandsmile.vercel.app/product/${product.slug}`,
+        priceCurrency: 'PKR',
+        price: effectivePrice,
+        priceValidUntil: '2027-12-31',
+        itemCondition: 'https://schema.org/NewCondition',
+        availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        seller: {
+          '@type': 'Organization',
+          name: 'Save & Smile',
+        },
+      },
+    }
+
+    if (reviewCount > 0) {
+      schemaObj.aggregateRating = {
+        '@type': 'AggregateRating',
+        ratingValue: Number(avgRating.toFixed(1)),
+        reviewCount: reviewCount,
+      }
+      schemaObj.review = productReviews.slice(0, 3).map(r => ({
+        '@type': 'Review',
+        reviewRating: {
+          '@type': 'Rating',
+          ratingValue: Number(r.rating) || 5,
+        },
+        author: {
+          '@type': 'Person',
+          name: r.name || 'Verified Buyer',
+        },
+        reviewBody: r.text || r.title || 'Great product!',
+      }))
+    }
+
+    setPageSeo({
+      title: `${product.name} | Save & Smile`,
+      description: product.description?.slice(0, 160) || `Buy ${product.name} online at wholesale prices in Pakistan from Save & Smile. Fast nationwide cash on delivery.`,
+      canonical: `/product/${product.slug}`,
+      ogType: 'product',
+      ogImage: productImageUrl,
+      structuredData: schemaObj,
+    })
+  }, [product, effectivePrice, inStock, reviewCount, avgRating, productReviews])
 
   useEffect(() => {
     setMediaIndex(0)
@@ -827,7 +887,7 @@ export default function ProductPage() {
                 <a
                   className="qpdp-btn-wholesale-pill"
                   href={`https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(
-                    `Hi Save & Smile, I want to Buy in Wholesale:\n*${product.name}*${activeVariant ? `\nVariant: ${activeVariant.title}` : ''}\nProduct SKU: ${currentSku || product.id}\nQuantity: ${qty >= 5 ? qty : 10}+ pcs\nLink: https://www.saveandsmile.pk${productPath(product)}`
+                    `Hi Save & Smile, I want to Buy in Wholesale:\n*${product.name}*${activeVariant ? `\nVariant: ${activeVariant.title}` : ''}\nProduct SKU: ${currentSku || product.id}\nQuantity: ${qty >= 5 ? qty : 10}+ pcs\nLink: https://saveandsmile.vercel.app${productPath(product)}`
                   )}`}
                   target="_blank"
                   rel="noreferrer"
@@ -994,10 +1054,13 @@ export default function ProductPage() {
               <table className="qpdp-specs">
                 <tbody>
                   {specs.map(row => (
-                    <tr key={row.label}><th>{row.label}</th><td>{row.value}</td></tr>
+                    <tr key={row.label}>
+                      <th>{row.label}</th>
+                      <td>{row.label?.toLowerCase() === 'brand' && row.value === 'Qadri Select' ? 'Save & Smile' : row.value}</td>
+                    </tr>
                   ))}
                   <tr><th>Items per pack</th><td>1</td></tr>
-                  <tr><th>Sold by</th><td>{product.brand || 'Save & Smile'}</td></tr>
+                  <tr><th>Sold by</th><td>Save & Smile</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1192,7 +1255,7 @@ export default function ProductPage() {
 
           <a
             href={`https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(
-              `Hi Save & Smile, I want to order this product:\n*${product.name}*${activeVariant ? `\nVariant: ${activeVariant.title}` : ''}\nPrice: Rs. ${currentPrice}\nQuantity: ${qty}\nLink: https://www.saveandsmile.pk${productPath(product)}`
+              `Hi Save & Smile, I want to order this product:\n*${product.name}*${activeVariant ? `\nVariant: ${activeVariant.title}` : ''}\nPrice: Rs. ${currentPrice}\nQuantity: ${qty}\nLink: https://saveandsmile.vercel.app${productPath(product)}`
             )}`}
             target="_blank"
             rel="noopener noreferrer"

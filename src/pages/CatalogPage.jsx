@@ -4,6 +4,7 @@ import { SORT_OPTIONS, findCategoryIn } from '../content'
 import { useCart } from '../context/CartContext'
 import { useStoreData } from '../context/StoreDataContext'
 import ProductCard from '../components/ProductCard'
+import { setPageSeo } from '../utils/seo'
 
 const PRICE_MIN = 0
 const PRICE_MAX = 15000
@@ -39,8 +40,53 @@ export default function CatalogPage({ mode = 'shop' }) {
         : sections.find(s => s.group === group)?.title || 'Shop'
 
   useEffect(() => {
-    document.title = `${title} | Save & Smile`
-  }, [title])
+    const isNoIndex = mode === 'wishlist' || mode === 'search'
+    const catCanonical = mode === 'category' && category ? `/category/${category.slug}` : '/shop'
+
+    let catSchema = null
+    if (mode === 'category' && category) {
+      catSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: `${category.name} | Save & Smile`,
+        description: `Explore ${category.name} products at wholesale prices in Pakistan from Save & Smile.`,
+        url: `https://saveandsmile.vercel.app/category/${category.slug}`,
+        breadcrumb: {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            {
+              '@type': 'ListItem',
+              position: 1,
+              name: 'Home',
+              item: 'https://saveandsmile.vercel.app/',
+            },
+            {
+              '@type': 'ListItem',
+              position: 2,
+              name: 'Categories',
+              item: 'https://saveandsmile.vercel.app/shop',
+            },
+            {
+              '@type': 'ListItem',
+              position: 3,
+              name: category.name,
+              item: `https://saveandsmile.vercel.app/category/${category.slug}`,
+            },
+          ],
+        },
+      }
+    }
+
+    setPageSeo({
+      title: `${title} | Save & Smile`,
+      description: mode === 'category' && category
+        ? `Shop top quality ${category.name} at wholesale prices in Pakistan with cash on delivery from Save & Smile.`
+        : 'Browse all products, trending gadgets, home essentials, and lifestyle accessories at wholesale rates.',
+      canonical: catCanonical,
+      noindex: isNoIndex,
+      structuredData: catSchema,
+    })
+  }, [title, mode, category])
 
   const results = useMemo(() => {
     let list = [...products]

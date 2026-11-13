@@ -1,4 +1,4 @@
-// Production REST client for the Qadri Gadgets API with RBAC Bearer Token Authorization.
+// Production REST client for the Save & Smile API with RBAC Bearer Token Authorization.
 const BASE = import.meta.env?.VITE_API_URL || '/api'
 
 let authToken = null

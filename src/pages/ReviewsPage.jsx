@@ -9,7 +9,7 @@ const EXTRA = [
   { id: 103, name: 'Zain Noushad', date: '29 Oct 2026', rating: 5, title: 'Everything is best', text: 'Sab kuch buhat acha ha, order b time par received hua, munasib price and good quality.' },
   { id: 104, name: 'Hina Sheikh', date: '28 Oct 2026', rating: 5, title: 'Bht acha experience hai mera', text: 'Main 3 saal se order kar Rahi Hun or hamesha Mera experience acha hota hai.' },
   { id: 105, name: 'Kashan', date: '28 Oct 2026', rating: 5, title: 'Best and recommended', text: 'Best gadgets quality same as picture proper pack 💯 recommended.' },
-  { id: 106, name: 'Urooj Abbasi', date: '26 Oct 2026', rating: 4, title: 'Great service by qadri gadgets', text: 'Salam, main kaafi saal se Qadri Gadgets se order kar rahi hoon, Alhamdulillah saman acha aata hai.' },
+  { id: 106, name: 'Urooj Abbasi', date: '26 Oct 2026', rating: 4, title: 'Great service by Save & Smile', text: 'Salam, main kaafi saal se Save & Smile se order kar rahi hoon, Alhamdulillah saman acha aata hai.' },
 ]
 
 const Star = ({ fill = true }) => (

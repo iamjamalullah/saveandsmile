@@ -22,7 +22,7 @@ dist-ssr
 *.key
 
 # Backups (contain customer PII)
-backups/*.json
+backups/
 !backups/.gitkeep
 db.json.tmp
 db.json.restore.tmp

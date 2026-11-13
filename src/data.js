@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────
-//  Qadri Gadgets – static presentation config.
+//  Save & Smile – static presentation config.
 //  Catalogue content (products, categories, hero banners, reviews)
-//  now lives in db.json and is served by json-server through the
+//  now lives in Supabase PostgreSQL / db.json and is served by
 //  StoreDataContext API layer.
 // ─────────────────────────────────────────────────────────────
 const CDN = 'https://www.qadrigadgets.pk'
@@ -18,7 +18,7 @@ export const BRAND = {
   tel: '+923218273588',
   tel2: '+923302760775',
   whatsapp: '923218273588',
-  email: 'info@saveandsmile.pk',
+  email: null,
   address: 'Karachi, Pakistan',
   announcement: 'Welcome to Save & Smile — Pakistan\'s Leading Wholesale & Retail Store · Free Nationwide Shipping on Orders Above Rs. 3,000!',
   announcementPhone: '',
@@ -123,6 +123,6 @@ export const FOOTER = {
   social: [
     { label: 'Facebook', href: 'https://www.facebook.com/share/1AW915F8WA/', icon: `${CDN}/images/social_icon_filled/facebook_icon.svg` },
     { label: 'Instagram', href: 'https://www.instagram.com/', icon: `${CDN}/images/social_icon_filled/instagram_icon.svg` },
-    { label: 'Tiktok', href: 'https://www.tiktok.com/@qadrigadgets.pk', icon: `${CDN}/images/social_icon_filled/tiktok_icon.svg` },
+    { label: 'Tiktok', href: 'https://www.tiktok.com/@saveandsmile.pk', icon: `${CDN}/images/social_icon_filled/tiktok_icon.svg` },
   ],
 }

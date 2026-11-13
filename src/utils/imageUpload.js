@@ -1,6 +1,6 @@
 /**
  * Automatic Client-Side WebP Converter & Multi-Image Uploader
- * Qadri Gadgets E-Commerce Architecture
+ * Save & Smile E-Commerce Architecture
  */
 
 /**

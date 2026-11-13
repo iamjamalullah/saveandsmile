@@ -1,5 +1,5 @@
 /**
- * QADRI GADGETS — AUTHORITATIVE CATALOG & ENTITY SERVICE
+ * SAVE & SMILE — AUTHORITATIVE CATALOG & ENTITY SERVICE
  * 
  * Provides production-grade ACID database persistence for:
  * - Products, inventory, variants & bulk tier pricing
@@ -34,7 +34,7 @@ function formatProductRow(row) {
     price: Number(row.price),
     oldPrice: row.old_price ? Number(row.old_price) : Number(row.price),
     stock: parseInt(row.stock_quantity, 10),
-    brand: row.brand || 'Qadri Select',
+    brand: (row.brand === 'Qadri Select' ? 'Save & Smile' : row.brand) || 'Save & Smile',
     description: row.description || '',
     video: row.video_url || null,
     image: row.image_main,
@@ -123,7 +123,7 @@ export async function createProduct(data) {
         Number(data.price) || 0,
         Number(data.oldPrice) || Number(data.price) || 0,
         Number(data.stock) || 0,
-        data.brand || 'Qadri Select',
+        data.brand || 'Save & Smile',
         data.description || '',
         data.video || null,
         data.image || '/images/p1.jpg',
@@ -194,8 +194,51 @@ export async function updateProduct(id, fields) {
 }
 
 export async function deleteProduct(id) {
+  // 1. Fetch product to inspect media and details before deletion
+  const prodRes = await query('SELECT * FROM products WHERE id = $1', [id])
+  if (!prodRes.rows.length) return false
+  const product = prodRes.rows[0]
+
+  // 2. Collect product images
+  const imagesToCheck = []
+  if (product.image_main) imagesToCheck.push(product.image_main)
+  try {
+    const gallery = typeof product.images_gallery === 'string'
+      ? JSON.parse(product.images_gallery)
+      : (product.images_gallery || [])
+    if (Array.isArray(gallery)) imagesToCheck.push(...gallery)
+  } catch {}
+
+  // 3. Collect variant images
+  const varImgs = await query('SELECT image_url FROM product_variant_images WHERE product_id = $1', [id])
+  varImgs.rows.forEach(v => {
+    if (v.image_url) imagesToCheck.push(v.image_url)
+  })
+
+  // 4. Delete the product record (Postgres CASCADE safely cleans up product_options, product_option_values, product_variants, product_variant_images)
+  // Historical orders, order_items, customers, and invoices remain 100% preserved!
   const res = await query('DELETE FROM products WHERE id = $1 RETURNING id', [id])
-  return res.rows.length > 0
+  const deleted = res.rows.length > 0
+
+  // 5. Clean up any homepage draft / published section product references
+  if (deleted) {
+    try {
+      await query(`
+        UPDATE sections 
+        SET content_json = (
+          CASE 
+            WHEN content_json LIKE '%"items"%' OR content_json LIKE '%"products"%'
+            THEN regexp_replace(content_json, '\\b' || $1 || '\\b', '0', 'g')
+            ELSE content_json
+          END
+        )
+      `, [String(id)])
+    } catch (cleanErr) {
+      console.warn('[HOMEPAGE CLEANUP WARNING]:', cleanErr.message)
+    }
+  }
+
+  return deleted
 }
 
 // ── CATEGORIES CRUD ──
@@ -246,7 +289,30 @@ export async function updateCategory(id, fields) {
   return { id: r.id, name: r.name, slug: r.slug, icon: r.icon, image: r.image_url }
 }
 
-export async function deleteCategory(id) {
+export async function deleteCategory(id, options = {}) {
+  // 1. Check if category exists
+  const catRes = await query('SELECT * FROM categories WHERE id = $1', [id])
+  if (!catRes.rows.length) return false
+  const cat = catRes.rows[0]
+
+  // 2. Safe Category Deletion: Check if any active products belong to this category!
+  // Products must NEVER be deleted automatically when a category is deleted.
+  const prodCheck = await query('SELECT count(*) FROM products WHERE category_name = $1', [cat.name])
+  const productCount = parseInt(prodCheck.rows[0].count, 10)
+
+  if (productCount > 0 && !options.reassignToCategory) {
+    const error = new Error(`Cannot delete category "${cat.name}". ${productCount} products currently belong to this category. Please reassign or approve before deletion.`)
+    error.code = 'CATEGORY_HAS_PRODUCTS'
+    error.productCount = productCount
+    throw error
+  }
+
+  // If explicit reassignment provided, safely reassign products
+  if (productCount > 0 && options.reassignToCategory) {
+    await query('UPDATE products SET category_name = $1 WHERE category_name = $2', [options.reassignToCategory, cat.name])
+  }
+
+  // 3. Delete category record
   const res = await query('DELETE FROM categories WHERE id = $1 RETURNING id', [id])
   return res.rows.length > 0
 }

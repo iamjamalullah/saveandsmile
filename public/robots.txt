@@ -1,0 +1,28 @@
+# robots.txt for Save & Smile E-Commerce
+User-agent: *
+Allow: /
+Allow: /shop
+Allow: /product/
+Allow: /category/
+Allow: /bulk-order
+Allow: /reviews
+Allow: /about-us
+Allow: /contact
+Allow: /support
+Allow: /terms-conditions
+Allow: /privacy-policy
+
+# Disallow private user sessions, cart, checkout, account, and admin panels
+Disallow: /cart
+Disallow: /checkout
+Disallow: /account
+Disallow: /wishlist
+Disallow: /admin
+Disallow: /admin/
+Disallow: /staff-login
+Disallow: /login
+Disallow: /signup
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://saveandsmile.vercel.app/sitemap.xml

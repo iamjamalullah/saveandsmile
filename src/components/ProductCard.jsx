@@ -11,11 +11,11 @@ export default function ProductCard({ product, context = 'default', className = 
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100) : 0
 
   const whatsappMessage = encodeURIComponent(
-    `Hi Save & Smile, I want to order this product:\n*${product.name}*\nPrice: Rs. ${product.price.toLocaleString()}\nLink: https://www.saveandsmile.pk${productPath(product)}`
+    `Hi Save & Smile, I want to order this product:\n*${product.name}*\nPrice: Rs. ${product.price.toLocaleString()}\nLink: https://saveandsmile.vercel.app${productPath(product)}`
   )
 
   const wholesaleMessage = encodeURIComponent(
-    `Hi Save & Smile, I want to inquire about wholesale bulk pricing for:\n*${product.name}*\nSKU: ${product.sku || product.id}\nLink: https://www.saveandsmile.pk${productPath(product)}`
+    `Hi Save & Smile, I want to inquire about wholesale bulk pricing for:\n*${product.name}*\nSKU: ${product.sku || product.id}\nLink: https://saveandsmile.vercel.app${productPath(product)}`
   )
 
   const isHot = product.featured || product.group === 'hot' || (product.reviewsCount || 0) > 3

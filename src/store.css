@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────
-   Exact header replica of qadrigadgets.pk (2026)
+   Save & Smile Premium Header (2026)
    ───────────────────────────────────────────────────────── */
 .qh-ticker {
   background: #fff;
@@ -100,10 +100,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
   background: rgba(255, 255, 255, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.32);
-  padding: 4px 6px;
+  padding: 3px 5px;
   border-radius: 999px;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -138,16 +138,16 @@
   z-index: 1;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   color: #ffffff !important;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 500;
   font-family: 'Poppins', sans-serif;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.15px;
   line-height: 1;
   text-decoration: none !important;
   white-space: nowrap;
-  padding: 8px 15px;
+  padding: 6px 11px;
   border-radius: 999px;
   transition: all 0.2s ease;
 }
@@ -172,6 +172,18 @@
 .qh-pcat-toggle { background: none; border: 0; cursor: pointer; font-family: inherit; }
 .qh-chev { width: 11px; height: 11px; flex-shrink: 0; transition: transform .22s ease; }
 .qh-pcat.is-open .qh-chev { transform: rotate(180deg); }
+
+@media (max-width: 1200px) and (min-width: 992px) {
+  .qh-link {
+    font-size: 12.5px;
+    padding: 5px 9px;
+    gap: 4px;
+  }
+  .qh-nav > ul {
+    gap: 2px;
+    padding: 3px 4px;
+  }
+}
 
 .qh-pcat { position: relative; z-index: 20; }
 

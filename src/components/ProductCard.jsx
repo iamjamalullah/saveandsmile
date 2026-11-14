@@ -24,7 +24,16 @@ export default function ProductCard({ product, context = 'default', className = 
     <article className={`qg-card ${context && context !== 'default' ? `qg-card--${context}` : ''} ${className}`.trim()}>
       <div className="qg-card-media">
         <Link className="qg-card-open" to={productPath(product)} aria-label={product.name}>
-          <img src={product.image} alt={product.name} loading="lazy" className="qg-card-img" />
+          <img
+            src={product.image}
+            alt={product.name}
+            loading="lazy"
+            className="qg-card-img"
+            onError={(e) => {
+              e.target.onerror = null
+              e.target.src = '/images/p1.jpg'
+            }}
+          />
         </Link>
         <span className={`qg-card-tag ${isHot ? 'is-hot' : 'is-trending'}`}>
           {isHot ? '🔥 HOT DEAL' : '💥 TRENDING'}

@@ -396,24 +396,22 @@ const handleImageUpload = async (req, res) => {
 
       // Upload directly to permanent Supabase Storage
       let finalUrl = `/uploads/products/${filename}`
-      if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
-        try {
-          const uploadRes = await uploadBuffer(webpResult.webpBuffer, `products/${filename}`, 'image/webp')
-          if (uploadRes && uploadRes.publicUrl) {
-            finalUrl = uploadRes.publicUrl
-          }
-          await mediaService.registerMedia({
-            bucket: 'product-media',
-            path: `products/${filename}`,
-            filename,
-            mimeType: 'image/webp',
-            sizeBytes: webpResult.webpBuffer.length,
-            ownerType: 'product',
-            ownerId: 'upload',
-          }).catch(mErr => console.warn('[MEDIA REGISTER WARNING]:', mErr.message))
-        } catch (sErr) {
-          console.warn('[SUPABASE UPLOAD WARNING]:', sErr.message)
+      try {
+        const uploadRes = await uploadBuffer(webpResult.webpBuffer, `products/${filename}`, 'image/webp')
+        if (uploadRes && uploadRes.publicUrl) {
+          finalUrl = uploadRes.publicUrl
         }
+        await mediaService.registerMedia({
+          bucket: 'product-media',
+          path: `products/${filename}`,
+          filename,
+          mimeType: 'image/webp',
+          sizeBytes: webpResult.webpBuffer.length,
+          ownerType: 'product',
+          ownerId: 'upload',
+        }).catch(mErr => console.warn('[MEDIA REGISTER WARNING]:', mErr.message))
+      } catch (sErr) {
+        console.warn('[SUPABASE UPLOAD WARNING]:', sErr.message)
       }
 
       savedUrls.push(finalUrl)

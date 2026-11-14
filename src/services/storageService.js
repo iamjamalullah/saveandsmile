@@ -25,14 +25,27 @@ let supabase = null
  * Initialize or return the Supabase client.
  * Fails gracefully if credentials are missing.
  */
-function getClient() {
+async function getClient() {
   if (supabase) return supabase
 
-  const url = process.env.SUPABASE_URL
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  let url = process.env.SUPABASE_URL || 'https://piocbtkjzznzzdftyelh.supabase.co'
+  let key = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!key) {
+    try {
+      const { query } = await import('../db/index.js')
+      const res = await query("SELECT value FROM system_config WHERE key = 'SUPABASE_SERVICE_ROLE_KEY'")
+      if (res.rows.length > 0 && res.rows[0].value) {
+        key = res.rows[0].value
+        process.env.SUPABASE_SERVICE_ROLE_KEY = key
+      }
+    } catch (dbErr) {
+      console.warn('[STORAGE] Could not query system_config table:', dbErr.message)
+    }
+  }
 
   if (!url || !key) {
-    throw new Error('[STORAGE] SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in environment variables.')
+    throw new Error('[STORAGE] SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be configured in environment or system_config.')
   }
 
   supabase = createClient(url, key)
@@ -68,7 +81,7 @@ async function withRetry(fn, label = 'operation') {
  * @returns {Promise<{path: string, publicUrl: string, size: number}>}
  */
 export async function uploadFile(localPath, destPath, contentType = null) {
-  const client = getClient()
+  const client = await getClient()
   const fileBuffer = await fs.promises.readFile(localPath)
   const size = fileBuffer.length
 
@@ -95,7 +108,7 @@ export async function uploadFile(localPath, destPath, contentType = null) {
  * Upload from a Buffer (for programmatic use).
  */
 export async function uploadBuffer(buffer, destPath, contentType = 'application/octet-stream') {
-  const client = getClient()
+  const client = await getClient()
   if (!buffer || buffer.length === 0) {
     throw new Error('[STORAGE] Buffer is empty')
   }
@@ -119,7 +132,7 @@ export async function uploadBuffer(buffer, destPath, contentType = 'application/
  * @returns {Promise<boolean>} true if deletion succeeded
  */
 export async function deleteObject(objectPath) {
-  const client = getClient()
+  const client = await getClient()
   const result = await withRetry(async () => {
     const { data, error } = await client.storage.from(BUCKET).remove([objectPath])
     if (error) throw error
@@ -138,7 +151,7 @@ export async function deleteBatch(paths) {
     return { deleted: [], failed: [] }
   }
 
-  const client = getClient()
+  const client = await getClient()
   try {
     const { data, error } = await client.storage.from(BUCKET).remove(paths)
     if (error) throw error
@@ -166,7 +179,7 @@ export async function deleteBatch(paths) {
  * @returns {Promise<boolean>}
  */
 export async function objectExists(objectPath) {
-  const client = getClient()
+  const client = await getClient()
   const dir = path.posix.dirname(objectPath)
   const file = path.posix.basename(objectPath)
   const prefix = dir === '.' ? '' : dir
@@ -189,9 +202,8 @@ export async function objectExists(objectPath) {
  * @returns {string|null}
  */
 export function getPublicUrl(objectPath) {
-  const client = getClient()
-  const { data } = client.storage.from(BUCKET).getPublicUrl(objectPath)
-  return data?.publicUrl || null
+  const url = process.env.SUPABASE_URL || 'https://piocbtkjzznzzdftyelh.supabase.co'
+  return `${url}/storage/v1/object/public/${BUCKET}/${objectPath}`
 }
 
 /**

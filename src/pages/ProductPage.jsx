@@ -583,8 +583,11 @@ export default function ProductPage() {
                     src={activeMedia?.src || product.image}
                     alt={product.name}
                     onError={(e) => {
-                      if (product.image && e.target.src !== product.image) {
+                      if (product.image && !e.target.src.endsWith(product.image)) {
                         e.target.src = product.image
+                      } else {
+                        e.target.onerror = null
+                        e.target.src = '/images/p1.jpg'
                       }
                     }}
                     style={{
@@ -648,8 +651,11 @@ export default function ProductPage() {
                     src={m.type === 'video' ? product.image : m.src}
                     alt=""
                     onError={(e) => {
-                      if (product.image && e.target.src !== product.image) {
+                      if (product.image && !e.target.src.endsWith(product.image)) {
                         e.target.src = product.image
+                      } else {
+                        e.target.onerror = null
+                        e.target.src = '/images/p1.jpg'
                       }
                     }}
                   />

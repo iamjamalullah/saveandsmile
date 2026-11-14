@@ -47,13 +47,41 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
           </span>
         )
       case 'Processing':
-        return <span className="badge badge-status badge-processing"><i className="bi bi-gear-fill"></i> Processing</span>
+        return (
+          <span 
+            className="badge badge-status badge-processing"
+            style={{ backgroundColor: '#dbeafe', color: '#1e40af', border: '1px solid #93c5fd', fontWeight: 600 }}
+          >
+            <i className="bi bi-gear-fill"></i> Processing
+          </span>
+        )
       case 'Shipped':
-        return <span className="badge badge-status badge-shipped"><i className="bi bi-truck"></i> Shipped</span>
+        return (
+          <span 
+            className="badge badge-status badge-shipped"
+            style={{ backgroundColor: '#ede9fe', color: '#5b21b6', border: '1px solid #c4b5fd', fontWeight: 600 }}
+          >
+            <i className="bi bi-truck"></i> Shipped
+          </span>
+        )
       case 'Delivered':
-        return <span className="badge badge-status badge-delivered"><i className="bi bi-check-circle-fill"></i> Delivered</span>
+        return (
+          <span 
+            className="badge badge-status badge-delivered"
+            style={{ backgroundColor: '#dcfce7', color: '#15803d', border: '1px solid #86efac', fontWeight: 600 }}
+          >
+            <i className="bi bi-check-circle-fill"></i> Delivered
+          </span>
+        )
       case 'Cancelled':
-        return <span className="badge badge-status badge-cancelled"><i className="bi bi-x-circle-fill"></i> Cancelled</span>
+        return (
+          <span 
+            className="badge badge-status badge-cancelled"
+            style={{ backgroundColor: '#fee2e2', color: '#b91c1c', border: '1px solid #fca5a5', fontWeight: 600 }}
+          >
+            <i className="bi bi-x-circle-fill"></i> Cancelled
+          </span>
+        )
       default:
         return <span className="badge bg-secondary">{status}</span>
     }

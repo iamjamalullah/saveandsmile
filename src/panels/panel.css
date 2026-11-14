@@ -103,10 +103,10 @@
 .pnl-nav-label {
   padding: 14px 11px 6px;
   font-size: 9px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: .16em;
   text-transform: uppercase;
-  color: #6b9a87;
+  color: #8db8a5;
 }
 
 .pnl-nav-btn {
@@ -120,20 +120,23 @@
   border: 0;
   border-radius: 10px;
   background: transparent;
-  color: #b9d2c6;
+  color: #eaf6f0;
   font-family: inherit;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   text-align: left;
   cursor: pointer;
   transition: background .15s ease, color .15s ease;
 }
-.pnl-nav-btn i { font-size: 15px; width: 18px; text-align: center; opacity: .92; }
-.pnl-nav-btn:hover { background: rgba(255, 255, 255, .07); color: #fff; }
+.pnl-nav-btn i { font-size: 15px; width: 18px; text-align: center; opacity: .95; color: #a9e8d2; }
+.pnl-nav-btn:hover { background: rgba(255, 255, 255, .09); color: #ffffff; }
+.pnl-nav-btn:hover i { color: #ffffff; }
 .pnl-nav-btn.active {
   background: linear-gradient(90deg, rgba(58, 208, 160, .24), rgba(58, 208, 160, .05));
-  color: #fff;
+  color: #ffffff;
+  font-weight: 500;
 }
+.pnl-nav-btn.active i { color: #48dfb0; }
 .pnl-nav-btn.active::before {
   content: '';
   position: absolute;
@@ -178,8 +181,8 @@
   font-size: 12px;
   font-weight: 700;
 }
-.pnl-side-user b { display: block; color: #fff; font-size: 11.8px; line-height: 1.3; }
-.pnl-side-user small { display: block; color: #84ab99; font-size: 10px; }
+.pnl-side-user b { display: block; color: #ffffff; font-size: 11.8px; line-height: 1.3; font-weight: 500; }
+.pnl-side-user small { display: block; color: #a4c9b8; font-size: 10px; }
 
 .pnl-side-action {
   display: flex;
@@ -188,17 +191,17 @@
   width: 100%;
   padding: 8px 10px;
   margin-top: 6px;
-  border: 1px solid rgba(255, 255, 255, .12);
+  border: 1px solid rgba(255, 255, 255, .15);
   border-radius: 9px;
-  background: rgba(255, 255, 255, .04);
-  color: #dceee6;
+  background: rgba(255, 255, 255, .05);
+  color: #f1f8f5;
   font-family: inherit;
   font-size: 11.5px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: background .15s ease;
+  transition: background .15s ease, color .15s ease;
 }
-.pnl-side-action:hover { background: rgba(255, 255, 255, .1); color: #fff; }
+.pnl-side-action:hover { background: rgba(255, 255, 255, .12); color: #ffffff; }
 .pnl-side-action i { font-size: 13px; }
 
 /* Collapsed desktop sidebar */

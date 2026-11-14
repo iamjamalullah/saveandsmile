@@ -300,7 +300,7 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                               onError={(e) => { e.target.src = '/images/cat1.jpg' }}
                             />
                             <div>
-                              <div className="fw-semibold text-dark d-flex align-items-center gap-1.5 flex-wrap">
+                              <div className="fw-medium text-dark d-flex align-items-center gap-1.5 flex-wrap" style={{ fontSize: '0.88rem' }}>
                                 {p.name}
                                 {p.hasVariants && p.variants?.length > 0 && (
                                   <span className="badge bg-primary-subtle text-primary border border-primary-subtle" style={{ fontSize: '10px' }}>
@@ -326,7 +326,7 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                         </td>
                         <td>
                           <div>
-                            <span className="fw-bold text-dark">
+                            <span className="fw-medium text-dark" style={{ fontSize: '0.88rem' }}>
                               {storeSettings?.currency || 'Rs.'} {p.price.toLocaleString()}
                             </span>
                             {p.oldPrice > p.price && (
@@ -406,10 +406,10 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                         {p.stock === 0 ? 'Out of Stock' : `${p.stock} in stock`}
                       </span>
                     </div>
-                    <h6 className="fw-bold mb-2 text-truncate" title={p.name}>{p.name}</h6>
+                    <h6 className="fw-medium mb-2 text-truncate" title={p.name}>{p.name}</h6>
                     <div className="mt-auto">
                       <div className="d-flex align-items-baseline gap-2 mb-3">
-                        <span className="fw-bold fs-5 text-dark">
+                        <span className="fw-semibold fs-6 text-dark">
                           {storeSettings?.currency || 'Rs.'} {p.price.toLocaleString()}
                         </span>
                         {p.oldPrice > p.price && (

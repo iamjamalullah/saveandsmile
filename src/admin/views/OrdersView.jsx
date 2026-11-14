@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useStoreData } from '../../context/StoreDataContext'
 import { CITIES } from '../../data'
 
@@ -9,6 +9,8 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCity, setSelectedCity] = useState('ALL')
   const [sortBy, setSortBy] = useState('newest')
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 15
 
   // Calculate status counts
   const counts = useMemo(() => {
@@ -50,7 +52,74 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
     })
   }, [orders, activeStatusTab, searchTerm, selectedCity, sortBy])
 
-  // Render status badge
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [activeStatusTab, searchTerm, selectedCity, sortBy])
+
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / pageSize))
+  const paginatedOrders = useMemo(() => {
+    const start = (currentPage - 1) * pageSize
+    return filteredOrders.slice(start, start + pageSize)
+  }, [filteredOrders, currentPage, pageSize])
+
+  // Export to Excel / CSV
+  const exportToExcel = () => {
+    if (!filteredOrders || filteredOrders.length === 0) {
+      alert('No orders available to export.')
+      return
+    }
+    const headers = [
+      'Order ID',
+      'Date',
+      'Customer Name',
+      'Mobile Number',
+      'City',
+      'Delivery Address',
+      'Total Items',
+      'Ordered Products',
+      'Total Amount (Rs)',
+      'Payment Method',
+      'Status',
+      'Tracking Number',
+      'Customer Notes'
+    ]
+    const rows = filteredOrders.map(o => {
+      const itemsSummary = (o.items || []).map(i => {
+        const v = i.variant?.title || i.variant_title ? ` [${i.variant?.title || i.variant_title}]` : ''
+        return `${i.qty || 1}x ${i.product?.name || i.name || 'Product'}${v}`
+      }).join('; ')
+
+      return [
+        `"${o.id || ''}"`,
+        `"${o.date || ''}"`,
+        `"${(o.customer?.name || o.customerName || '').replace(/"/g, '""')}"`,
+        `"${o.customer?.mobile || o.customerMobile || ''}"`,
+        `"${(o.customer?.city || o.customerCity || '').replace(/"/g, '""')}"`,
+        `"${(o.customer?.address || o.deliveryAddress || '').replace(/"/g, '""')}"`,
+        (o.items || []).reduce((sum, i) => sum + (i.qty || 1), 0),
+        `"${itemsSummary.replace(/"/g, '""')}"`,
+        Number(o.total || 0),
+        `"${o.paymentMethod || 'Cash on Delivery'}"`,
+        `"${o.status || 'Pending'}"`,
+        `"${o.trackingNumber || ''}"`,
+        `"${(o.notes || '').replace(/"/g, '""')}"`
+      ]
+    })
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n')
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `SaveAndSmile_Orders_${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  // Render status badge with high contrast & bright colors
   const renderStatusBadge = (status) => {
     switch (status) {
       case 'Pending':
@@ -63,13 +132,41 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
           </span>
         )
       case 'Processing':
-        return <span className="badge badge-status badge-processing"><i className="bi bi-gear-fill"></i> Processing</span>
+        return (
+          <span 
+            className="badge badge-status badge-processing"
+            style={{ backgroundColor: '#dbeafe', color: '#1e40af', border: '1px solid #93c5fd', fontWeight: 600 }}
+          >
+            <i className="bi bi-gear-fill"></i> Processing
+          </span>
+        )
       case 'Shipped':
-        return <span className="badge badge-status badge-shipped"><i className="bi bi-truck"></i> Shipped</span>
+        return (
+          <span 
+            className="badge badge-status badge-shipped"
+            style={{ backgroundColor: '#ede9fe', color: '#5b21b6', border: '1px solid #c4b5fd', fontWeight: 600 }}
+          >
+            <i className="bi bi-truck"></i> Shipped
+          </span>
+        )
       case 'Delivered':
-        return <span className="badge badge-status badge-delivered"><i className="bi bi-check-circle-fill"></i> Delivered</span>
+        return (
+          <span 
+            className="badge badge-status badge-delivered"
+            style={{ backgroundColor: '#dcfce7', color: '#15803d', border: '1px solid #86efac', fontWeight: 600 }}
+          >
+            <i className="bi bi-check-circle-fill"></i> Delivered
+          </span>
+        )
       case 'Cancelled':
-        return <span className="badge badge-status badge-cancelled"><i className="bi bi-x-circle-fill"></i> Cancelled</span>
+        return (
+          <span 
+            className="badge badge-status badge-cancelled"
+            style={{ backgroundColor: '#fee2e2', color: '#b91c1c', border: '1px solid #fca5a5', fontWeight: 600 }}
+          >
+            <i className="bi bi-x-circle-fill"></i> Cancelled
+          </span>
+        )
       default:
         return <span className="badge bg-secondary">{status}</span>
     }
@@ -85,12 +182,20 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
             Track and process real-time customer purchases and fulfillment status
           </p>
         </div>
-        <div className="d-flex gap-2">
+        <div className="d-flex align-items-center gap-2 flex-wrap">
+          <button
+            className="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1.5 shadow-sm bg-white"
+            onClick={exportToExcel}
+            title="Download Customer Orders to Excel / CSV"
+          >
+            <i className="bi bi-file-earmark-excel-fill text-success fs-6"></i>
+            <span className="fw-medium">Export to Excel</span>
+          </button>
           <span 
             className="badge border px-3 py-2 fw-medium d-inline-flex align-items-center"
             style={{ backgroundColor: '#fef3c7', color: '#78350f', borderColor: '#fde68a' }}
           >
-            <i className="bi bi-bell-fill me-1.5"></i> {counts.pending} Orders Need Confirmation
+            <i className="bi bi-bell-fill me-1.5 text-warning"></i> {counts.pending} Orders Need Confirmation
           </span>
         </div>
       </div>
@@ -194,21 +299,21 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
 
       {/* Orders Table */}
       <div className="card shadow-sm">
-        <div className="table-responsive">
+        <div className="table-responsive orders-table-wrapper">
           <table className="table admin-table mb-0">
             <thead>
               <tr>
-                <th>Order ID &amp; Date</th>
-                <th>Customer Info</th>
-                <th>City &amp; Address</th>
-                <th>Ordered Items</th>
-                <th>Total (COD)</th>
-                <th>Current Status</th>
-                <th className="text-end">Actions</th>
+                <th style={{ minWidth: 120 }}>Order ID &amp; Date</th>
+                <th style={{ minWidth: 140 }}>Customer Info</th>
+                <th style={{ minWidth: 160 }}>City &amp; Address</th>
+                <th style={{ minWidth: 160 }}>Ordered Items</th>
+                <th style={{ minWidth: 100 }}>Total (COD)</th>
+                <th style={{ minWidth: 110 }}>Current Status</th>
+                <th className="text-end" style={{ minWidth: 170 }}>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredOrders.length === 0 ? (
+              {paginatedOrders.length === 0 ? (
                 <tr>
                   <td colSpan="7" className="text-center py-5 text-muted">
                     <i className="bi bi-receipt fs-1 d-block mb-2 text-secondary opacity-50"></i>
@@ -216,32 +321,32 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
                   </td>
                 </tr>
               ) : (
-                filteredOrders.map((order) => (
+                paginatedOrders.map((order) => (
                   <tr key={order.id}>
                     <td>
-                      <div className="fw-semibold text-primary font-monospace">{order.id}</div>
-                      <small className="text-muted d-block">{order.date}</small>
+                      <div className="fw-semibold text-primary font-monospace" style={{ fontSize: '0.85rem' }}>{order.id}</div>
+                      <small className="text-muted d-block" style={{ fontSize: '11px' }}>{order.date}</small>
                     </td>
                     <td>
-                      <div className="fw-medium text-dark">{order.customer?.name || order.customerName || 'Guest Customer'}</div>
-                      <div className="small text-muted d-flex align-items-center gap-1">
+                      <div className="fw-medium text-dark" style={{ fontSize: '0.88rem' }}>{order.customer?.name || order.customerName || 'Guest Customer'}</div>
+                      <div className="small text-muted d-flex align-items-center gap-1" style={{ fontSize: '11.5px' }}>
                         <i className="bi bi-telephone"></i>
                         <span>{order.customer?.mobile || order.customerMobile || '—'}</span>
                       </div>
                     </td>
                     <td>
-                      <span className="badge bg-light text-dark border mb-1 fw-normal">
+                      <span className="badge bg-light text-dark border mb-1 fw-normal" style={{ fontSize: '11px' }}>
                         <i className="bi bi-geo-alt me-1 text-danger"></i>
                         {order.customer?.city || order.customerCity || 'Pakistan'}
                       </span>
-                      <small className="text-muted d-block text-truncate" style={{ maxWidth: 180 }} title={order.customer?.address || order.deliveryAddress || ''}>
+                      <small className="text-muted d-block text-truncate" style={{ maxWidth: 170, fontSize: '11.5px' }} title={order.customer?.address || order.deliveryAddress || ''}>
                         {order.customer?.address || order.deliveryAddress || 'Standard Delivery Address'}
                       </small>
                       {order.notes && (
                         <div className="mt-1" title={`Customer note: ${order.notes}`}>
                           <span 
                             className="badge border text-truncate d-inline-block" 
-                            style={{ maxWidth: 180, fontSize: '11px', fontWeight: 500, backgroundColor: '#fef3c7', color: '#78350f', borderColor: '#fde68a' }}
+                            style={{ maxWidth: 170, fontSize: '11px', fontWeight: 500, backgroundColor: '#fef3c7', color: '#78350f', borderColor: '#fde68a' }}
                           >
                             <i className="bi bi-chat-left-quote-fill me-1"></i>
                             {order.notes}
@@ -251,37 +356,39 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
                     </td>
                     <td>
                       <div className="small">
-                        <span className="fw-medium text-dark">
+                        <span className="fw-medium text-dark" style={{ fontSize: '11.5px' }}>
                           {(order.items || []).reduce((sum, i) => sum + (i.qty || 1), 0)} items:
                         </span>
-                        <div className="text-muted text-truncate" style={{ maxWidth: 200 }} title={(order.items || []).map(i => `${i.qty || 1}x ${i.product?.name || i.name || 'Product'}`).join(', ')}>
+                        <div className="text-muted text-truncate" style={{ maxWidth: 180, fontSize: '11.5px' }} title={(order.items || []).map(i => `${i.qty || 1}x ${i.product?.name || i.name || 'Product'}`).join(', ')}>
                           {(order.items || []).map(i => `${i.qty || 1}x ${i.product?.name || i.name || 'Product'}`).join(', ')}
                         </div>
                       </div>
                     </td>
-                    <td>
-                      <div className="fw-semibold fs-6 text-dark">
-                        {storeSettings?.currency || 'Rs.'} {Number(order.total || 0).toLocaleString()}
+                    <td style={{ whiteSpace: 'nowrap' }}>
+                      <div className="fw-medium text-dark" style={{ fontSize: '0.85rem' }}>
+                        <span className="text-muted" style={{ fontSize: '0.74rem' }}>{storeSettings?.currency || 'Rs.'}</span> {Number(order.total || 0).toLocaleString()}
                       </div>
-                      <small className="text-muted d-block">{order.paymentMethod || 'Cash on Delivery'}</small>
+                      <small className="text-muted d-block" style={{ fontSize: '10.5px' }}>{order.paymentMethod || 'Cash on Delivery'}</small>
                     </td>
                     <td>
                       <div className="d-flex align-items-center gap-2">
                         {renderStatusBadge(order.status)}
                       </div>
                     </td>
-                    <td className="text-end">
-                      <div className="d-flex justify-content-end gap-1">
+                    <td className="text-end" style={{ whiteSpace: 'nowrap' }}>
+                      <div className="d-flex justify-content-end align-items-center gap-1.5">
                         <button
-                          className="btn btn-sm btn-primary"
+                          className="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center"
+                          style={{ width: '32px', height: '32px', padding: 0 }}
                           onClick={() => onSelectOrder(order)}
                           title="View Order Details & Print Invoice"
+                          aria-label={`View order ${order.id}`}
                         >
-                          <i className="bi bi-eye-fill me-1"></i> Details
+                          <i className="bi bi-eye fs-6"></i>
                         </button>
                         <select
                           className="form-select form-select-sm"
-                          style={{ width: 116, fontSize: 11 }}
+                          style={{ width: 106, fontSize: 11, height: '32px', padding: '2px 6px' }}
                           value={order.status}
                           onChange={(e) => {
                             const next = e.target.value
@@ -300,13 +407,15 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
                           ))}
                         </select>
                         <button
-                          className="btn btn-sm btn-light border text-danger"
+                          className="btn btn-sm btn-light border text-danger d-inline-flex align-items-center justify-content-center"
+                          style={{ width: '32px', height: '32px', padding: 0 }}
                           onClick={() => {
                             if (window.confirm(`Are you sure you want to delete order ${order.id}?`)) {
                               deleteOrder(order.id)
                             }
                           }}
                           title="Delete Order"
+                          aria-label={`Delete order ${order.id}`}
                         >
                           <i className="bi bi-trash"></i>
                         </button>
@@ -318,6 +427,48 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Footer */}
+        {filteredOrders.length > 0 && (
+          <div className="card-footer bg-white border-top d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 p-3">
+            <span className="small text-muted">
+              Showing <strong>{((currentPage - 1) * pageSize) + 1}</strong>–<strong>{Math.min(currentPage * pageSize, filteredOrders.length)}</strong> of <strong>{filteredOrders.length}</strong> orders
+            </span>
+            {totalPages > 1 && (
+              <nav aria-label="Orders pagination">
+                <ul className="pagination pagination-sm mb-0">
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button 
+                      className="page-link" 
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
+                      disabled={currentPage === 1}
+                      aria-label="Previous"
+                    >
+                      &laquo; Prev
+                    </button>
+                  </li>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pg) => (
+                    <li key={pg} className={`page-item ${currentPage === pg ? 'active' : ''}`}>
+                      <button className="page-link" onClick={() => setCurrentPage(pg)}>
+                        {pg}
+                      </button>
+                    </li>
+                  ))}
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button 
+                      className="page-link" 
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
+                      disabled={currentPage === totalPages}
+                      aria-label="Next"
+                    >
+                      Next &raquo;
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

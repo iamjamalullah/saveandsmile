@@ -380,16 +380,16 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
           ref={tableContainerRef}
           onScroll={handleTableScroll}
         >
-          <table className="table admin-table orders-table mb-0" style={{ minWidth: 1020 }}>
+          <table className="table admin-table orders-table mb-0" style={{ minWidth: 970 }}>
             <thead>
               <tr>
-                <th style={{ width: 135 }}>Order ID &amp; Date</th>
-                <th style={{ width: 140 }}>Customer Info</th>
-                <th style={{ minWidth: 165 }}>City &amp; Address</th>
-                <th style={{ minWidth: 185 }}>Ordered Items</th>
-                <th style={{ width: 105 }}>Total (COD)</th>
-                <th className="text-center" style={{ width: 115 }}>Current Status</th>
-                <th className="text-center" style={{ width: 180 }}>Actions</th>
+                <th style={{ width: 130 }}>Order ID &amp; Date</th>
+                <th style={{ width: 130 }}>Customer Info</th>
+                <th style={{ width: 155, minWidth: 150 }}>City &amp; Address</th>
+                <th style={{ width: 175, minWidth: 165 }}>Ordered Items</th>
+                <th style={{ width: 95 }}>Total (COD)</th>
+                <th className="text-center" style={{ width: 110 }}>Current Status</th>
+                <th className="text-center" style={{ width: 175 }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -403,18 +403,18 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
               ) : (
                 paginatedOrders.map((order) => (
                   <tr key={order.id}>
-                    <td style={{ width: 135 }}>
+                    <td style={{ width: 130 }}>
                       <div className="fw-semibold text-primary font-monospace" style={{ fontSize: '0.85rem' }}>{order.id}</div>
                       <small className="text-muted d-block" style={{ fontSize: '11px' }}>{order.date}</small>
                     </td>
-                    <td style={{ width: 140 }}>
+                    <td style={{ width: 130 }}>
                       <div className="fw-medium text-dark" style={{ fontSize: '0.88rem' }}>{order.customer?.name || order.customerName || 'Guest Customer'}</div>
                       <div className="small text-muted d-flex align-items-center gap-1" style={{ fontSize: '11.5px' }}>
                         <i className="bi bi-telephone"></i>
                         <span>{order.customer?.mobile || order.customerMobile || '—'}</span>
                       </div>
                     </td>
-                    <td style={{ minWidth: 165 }}>
+                    <td style={{ width: 155, minWidth: 150 }}>
                       <span className="badge bg-light text-dark border mb-1 fw-normal" style={{ fontSize: '11px' }}>
                         <i className="bi bi-geo-alt me-1 text-danger"></i>
                         {order.customer?.city || order.customerCity || 'Pakistan'}
@@ -434,7 +434,7 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
                         </div>
                       )}
                     </td>
-                    <td style={{ minWidth: 185 }}>
+                    <td style={{ width: 175, minWidth: 165 }}>
                       <div className="small">
                         <span className="fw-medium text-dark" style={{ fontSize: '11.5px' }}>
                           {(order.items || []).reduce((sum, i) => sum + (i.qty || 1), 0)} items:
@@ -444,18 +444,18 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
                         </div>
                       </div>
                     </td>
-                    <td style={{ width: 105, whiteSpace: 'nowrap' }}>
+                    <td style={{ width: 95, whiteSpace: 'nowrap' }}>
                       <div className="fw-medium text-dark" style={{ fontSize: '0.85rem' }}>
                         <span className="text-muted" style={{ fontSize: '0.74rem' }}>{storeSettings?.currency || 'Rs.'}</span> {Number(order.total || 0).toLocaleString()}
                       </div>
                       <small className="text-muted d-block" style={{ fontSize: '10.5px' }}>{order.paymentMethod || 'Cash on Delivery'}</small>
                     </td>
-                    <td className="text-center" style={{ width: 115 }}>
+                    <td className="text-center" style={{ width: 110 }}>
                       <div className="d-flex justify-content-center align-items-center">
                         {renderStatusBadge(order.status)}
                       </div>
                     </td>
-                    <td className="text-center" style={{ width: 180, whiteSpace: 'nowrap' }}>
+                    <td className="text-center" style={{ width: 175, whiteSpace: 'nowrap' }}>
                       <div className="d-flex justify-content-center align-items-center gap-1.5">
                         <button
                           className="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center"

@@ -411,6 +411,9 @@ export default function ProductPage() {
     ? (productReviews.reduce((sum, r) => sum + (Number(r.rating) || 5), 0) / reviewCount)
     : 0
 
+  const effectivePrice = activeVariant ? Number(activeVariant.price) : Number(product?.price || 0)
+  const isProductInStock = Boolean(!hasVariants ? (Number(product?.stock || 0) > 0) : (activeVariant && activeVariant.active !== false && Number(activeVariant.stock) > 0))
+
   useEffect(() => {
     if (!product) return
 
@@ -436,7 +439,7 @@ export default function ProductPage() {
         price: effectivePrice,
         priceValidUntil: '2027-12-31',
         itemCondition: 'https://schema.org/NewCondition',
-        availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        availability: isProductInStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
         seller: {
           '@type': 'Organization',
           name: 'Save & Smile',
@@ -472,7 +475,7 @@ export default function ProductPage() {
       ogImage: productImageUrl,
       structuredData: schemaObj,
     })
-  }, [product, effectivePrice, inStock, reviewCount, avgRating, productReviews])
+  }, [product, effectivePrice, isProductInStock, reviewCount, avgRating, productReviews])
 
   useEffect(() => {
     setMediaIndex(0)

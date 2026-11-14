@@ -607,8 +607,8 @@ export default function ProductFormModal({ product, isOpen, onClose }) {
             flexDirection: 'column',
           }}
         >
-          <div className="modal-header bg-dark text-white py-3" style={{ flexShrink: 0 }}>
-            <h5 className="modal-title fw-bold">
+          <div className="modal-header bg-dark text-white py-2.5 px-3" style={{ flexShrink: 0 }}>
+            <h5 className="modal-title fw-bold" style={{ fontSize: '1.05rem' }}>
               <i className={`bi ${product ? 'bi-pencil-square' : 'bi-plus-circle'} me-2 text-warning`}></i>
               {product ? `Edit Product: ${product.name}` : 'Add New Gadget to Catalog'}
             </h5>
@@ -626,7 +626,7 @@ export default function ProductFormModal({ product, isOpen, onClose }) {
             }}
           >
             <div
-              className="modal-body p-4"
+              className="modal-body p-3 p-md-3.5"
               style={{
                 overflowY: 'auto',
                 flex: 1,

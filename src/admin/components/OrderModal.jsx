@@ -32,16 +32,16 @@ export default function OrderModal({ order, onClose }) {
       <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content shadow-lg border-0">
           {/* Modal Header */}
-          <div className="modal-header bg-dark text-white py-3">
+          <div className="modal-header bg-dark text-white py-2.5 px-3">
             <div className="d-flex align-items-center gap-2">
-              <span className="badge bg-warning text-dark font-monospace fs-6 fw-medium">{order.id}</span>
-              <h5 className="modal-title fw-semibold mb-0 text-white">Order Details &amp; Fulfillment</h5>
+              <span className="badge bg-warning text-dark font-monospace fs-6 fw-medium" style={{ fontSize: '0.85rem' }}>{order.id}</span>
+              <h5 className="modal-title fw-semibold mb-0 text-white" style={{ fontSize: '1rem' }}>Order Details &amp; Fulfillment</h5>
             </div>
             <button type="button" className="btn-close btn-close-white" onClick={onClose} aria-label="Close"></button>
           </div>
 
           {/* Modal Body */}
-          <div className="modal-body p-4 printable-invoice">
+          <div className="modal-body p-3 p-md-3.5 printable-invoice">
             {/* Header info (Printable) */}
             <div className="d-flex justify-content-between align-items-start border-bottom pb-3 mb-4">
               <div>

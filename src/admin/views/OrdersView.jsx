@@ -251,16 +251,17 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
   return (
     <div className="orders-view">
       {/* Top Header */}
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
         <div>
-          <h3 className="fw-semibold mb-1">Customer Orders</h3>
-          <p className="text-muted small mb-0">
+          <h3 className="fw-semibold mb-0.5" style={{ fontSize: '1.2rem' }}>Customer Orders</h3>
+          <p className="text-muted small mb-0" style={{ fontSize: '11px' }}>
             Track and process real-time customer purchases and fulfillment status
           </p>
         </div>
         <div className="d-flex align-items-center gap-2 flex-wrap">
           <button
             className="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1.5 shadow-sm bg-white"
+            style={{ fontSize: '11px', height: '30px', padding: '3px 9px' }}
             onClick={exportToExcel}
             title="Download Customer Orders to Excel / CSV"
           >
@@ -268,50 +269,56 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
             <span className="fw-medium">Export to Excel</span>
           </button>
           <span 
-            className="badge border px-3 py-2 fw-medium d-inline-flex align-items-center"
-            style={{ backgroundColor: '#fef3c7', color: '#78350f', borderColor: '#fde68a' }}
+            className="badge border px-2.5 py-1.5 fw-medium d-inline-flex align-items-center"
+            style={{ backgroundColor: '#fef3c7', color: '#78350f', borderColor: '#fde68a', fontSize: '10.5px' }}
           >
-            <i className="bi bi-bell-fill me-1.5 text-warning"></i> {counts.pending} Orders Need Confirmation
+            <i className="bi bi-bell-fill me-1 text-warning"></i> {counts.pending} Orders Need Confirmation
           </span>
         </div>
       </div>
 
       {/* Status Navigation Tabs */}
-      <div className="card shadow-sm mb-4">
-        <div className="card-body p-2 p-md-3">
-          <div className="d-flex flex-wrap gap-2">
+      <div className="card shadow-sm mb-3">
+        <div className="card-body p-2 p-md-2.5">
+          <div className="d-flex flex-wrap gap-1.5">
             <button
               className={`btn btn-sm ${activeStatusTab === 'ALL' ? 'btn-dark' : 'btn-light border'}`}
+              style={{ fontSize: '11px', padding: '3px 8px' }}
               onClick={() => setActiveStatusTab('ALL')}
             >
               All Orders <span className="badge bg-secondary ms-1">{counts.all}</span>
             </button>
             <button
               className={`btn btn-sm ${activeStatusTab === 'Pending' ? 'btn-warning text-dark fw-bold' : 'btn-light border'}`}
+              style={{ fontSize: '11px', padding: '3px 8px' }}
               onClick={() => setActiveStatusTab('Pending')}
             >
               Pending <span className="badge bg-light text-dark ms-1">{counts.pending}</span>
             </button>
             <button
               className={`btn btn-sm ${activeStatusTab === 'Processing' ? 'btn-primary' : 'btn-light border'}`}
+              style={{ fontSize: '11px', padding: '3px 8px' }}
               onClick={() => setActiveStatusTab('Processing')}
             >
               Processing <span className="badge bg-light text-primary ms-1">{counts.processing}</span>
             </button>
             <button
               className={`btn btn-sm ${activeStatusTab === 'Shipped' ? 'btn-info text-white' : 'btn-light border'}`}
+              style={{ fontSize: '11px', padding: '3px 8px' }}
               onClick={() => setActiveStatusTab('Shipped')}
             >
               Shipped <span className="badge bg-light text-dark ms-1">{counts.shipped}</span>
             </button>
             <button
               className={`btn btn-sm ${activeStatusTab === 'Delivered' ? 'btn-success' : 'btn-light border'}`}
+              style={{ fontSize: '11px', padding: '3px 8px' }}
               onClick={() => setActiveStatusTab('Delivered')}
             >
               Delivered <span className="badge bg-light text-success ms-1">{counts.delivered}</span>
             </button>
             <button
               className={`btn btn-sm ${activeStatusTab === 'Cancelled' ? 'btn-danger' : 'btn-light border'}`}
+              style={{ fontSize: '11px', padding: '3px 8px' }}
               onClick={() => setActiveStatusTab('Cancelled')}
             >
               Cancelled <span className="badge bg-light text-danger ms-1">{counts.cancelled}</span>
@@ -321,18 +328,19 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="card shadow-sm mb-4">
-        <div className="card-body p-3 p-md-4">
-          <div className="row g-3 align-items-center">
+      <div className="card shadow-sm mb-3">
+        <div className="card-body p-2.5 p-md-3">
+          <div className="row g-2 align-items-center">
             {/* Search */}
             <div className="col-12 col-md-5">
-              <div className="input-group">
+              <div className="input-group input-group-sm">
                 <span className="input-group-text bg-light border-end-0">
                   <i className="bi bi-search text-muted"></i>
                 </span>
                 <input
                   type="text"
                   className="form-control border-start-0"
+                  style={{ fontSize: '11px' }}
                   placeholder="Search by Order #, Customer Name, Mobile..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -346,7 +354,8 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
             {/* City Filter */}
             <div className="col-6 col-md-4">
               <select
-                className="form-select"
+                className="form-select form-select-sm"
+                style={{ fontSize: '11px' }}
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
               >
@@ -360,7 +369,8 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
             {/* Sort */}
             <div className="col-6 col-md-3">
               <select
-                className="form-select"
+                className="form-select form-select-sm"
+                style={{ fontSize: '11px' }}
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
@@ -380,16 +390,16 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
           ref={tableContainerRef}
           onScroll={handleTableScroll}
         >
-          <table className="table admin-table orders-table mb-0" style={{ minWidth: 970 }}>
+          <table className="table admin-table orders-table mb-0" style={{ minWidth: 880 }}>
             <thead>
               <tr>
-                <th style={{ width: 130 }}>Order ID &amp; Date</th>
-                <th style={{ width: 130 }}>Customer Info</th>
-                <th style={{ width: 155, minWidth: 150 }}>City &amp; Address</th>
-                <th style={{ width: 175, minWidth: 165 }}>Ordered Items</th>
-                <th style={{ width: 95 }}>Total (COD)</th>
-                <th className="text-center" style={{ width: 110 }}>Current Status</th>
-                <th className="text-center" style={{ width: 175 }}>Actions</th>
+                <th style={{ width: 118 }}>Order ID &amp; Date</th>
+                <th style={{ width: 120 }}>Customer Info</th>
+                <th style={{ width: 142, minWidth: 135 }}>City &amp; Address</th>
+                <th style={{ width: 160, minWidth: 150 }}>Ordered Items</th>
+                <th style={{ width: 86 }}>Total (COD)</th>
+                <th className="text-center" style={{ width: 100 }}>Current Status</th>
+                <th className="text-center" style={{ width: 156 }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -403,30 +413,30 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
               ) : (
                 paginatedOrders.map((order) => (
                   <tr key={order.id}>
-                    <td style={{ width: 130 }}>
-                      <div className="fw-semibold text-primary font-monospace" style={{ fontSize: '0.85rem' }}>{order.id}</div>
-                      <small className="text-muted d-block" style={{ fontSize: '11px' }}>{order.date}</small>
+                    <td style={{ width: 118 }}>
+                      <div className="fw-semibold text-primary font-monospace" style={{ fontSize: '0.78rem' }}>{order.id}</div>
+                      <small className="text-muted d-block" style={{ fontSize: '10px' }}>{order.date}</small>
                     </td>
-                    <td style={{ width: 130 }}>
-                      <div className="fw-medium text-dark" style={{ fontSize: '0.88rem' }}>{order.customer?.name || order.customerName || 'Guest Customer'}</div>
-                      <div className="small text-muted d-flex align-items-center gap-1" style={{ fontSize: '11.5px' }}>
+                    <td style={{ width: 120 }}>
+                      <div className="fw-medium text-dark" style={{ fontSize: '0.8rem' }}>{order.customer?.name || order.customerName || 'Guest Customer'}</div>
+                      <div className="small text-muted d-flex align-items-center gap-1" style={{ fontSize: '10.5px' }}>
                         <i className="bi bi-telephone"></i>
                         <span>{order.customer?.mobile || order.customerMobile || '—'}</span>
                       </div>
                     </td>
-                    <td style={{ width: 155, minWidth: 150 }}>
-                      <span className="badge bg-light text-dark border mb-1 fw-normal" style={{ fontSize: '11px' }}>
+                    <td style={{ width: 142, minWidth: 135 }}>
+                      <span className="badge bg-light text-dark border mb-1 fw-normal" style={{ fontSize: '10px' }}>
                         <i className="bi bi-geo-alt me-1 text-danger"></i>
                         {order.customer?.city || order.customerCity || 'Pakistan'}
                       </span>
-                      <small className="text-muted d-block" style={{ fontSize: '11.5px', wordBreak: 'break-word' }} title={order.customer?.address || order.deliveryAddress || ''}>
+                      <small className="text-muted d-block" style={{ fontSize: '10.5px', wordBreak: 'break-word' }} title={order.customer?.address || order.deliveryAddress || ''}>
                         {order.customer?.address || order.deliveryAddress || 'Standard Delivery Address'}
                       </small>
                       {order.notes && (
-                        <div className="mt-1" title={`Customer note: ${order.notes}`}>
+                        <div className="mt-0.5" title={`Customer note: ${order.notes}`}>
                           <span 
                             className="badge border d-inline-block text-wrap" 
-                            style={{ fontSize: '11px', fontWeight: 500, backgroundColor: '#fef3c7', color: '#78350f', borderColor: '#fde68a', maxWidth: '100%' }}
+                            style={{ fontSize: '10px', fontWeight: 500, backgroundColor: '#fef3c7', color: '#78350f', borderColor: '#fde68a', maxWidth: '100%' }}
                           >
                             <i className="bi bi-chat-left-quote-fill me-1"></i>
                             {order.notes}
@@ -434,41 +444,41 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
                         </div>
                       )}
                     </td>
-                    <td style={{ width: 175, minWidth: 165 }}>
+                    <td style={{ width: 160, minWidth: 150 }}>
                       <div className="small">
-                        <span className="fw-medium text-dark" style={{ fontSize: '11.5px' }}>
+                        <span className="fw-medium text-dark" style={{ fontSize: '10.5px' }}>
                           {(order.items || []).reduce((sum, i) => sum + (i.qty || 1), 0)} items:
                         </span>
-                        <div className="text-muted" style={{ fontSize: '11.5px', wordBreak: 'break-word' }} title={(order.items || []).map(i => `${i.qty || 1}x ${i.product?.name || i.name || 'Product'}`).join(', ')}>
+                        <div className="text-muted" style={{ fontSize: '10.5px', wordBreak: 'break-word' }} title={(order.items || []).map(i => `${i.qty || 1}x ${i.product?.name || i.name || 'Product'}`).join(', ')}>
                           {(order.items || []).map(i => `${i.qty || 1}x ${i.product?.name || i.name || 'Product'}`).join(', ')}
                         </div>
                       </div>
                     </td>
-                    <td style={{ width: 95, whiteSpace: 'nowrap' }}>
-                      <div className="fw-medium text-dark" style={{ fontSize: '0.85rem' }}>
-                        <span className="text-muted" style={{ fontSize: '0.74rem' }}>{storeSettings?.currency || 'Rs.'}</span> {Number(order.total || 0).toLocaleString()}
+                    <td style={{ width: 86, whiteSpace: 'nowrap' }}>
+                      <div className="fw-medium text-dark" style={{ fontSize: '0.78rem' }}>
+                        <span className="text-muted" style={{ fontSize: '0.7rem' }}>{storeSettings?.currency || 'Rs.'}</span> {Number(order.total || 0).toLocaleString()}
                       </div>
-                      <small className="text-muted d-block" style={{ fontSize: '10.5px' }}>{order.paymentMethod || 'Cash on Delivery'}</small>
+                      <small className="text-muted d-block" style={{ fontSize: '9.5px' }}>{order.paymentMethod || 'Cash on Delivery'}</small>
                     </td>
-                    <td className="text-center" style={{ width: 110 }}>
+                    <td className="text-center" style={{ width: 100 }}>
                       <div className="d-flex justify-content-center align-items-center">
                         {renderStatusBadge(order.status)}
                       </div>
                     </td>
-                    <td className="text-center" style={{ width: 175, whiteSpace: 'nowrap' }}>
-                      <div className="d-flex justify-content-center align-items-center gap-1.5">
+                    <td className="text-center" style={{ width: 156, whiteSpace: 'nowrap' }}>
+                      <div className="d-flex justify-content-center align-items-center gap-1">
                         <button
                           className="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center"
-                          style={{ width: '32px', height: '32px', padding: 0 }}
+                          style={{ width: '28px', height: '28px', padding: 0 }}
                           onClick={() => onSelectOrder(order)}
                           title="View Order Details & Print Invoice"
                           aria-label={`View order ${order.id}`}
                         >
-                          <i className="bi bi-eye fs-6"></i>
+                          <i className="bi bi-eye" style={{ fontSize: '13px' }}></i>
                         </button>
                         <select
                           className="form-select form-select-sm"
-                          style={{ width: 106, fontSize: 11, height: '32px', padding: '2px 6px' }}
+                          style={{ width: 92, fontSize: 10, height: '28px', padding: '2px 4px' }}
                           value={order.status}
                           onChange={(e) => {
                             const next = e.target.value
@@ -488,7 +498,7 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
                         </select>
                         <button
                           className="btn btn-sm btn-light border text-danger d-inline-flex align-items-center justify-content-center"
-                          style={{ width: '32px', height: '32px', padding: 0 }}
+                          style={{ width: '28px', height: '28px', padding: 0 }}
                           onClick={() => {
                             if (window.confirm(`Are you sure you want to delete order ${order.id}?`)) {
                               deleteOrder(order.id)
@@ -497,7 +507,7 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
                           title="Delete Order"
                           aria-label={`Delete order ${order.id}`}
                         >
-                          <i className="bi bi-trash"></i>
+                          <i className="bi bi-trash" style={{ fontSize: '12px' }}></i>
                         </button>
                       </div>
                     </td>

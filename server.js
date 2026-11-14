@@ -6,7 +6,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import bcrypt from 'bcryptjs'
-import { processCheckout } from './src/services/orderService.js'
+import * as orderService from './src/services/orderService.js'
 import {
   getPublishedSections,
   getDraftSections,
@@ -776,7 +776,7 @@ const handleOrderCreation = async (req, res) => {
   if (process.env.DATABASE_URL) {
     try {
       const idempotencyKey = req.headers['idempotency-key'] || req.headers['x-idempotency-key'] || body.idempotencyKey || null
-      const pgOrderResult = await processCheckout({
+      const pgOrderResult = await orderService.processCheckout({
         customer: { name, mobile, email, city, address },
         items: rawItems,
         deliveryMethod: body.deliveryMethod || 'Standard',
@@ -1215,6 +1215,43 @@ if (process.env.DATABASE_URL) {
         })
       }
       return res.status(500).json({ error: 'Failed to delete category in PostgreSQL: ' + err.message })
+    }
+  })
+
+  // Orders (Authoritative PostgreSQL Persistence)
+  server.get(['/orders', '/api/orders'], requireAdmin, async (req, res, next) => {
+    try {
+      const ordersList = await orderService.getOrders()
+      return res.json(ordersList)
+    } catch (err) {
+      return next(err)
+    }
+  })
+  server.get(['/orders/:id', '/api/orders/:id'], requireAdmin, async (req, res, next) => {
+    try {
+      const order = await orderService.getOrderById(req.params.id)
+      if (!order) return res.status(404).json({ error: 'Order not found' })
+      return res.json(order)
+    } catch (err) {
+      return next(err)
+    }
+  })
+  server.patch(['/orders/:id', '/api/orders/:id'], requireAdmin, async (req, res, next) => {
+    try {
+      const { status, trackingNumber } = req.body
+      const updated = await orderService.updateOrderStatus(req.params.id, status, trackingNumber)
+      if (!updated) return res.status(404).json({ error: 'Order not found' })
+      return res.json(updated)
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to update order in PostgreSQL: ' + err.message })
+    }
+  })
+  server.delete(['/orders/:id', '/api/orders/:id'], requireAdmin, async (req, res, next) => {
+    try {
+      const ok = await orderService.deleteOrder(req.params.id)
+      return res.json({ success: ok })
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to delete order in PostgreSQL: ' + err.message })
     }
   })
 }

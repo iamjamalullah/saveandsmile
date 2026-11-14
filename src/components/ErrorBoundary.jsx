@@ -13,6 +13,17 @@ export class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     console.error('Unhandled runtime error captured by ErrorBoundary:', error, errorInfo)
     this.setState({ errorInfo })
+
+    // Auto-reload to fetch latest deployment bundle if user had an older tab open with stale chunk hashes
+    const errMsg = error?.message || String(error)
+    if (errMsg.includes('Failed to fetch dynamically imported module') || error?.name === 'ChunkLoadError') {
+      const lastReload = sessionStorage.getItem('chunk_reload_timestamp')
+      const now = Date.now()
+      if (!lastReload || now - parseInt(lastReload, 10) > 15000) {
+        sessionStorage.setItem('chunk_reload_timestamp', String(now))
+        window.location.reload()
+      }
+    }
   }
 
   handleReload = () => {

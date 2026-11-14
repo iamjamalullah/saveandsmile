@@ -284,3 +284,100 @@ export async function processCheckout({
 
   return orderResult
 }
+
+/**
+ * Authoritatively retrieves customer orders and their line items from PostgreSQL.
+ */
+export async function getOrders() {
+  const ordersRes = await query(`
+    SELECT o.id, o.customer_id, o.customer_name, o.customer_mobile, o.customer_email,
+           o.customer_city, o.delivery_address, o.delivery_method, o.payment_method,
+           o.status, o.tracking_number, o.subtotal::numeric, o.discount::numeric,
+           o.coupon_code, o.shipping_fee::numeric, o.total::numeric, o.customer_notes,
+           o.created_at, o.updated_at
+    FROM orders o
+    ORDER BY o.created_at DESC
+  `)
+
+  const orderIds = ordersRes.rows.map(o => o.id)
+  const itemsByOrder = {}
+  if (orderIds.length > 0) {
+    const pPlaceholders = orderIds.map((_, i) => `$${i + 1}`).join(', ')
+    const itemsRes = await query(`
+      SELECT i.id, i.order_id, i.product_id, i.product_name, i.product_sku,
+             i.variant_id, i.variant_title, i.unit_price::numeric, i.quantity, i.line_total::numeric,
+             p.image_main as product_image
+      FROM order_items i
+      LEFT JOIN products p ON i.product_id = p.id
+      WHERE i.order_id IN (${pPlaceholders})
+      ORDER BY i.id ASC
+    `, orderIds)
+
+    itemsRes.rows.forEach(item => {
+      if (!itemsByOrder[item.order_id]) itemsByOrder[item.order_id] = []
+      itemsByOrder[item.order_id].push({
+        id: item.id,
+        productId: item.product_id,
+        name: item.product_name,
+        sku: item.product_sku,
+        variantId: item.variant_id,
+        variantTitle: item.variant_title,
+        price: Number(item.unit_price),
+        qty: item.quantity,
+        total: Number(item.line_total),
+        image: item.product_image || '/images/p1.jpg',
+      })
+    })
+  }
+
+  return ordersRes.rows.map(o => ({
+    id: o.id,
+    customer: {
+      name: o.customer_name,
+      mobile: o.customer_mobile,
+      email: o.customer_email || '',
+      city: o.customer_city,
+      address: o.delivery_address,
+    },
+    items: itemsByOrder[o.id] || [],
+    subtotal: Number(o.subtotal),
+    discount: Number(o.discount),
+    coupon: o.coupon_code || '',
+    shippingFee: Number(o.shipping_fee),
+    total: Number(o.total),
+    deliveryMethod: o.delivery_method,
+    paymentMethod: o.payment_method,
+    status: o.status,
+    trackingNumber: o.tracking_number || '',
+    notes: o.customer_notes || '',
+    createdAt: o.created_at,
+    date: new Date(o.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+  }))
+}
+
+export async function getOrderById(orderId) {
+  const orders = await getOrders()
+  return orders.find(o => String(o.id) === String(orderId)) || null
+}
+
+export async function updateOrderStatus(orderId, status, trackingNumber = null) {
+  const updates = ['status = $1']
+  const params = [status, orderId]
+  if (trackingNumber !== null && trackingNumber !== undefined) {
+    params.push(trackingNumber)
+    updates.push(`tracking_number = $${params.length}`)
+  }
+  updates.push('updated_at = CURRENT_TIMESTAMP')
+  const res = await query(
+    `UPDATE orders SET ${updates.join(', ')} WHERE id = $2 RETURNING *`,
+    params
+  )
+  if (!res.rows.length) return null
+  return getOrderById(orderId)
+}
+
+export async function deleteOrder(orderId) {
+  await query('DELETE FROM order_items WHERE order_id = $1', [orderId])
+  const res = await query('DELETE FROM orders WHERE id = $1', [orderId])
+  return res.rowCount > 0
+}

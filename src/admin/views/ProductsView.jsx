@@ -240,7 +240,7 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
             <table className="table admin-table mb-0">
               <thead>
                 <tr>
-                  <th style={{ width: 36, padding: '0.45rem 0.5rem' }}>
+                  <th style={{ width: 42, padding: '0.55rem 0.6rem', textAlign: 'center' }}>
                     <input
                       type="checkbox"
                       className="form-check-input"
@@ -248,11 +248,11 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                       onChange={handleSelectAll}
                     />
                   </th>
-                  <th style={{ padding: '0.45rem 0.6rem', fontSize: '0.68rem' }}>Product Details</th>
-                  <th style={{ padding: '0.45rem 0.6rem', fontSize: '0.68rem', width: 145 }}>Category</th>
-                  <th style={{ padding: '0.45rem 0.6rem', fontSize: '0.68rem', width: 110 }}>Price</th>
-                  <th style={{ padding: '0.45rem 0.6rem', fontSize: '0.68rem', width: 115 }}>Stock Status</th>
-                  <th className="text-end" style={{ padding: '0.45rem 0.6rem', fontSize: '0.68rem', width: 85 }}>Actions</th>
+                  <th style={{ padding: '0.55rem 0.75rem', fontSize: '0.68rem' }}>Product Details</th>
+                  <th style={{ padding: '0.55rem 0.75rem', fontSize: '0.68rem', width: 150 }}>Category</th>
+                  <th style={{ padding: '0.55rem 0.75rem', fontSize: '0.68rem', width: 120 }}>Price</th>
+                  <th style={{ padding: '0.55rem 0.75rem', fontSize: '0.68rem', width: 130 }}>Stock Status</th>
+                  <th className="text-end" style={{ padding: '0.55rem 0.75rem', fontSize: '0.68rem', width: 90 }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -268,7 +268,7 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                     const discount = p.oldPrice > p.price ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : 0
                     return (
                       <tr key={p.id}>
-                        <td style={{ padding: '0.42rem 0.5rem', verticalAlign: 'middle' }}>
+                        <td style={{ padding: '0.5rem 0.6rem', verticalAlign: 'middle', textAlign: 'center' }}>
                           <input
                             type="checkbox"
                             className="form-check-input"
@@ -276,38 +276,47 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                             onChange={() => handleToggleSelect(p.id)}
                           />
                         </td>
-                        <td style={{ padding: '0.42rem 0.6rem', verticalAlign: 'middle' }}>
-                          <div className="d-flex align-items-center gap-2.5">
+                        <td style={{ padding: '0.5rem 0.75rem', verticalAlign: 'middle' }}>
+                          <div className="d-flex align-items-center" style={{ gap: '12px' }}>
                             <img
                               src={p.image}
                               alt={p.name}
                               className="admin-thumb"
-                              style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '5px' }}
+                              style={{
+                                width: '36px',
+                                height: '36px',
+                                minWidth: '36px',
+                                maxWidth: '36px',
+                                flex: '0 0 36px',
+                                objectFit: 'cover',
+                                borderRadius: '6px',
+                                display: 'block'
+                              }}
                               onError={(e) => { e.target.src = '/images/cat1.jpg' }}
                             />
-                            <div>
-                              <div className="fw-medium text-dark d-flex align-items-center gap-1.5 flex-wrap" style={{ fontSize: '0.76rem', lineHeight: 1.3 }}>
-                                {p.name}
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                              <div className="fw-medium text-dark d-flex align-items-center flex-wrap" style={{ fontSize: '0.78rem', lineHeight: 1.35, gap: '6px' }}>
+                                <span>{p.name}</span>
                                 {p.hasVariants && p.variants?.length > 0 && (
-                                  <span className="badge bg-primary-subtle text-primary border border-primary-subtle" style={{ fontSize: '9px', padding: '1px 5px' }}>
+                                  <span className="badge bg-primary-subtle text-primary border border-primary-subtle" style={{ fontSize: '9px', padding: '1.5px 5.5px', fontWeight: 500 }}>
                                     <i className="bi bi-layers me-1"></i>{p.variants.length} Variants
                                   </span>
                                 )}
                               </div>
-                              <small className="text-muted d-block font-monospace" style={{ fontSize: '9.5px' }}>
+                              <small className="text-muted d-block font-monospace" style={{ fontSize: '9.5px', marginTop: '2px' }}>
                                 SKU: {p.sku || `GS-${p.id}`}
                               </small>
                             </div>
                           </div>
                         </td>
-                        <td style={{ padding: '0.42rem 0.6rem', verticalAlign: 'middle' }}>
-                          <span className="badge bg-light text-dark border" style={{ fontSize: '9.5px', padding: '2.5px 6.5px', fontWeight: 500 }}>
+                        <td style={{ padding: '0.5rem 0.75rem', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
+                          <span className="badge bg-light text-dark border" style={{ fontSize: '9.5px', padding: '2.5px 7px', fontWeight: 500 }}>
                             {p.category}
                           </span>
                         </td>
-                        <td style={{ padding: '0.42rem 0.6rem', verticalAlign: 'middle' }}>
+                        <td style={{ padding: '0.5rem 0.75rem', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
                           <div>
-                            <span className="fw-medium text-dark" style={{ fontSize: '0.76rem' }}>
+                            <span className="fw-medium text-dark" style={{ fontSize: '0.78rem' }}>
                               {storeSettings?.currency || 'Rs.'} {p.price.toLocaleString()}
                             </span>
                             {p.oldPrice > p.price && (
@@ -318,22 +327,22 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                             )}
                           </div>
                         </td>
-                        <td style={{ padding: '0.42rem 0.6rem', verticalAlign: 'middle' }}>
+                        <td style={{ padding: '0.5rem 0.75rem', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
                           <div className="d-flex align-items-center gap-1.5">
-                            <span className={`badge ${p.stock === 0 ? 'bg-danger' : p.stock <= 5 ? 'bg-warning text-dark' : 'bg-success'}`} style={{ fontSize: '9.5px', padding: '2.5px 6.5px', fontWeight: 500 }}>
+                            <span className={`badge ${p.stock === 0 ? 'bg-danger' : p.stock <= 5 ? 'bg-warning text-dark' : 'bg-success'}`} style={{ fontSize: '9.5px', padding: '2.5px 7px', fontWeight: 500 }}>
                               {p.stock === 0 ? 'Out of Stock' : `${p.stock} In Stock`}
                             </span>
                             <button
                               className="btn btn-sm btn-link p-0 text-muted"
                               onClick={() => toggleProductStock(p.id)}
                               title={p.stock > 0 ? 'Mark Out of Stock' : 'Restock 15 units'}
-                              style={{ fontSize: '10.5px' }}
+                              style={{ fontSize: '11px' }}
                             >
                               <i className="bi bi-arrow-repeat"></i>
                             </button>
                           </div>
                         </td>
-                        <td className="text-end" style={{ padding: '0.42rem 0.6rem', verticalAlign: 'middle' }}>
+                        <td className="text-end" style={{ padding: '0.5rem 0.75rem', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
                           <div className="btn-group">
                             <button
                               className="btn btn-sm btn-light border d-inline-flex align-items-center justify-content-center"

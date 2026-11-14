@@ -2,7 +2,10 @@ import { apiRequest } from './client';
 import {
   AuthResponse,
   Category,
+  Coupon,
   HomeSection,
+  Inquiry,
+  NotificationItem,
   Order,
   OrderStatus,
   Product,
@@ -229,5 +232,67 @@ export const settingsApi = {
       method: 'PATCH',
       body: settings,
     });
+  },
+};
+
+export const inquiriesApi = {
+  getInquiries: async (): Promise<Inquiry[]> => {
+    try {
+      const res = await apiRequest<Inquiry[]>('/contacts');
+      return Array.isArray(res) ? res : [];
+    } catch {
+      return [];
+    }
+  },
+
+  updateStatus: async (id: string | number, status: 'new' | 'in_progress' | 'resolved'): Promise<void> => {
+    await apiRequest(`/contacts/${id}`, {
+      method: 'PATCH',
+      body: { status },
+    });
+  },
+
+  deleteInquiry: async (id: string | number): Promise<void> => {
+    await apiRequest(`/contacts/${id}`, { method: 'DELETE' });
+  },
+};
+
+export const couponsApi = {
+  getCoupons: async (): Promise<Coupon[]> => {
+    try {
+      const res = await apiRequest<Coupon[]>('/coupons');
+      return Array.isArray(res) ? res : [];
+    } catch {
+      return [];
+    }
+  },
+
+  createCoupon: async (coupon: Partial<Coupon>): Promise<Coupon> => {
+    return apiRequest<Coupon>('/coupons', {
+      method: 'POST',
+      body: coupon,
+    });
+  },
+
+  updateCoupon: async (id: string | number, coupon: Partial<Coupon>): Promise<Coupon> => {
+    return apiRequest<Coupon>(`/coupons/${id}`, {
+      method: 'PATCH',
+      body: coupon,
+    });
+  },
+
+  deleteCoupon: async (id: string | number): Promise<void> => {
+    await apiRequest(`/coupons/${id}`, { method: 'DELETE' });
+  },
+};
+
+export const notificationsApi = {
+  registerDeviceToken: async (token: string, platform: string = 'android'): Promise<void> => {
+    try {
+      await apiRequest('/admin/notifications/register-token', {
+        method: 'POST',
+        body: { token, platform, timestamp: new Date().toISOString() },
+      });
+    } catch {}
   },
 };

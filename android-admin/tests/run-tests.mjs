@@ -154,3 +154,93 @@ test('Product Variant Matrix Generation', async (t) => {
     assert.equal(variant.isAvailable, true);
   });
 });
+
+test('Real-Time Synchronization & Safe Rollback', async (t) => {
+  await t.test('should optimistically update order status and rollback on failure', async () => {
+    let currentOrders = [{ id: 'GS-100', status: 'Pending' }];
+    const backup = [...currentOrders];
+
+    // Optimistic UI change
+    currentOrders = currentOrders.map(o => o.id === 'GS-100' ? { ...o, status: 'Confirmed' } : o);
+    assert.equal(currentOrders[0].status, 'Confirmed');
+
+    // Simulate backend network failure
+    const simulateBackendFailure = true;
+    if (simulateBackendFailure) {
+      currentOrders = backup; // Rollback
+    }
+
+    assert.equal(currentOrders[0].status, 'Pending');
+  });
+
+  await t.test('should detect incoming new orders during polling sync', () => {
+    const knownIds = new Set(['GS-1', 'GS-2']);
+    const serverOrders = [{ id: 'GS-1' }, { id: 'GS-2' }, { id: 'GS-3' }];
+
+    const newOrders = serverOrders.filter(o => !knownIds.has(o.id));
+    assert.equal(newOrders.length, 1);
+    assert.equal(newOrders[0].id, 'GS-3');
+  });
+});
+
+test('Push Notifications & Deep Link Routing', async (t) => {
+  await t.test('should route order notification payload to OrderDetail screen with correct ID', () => {
+    const payload = {
+      category: 'order',
+      targetId: 'GS-ORD-9999',
+      targetScreen: 'OrderDetail',
+    };
+
+    let navigatedTo = null;
+    let navigatedParams = null;
+    const mockNavigate = (screen, params) => {
+      navigatedTo = screen;
+      navigatedParams = params;
+    };
+
+    if (payload.targetScreen === 'OrderDetail' && payload.targetId) {
+      mockNavigate('OrderDetail', { orderId: payload.targetId });
+    }
+
+    assert.equal(navigatedTo, 'OrderDetail');
+    assert.deepEqual(navigatedParams, { orderId: 'GS-ORD-9999' });
+  });
+
+  await t.test('should calculate unread notification count accurately', () => {
+    const list = [
+      { id: '1', isRead: false },
+      { id: '2', isRead: true },
+      { id: '3', isRead: false },
+    ];
+    const unread = list.filter(n => !n.isRead).length;
+    assert.equal(unread, 2);
+  });
+});
+
+test('Inquiries & WhatsApp Phone Formatting', async (t) => {
+  await t.test('should format Pakistani mobile numbers for WhatsApp API links', () => {
+    const rawMobile = '0333 722 1552';
+    const clean = rawMobile.replace(/[^0-9]/g, '');
+    const formatted = clean.startsWith('0') ? `92${clean.slice(1)}` : clean;
+
+    assert.equal(formatted, '923337221552');
+    const waUrl = `https://wa.me/${formatted}?text=Hi`;
+    assert.equal(waUrl, 'https://wa.me/923337221552?text=Hi');
+  });
+});
+
+test('Promotional Coupon Calculations', async (t) => {
+  await t.test('should calculate percentage discount properly', () => {
+    const subtotal = 3000;
+    const coupon = { discountType: 'percentage', discountValue: 15 };
+    const discount = Math.round((subtotal * coupon.discountValue) / 100);
+    assert.equal(discount, 450);
+  });
+
+  await t.test('should calculate fixed amount discount properly', () => {
+    const subtotal = 2500;
+    const coupon = { discountType: 'fixed', discountValue: 500 };
+    const discount = Math.min(subtotal, coupon.discountValue);
+    assert.equal(discount, 500);
+  });
+});

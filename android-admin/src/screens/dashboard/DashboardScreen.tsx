@@ -23,6 +23,7 @@ import {
   PlusCircle,
   Receipt,
   LayoutTemplate,
+  BarChart3,
   ChevronRight,
 } from 'lucide-react-native';
 
@@ -37,6 +38,7 @@ export const DashboardScreen: React.FC<{ navigation: any }> = ({ navigation }) =
       <Header
         title="Admin Console"
         subtitle={`Welcome back, ${user?.name || 'Administrator'}`}
+        onNotificationPress={() => navigation.navigate('Notifications')}
       />
 
       <ScrollView
@@ -144,6 +146,14 @@ export const DashboardScreen: React.FC<{ navigation: any }> = ({ navigation }) =
             >
               <LayoutTemplate size={16} color={colors.primary.DEFAULT} />
               <Text style={styles.quickActionText}>Home Page</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Reports')}
+              style={styles.quickActionBtn}
+            >
+              <BarChart3 size={16} color={colors.primary.DEFAULT} />
+              <Text style={styles.quickActionText}>Reports</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -1345,9 +1345,9 @@ server.get(['/products', '/api/products'], (req, res, next) => {
             packageName: 'com.saveandsmile.admin',
             version: '1.0.0',
             versionCode: 1,
-            fileSizeBytes: 4876249,
-            fileSizeFormatted: '4.8 MB',
-            checksumSha256: '9f8b417c24430ef6f24d35eb1fef3e53629b35bc244a2c07ef2efef96e14713e',
+            fileSizeBytes: 3098013,
+            fileSizeFormatted: '3.0 MB',
+            checksumSha256: '1ef3ead538af291c68cc741b6cbe32cfc1731473c18be49686df75c75ad8e717',
             downloadUrl: defaultDownloadUrl,
             releaseNotes: 'Official Save & Smile Android Admin Release v1.0.0. Real-time order fulfillment, catalog multi-variants, WebP image processing, customer support, and sales analytics.',
             createdAt: new Date().toISOString(),
@@ -1480,19 +1480,21 @@ server.get(['/products', '/api/products'], (req, res, next) => {
 
   // 4. Stream APK Download with Proper Headers
   server.get(['/api/downloads/admin-apk', '/downloads/SaveAndSmile-Admin.apk'], (req, res) => {
+    const publicApk = path.join(__dirname, 'public', 'downloads', 'SaveAndSmile-Admin.apk')
     const localApk = path.join(DOWNLOADS_DIR, 'SaveAndSmile-Admin.apk')
     res.setHeader('Content-Type', 'application/vnd.android.package-archive')
     res.setHeader('Content-Disposition', 'attachment; filename="SaveAndSmile-Admin.apk"')
 
     try {
+      if (fs.existsSync(publicApk)) {
+        return res.sendFile(publicApk)
+      }
       if (fs.existsSync(localApk)) {
         return res.sendFile(localApk)
       }
     } catch (_) {}
 
-    const supabaseUrl = process.env.SUPABASE_URL || 'https://piocbtkjzznzzdftyelh.supabase.co'
-    const fallbackUrl = `${supabaseUrl}/storage/v1/object/public/product-media/releases/SaveAndSmile-Admin-v1.0.0.apk`
-    return res.redirect(302, fallbackUrl)
+    return res.redirect(302, '/downloads/SaveAndSmile-Admin.apk')
   })
 
   server.use('/api', router)

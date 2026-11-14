@@ -54,6 +54,255 @@ function formatProductRow(row) {
   }
 }
 
+/**
+ * Hydrates an array of product objects with their relational variants, options, and color galleries.
+ * Uses batch queries to avoid N+1 performance bottlenecks.
+ * 
+ * @param {Array<Object>} products - Array of formatted product objects
+ * @param {Object} [client] - Optional PostgreSQL client for transactional queries
+ * @returns {Promise<Array<Object>>} Hydrated product objects
+ */
+export async function populateProductsRelations(products, client = null) {
+  if (!Array.isArray(products) || products.length === 0) return products
+  const runQuery = client ? (sql, params) => client.query(sql, params) : query
+
+  const productIds = products.map(p => p.id)
+  if (productIds.length === 0) return products
+  const pPlaceholders = productIds.map((_, i) => `$${i + 1}`).join(', ')
+
+  // 1. Fetch all product_options for these products
+  const optionsRes = await runQuery(`
+    SELECT id, product_id, name, sort_order
+    FROM product_options
+    WHERE product_id IN (${pPlaceholders})
+    ORDER BY sort_order ASC, id ASC
+  `, productIds)
+
+  const optionIds = optionsRes.rows.map(o => o.id)
+  const valuesByOption = {}
+  if (optionIds.length > 0) {
+    const oPlaceholders = optionIds.map((_, i) => `$${i + 1}`).join(', ')
+    const valuesRes = await runQuery(`
+      SELECT id, option_id, value, hex_code, sort_order
+      FROM product_option_values
+      WHERE option_id IN (${oPlaceholders})
+      ORDER BY sort_order ASC, id ASC
+    `, optionIds)
+    valuesRes.rows.forEach(v => {
+      if (!valuesByOption[v.option_id]) valuesByOption[v.option_id] = []
+      valuesByOption[v.option_id].push({
+        id: v.id,
+        name: v.value,
+        hex: v.hex_code,
+        sortOrder: v.sort_order,
+      })
+    })
+  }
+
+  const optionsByProduct = {}
+  optionsRes.rows.forEach(r => {
+    if (!optionsByProduct[r.product_id]) optionsByProduct[r.product_id] = []
+    optionsByProduct[r.product_id].push({
+      id: r.id,
+      name: r.name,
+      sortOrder: r.sort_order,
+      values: valuesByOption[r.id] || [],
+    })
+  })
+
+  // 2. Fetch all product_variants for these products
+  const variantsRes = await runQuery(`
+    SELECT id, product_id, sku, title, color_value as color, size_value as size,
+           options, price::numeric, old_price::numeric as "oldPrice", stock_quantity as stock,
+           is_active as active, barcode
+    FROM product_variants
+    WHERE product_id IN (${pPlaceholders})
+    ORDER BY id ASC
+  `, productIds)
+
+  const variantsByProduct = {}
+  variantsRes.rows.forEach(v => {
+    if (!variantsByProduct[v.product_id]) variantsByProduct[v.product_id] = []
+    let parsedOpts = {}
+    try {
+      parsedOpts = typeof v.options === 'string' ? JSON.parse(v.options) : (v.options || {})
+    } catch (_) {}
+    variantsByProduct[v.product_id].push({
+      id: v.id,
+      productId: v.product_id,
+      sku: v.sku || '',
+      title: v.title || '',
+      color: v.color || '',
+      size: v.size || '',
+      options: parsedOpts,
+      price: Number(v.price),
+      oldPrice: Number(v.oldPrice || v.price),
+      stock: parseInt(v.stock, 10),
+      active: v.active !== false,
+      barcode: v.barcode || '',
+    })
+  })
+
+  // 3. Fetch all product_variant_images (color galleries) for these products
+  const imagesRes = await runQuery(`
+    SELECT product_id, color_name as "colorName", image_url, is_primary, sort_order
+    FROM product_variant_images
+    WHERE product_id IN (${pPlaceholders})
+    ORDER BY sort_order ASC, id ASC
+  `, productIds)
+
+  const colorImagesByProduct = {}
+  imagesRes.rows.forEach(img => {
+    if (!colorImagesByProduct[img.product_id]) colorImagesByProduct[img.product_id] = {}
+    const cName = img.colorName || 'Default'
+    if (!colorImagesByProduct[img.product_id][cName]) {
+      colorImagesByProduct[img.product_id][cName] = {
+        colorName: cName,
+        images: [],
+        primaryImage: '',
+      }
+    }
+    colorImagesByProduct[img.product_id][cName].images.push(img.image_url)
+    if (img.is_primary || !colorImagesByProduct[img.product_id][cName].primaryImage) {
+      colorImagesByProduct[img.product_id][cName].primaryImage = img.image_url
+    }
+  })
+
+  // Attach relational data to each product
+  return products.map(p => {
+    const opts = optionsByProduct[p.id] || []
+    const vars = variantsByProduct[p.id] || []
+    const cImgsMap = colorImagesByProduct[p.id] || {}
+    const colorImages = Object.values(cImgsMap)
+
+    return {
+      ...p,
+      options: opts,
+      variants: vars,
+      colorImages,
+      // If product has variants in DB, guarantee hasVariants is true
+      hasVariants: p.hasVariants || vars.length > 0,
+    }
+  })
+}
+
+/**
+ * Saves or updates product options, option values, purchasable variants, and color galleries
+ * within a database transaction.
+ * 
+ * @param {Object} client - PostgreSQL transaction client
+ * @param {number} productId - The product ID to save variants for
+ * @param {Object} data - Payload containing options, variants, colorImages, variantConfig
+ */
+async function saveProductVariantsTx(client, productId, data) {
+  const hasVars = Boolean(data.hasVariants || (Array.isArray(data.variants) && data.variants.length > 0))
+  const optionsList = Array.isArray(data.options) ? data.options : []
+  const variantsList = Array.isArray(data.variants) ? data.variants : []
+  const colorImagesList = Array.isArray(data.colorImages) ? data.colorImages : []
+
+  // Clean up existing relational metadata safely
+  await client.query('DELETE FROM product_options WHERE product_id = $1', [productId])
+  await client.query('DELETE FROM product_variant_images WHERE product_id = $1', [productId])
+
+  if (!hasVars || variantsList.length === 0) {
+    // If variants removed, delete variant rows
+    await client.query('DELETE FROM product_variants WHERE product_id = $1', [productId])
+    await client.query('UPDATE products SET has_variants = FALSE, variant_config = $1 WHERE id = $2', ['none', productId])
+    return
+  }
+
+  // 1. Insert product_options & product_option_values
+  for (let optIdx = 0; optIdx < optionsList.length; optIdx++) {
+    const opt = optionsList[optIdx]
+    const optName = (opt.name || `Option ${optIdx + 1}`).trim()
+    const optRes = await client.query(
+      `INSERT INTO product_options (product_id, name, sort_order)
+       VALUES ($1, $2, $3) RETURNING id`,
+      [productId, optName, optIdx]
+    )
+    const optId = optRes.rows[0].id
+
+    if (Array.isArray(opt.values)) {
+      for (let valIdx = 0; valIdx < opt.values.length; valIdx++) {
+        const val = opt.values[valIdx]
+        const valName = typeof val === 'string' ? val.trim() : (val.name || String(val)).trim()
+        const hexCode = typeof val === 'object' ? (val.hex || val.hexCode || null) : null
+        await client.query(
+          `INSERT INTO product_option_values (option_id, product_id, value, hex_code, sort_order)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [optId, productId, valName, hexCode, valIdx]
+        )
+      }
+    }
+  }
+
+  // 2. Synchronize product_variants
+  // Fetch existing variant IDs for this product to determine what to delete
+  const existingVarsRes = await client.query('SELECT id FROM product_variants WHERE product_id = $1', [productId])
+  const existingIds = new Set(existingVarsRes.rows.map(r => r.id))
+  const preservedIds = new Set()
+
+  for (let i = 0; i < variantsList.length; i++) {
+    const v = variantsList[i]
+    const vTitle = v.title || `${v.color || ''} ${v.size || ''}`.trim() || `Variant ${i + 1}`
+    const vSku = v.sku?.trim() || `${data.sku || 'GS'}-${productId}-${i + 1}`
+    const vOptionsJson = v.options ? (typeof v.options === 'string' ? v.options : JSON.stringify(v.options)) : '{}'
+    const vPrice = Number(v.price) >= 0 ? Number(v.price) : Number(data.price || 0)
+    const vOldPrice = Number(v.oldPrice) >= 0 ? Number(v.oldPrice) : (Number(data.oldPrice) || vPrice)
+    const vStock = Number(v.stock) >= 0 ? Number(v.stock) : 0
+    const vActive = v.active !== false
+    const vBarcode = v.barcode ? String(v.barcode).trim() : null
+    const vColor = v.color || (typeof v.options === 'object' ? (v.options?.Color || null) : null)
+    const vSize = v.size || (typeof v.options === 'object' ? (v.options?.Size || null) : null)
+
+    const canReuseId = v.id && typeof v.id === 'number' && existingIds.has(v.id)
+
+    if (canReuseId) {
+      await client.query(`
+        UPDATE product_variants
+        SET sku = $1, title = $2, color_value = $3, size_value = $4, options = $5,
+            price = $6, old_price = $7, stock_quantity = $8, is_active = $9, barcode = $10,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = $11 AND product_id = $12
+      `, [vSku, vTitle, vColor, vSize, vOptionsJson, vPrice, vOldPrice, vStock, vActive, vBarcode, v.id, productId])
+      preservedIds.add(v.id)
+    } else {
+      const insRes = await client.query(`
+        INSERT INTO product_variants (
+          product_id, sku, title, color_value, size_value, options,
+          price, old_price, stock_quantity, is_active, barcode
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        RETURNING id
+      `, [productId, vSku, vTitle, vColor, vSize, vOptionsJson, vPrice, vOldPrice, vStock, vActive, vBarcode])
+      preservedIds.add(insRes.rows[0].id)
+    }
+  }
+
+  // Delete obsolete variants that are no longer part of this product configuration
+  const toDelete = [...existingIds].filter(id => !preservedIds.has(id))
+  if (toDelete.length > 0) {
+    const delPlaceholders = toDelete.map((_, i) => `$${i + 1}`).join(', ')
+    await client.query(`DELETE FROM product_variants WHERE id IN (${delPlaceholders}) AND product_id = $${toDelete.length + 1}`, [...toDelete, productId])
+  }
+
+  // 3. Insert product_variant_images (Color Galleries)
+  for (let ciIdx = 0; ciIdx < colorImagesList.length; ciIdx++) {
+    const ci = colorImagesList[ciIdx]
+    const colorName = ci.color || ci.colorName || ci.name || 'Default'
+    const images = Array.isArray(ci.images) ? ci.images : []
+    const primaryImg = ci.primaryImage || images[0] || ''
+
+    for (let imgIdx = 0; imgIdx < images.length; imgIdx++) {
+      const imgUrl = images[imgIdx]
+      if (!imgUrl) continue
+      await client.query(`
+        INSERT INTO product_variant_images (product_id, color_name, image_url, is_primary, sort_order)
+        VALUES ($1, $2, $3, $4, $5)
+      `, [productId, colorName, imgUrl, imgUrl === primaryImg || imgIdx === 0, imgIdx])
+    }
+  }
+}
+
 // ── PRODUCTS CRUD ──
 
 export async function getProducts(filters = {}) {
@@ -82,13 +331,18 @@ export async function getProducts(filters = {}) {
   sql += ` ORDER BY ${sortCol} ${sortOrder}`
 
   const res = await query(sql, params)
-  return res.rows.map(formatProductRow)
+  const baseProducts = res.rows.map(formatProductRow)
+
+  // Hydrate all products with variants, options, and colorImages
+  return populateProductsRelations(baseProducts)
 }
 
 export async function getProductById(id) {
   const res = await query('SELECT * FROM products WHERE id = $1', [id])
   if (!res.rows.length) return null
-  return formatProductRow(res.rows[0])
+  const baseProduct = formatProductRow(res.rows[0])
+  const hydrated = await populateProductsRelations([baseProduct])
+  return hydrated[0] || baseProduct
 }
 
 export async function createProduct(data) {
@@ -106,6 +360,9 @@ export async function createProduct(data) {
 
     const sku = data.sku || `QGW-${1000 + nextId}`
     const slug = data.slug || `${data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${sku.toLowerCase()}`
+
+    const hasVars = Boolean(data.hasVariants || (Array.isArray(data.variants) && data.variants.length > 0))
+    const variantConfig = data.variantConfig || (hasVars ? 'color' : 'none')
 
     const res = await client.query(
       `INSERT INTO products (
@@ -134,65 +391,95 @@ export async function createProduct(data) {
         specsJson,
         bulkTiersJson,
         Boolean(data.featured),
-        Boolean(data.hasVariants),
-        data.variantConfig || 'none',
+        hasVars,
+        variantConfig,
         Number(data.rating) || 5.0,
         Number(data.reviewsCount) || 0,
       ]
     )
 
-    return formatProductRow(res.rows[0])
+    // Save relational options, variants, and color galleries
+    if (data.options || data.variants || data.colorImages) {
+      await saveProductVariantsTx(client, nextId, data)
+    }
+
+    const baseProduct = formatProductRow(res.rows[0])
+    const hydrated = await populateProductsRelations([baseProduct], client)
+    return hydrated[0] || baseProduct
   })
 }
 
 export async function updateProduct(id, fields) {
-  const allowed = {
-    name: 'name',
-    price: 'price',
-    oldPrice: 'old_price',
-    stock: 'stock_quantity',
-    category: 'category_name',
-    group: 'group_name',
-    brand: 'brand',
-    description: 'description',
-    video: 'video_url',
-    image: 'image_main',
-    featured: 'is_featured',
-    hasVariants: 'has_variants',
-    variantConfig: 'variant_config',
-  }
-
-  const updates = []
-  const params = [id]
-
-  for (const [key, val] of Object.entries(fields)) {
-    if (allowed[key]) {
-      params.push(val)
-      updates.push(`${allowed[key]} = $${params.length}`)
-    } else if (key === 'images') {
-      params.push(JSON.stringify(val))
-      updates.push(`images_gallery = $${params.length}`)
-    } else if (key === 'highlights') {
-      params.push(JSON.stringify(val))
-      updates.push(`highlights = $${params.length}`)
-    } else if (key === 'specs') {
-      params.push(JSON.stringify(val))
-      updates.push(`specs_json = $${params.length}`)
-    } else if (key === 'bulkTiers') {
-      params.push(JSON.stringify(val))
-      updates.push(`bulk_tiers_json = $${params.length}`)
+  return transaction(async client => {
+    const allowed = {
+      name: 'name',
+      price: 'price',
+      oldPrice: 'old_price',
+      stock: 'stock_quantity',
+      category: 'category_name',
+      group: 'group_name',
+      brand: 'brand',
+      description: 'description',
+      video: 'video_url',
+      image: 'image_main',
+      featured: 'is_featured',
+      hasVariants: 'has_variants',
+      variantConfig: 'variant_config',
     }
-  }
 
-  if (!updates.length) {
-    return getProductById(id)
-  }
+    const updates = []
+    const params = [id]
 
-  updates.push('updated_at = CURRENT_TIMESTAMP')
-  const sql = `UPDATE products SET ${updates.join(', ')} WHERE id = $1 RETURNING *`
-  const res = await query(sql, params)
-  if (!res.rows.length) return null
-  return formatProductRow(res.rows[0])
+    // Determine hasVariants and variantConfig if passed
+    if (fields.variants !== undefined || fields.hasVariants !== undefined) {
+      const hasVars = Boolean(fields.hasVariants || (Array.isArray(fields.variants) && fields.variants.length > 0))
+      fields.hasVariants = hasVars
+      if (!fields.variantConfig) {
+        fields.variantConfig = hasVars ? 'color' : 'none'
+      }
+    }
+
+    for (const [key, val] of Object.entries(fields)) {
+      if (allowed[key]) {
+        params.push(val)
+        updates.push(`${allowed[key]} = $${params.length}`)
+      } else if (key === 'images') {
+        params.push(JSON.stringify(val))
+        updates.push(`images_gallery = $${params.length}`)
+      } else if (key === 'highlights') {
+        params.push(JSON.stringify(val))
+        updates.push(`highlights = $${params.length}`)
+      } else if (key === 'specs') {
+        params.push(JSON.stringify(val))
+        updates.push(`specs_json = $${params.length}`)
+      } else if (key === 'bulkTiers') {
+        params.push(JSON.stringify(val))
+        updates.push(`bulk_tiers_json = $${params.length}`)
+      }
+    }
+
+    let updatedRow = null
+    if (updates.length > 0) {
+      updates.push('updated_at = CURRENT_TIMESTAMP')
+      const sql = `UPDATE products SET ${updates.join(', ')} WHERE id = $1 RETURNING *`
+      const res = await client.query(sql, params)
+      if (!res.rows.length) return null
+      updatedRow = res.rows[0]
+    } else {
+      const checkRes = await client.query('SELECT * FROM products WHERE id = $1', [id])
+      if (!checkRes.rows.length) return null
+      updatedRow = checkRes.rows[0]
+    }
+
+    // Update relational variants, options, and color galleries if passed in payload
+    if (fields.variants !== undefined || fields.options !== undefined || fields.colorImages !== undefined) {
+      await saveProductVariantsTx(client, id, fields)
+    }
+
+    const baseProduct = formatProductRow(updatedRow)
+    const hydrated = await populateProductsRelations([baseProduct], client)
+    return hydrated[0] || baseProduct
+  })
 }
 
 export async function deleteProduct(id) {

@@ -144,7 +144,7 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
             </div>
 
             {/* Category Filter */}
-            <div className="col-6 col-md-2">
+            <div className="col-6 col-md-3">
               <select
                 className="form-select"
                 value={selectedCategory}
@@ -153,20 +153,6 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                 <option value="ALL">All Categories</option>
                 {categories.map((c) => (
                   <option key={c.name} value={c.name}>{c.icon} {c.name}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Group Filter */}
-            <div className="col-6 col-md-2">
-              <select
-                className="form-select"
-                value={selectedGroup}
-                onChange={(e) => setSelectedGroup(e.target.value)}
-              >
-                <option value="ALL">All Groups</option>
-                {groups.map((g) => (
-                  <option key={g.value} value={g.value}>{g.label}</option>
                 ))}
               </select>
             </div>
@@ -186,7 +172,7 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
             </div>
 
             {/* Sort & View Mode */}
-            <div className="col-6 col-md-2 d-flex gap-2">
+            <div className="col-12 col-md-3 d-flex gap-2">
               <select
                 className="form-select flex-grow-1"
                 value={sortBy}
@@ -254,7 +240,7 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
             <table className="table admin-table mb-0">
               <thead>
                 <tr>
-                  <th style={{ width: 40 }}>
+                  <th style={{ width: 36, padding: '0.45rem 0.5rem' }}>
                     <input
                       type="checkbox"
                       className="form-check-input"
@@ -262,18 +248,17 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                       onChange={handleSelectAll}
                     />
                   </th>
-                  <th>Product Details</th>
-                  <th>Category</th>
-                  <th>Group</th>
-                  <th>Price</th>
-                  <th>Stock Status</th>
-                  <th className="text-end">Actions</th>
+                  <th style={{ padding: '0.45rem 0.6rem', fontSize: '0.68rem' }}>Product Details</th>
+                  <th style={{ padding: '0.45rem 0.6rem', fontSize: '0.68rem', width: 145 }}>Category</th>
+                  <th style={{ padding: '0.45rem 0.6rem', fontSize: '0.68rem', width: 110 }}>Price</th>
+                  <th style={{ padding: '0.45rem 0.6rem', fontSize: '0.68rem', width: 115 }}>Stock Status</th>
+                  <th className="text-end" style={{ padding: '0.45rem 0.6rem', fontSize: '0.68rem', width: 85 }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredProducts.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="text-center py-5 text-muted">
+                    <td colSpan="6" className="text-center py-5 text-muted">
                       <i className="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
                       No products found matching your current filter criteria.
                     </td>
@@ -283,7 +268,7 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                     const discount = p.oldPrice > p.price ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : 0
                     return (
                       <tr key={p.id}>
-                        <td>
+                        <td style={{ padding: '0.42rem 0.5rem', verticalAlign: 'middle' }}>
                           <input
                             type="checkbox"
                             className="form-check-input"
@@ -291,81 +276,80 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                             onChange={() => handleToggleSelect(p.id)}
                           />
                         </td>
-                        <td>
-                          <div className="d-flex align-items-center gap-3">
+                        <td style={{ padding: '0.42rem 0.6rem', verticalAlign: 'middle' }}>
+                          <div className="d-flex align-items-center gap-2.5">
                             <img
                               src={p.image}
                               alt={p.name}
                               className="admin-thumb"
+                              style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '5px' }}
                               onError={(e) => { e.target.src = '/images/cat1.jpg' }}
                             />
                             <div>
-                              <div className="fw-medium text-dark d-flex align-items-center gap-1.5 flex-wrap" style={{ fontSize: '0.88rem' }}>
+                              <div className="fw-medium text-dark d-flex align-items-center gap-1.5 flex-wrap" style={{ fontSize: '0.76rem', lineHeight: 1.3 }}>
                                 {p.name}
                                 {p.hasVariants && p.variants?.length > 0 && (
-                                  <span className="badge bg-primary-subtle text-primary border border-primary-subtle" style={{ fontSize: '10px' }}>
+                                  <span className="badge bg-primary-subtle text-primary border border-primary-subtle" style={{ fontSize: '9px', padding: '1px 5px' }}>
                                     <i className="bi bi-layers me-1"></i>{p.variants.length} Variants
                                   </span>
                                 )}
                               </div>
-                              <small className="text-muted d-block font-monospace">
+                              <small className="text-muted d-block font-monospace" style={{ fontSize: '9.5px' }}>
                                 SKU: {p.sku || `GS-${p.id}`}
                               </small>
                             </div>
                           </div>
                         </td>
-                        <td>
-                          <span className="badge bg-light text-dark border">
+                        <td style={{ padding: '0.42rem 0.6rem', verticalAlign: 'middle' }}>
+                          <span className="badge bg-light text-dark border" style={{ fontSize: '9.5px', padding: '2.5px 6.5px', fontWeight: 500 }}>
                             {p.category}
                           </span>
                         </td>
-                        <td>
-                          <span className="badge bg-secondary-subtle text-secondary text-capitalize">
-                            {p.group}
-                          </span>
-                        </td>
-                        <td>
+                        <td style={{ padding: '0.42rem 0.6rem', verticalAlign: 'middle' }}>
                           <div>
-                            <span className="fw-medium text-dark" style={{ fontSize: '0.88rem' }}>
+                            <span className="fw-medium text-dark" style={{ fontSize: '0.76rem' }}>
                               {storeSettings?.currency || 'Rs.'} {p.price.toLocaleString()}
                             </span>
                             {p.oldPrice > p.price && (
-                              <div className="small">
+                              <div style={{ fontSize: '9.5px', marginTop: '1px' }}>
                                 <s className="text-muted me-1">{storeSettings?.currency || 'Rs.'} {p.oldPrice.toLocaleString()}</s>
-                                <span className="badge bg-danger-subtle text-danger">-{discount}%</span>
+                                <span className="badge bg-danger-subtle text-danger" style={{ fontSize: '8.5px', padding: '1px 3px' }}>-{discount}%</span>
                               </div>
                             )}
                           </div>
                         </td>
-                        <td>
-                          <div className="d-flex align-items-center gap-2">
-                            <span className={`badge ${p.stock === 0 ? 'bg-danger' : p.stock <= 5 ? 'bg-warning text-dark' : 'bg-success'}`}>
+                        <td style={{ padding: '0.42rem 0.6rem', verticalAlign: 'middle' }}>
+                          <div className="d-flex align-items-center gap-1.5">
+                            <span className={`badge ${p.stock === 0 ? 'bg-danger' : p.stock <= 5 ? 'bg-warning text-dark' : 'bg-success'}`} style={{ fontSize: '9.5px', padding: '2.5px 6.5px', fontWeight: 500 }}>
                               {p.stock === 0 ? 'Out of Stock' : `${p.stock} In Stock`}
                             </span>
                             <button
                               className="btn btn-sm btn-link p-0 text-muted"
                               onClick={() => toggleProductStock(p.id)}
                               title={p.stock > 0 ? 'Mark Out of Stock' : 'Restock 15 units'}
+                              style={{ fontSize: '10.5px' }}
                             >
                               <i className="bi bi-arrow-repeat"></i>
                             </button>
                           </div>
                         </td>
-                        <td className="text-end">
+                        <td className="text-end" style={{ padding: '0.42rem 0.6rem', verticalAlign: 'middle' }}>
                           <div className="btn-group">
                             <button
-                              className="btn btn-sm btn-light border"
+                              className="btn btn-sm btn-light border d-inline-flex align-items-center justify-content-center"
+                              style={{ width: '28px', height: '28px', padding: 0 }}
                               onClick={() => onEditProduct(p)}
                               title="Edit Product"
                             >
-                              <i className="bi bi-pencil text-primary"></i>
+                              <i className="bi bi-pencil text-primary" style={{ fontSize: '12px' }}></i>
                             </button>
                             <button
-                              className="btn btn-sm btn-light border text-danger"
+                              className="btn btn-sm btn-light border text-danger d-inline-flex align-items-center justify-content-center"
+                              style={{ width: '28px', height: '28px', padding: 0 }}
                               onClick={() => onDeleteProduct(p)}
                               title="Delete Product"
                             >
-                              <i className="bi bi-trash"></i>
+                              <i className="bi bi-trash" style={{ fontSize: '12px' }}></i>
                             </button>
                           </div>
                         </td>

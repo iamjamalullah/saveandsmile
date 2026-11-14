@@ -7,8 +7,8 @@ export const useStoreData = () => useContext(StoreDataContext)
 const DEFAULT_SETTINGS = {
   name: 'Save & Smile',
   tagline: 'Your Trusted Online Shopping Hub',
-  phone: '0321-8273588',
-  whatsapp: '923218273588',
+  phone: '0333-7221552',
+  whatsapp: '923337221552',
   email: null,
   address: 'Karachi, Pakistan',
   currency: 'Rs.',
@@ -17,7 +17,7 @@ const DEFAULT_SETTINGS = {
   expressShippingFee: 350,
   taxRate: 0,
   allowGuestCheckout: true,
-  announcement: 'Join Our Community Group Today Send Your Name, City & Area to 0321-8273588',
+  announcement: 'Join Our Community Group Today Send Your Name, City & Area to 0333-7221552',
 }
 
 const slugify = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')

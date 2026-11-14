@@ -109,7 +109,7 @@ export default function ReviewsPage() {
             </label>
             <label>
               WHATSAPP NUMBER
-              <input value={form.whatsapp} onChange={set('whatsapp')} placeholder="e.g. 03218273588" />
+              <input value={form.whatsapp} onChange={set('whatsapp')} placeholder="e.g. 03337221552" />
             </label>
           </div>
 

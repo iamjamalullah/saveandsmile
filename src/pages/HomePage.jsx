@@ -35,7 +35,7 @@ export default function HomePage() {
             },
             contactPoint: {
               '@type': 'ContactPoint',
-              telephone: '+923218273588',
+              telephone: '+923337221552',
               contactType: 'customer service',
               areaServed: 'PK',
               availableLanguage: ['en', 'ur'],

@@ -329,7 +329,7 @@ export function InfoModal({ info, onClose }) {
     about: { h: 'About Us', p: 'Save & Smile is a wholesale and retail supplier of gadgets, home organizers, beauty accessories and electronic items in Pakistan. We serve resellers and shoppers with reliable quality at the best wholesale rates.' },
     terms: { h: 'Terms & Conditions', p: 'Orders are accepted from resellers and shopkeepers only. Product images are for reference; colours may vary. Prices are subject to change without notice. Delivery time is 2–4 working days.' },
     privacy: { h: 'Privacy Policy', p: 'We only collect the information required to process your order (name, phone number and address). We never sell or share your data with third parties.' },
-    support: { h: 'Support', p: 'Need help with an order, product availability or wholesale pricing? Call us at 0321-8273588 or message us on WhatsApp — our team is available 24/7.' },
+    support: { h: 'Support', p: 'Need help with an order, product availability or wholesale pricing? Call us at 0333-7221552 or message us on WhatsApp — our team is available 24/7.' },
     account: { h: 'My Account', p: 'Login to track your orders, save addresses and manage your wishlist. If you are a new reseller, create an account to get wholesale pricing.' },
   }[info] || { h: 'Contact Us', p: 'Reach us on WhatsApp or call us any time.' }
 

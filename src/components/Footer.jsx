@@ -29,7 +29,7 @@ export default function Footer() {
               <p>{FOOTER.description}</p>
               <div className="qg-foot-contact">
                 <a href={`tel:${BRAND.tel}`}>📞 {BRAND.phone}</a>
-                <a href={`tel:${BRAND.tel2}`}>📞 {BRAND.phone2}</a>
+                {BRAND.phone2 && BRAND.phone2 !== BRAND.phone && <a href={`tel:${BRAND.tel2}`}>📞 {BRAND.phone2}</a>}
                 <a href={`https://wa.me/${BRAND.whatsapp}`} target="_blank" rel="noreferrer">💬 WhatsApp us</a>
               </div>
             </div>

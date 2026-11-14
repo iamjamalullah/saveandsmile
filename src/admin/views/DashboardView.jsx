@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useStoreData } from '../../context/StoreDataContext'
+import DownloadApkModal from '../components/DownloadApkModal'
 
 export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
   const { products = [], orders = [], categories = [], storeSettings = {}, toggleProductStock } = useStoreData()
@@ -33,6 +34,7 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
   ]
   const maxRevenue = Math.max(...monthsData.map(m => m.revenue))
   const [hoveredMonth, setHoveredMonth] = useState(null)
+  const [showApkModal, setShowApkModal] = useState(false)
 
   // Status badge styling helper
   const renderStatusBadge = (status) => {
@@ -93,7 +95,7 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
       <div className="card border-0 shadow-sm mb-4 pnl-hero text-white">
         <div className="card-body p-4">
           <div className="row align-items-center">
-            <div className="col-lg-8">
+            <div className="col-lg-7">
               <span className="badge bg-warning text-dark mb-2 fw-semibold px-2.5 py-1.5">
                 <i className="bi bi-shield-check me-1"></i> Administrator Access
               </span>
@@ -102,8 +104,8 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
                 Here is your store summary for today. You have <strong className="text-warning">{pendingOrders.length} pending orders</strong> that require fulfillment.
               </p>
             </div>
-            <div className="col-lg-4 text-lg-end mt-3 mt-lg-0">
-              <div className="d-flex gap-2 justify-content-lg-end">
+            <div className="col-lg-5 text-lg-end mt-3 mt-lg-0">
+              <div className="d-flex flex-wrap gap-2 justify-content-lg-end align-items-center">
                 <button
                   className="btn btn-warning fw-semibold shadow-sm"
                   onClick={onOpenAddProduct}
@@ -115,6 +117,14 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
                   onClick={() => goTab('orders')}
                 >
                   <i className="bi bi-box-seam me-1"></i> Orders
+                </button>
+                <button
+                  className="btn btn-success fw-semibold shadow-sm d-inline-flex align-items-center gap-1.5"
+                  onClick={() => setShowApkModal(true)}
+                  title="Download Save & Smile Android Admin App (APK & QR Code)"
+                >
+                  <i className="bi bi-android2 fs-6"></i>
+                  <span>Download APK</span>
                 </button>
               </div>
             </div>
@@ -516,6 +526,12 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
           </div>
         </div>
       </div>
+
+      {/* Save & Smile Android Admin App Download Modal with QR Code */}
+      <DownloadApkModal
+        isOpen={showApkModal}
+        onClose={() => setShowApkModal(false)}
+      />
     </div>
   )
 }

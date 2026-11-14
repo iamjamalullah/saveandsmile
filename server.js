@@ -1307,9 +1307,16 @@ server.get(['/products', '/api/products'], (req, res, next) => {
   })
 
   // ── MOBILE APP RELEASES & DISTRIBUTION ENDPOINTS ──────────────────
-  const DOWNLOADS_DIR = path.join(__dirname, 'public', 'downloads')
-  if (!fs.existsSync(DOWNLOADS_DIR)) {
-    fs.mkdirSync(DOWNLOADS_DIR, { recursive: true })
+  const DOWNLOADS_DIR = IS_VERCEL
+    ? path.join('/tmp', 'downloads')
+    : path.join(__dirname, 'public', 'downloads')
+
+  try {
+    if (!fs.existsSync(DOWNLOADS_DIR)) {
+      fs.mkdirSync(DOWNLOADS_DIR, { recursive: true })
+    }
+  } catch (dirErr) {
+    console.warn('[DOWNLOADS_DIR WARNING]:', dirErr.message)
   }
 
   // 1. Get latest active release metadata
@@ -1409,7 +1416,11 @@ server.get(['/products', '/api/products'], (req, res, next) => {
       const apkFilename = 'SaveAndSmile-Admin.apk'
       const localDest = path.join(DOWNLOADS_DIR, apkFilename)
 
-      fs.writeFileSync(localDest, apkBuffer)
+      try {
+        fs.writeFileSync(localDest, apkBuffer)
+      } catch (wErr) {
+        console.warn('[LOCAL APK WRITE NOTICE]:', wErr.message)
+      }
 
       const host = req.get('host') || 'saveandsmile.vercel.app'
       const protocol = req.protocol === 'http' && host.includes('localhost') ? 'http' : 'https'
@@ -1473,9 +1484,11 @@ server.get(['/products', '/api/products'], (req, res, next) => {
     res.setHeader('Content-Type', 'application/vnd.android.package-archive')
     res.setHeader('Content-Disposition', 'attachment; filename="SaveAndSmile-Admin.apk"')
 
-    if (fs.existsSync(localApk)) {
-      return res.sendFile(localApk)
-    }
+    try {
+      if (fs.existsSync(localApk)) {
+        return res.sendFile(localApk)
+      }
+    } catch (_) {}
 
     const supabaseUrl = process.env.SUPABASE_URL || 'https://piocbtkjzznzzdftyelh.supabase.co'
     const fallbackUrl = `${supabaseUrl}/storage/v1/object/public/product-media/releases/SaveAndSmile-Admin-v1.0.0.apk`

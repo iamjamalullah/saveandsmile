@@ -352,6 +352,7 @@ const handleImageUpload = async (req, res) => {
     }
 
     const savedUrls = []
+    let lastUploadError = null
     for (let i = 0; i < images.length; i++) {
       const item = images[i]
       const dataUrl = item.data || item.dataUrl || item.base64 || ''
@@ -396,7 +397,6 @@ const handleImageUpload = async (req, res) => {
 
       // Upload directly to permanent Supabase Storage
       let finalUrl = `/uploads/products/${filename}`
-      let lastUploadError = null
       try {
         const uploadRes = await uploadBuffer(webpResult.webpBuffer, `products/${filename}`, 'image/webp')
         if (uploadRes && uploadRes.publicUrl) {

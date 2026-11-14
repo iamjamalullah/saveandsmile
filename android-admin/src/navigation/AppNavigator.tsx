@@ -10,6 +10,10 @@ import { HomePageEditorScreen } from '../screens/homepage/HomePageEditorScreen';
 import { WatchShopScreen } from '../screens/watch-shop/WatchShopScreen';
 import { ReviewsScreen } from '../screens/reviews/ReviewsScreen';
 import { SettingsScreen } from '../screens/settings/SettingsScreen';
+import { NotificationsScreen } from '../screens/notifications/NotificationsScreen';
+import { InquiriesListScreen } from '../screens/inquiries/InquiriesListScreen';
+import { CouponsListScreen } from '../screens/coupons/CouponsListScreen';
+import { ReportsScreen } from '../screens/reports/ReportsScreen';
 import { colors } from '../theme/colors';
 
 const Stack = createNativeStackNavigator();
@@ -19,7 +23,7 @@ export const AppNavigator: React.FC = () => {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.slate.background }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.slate.canvas }}>
         <ActivityIndicator size="large" color={colors.primary.DEFAULT} />
       </View>
     );
@@ -38,6 +42,10 @@ export const AppNavigator: React.FC = () => {
           <Stack.Screen name="WatchShop" component={WatchShopScreen} />
           <Stack.Screen name="Reviews" component={ReviewsScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="Notifications" component={NotificationsScreen} />
+          <Stack.Screen name="Inquiries" component={InquiriesListScreen} />
+          <Stack.Screen name="Coupons" component={CouponsListScreen} />
+          <Stack.Screen name="Reports" component={ReportsScreen} />
         </>
       )}
     </Stack.Navigator>

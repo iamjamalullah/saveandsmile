@@ -9,6 +9,7 @@ import {
   Linking,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
+import { useAdminData } from '../../context/AdminDataContext';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { Header } from '../../components/Header';
@@ -19,14 +20,18 @@ import {
   Star,
   Sliders,
   LogOut,
-  ExternalLink,
   ChevronRight,
   ShieldCheck,
   Server,
+  Bell,
+  MessageSquare,
+  Tag,
+  BarChart3,
 } from 'lucide-react-native';
 
 export const MoreMenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { user, logout } = useAuth();
+  const { unreadNotificationCount, inquiries } = useAdminData();
 
   const handleLogout = () => {
     Alert.alert('Sign Out', 'Are you sure you want to log out of Save & Smile Admin?', [
@@ -35,7 +40,37 @@ export const MoreMenuScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     ]);
   };
 
+  const newInquiriesCount = inquiries.filter(i => i.status === 'new').length;
+
   const menuSections = [
+    {
+      label: 'Analytics & Alerts',
+      items: [
+        {
+          id: 'Reports',
+          label: 'Sales Reports & Analytics',
+          subtitle: 'Revenue, fulfillment rate, and KPI charts',
+          icon: <BarChart3 size={18} color="#059669" />,
+          screen: 'Reports',
+        },
+        {
+          id: 'Notifications',
+          label: 'Notification Center',
+          subtitle: 'Orders, inventory and inquiry alerts',
+          icon: <Bell size={18} color="#d97706" />,
+          screen: 'Notifications',
+          badge: unreadNotificationCount > 0 ? unreadNotificationCount : undefined,
+        },
+        {
+          id: 'Inquiries',
+          label: 'Customer Inquiries & Support',
+          subtitle: 'Direct customer contact and WhatsApp chats',
+          icon: <MessageSquare size={18} color="#2563eb" />,
+          screen: 'Inquiries',
+          badge: newInquiriesCount > 0 ? newInquiriesCount : undefined,
+        },
+      ],
+    },
     {
       label: 'Storefront & Content',
       items: [
@@ -59,6 +94,13 @@ export const MoreMenuScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           subtitle: 'Product video reels & promotional media',
           icon: <Video size={18} color={colors.primary.DEFAULT} />,
           screen: 'WatchShop',
+        },
+        {
+          id: 'Coupons',
+          label: 'Discounts & Coupons',
+          subtitle: 'Promotional codes, discounts and validity',
+          icon: <Tag size={18} color="#7c3aed" />,
+          screen: 'Coupons',
         },
       ],
     },
@@ -85,7 +127,11 @@ export const MoreMenuScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
   return (
     <View style={styles.container}>
-      <Header title="More Modules" subtitle="Complete management options" />
+      <Header
+        title="More Modules"
+        subtitle="Complete administrative console"
+        onNotificationPress={() => navigation.navigate('Notifications')}
+      />
 
       <ScrollView style={styles.content} contentContainerStyle={styles.scrollPadding}>
         {/* Staff Profile Card */}
@@ -101,60 +147,63 @@ export const MoreMenuScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             </Text>
           </View>
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>{user?.name || 'Store Administrator'}</Text>
-            <Text style={styles.profileRole}>Role: {user?.role?.toUpperCase() || 'ADMINISTRATOR'}</Text>
-            <Text style={styles.profileEmail}>{user?.email || 'admin@saveandsmile.com'}</Text>
+            <View style={styles.nameRow}>
+              <Text style={styles.profileName}>{user?.name || 'Store Administrator'}</Text>
+              <View style={styles.roleBadge}>
+                <ShieldCheck size={11} color="#047857" />
+                <Text style={styles.roleBadgeText}>{(user?.role || 'admin').toUpperCase()}</Text>
+              </View>
+            </View>
+            <Text style={styles.profileEmail}>{user?.email || 'admin@saveandsmile.pk'}</Text>
           </View>
         </View>
 
-        {/* Menu Groups */}
-        {menuSections.map(sec => (
-          <View key={sec.label} style={styles.menuSection}>
-            <Text style={styles.sectionHeading}>{sec.label}</Text>
-            <View style={styles.card}>
-              {sec.items.map((item, idx) => (
+        {/* Server & Backend Info Card */}
+        <View style={styles.serverCard}>
+          <Server size={14} color="#059669" />
+          <Text style={styles.serverText}>
+            Production Sync: <Text style={styles.serverBold}>saveandsmile.vercel.app/api</Text>
+          </Text>
+        </View>
+
+        {/* Menu Sections */}
+        {menuSections.map((section, sIdx) => (
+          <View key={sIdx} style={styles.sectionContainer}>
+            <Text style={styles.sectionLabel}>{section.label.toUpperCase()}</Text>
+            <View style={styles.sectionBox}>
+              {section.items.map((item, iIdx) => (
                 <TouchableOpacity
                   key={item.id}
+                  style={[styles.menuItem, iIdx < section.items.length - 1 && styles.menuItemBorder]}
                   onPress={() => navigation.navigate(item.screen)}
-                  style={[
-                    styles.menuRow,
-                    idx < sec.items.length - 1 && styles.menuRowDivider,
-                  ]}
+                  activeOpacity={0.7}
                 >
-                  <View style={styles.menuIconBox}>{item.icon}</View>
-                  <View style={styles.menuTextBox}>
-                    <Text style={styles.menuLabel}>{item.label}</Text>
+                  <View style={styles.menuIconWrap}>{item.icon}</View>
+                  <View style={styles.menuTextWrap}>
+                    <View style={styles.itemTitleRow}>
+                      <Text style={styles.menuLabel}>{item.label}</Text>
+                      {item.badge !== undefined && (
+                        <View style={styles.badgePill}>
+                          <Text style={styles.badgePillText}>{item.badge}</Text>
+                        </View>
+                      )}
+                    </View>
                     <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
                   </View>
-                  <ChevronRight size={15} color={colors.slate.muted} />
+                  <ChevronRight size={18} color={colors.slate.muted} />
                 </TouchableOpacity>
               ))}
             </View>
           </View>
         ))}
 
-        {/* System & Production Status */}
-        <View style={styles.menuSection}>
-          <Text style={styles.sectionHeading}>System & Server Status</Text>
-          <View style={styles.card}>
-            <View style={styles.serverRow}>
-              <Server size={16} color={colors.primary.DEFAULT} />
-              <View style={{ flex: 1, marginLeft: 10 }}>
-                <Text style={styles.serverTitle}>Authoritative Production API</Text>
-                <Text style={styles.serverUrl}>https://saveandsmile.vercel.app/api</Text>
-              </View>
-              <View style={styles.onlineBadge}>
-                <Text style={styles.onlineText}>Connected</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
         {/* Logout Button */}
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-          <LogOut size={16} color={colors.danger.DEFAULT} />
-          <Text style={styles.logoutText}>Sign Out of Administrator Session</Text>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} activeOpacity={0.8}>
+          <LogOut size={16} color="#ef4444" />
+          <Text style={styles.logoutText}>Sign Out from Save &amp; Smile Admin</Text>
         </TouchableOpacity>
+
+        <Text style={styles.footerVersion}>Save &amp; Smile Native Admin v1.0.0 (Build 1)</Text>
       </ScrollView>
     </View>
   );
@@ -163,147 +212,176 @@ export const MoreMenuScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.slate.background,
+    backgroundColor: colors.slate.canvas,
   },
   content: {
     flex: 1,
   },
   scrollPadding: {
     padding: spacing.md,
-    gap: spacing.md,
-    paddingBottom: spacing.xxxl,
+    paddingBottom: spacing.xxl,
   },
   profileCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.white,
-    borderRadius: spacing.borderRadius.lg,
     padding: spacing.md,
+    borderRadius: spacing.borderRadius.lg,
     borderWidth: 1,
     borderColor: colors.slate.border,
-    ...spacing.shadow.sm,
+    marginBottom: spacing.sm,
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.primary.DEFAULT,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#047857',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: spacing.md,
   },
   avatarText: {
-    fontSize: 16,
-    fontWeight: '800',
     color: colors.white,
+    fontWeight: '800',
+    fontSize: 16,
   },
   profileInfo: {
     flex: 1,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   profileName: {
     fontSize: 14,
     fontWeight: '700',
     color: colors.slate.ink,
   },
-  profileRole: {
-    fontSize: 10.5,
-    fontWeight: '700',
-    color: colors.primary.DEFAULT,
-    marginTop: 1,
+  roleBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ecfdf5',
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 4,
+    gap: 2,
+  },
+  roleBadgeText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#047857',
   },
   profileEmail: {
     fontSize: 11,
     color: colors.slate.muted,
-    marginTop: 1,
+    marginTop: 2,
   },
-  menuSection: {
+  serverCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ecfdf5',
+    paddingVertical: 8,
+    paddingHorizontal: spacing.md,
+    borderRadius: spacing.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: '#a7f3d0',
+    marginBottom: spacing.lg,
     gap: 6,
   },
-  sectionHeading: {
+  serverText: {
     fontSize: 11,
+    color: '#064e3b',
+  },
+  serverBold: {
     fontWeight: '700',
-    color: colors.slate.muted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
-    paddingLeft: 4,
   },
-  card: {
-    backgroundColor: colors.white,
-    borderRadius: spacing.borderRadius.lg,
-    borderWidth: 1,
-    borderColor: colors.slate.border,
-    ...spacing.shadow.sm,
-    overflow: 'hidden',
+  sectionContainer: {
+    marginBottom: spacing.lg,
   },
-  menuRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.md,
-  },
-  menuRowDivider: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.slate.divider,
-  },
-  menuIconBox: {
-    width: 32,
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  menuTextBox: {
-    flex: 1,
-  },
-  menuLabel: {
-    fontSize: 12.5,
-    fontWeight: '600',
-    color: colors.slate.ink,
-  },
-  menuSubtitle: {
-    fontSize: 10.5,
-    color: colors.slate.muted,
-    marginTop: 1,
-  },
-  serverRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.md,
-  },
-  serverTitle: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.slate.ink,
-  },
-  serverUrl: {
-    fontSize: 10.5,
-    color: colors.slate.muted,
-    fontFamily: 'monospace',
-    marginTop: 1,
-  },
-  onlineBadge: {
-    backgroundColor: colors.primary.subtle,
-    borderRadius: 4,
-    paddingVertical: 2,
-    paddingHorizontal: 6,
-  },
-  onlineText: {
+  sectionLabel: {
     fontSize: 10,
     fontWeight: '700',
-    color: colors.primary.DEFAULT,
+    color: colors.slate.muted,
+    marginBottom: spacing.xs,
+    paddingHorizontal: 4,
+    letterSpacing: 0.5,
   },
-  logoutBtn: {
+  sectionBox: {
+    backgroundColor: colors.white,
+    borderRadius: spacing.borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.slate.border,
+    overflow: 'hidden',
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.md,
+  },
+  menuItemBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.slate.light,
+  },
+  menuIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: colors.slate.light,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  menuTextWrap: {
+    flex: 1,
+  },
+  itemTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  menuLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.slate.ink,
+  },
+  badgePill: {
+    backgroundColor: '#ef4444',
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 10,
+  },
+  badgePillText: {
+    color: colors.white,
+    fontSize: 9,
+    fontWeight: '800',
+  },
+  menuSubtitle: {
+    fontSize: 11,
+    color: colors.slate.muted,
+    marginTop: 2,
+  },
+  logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    backgroundColor: colors.danger.subtle,
+    backgroundColor: '#fef2f2',
     borderWidth: 1,
-    borderColor: colors.danger.border,
-    borderRadius: spacing.borderRadius.lg,
+    borderColor: '#fecaca',
     paddingVertical: 12,
-    marginTop: spacing.sm,
+    borderRadius: spacing.borderRadius.md,
+    gap: 8,
+    marginTop: spacing.md,
   },
   logoutText: {
-    fontSize: 13,
+    color: '#ef4444',
     fontWeight: '700',
-    color: colors.danger.DEFAULT,
+    fontSize: 13,
+  },
+  footerVersion: {
+    textAlign: 'center',
+    fontSize: 10,
+    color: colors.slate.muted,
+    marginTop: spacing.lg,
   },
 });

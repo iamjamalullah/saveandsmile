@@ -184,6 +184,46 @@ export interface AuthResponse {
   expiresIn?: number;
 }
 
+export interface Inquiry {
+  id: string | number;
+  name: string;
+  email?: string;
+  phone?: string;
+  subject?: string;
+  message: string;
+  status: 'new' | 'in_progress' | 'resolved';
+  createdAt: string;
+}
+
+export interface Coupon {
+  id: string | number;
+  code: string;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  minPurchaseAmount?: number;
+  maxDiscount?: number;
+  startDate?: string;
+  endDate?: string;
+  usageLimit?: number;
+  usedCount?: number;
+  isActive: boolean;
+}
+
+export type NotificationCategory = 'order' | 'inventory' | 'inquiry' | 'review' | 'system';
+
+export interface NotificationItem {
+  id: string;
+  title: string;
+  body: string;
+  category: NotificationCategory;
+  targetId?: string;
+  targetScreen?: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export type ConnectionStatus = 'connected' | 'connecting' | 'disconnected' | 'syncing';
+
 export interface UploadResponse {
   success: boolean;
   urls: string[];

@@ -1,0 +1,121 @@
+name: Build and Release Save & Smile Admin APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'android-admin/**'
+      - '.github/workflows/build-saveandsmile-admin-apk.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-admin-apk:
+    name: Build Signed Android Admin APK & AAB
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'android-admin/package-lock.json'
+
+      - name: Setup Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android Admin Dependencies
+        run: |
+          cd android-admin
+          npm install
+
+      - name: Run Test Suite
+        run: |
+          cd android-admin
+          npm test
+
+      - name: Install Expo CLI & EAS CLI
+        run: |
+          npm install -g expo-cli @expo/cli eas-cli
+
+      - name: Expo Prebuild (Native Android Project Generation)
+        run: |
+          cd android-admin
+          npx expo prebuild --platform android --clean
+
+      - name: Generate Save & Smile Release Keystore
+        run: |
+          cd android-admin/android/app
+          keytool -genkey -v -keystore release.keystore -alias saveandsmile \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass saveandsmile123 -keypass saveandsmile123 \
+            -dname "CN=Save and Smile Admin, OU=Mobile, O=Save and Smile E-Commerce, L=Karachi, ST=Sindh, C=PK"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build Standalone Release APK
+        run: |
+          cd android-admin/android
+          chmod +x gradlew
+          ./gradlew assembleRelease --stacktrace
+
+      - name: Copy APK to Public Downloads
+        run: |
+          mkdir -p public/downloads
+          cp android-admin/android/app/build/outputs/apk/release/app-release.apk public/downloads/SaveAndSmile-Admin.apk
+          ls -lh public/downloads/SaveAndSmile-Admin.apk
+
+      - name: Commit Real APK to Repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/downloads/SaveAndSmile-Admin.apk
+          git diff --cached --quiet || git commit -m "ci: publish official SaveAndSmile-Admin.apk release [skip ci]"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        continue-on-error: true
+        with:
+          tag_name: v1.0.0-admin
+          name: "Save & Smile Official Android Admin App v1.0.0"
+          body: |
+            ## Save & Smile Official Android Admin Application v1.0.0
+
+            **Application Name:** Save & Smile Admin  
+            **Package ID:** `com.saveandsmile.admin`  
+            **Target Android OS:** Android 7.0 - 16  
+            **Production API:** `https://saveandsmile.vercel.app/api`  
+
+            ### Included Modules
+            - Real-time Order Management (Pending, Confirmed, Shipped, Delivered, Cancelled)
+            - Multi-Variant Product Catalog (Colors, Sizes, Custom Variants, Swatches)
+            - Real-time Push Notifications (FCM / Expo) with deep-linking
+            - Native WebP Camera and Photo Picker
+            - Homepage Editor & Hero Slide Management
+            - Watch & Shop Reels Video Integration
+            - Customer Reviews & Ratings Moderation
+            - Customer Inquiries with direct WhatsApp and Call buttons
+            - Coupons & Discounts Management
+            - Live Sales Reports & Analytics
+            - Store Settings & Staff RBAC Session Security
+          files: public/downloads/SaveAndSmile-Admin.apk
+          overwrite: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

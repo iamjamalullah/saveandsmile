@@ -1,43 +1,39 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { NavigationContainer } from '@react-navigation/native';
-import * as Notifications from 'expo-notifications';
+import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { AuthProvider } from './src/context/AuthContext';
 import { AdminDataProvider } from './src/context/AdminDataContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
-
-// Configure push notifications display behavior
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
+import { notificationService } from './src/services/NotificationService';
 
 export default function App() {
-  useEffect(() => {
-    // Request notification permissions gracefully on launch
-    const requestNotificationPermission = async () => {
-      try {
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
-        let finalStatus = existingStatus;
-        if (existingStatus !== 'granted') {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
-        }
-      } catch {}
-    };
+  const navigationRef = useRef<NavigationContainerRef<any>>(null);
 
-    requestNotificationPermission();
+  useEffect(() => {
+    // 1. Setup notification navigation handler for deep linking
+    notificationService.setNavigationHandler((screen, params) => {
+      if (navigationRef.current?.isReady()) {
+        navigationRef.current.navigate(screen, params);
+      }
+    });
+
+    // 2. Register for push notifications & configure notification channels
+    notificationService.registerForPushNotificationsAsync();
+
+    // 3. Setup listeners for foreground & tap events
+    const cleanupListeners = notificationService.setupNotificationListeners();
+
+    return () => {
+      cleanupListeners();
+    };
   }, []);
 
   return (
     <SafeAreaProvider>
       <AuthProvider>
         <AdminDataProvider>
-          <NavigationContainer>
+          <NavigationContainer ref={navigationRef}>
             <StatusBar style="dark" backgroundColor="#ffffff" />
             <AppNavigator />
           </NavigationContainer>

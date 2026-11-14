@@ -554,15 +554,6 @@ export default function ProductPage() {
   return (
     <main className="qpdp">
       <div className="qg-container">
-        <nav className="qcat-crumbs" aria-label="Breadcrumb">
-          <Link to="/">Home</Link><span>/</span>
-          <Link to="/shop">Shop</Link><span>/</span>
-          {category && <><Link to={`/category/${category.slug}`}>{category.name}</Link><span>/</span></>}
-          <span className="qcat-crumb-current">{product.name}</span>
-        </nav>
-      </div>
-
-      <div className="qg-container">
         <div className="qpdp-top">
           {/* ── Gallery ─────────────────────────────────── */}
           <div className="qpdp-gallery">

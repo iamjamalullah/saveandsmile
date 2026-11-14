@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useStoreData } from '../../context/StoreDataContext'
 import { CITIES } from '../../data'
 
@@ -11,6 +11,59 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
   const [sortBy, setSortBy] = useState('newest')
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 15
+
+  // Table horizontal scrolling & synchronization refs & states
+  const tableContainerRef = useRef(null)
+  const stickyScrollbarRef = useRef(null)
+  const isSyncingRef = useRef(false)
+
+  const [tableScrollWidth, setTableScrollWidth] = useState(0)
+  const [hasOverflow, setHasOverflow] = useState(false)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+
+  // Update scroll boundaries & overflow
+  const updateScrollState = useCallback(() => {
+    if (!tableContainerRef.current) return
+    const { scrollLeft, scrollWidth, clientWidth } = tableContainerRef.current
+    setTableScrollWidth(scrollWidth)
+    const overflow = scrollWidth > clientWidth + 3
+    setHasOverflow(overflow)
+    setCanScrollLeft(scrollLeft > 3)
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 3)
+  }, [])
+
+  // Sync scroll from table to sticky scrollbar
+  const handleTableScroll = () => {
+    if (isSyncingRef.current) return
+    isSyncingRef.current = true
+    if (stickyScrollbarRef.current && tableContainerRef.current) {
+      stickyScrollbarRef.current.scrollLeft = tableContainerRef.current.scrollLeft
+    }
+    updateScrollState()
+    requestAnimationFrame(() => {
+      isSyncingRef.current = false
+    })
+  }
+
+  // Sync scroll from sticky scrollbar to table
+  const handleStickyScroll = () => {
+    if (isSyncingRef.current) return
+    isSyncingRef.current = true
+    if (tableContainerRef.current && stickyScrollbarRef.current) {
+      tableContainerRef.current.scrollLeft = stickyScrollbarRef.current.scrollLeft
+    }
+    updateScrollState()
+    requestAnimationFrame(() => {
+      isSyncingRef.current = false
+    })
+  }
+
+  // Smooth scroll helper for left/right nudge buttons
+  const scrollTable = (offset) => {
+    if (!tableContainerRef.current) return
+    tableContainerRef.current.scrollBy({ left: offset, behavior: 'smooth' })
+  }
 
   // Calculate status counts
   const counts = useMemo(() => {
@@ -62,6 +115,29 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
     const start = (currentPage - 1) * pageSize
     return filteredOrders.slice(start, start + pageSize)
   }, [filteredOrders, currentPage, pageSize])
+
+  // Monitor table and container dimensions with ResizeObserver
+  useEffect(() => {
+    updateScrollState()
+
+    const container = tableContainerRef.current
+    if (!container) return
+
+    const ro = new ResizeObserver(() => {
+      updateScrollState()
+    })
+
+    ro.observe(container)
+    const tableEl = container.querySelector('table')
+    if (tableEl) ro.observe(tableEl)
+
+    window.addEventListener('resize', updateScrollState)
+
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', updateScrollState)
+    }
+  }, [paginatedOrders, currentPage, updateScrollState])
 
   // Export to Excel / CSV
   const exportToExcel = () => {
@@ -299,17 +375,21 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
 
       {/* Orders Table */}
       <div className="card shadow-sm">
-        <div className="table-responsive orders-table-wrapper">
-          <table className="table admin-table mb-0">
+        <div 
+          className="table-responsive orders-table-wrapper"
+          ref={tableContainerRef}
+          onScroll={handleTableScroll}
+        >
+          <table className="table admin-table mb-0" style={{ minWidth: 1060 }}>
             <thead>
               <tr>
-                <th style={{ minWidth: 120 }}>Order ID &amp; Date</th>
-                <th style={{ minWidth: 140 }}>Customer Info</th>
-                <th style={{ minWidth: 160 }}>City &amp; Address</th>
-                <th style={{ minWidth: 160 }}>Ordered Items</th>
-                <th style={{ minWidth: 100 }}>Total (COD)</th>
-                <th style={{ minWidth: 110 }}>Current Status</th>
-                <th className="text-end" style={{ minWidth: 170 }}>Actions</th>
+                <th style={{ width: 140 }}>Order ID &amp; Date</th>
+                <th style={{ width: 150 }}>Customer Info</th>
+                <th style={{ width: 170 }}>City &amp; Address</th>
+                <th style={{ width: 180 }}>Ordered Items</th>
+                <th style={{ width: 110 }}>Total (COD)</th>
+                <th style={{ width: 130 }}>Current Status</th>
+                <th className="text-end" style={{ width: 180 }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -427,6 +507,51 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
             </tbody>
           </table>
         </div>
+
+        {/* Persistent Sticky Synchronized Horizontal Scrollbar */}
+        {hasOverflow && (
+          <div 
+            className="orders-sticky-scrollbar-wrap"
+            role="region"
+            aria-label="Orders table horizontal scrollbar"
+          >
+            <button
+              type="button"
+              className="orders-sticky-scroll-btn"
+              onClick={() => scrollTable(-260)}
+              disabled={!canScrollLeft}
+              title="Scroll table left"
+              aria-label="Scroll table left"
+            >
+              <i className="bi bi-chevron-left"></i>
+            </button>
+
+            <div 
+              className="orders-sticky-scrollbar-track" 
+              ref={stickyScrollbarRef} 
+              onScroll={handleStickyScroll}
+              title="Drag horizontal scrollbar to navigate columns"
+            >
+              <div style={{ width: `${tableScrollWidth}px`, height: '1px' }} />
+            </div>
+
+            <button
+              type="button"
+              className="orders-sticky-scroll-btn"
+              onClick={() => scrollTable(260)}
+              disabled={!canScrollRight}
+              title="Scroll table right"
+              aria-label="Scroll table right"
+            >
+              <i className="bi bi-chevron-right"></i>
+            </button>
+
+            <div className="orders-scroll-hint d-none d-sm-flex align-items-center gap-1 text-muted small ms-1" style={{ fontSize: '11px', whiteSpace: 'nowrap' }}>
+              <i className="bi bi-arrows-expand text-primary" style={{ transform: 'rotate(45deg)' }}></i>
+              <span>Scroll columns</span>
+            </div>
+          </div>
+        )}
 
         {/* Pagination Footer */}
         {filteredOrders.length > 0 && (

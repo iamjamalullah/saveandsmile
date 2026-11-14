@@ -54,7 +54,14 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
   const renderStatusBadge = (status) => {
     switch (status) {
       case 'Pending':
-        return <span className="badge badge-status badge-pending"><i className="bi bi-clock-history"></i> Pending</span>
+        return (
+          <span 
+            className="badge badge-status badge-pending" 
+            style={{ backgroundColor: '#fef3c7', color: '#78350f', border: '1px solid #fde68a', fontWeight: 600 }}
+          >
+            <i className="bi bi-clock-history"></i> Pending
+          </span>
+        )
       case 'Processing':
         return <span className="badge badge-status badge-processing"><i className="bi bi-gear-fill"></i> Processing</span>
       case 'Shipped':
@@ -73,13 +80,16 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
       {/* Top Header */}
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
-          <h3 className="fw-bold mb-1">Customer Orders</h3>
+          <h3 className="fw-semibold mb-1">Customer Orders</h3>
           <p className="text-muted small mb-0">
             Track and process real-time customer purchases and fulfillment status
           </p>
         </div>
         <div className="d-flex gap-2">
-          <span className="badge bg-warning-subtle text-warning border px-3 py-2 fw-semibold d-inline-flex align-items-center">
+          <span 
+            className="badge border px-3 py-2 fw-medium d-inline-flex align-items-center"
+            style={{ backgroundColor: '#fef3c7', color: '#78350f', borderColor: '#fde68a' }}
+          >
             <i className="bi bi-bell-fill me-1.5"></i> {counts.pending} Orders Need Confirmation
           </span>
         </div>
@@ -209,28 +219,39 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
                 filteredOrders.map((order) => (
                   <tr key={order.id}>
                     <td>
-                      <div className="fw-bold text-primary font-monospace">{order.id}</div>
+                      <div className="fw-semibold text-primary font-monospace">{order.id}</div>
                       <small className="text-muted d-block">{order.date}</small>
                     </td>
                     <td>
-                      <div className="fw-semibold text-dark">{order.customer?.name || order.customerName || 'Guest Customer'}</div>
+                      <div className="fw-medium text-dark">{order.customer?.name || order.customerName || 'Guest Customer'}</div>
                       <div className="small text-muted d-flex align-items-center gap-1">
                         <i className="bi bi-telephone"></i>
                         <span>{order.customer?.mobile || order.customerMobile || '—'}</span>
                       </div>
                     </td>
                     <td>
-                      <span className="badge bg-light text-dark border mb-1">
+                      <span className="badge bg-light text-dark border mb-1 fw-normal">
                         <i className="bi bi-geo-alt me-1 text-danger"></i>
                         {order.customer?.city || order.customerCity || 'Pakistan'}
                       </span>
                       <small className="text-muted d-block text-truncate" style={{ maxWidth: 180 }} title={order.customer?.address || order.deliveryAddress || ''}>
                         {order.customer?.address || order.deliveryAddress || 'Standard Delivery Address'}
                       </small>
+                      {order.notes && (
+                        <div className="mt-1" title={`Customer note: ${order.notes}`}>
+                          <span 
+                            className="badge border text-truncate d-inline-block" 
+                            style={{ maxWidth: 180, fontSize: '11px', fontWeight: 500, backgroundColor: '#fef3c7', color: '#78350f', borderColor: '#fde68a' }}
+                          >
+                            <i className="bi bi-chat-left-quote-fill me-1"></i>
+                            {order.notes}
+                          </span>
+                        </div>
+                      )}
                     </td>
                     <td>
                       <div className="small">
-                        <span className="fw-semibold text-dark">
+                        <span className="fw-medium text-dark">
                           {(order.items || []).reduce((sum, i) => sum + (i.qty || 1), 0)} items:
                         </span>
                         <div className="text-muted text-truncate" style={{ maxWidth: 200 }} title={(order.items || []).map(i => `${i.qty || 1}x ${i.product?.name || i.name || 'Product'}`).join(', ')}>
@@ -239,7 +260,7 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
                       </div>
                     </td>
                     <td>
-                      <div className="fw-bold fs-6 text-dark">
+                      <div className="fw-semibold fs-6 text-dark">
                         {storeSettings?.currency || 'Rs.'} {Number(order.total || 0).toLocaleString()}
                       </div>
                       <small className="text-muted d-block">{order.paymentMethod || 'Cash on Delivery'}</small>

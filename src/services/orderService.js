@@ -306,9 +306,20 @@ export async function getOrders() {
     const itemsRes = await query(`
       SELECT i.id, i.order_id, i.product_id, i.product_name, i.product_sku,
              i.variant_id, i.variant_title, i.unit_price::numeric, i.quantity, i.line_total::numeric,
-             p.image_main as product_image
+             COALESCE(vimg.image_url, vimg_title.image_url, p.image_main) as product_image
       FROM order_items i
       LEFT JOIN products p ON i.product_id = p.id
+      LEFT JOIN product_variants pv ON i.variant_id = pv.id
+      LEFT JOIN LATERAL (
+        SELECT image_url FROM product_variant_images 
+        WHERE product_id = i.product_id AND LOWER(color_name) = LOWER(pv.color_value)
+        ORDER BY is_primary DESC, sort_order ASC, id ASC LIMIT 1
+      ) vimg ON true
+      LEFT JOIN LATERAL (
+        SELECT image_url FROM product_variant_images 
+        WHERE product_id = i.product_id AND LOWER(color_name) = LOWER(i.variant_title)
+        ORDER BY is_primary DESC, sort_order ASC, id ASC LIMIT 1
+      ) vimg_title ON true
       WHERE i.order_id IN (${pPlaceholders})
       ORDER BY i.id ASC
     `, orderIds)

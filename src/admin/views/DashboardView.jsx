@@ -38,7 +38,14 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
   const renderStatusBadge = (status) => {
     switch (status) {
       case 'Pending':
-        return <span className="badge badge-status badge-pending"><i className="bi bi-clock-history"></i> Pending</span>
+        return (
+          <span 
+            className="badge badge-status badge-pending" 
+            style={{ backgroundColor: '#fef3c7', color: '#78350f', border: '1px solid #fde68a', fontWeight: 600 }}
+          >
+            <i className="bi bi-clock-history"></i> Pending
+          </span>
+        )
       case 'Processing':
         return <span className="badge badge-status badge-processing"><i className="bi bi-gear-fill"></i> Processing</span>
       case 'Shipped':

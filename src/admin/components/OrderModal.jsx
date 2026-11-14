@@ -34,8 +34,8 @@ export default function OrderModal({ order, onClose }) {
           {/* Modal Header */}
           <div className="modal-header bg-dark text-white py-3">
             <div className="d-flex align-items-center gap-2">
-              <span className="badge bg-warning text-dark font-monospace fs-6">{order.id}</span>
-              <h5 className="modal-title fw-bold mb-0 text-white">Order Details &amp; Fulfillment</h5>
+              <span className="badge bg-warning text-dark font-monospace fs-6 fw-medium">{order.id}</span>
+              <h5 className="modal-title fw-semibold mb-0 text-white">Order Details &amp; Fulfillment</h5>
             </div>
             <button type="button" className="btn-close btn-close-white" onClick={onClose} aria-label="Close"></button>
           </div>
@@ -47,17 +47,25 @@ export default function OrderModal({ order, onClose }) {
               <div>
                 <div className="d-flex align-items-center gap-2 mb-1">
                   <div className="admin-sidebar-logo" style={{ width: 32, height: 32, fontSize: '0.9rem' }}>G</div>
-                  <h4 className="fw-bold mb-0 text-dark">{storeSettings?.name || 'Save & Smile'}</h4>
+                  <h4 className="fw-semibold mb-0 text-dark">{storeSettings?.name || 'Save & Smile'}</h4>
                 </div>
                 <small className="text-muted d-block">{storeSettings?.tagline || ''}</small>
                 <small className="text-muted d-block">Contact: {storeSettings?.phone || '0333-7221552'} | {storeSettings?.email || ''}</small>
               </div>
               <div className="text-end">
-                <span className="badge bg-secondary font-monospace">INVOICE</span>
-                <div className="fw-bold text-dark mt-1">Date: {order.date}</div>
+                <span className="badge bg-secondary font-monospace fw-normal">INVOICE</span>
+                <div className="fw-medium text-dark mt-1">Date: {order.date}</div>
                 <div className="small text-muted">Payment: {order.paymentMethod}</div>
                 <div className="mt-1">
-                  <span className={`badge ${order.status === 'Delivered' ? 'bg-success' : order.status === 'Cancelled' ? 'bg-danger' : 'bg-warning text-dark'}`}>
+                  <span 
+                    className="badge" 
+                    style={{ 
+                      fontWeight: 500,
+                      backgroundColor: order.status === 'Delivered' ? '#d1fae5' : order.status === 'Cancelled' ? '#fee2e2' : '#fef3c7',
+                      color: order.status === 'Delivered' ? '#065f46' : order.status === 'Cancelled' ? '#991b1b' : '#78350f',
+                      border: `1px solid ${order.status === 'Delivered' ? '#a7f3d0' : order.status === 'Cancelled' ? '#fecaca' : '#fde68a'}`
+                    }}
+                  >
                     Status: {order.status}
                   </span>
                 </div>
@@ -68,8 +76,8 @@ export default function OrderModal({ order, onClose }) {
             <div className="row g-3 mb-4">
               <div className="col-12 col-md-6">
                 <div className="card h-100 bg-light border-0 p-3">
-                  <h6 className="fw-bold text-uppercase small text-muted mb-2">Customer Information</h6>
-                  <div className="fw-bold text-dark fs-6">{order.customer?.name || order.customerName || 'Customer'}</div>
+                  <h6 className="fw-semibold text-uppercase small text-muted mb-2">Customer Information</h6>
+                  <div className="fw-semibold text-dark fs-6">{order.customer?.name || order.customerName || 'Customer'}</div>
                   <div className="small text-muted mb-1">
                     <i className="bi bi-telephone text-primary me-1"></i>
                     {order.customer?.mobile || order.customerMobile || '—'}
@@ -95,13 +103,13 @@ export default function OrderModal({ order, onClose }) {
 
               <div className="col-12 col-md-6">
                 <div className="card h-100 bg-light border-0 p-3">
-                  <h6 className="fw-bold text-uppercase small text-muted mb-2">Delivery Address</h6>
+                  <h6 className="fw-semibold text-uppercase small text-muted mb-2">Delivery Address</h6>
                   <div className="mb-1">
-                    <span className="badge bg-dark mb-1">{order.customer?.city || order.customerCity || 'Pakistan'}</span>
+                    <span className="badge bg-dark mb-1 fw-normal">{order.customer?.city || order.customerCity || 'Pakistan'}</span>
                   </div>
                   <p className="small text-dark mb-2">{order.customer?.address || order.deliveryAddress || 'Standard Delivery Address'}</p>
                   {order.trackingNumber && (
-                    <div className="small text-primary fw-semibold">
+                    <div className="small text-primary fw-medium">
                       <i className="bi bi-truck me-1"></i> Courier Tracking: {order.trackingNumber}
                     </div>
                   )}
@@ -109,8 +117,21 @@ export default function OrderModal({ order, onClose }) {
               </div>
             </div>
 
+            {/* Special Delivery Instructions / Notes */}
+            {order.notes && (
+              <div className="alert alert-warning border border-warning-subtle d-flex align-items-start gap-2.5 mb-4 p-3 rounded-3 shadow-none">
+                <i className="bi bi-chat-left-quote-fill fs-5 text-warning flex-shrink-0 mt-0.5"></i>
+                <div className="flex-grow-1">
+                  <div className="fw-semibold text-dark small text-uppercase mb-1">Customer Special Delivery Instructions / Note:</div>
+                  <div className="text-dark small font-monospace fst-italic" style={{ whiteSpace: 'pre-wrap' }}>
+                    "{order.notes}"
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Order Items List */}
-            <h6 className="fw-bold text-dark mb-2">Purchased Items ({itemsCount})</h6>
+            <h6 className="fw-semibold text-dark mb-2">Purchased Items ({itemsCount})</h6>
             <div className="table-responsive border rounded mb-3">
               <table className="table admin-table mb-0">
                 <thead className="table-light">
@@ -128,7 +149,7 @@ export default function OrderModal({ order, onClose }) {
                     const variantLabel = item.variantTitle || item.variant?.title || [item.variant?.color, item.variant?.size].filter(Boolean).join(' / ')
                     const skuCode = item.variant?.sku || item.sku || item.product?.sku
                     const itemName = item.product?.name || item.name || 'Product'
-                    const itemImg = item.product?.image || item.image || '/images/cat1.jpg'
+                    const itemImg = item.image || item.variant?.image || item.product?.image || '/images/cat1.jpg'
                     const itemCat = item.product?.category || item.category || 'General'
                     return (
                       <tr key={idx}>
@@ -141,9 +162,9 @@ export default function OrderModal({ order, onClose }) {
                               onError={(e) => { e.target.src = '/images/cat1.jpg' }}
                             />
                             <div>
-                              <div className="fw-semibold text-dark">{itemName}</div>
+                              <div className="fw-medium text-dark">{itemName}</div>
                               {variantLabel && (
-                                <div className="badge bg-primary-subtle text-primary border border-primary-subtle my-0.5" style={{ fontSize: '11px' }}>
+                                <div className="badge bg-primary-subtle text-primary border border-primary-subtle my-0.5" style={{ fontSize: '11px', fontWeight: 500 }}>
                                   <i className="bi bi-tag-fill me-1"></i> {variantLabel}
                                 </div>
                               )}
@@ -154,13 +175,13 @@ export default function OrderModal({ order, onClose }) {
                           </div>
                         </td>
                         <td>
-                          <span className="badge bg-light text-dark border">{itemCat}</span>
+                          <span className="badge bg-light text-dark border fw-normal">{itemCat}</span>
                         </td>
-                        <td className="text-center fw-bold">{item.qty}</td>
+                        <td className="text-center fw-medium">{item.qty}</td>
                         <td className="text-end">
                           {storeSettings?.currency || 'Rs.'} {unitPrice.toLocaleString()}
                         </td>
-                        <td className="text-end fw-bold">
+                        <td className="text-end fw-semibold text-dark">
                           {storeSettings?.currency || 'Rs.'} {((item.qty || 1) * unitPrice).toLocaleString()}
                         </td>
                       </tr>
@@ -176,22 +197,22 @@ export default function OrderModal({ order, onClose }) {
                 <div className="card bg-light border-0 p-3">
                   <div className="d-flex justify-content-between mb-1 small">
                     <span className="text-muted">Subtotal:</span>
-                    <span className="fw-semibold">{storeSettings?.currency || 'Rs.'} {subtotal.toLocaleString()}</span>
+                    <span className="fw-medium text-dark">{storeSettings?.currency || 'Rs.'} {subtotal.toLocaleString()}</span>
                   </div>
                   <div className="d-flex justify-content-between mb-1 small">
                     <span className="text-muted">Shipping Fee:</span>
                     <span>
                       {shipping === 0 ? (
-                        <span className="text-success fw-bold">FREE</span>
+                        <span className="text-success fw-medium">FREE</span>
                       ) : (
                         `${storeSettings?.currency || 'Rs.'} ${shipping.toLocaleString()}`
                       )}
                     </span>
                   </div>
                   <hr className="my-2" />
-                  <div className="d-flex justify-content-between fs-5 fw-bold text-dark">
-                    <span>Total Due (COD):</span>
-                    <span className="text-primary">{storeSettings?.currency || 'Rs.'} {grandTotal.toLocaleString()}</span>
+                  <div className="d-flex justify-content-between align-items-center fs-6 text-dark">
+                    <span className="text-muted fw-normal">Total Due (COD):</span>
+                    <span className="text-primary fw-semibold fs-5">{storeSettings?.currency || 'Rs.'} {grandTotal.toLocaleString()}</span>
                   </div>
                 </div>
               </div>

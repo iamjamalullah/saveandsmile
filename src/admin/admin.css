@@ -36,6 +36,19 @@
   font-weight: 600 !important;
 }
 
+.admin-shell .fw-bold,
+.modal-content .fw-bold,
+.orders-view .fw-bold,
+.dashboard-view .fw-bold,
+.printable-invoice .fw-bold {
+  font-weight: 600 !important;
+}
+
+.admin-shell h1, .admin-shell h2, .admin-shell h3, .admin-shell h4, .admin-shell h5, .admin-shell h6,
+.modal-content h1, .modal-content h2, .modal-content h3, .modal-content h4, .modal-content h5, .modal-content h6 {
+  font-weight: 600 !important;
+}
+
 /* Sidebar Styles */
 .admin-sidebar {
   width: var(--admin-sidebar-width);
@@ -281,9 +294,12 @@
   gap: 0.35rem;
 }
 
+.badge-status.badge-pending,
+.badge.badge-pending,
 .badge-pending {
-  background-color: #fef3c7;
-  color: #92400e;
+  background-color: #fef3c7 !important;
+  color: #78350f !important;
+  border: 1px solid #fde68a !important;
 }
 
 .badge-processing {

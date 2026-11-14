@@ -48,6 +48,9 @@ async function getClient() {
     throw new Error('[STORAGE] SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be configured in environment or system_config.')
   }
 
+  url = url.trim().split(/[\r\n]/)[0].trim()
+  key = key.trim().split(/[\r\n]/)[0].trim()
+
   supabase = createClient(url, key)
   return supabase
 }

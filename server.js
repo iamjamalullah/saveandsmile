@@ -352,7 +352,6 @@ const handleImageUpload = async (req, res) => {
     }
 
     const savedUrls = []
-    let lastUploadError = null
     for (let i = 0; i < images.length; i++) {
       const item = images[i]
       const dataUrl = item.data || item.dataUrl || item.base64 || ''
@@ -412,7 +411,6 @@ const handleImageUpload = async (req, res) => {
           ownerId: 'upload',
         }).catch(mErr => console.warn('[MEDIA REGISTER WARNING]:', mErr.message))
       } catch (sErr) {
-        lastUploadError = sErr.message
         console.warn('[SUPABASE UPLOAD WARNING]:', sErr.message)
       }
 
@@ -428,7 +426,6 @@ const handleImageUpload = async (req, res) => {
       urls: savedUrls,
       count: savedUrls.length,
       format: 'webp',
-      lastUploadError: lastUploadError || undefined,
       message: `${savedUrls.length} image(s) converted to WebP and saved successfully!`,
     })
   } catch (err) {

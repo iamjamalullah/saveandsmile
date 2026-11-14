@@ -633,7 +633,6 @@ export default function ProductPage() {
                   </button>
                 </div>
               )}
-              {off > 0 && <span className="qg-card-off">{off}% OFF</span>}
               {media.length > 1 && (
                 <>
                   <button className="qpdp-nav l" onClick={() => setMediaIndex(i => (i - 1 + media.length) % media.length)} aria-label="Previous image">‹</button>

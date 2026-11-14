@@ -133,7 +133,6 @@ export function QuickView() {
         <div className="qg-quick-grid">
           <div className="qg-quick-media">
             <img src={p.image} alt={p.name} />
-            {off > 0 && <span className="qg-card-off">{off}% OFF</span>}
           </div>
           <div className="qg-quick-info">
             <p className="qg-quick-cat">{p.category}</p>

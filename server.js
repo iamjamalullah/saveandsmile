@@ -396,6 +396,7 @@ const handleImageUpload = async (req, res) => {
 
       // Upload directly to permanent Supabase Storage
       let finalUrl = `/uploads/products/${filename}`
+      let lastUploadError = null
       try {
         const uploadRes = await uploadBuffer(webpResult.webpBuffer, `products/${filename}`, 'image/webp')
         if (uploadRes && uploadRes.publicUrl) {
@@ -411,6 +412,7 @@ const handleImageUpload = async (req, res) => {
           ownerId: 'upload',
         }).catch(mErr => console.warn('[MEDIA REGISTER WARNING]:', mErr.message))
       } catch (sErr) {
+        lastUploadError = sErr.message
         console.warn('[SUPABASE UPLOAD WARNING]:', sErr.message)
       }
 
@@ -426,6 +428,7 @@ const handleImageUpload = async (req, res) => {
       urls: savedUrls,
       count: savedUrls.length,
       format: 'webp',
+      lastUploadError: lastUploadError || undefined,
       message: `${savedUrls.length} image(s) converted to WebP and saved successfully!`,
     })
   } catch (err) {

@@ -1,0 +1,47 @@
+export const colors = {
+  primary: {
+    DEFAULT: '#047857',
+    dark: '#064e3b',
+    light: '#10b981',
+    subtle: '#ecfdf5',
+    border: '#a7f3d0',
+  },
+  accent: {
+    DEFAULT: '#f59e0b',
+    dark: '#b45309',
+    light: '#fbbf24',
+    subtle: '#fef3c7',
+  },
+  danger: {
+    DEFAULT: '#ef4444',
+    dark: '#b91c1c',
+    subtle: '#fee2e2',
+    border: '#fca5a5',
+  },
+  info: {
+    DEFAULT: '#3b82f6',
+    dark: '#1d4ed8',
+    subtle: '#eff6ff',
+    border: '#bfdbfe',
+  },
+  slate: {
+    ink: '#0f172a',
+    body: '#334155',
+    muted: '#64748b',
+    border: '#e2e8f0',
+    borderDark: '#cbd5e1',
+    card: '#ffffff',
+    background: '#f8fafc',
+    divider: '#f1f5f9',
+  },
+  badge: {
+    pending: { bg: '#fef3c7', text: '#92400e', border: '#fde68a' },
+    processing: { bg: '#eff6ff', text: '#1e40af', border: '#bfdbfe' },
+    shipped: { bg: '#f5f3ff', text: '#5b21b6', border: '#ddd6fe' },
+    delivered: { bg: '#ecfdf5', text: '#065f46', border: '#a7f3d0' },
+    cancelled: { bg: '#fee2e2', text: '#991b1b', border: '#fca5a5' },
+  },
+  white: '#ffffff',
+  black: '#000000',
+  transparent: 'transparent',
+};

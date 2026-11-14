@@ -8,15 +8,15 @@ export default function OrderModal({ order, onClose }) {
 
   if (!order) return null
 
-  const itemsCount = order.items.reduce((sum, i) => sum + i.qty, 0)
-  const subtotal = order.items.reduce((sum, i) => sum + i.qty * (i.variant?.price ?? i.unitPrice ?? i.product?.price ?? 0), 0)
-  const shipping = order.shippingFee || 0
-  const grandTotal = subtotal + shipping
+  const itemsCount = (order.items || []).reduce((sum, i) => sum + (i.qty || 1), 0)
+  const subtotal = (order.items || []).reduce((sum, i) => sum + (i.qty || 1) * (i.variant?.price ?? i.unitPrice ?? i.price ?? i.product?.price ?? 0), 0)
+  const shipping = Number(order.shippingFee || 0)
+  const grandTotal = Number(order.total || (subtotal + shipping))
 
   // Clean phone number for WhatsApp link
-  const cleanPhone = (order.customer.mobile || '').replace(/[^0-9]/g, '')
+  const cleanPhone = (order.customer?.mobile || order.customerMobile || '').replace(/[^0-9]/g, '')
   const waNumber = cleanPhone.startsWith('0') ? '92' + cleanPhone.slice(1) : cleanPhone
-  const waMessage = encodeURIComponent(`Assalam o Alaikum ${order.customer.name}, this is regarding your order ${order.id} on ${storeSettings.name}.`)
+  const waMessage = encodeURIComponent(`Assalam o Alaikum ${order.customer?.name || 'Customer'}, this is regarding your order ${order.id} on ${storeSettings.name}.`)
   const waLink = `https://wa.me/${waNumber}?text=${waMessage}`
 
   const handleStatusChange = (newStatus) => {
@@ -69,15 +69,15 @@ export default function OrderModal({ order, onClose }) {
               <div className="col-12 col-md-6">
                 <div className="card h-100 bg-light border-0 p-3">
                   <h6 className="fw-bold text-uppercase small text-muted mb-2">Customer Information</h6>
-                  <div className="fw-bold text-dark fs-6">{order.customer.name}</div>
+                  <div className="fw-bold text-dark fs-6">{order.customer?.name || order.customerName || 'Customer'}</div>
                   <div className="small text-muted mb-1">
                     <i className="bi bi-telephone text-primary me-1"></i>
-                    {order.customer.mobile}
+                    {order.customer?.mobile || order.customerMobile || '—'}
                   </div>
-                  {order.customer.email && (
+                  {(order.customer?.email || order.customerEmail) && (
                     <div className="small text-muted mb-2">
                       <i className="bi bi-envelope text-primary me-1"></i>
-                      {order.customer.email}
+                      {order.customer?.email || order.customerEmail}
                     </div>
                   )}
                   <div className="no-print mt-2">
@@ -123,35 +123,38 @@ export default function OrderModal({ order, onClose }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {order.items.map((item, idx) => {
-                    const unitPrice = Number(item.variant?.price ?? item.unitPrice ?? item.product?.price ?? 0)
+                  {(order.items || []).map((item, idx) => {
+                    const unitPrice = Number(item.variant?.price ?? item.unitPrice ?? item.price ?? item.product?.price ?? 0)
                     const variantLabel = item.variantTitle || item.variant?.title || [item.variant?.color, item.variant?.size].filter(Boolean).join(' / ')
                     const skuCode = item.variant?.sku || item.sku || item.product?.sku
+                    const itemName = item.product?.name || item.name || 'Product'
+                    const itemImg = item.product?.image || item.image || '/images/cat1.jpg'
+                    const itemCat = item.product?.category || item.category || 'General'
                     return (
                       <tr key={idx}>
                         <td>
                           <div className="d-flex align-items-center gap-2">
                             <img
-                              src={item.product?.image || '/images/cat1.jpg'}
-                              alt={item.product?.name}
+                              src={itemImg}
+                              alt={itemName}
                               className="admin-thumb"
                               onError={(e) => { e.target.src = '/images/cat1.jpg' }}
                             />
                             <div>
-                              <div className="fw-semibold text-dark">{item.product?.name}</div>
+                              <div className="fw-semibold text-dark">{itemName}</div>
                               {variantLabel && (
                                 <div className="badge bg-primary-subtle text-primary border border-primary-subtle my-0.5" style={{ fontSize: '11px' }}>
                                   <i className="bi bi-tag-fill me-1"></i> {variantLabel}
                                 </div>
                               )}
                               <div className="small text-muted font-monospace">
-                                {skuCode ? `SKU: ${skuCode} | ` : ''}ID: {item.product?.id}
+                                {skuCode ? `SKU: ${skuCode} | ` : ''}ID: {item.product?.id || item.productId || '—'}
                               </div>
                             </div>
                           </div>
                         </td>
                         <td>
-                          <span className="badge bg-light text-dark border">{item.product?.category}</span>
+                          <span className="badge bg-light text-dark border">{itemCat}</span>
                         </td>
                         <td className="text-center fw-bold">{item.qty}</td>
                         <td className="text-end">

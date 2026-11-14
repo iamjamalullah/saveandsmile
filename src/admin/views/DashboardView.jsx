@@ -379,22 +379,22 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
                     <tr key={order.id}>
                       <td className="fw-semibold text-primary">{order.id}</td>
                       <td>
-                        <div className="fw-medium">{order.customer.name}</div>
-                        <small className="text-muted">{order.customer.mobile}</small>
+                        <div className="fw-medium">{order.customer?.name || order.customerName || 'Customer'}</div>
+                        <small className="text-muted">{order.customer?.mobile || order.customerMobile || '—'}</small>
                       </td>
                       <td>
                         <span className="badge bg-light text-dark border">
                           <i className="bi bi-geo-alt me-1 text-danger"></i>
-                          {order.customer.city}
+                          {order.customer?.city || order.customerCity || 'Pakistan'}
                         </span>
                       </td>
                       <td>
                         <span className="badge bg-secondary-subtle text-secondary">
-                          {order.items.reduce((sum, i) => sum + i.qty, 0)} items
+                          {(order.items || []).reduce((sum, i) => sum + (i.qty || 1), 0)} items
                         </span>
                       </td>
                       <td className="fw-bold">
-                        {storeSettings.currency} {order.total.toLocaleString()}
+                        {storeSettings.currency} {Number(order.total || 0).toLocaleString()}
                       </td>
                       <td>{renderStatusBadge(order.status)}</td>
                       <td className="text-end">

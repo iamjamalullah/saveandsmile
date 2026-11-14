@@ -30,14 +30,17 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
 
       // Search
       const search = searchTerm.toLowerCase()
+      const cName = o.customer?.name || o.customerName || ''
+      const cMobile = o.customer?.mobile || o.customerMobile || ''
+      const cCity = o.customer?.city || o.customerCity || ''
       const matchesSearch = !searchTerm ||
         o.id.toLowerCase().includes(search) ||
-        o.customer.name.toLowerCase().includes(search) ||
-        o.customer.mobile.includes(search) ||
-        (o.customer.city && o.customer.city.toLowerCase().includes(search))
+        cName.toLowerCase().includes(search) ||
+        cMobile.includes(search) ||
+        (cCity && cCity.toLowerCase().includes(search))
 
       // City Filter
-      const matchesCity = selectedCity === 'ALL' || o.customer.city === selectedCity
+      const matchesCity = selectedCity === 'ALL' || cCity === selectedCity
 
       return matchesStatus && matchesSearch && matchesCity
     }).sort((a, b) => {
@@ -210,36 +213,36 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
                       <small className="text-muted d-block">{order.date}</small>
                     </td>
                     <td>
-                      <div className="fw-semibold text-dark">{order.customer.name}</div>
+                      <div className="fw-semibold text-dark">{order.customer?.name || order.customerName || 'Guest Customer'}</div>
                       <div className="small text-muted d-flex align-items-center gap-1">
                         <i className="bi bi-telephone"></i>
-                        <span>{order.customer.mobile}</span>
+                        <span>{order.customer?.mobile || order.customerMobile || '—'}</span>
                       </div>
                     </td>
                     <td>
                       <span className="badge bg-light text-dark border mb-1">
                         <i className="bi bi-geo-alt me-1 text-danger"></i>
-                        {order.customer.city}
+                        {order.customer?.city || order.customerCity || 'Pakistan'}
                       </span>
-                      <small className="text-muted d-block text-truncate" style={{ maxWidth: 180 }} title={order.customer.address}>
-                        {order.customer.address}
+                      <small className="text-muted d-block text-truncate" style={{ maxWidth: 180 }} title={order.customer?.address || order.deliveryAddress || ''}>
+                        {order.customer?.address || order.deliveryAddress || 'Standard Delivery Address'}
                       </small>
                     </td>
                     <td>
                       <div className="small">
                         <span className="fw-semibold text-dark">
-                          {order.items.reduce((sum, i) => sum + i.qty, 0)} items:
+                          {(order.items || []).reduce((sum, i) => sum + (i.qty || 1), 0)} items:
                         </span>
-                        <div className="text-muted text-truncate" style={{ maxWidth: 200 }} title={order.items.map(i => `${i.qty}x ${i.product.name}`).join(', ')}>
-                          {order.items.map(i => `${i.qty}x ${i.product.name}`).join(', ')}
+                        <div className="text-muted text-truncate" style={{ maxWidth: 200 }} title={(order.items || []).map(i => `${i.qty || 1}x ${i.product?.name || i.name || 'Product'}`).join(', ')}>
+                          {(order.items || []).map(i => `${i.qty || 1}x ${i.product?.name || i.name || 'Product'}`).join(', ')}
                         </div>
                       </div>
                     </td>
                     <td>
                       <div className="fw-bold fs-6 text-dark">
-                        {storeSettings.currency} {order.total.toLocaleString()}
+                        {storeSettings.currency} {Number(order.total || 0).toLocaleString()}
                       </div>
-                      <small className="text-muted d-block">Cash on Delivery</small>
+                      <small className="text-muted d-block">{order.paymentMethod || 'Cash on Delivery'}</small>
                     </td>
                     <td>
                       <div className="d-flex align-items-center gap-2">

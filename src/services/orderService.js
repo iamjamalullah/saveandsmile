@@ -326,6 +326,14 @@ export async function getOrders() {
         qty: item.quantity,
         total: Number(item.line_total),
         image: item.product_image || '/images/p1.jpg',
+        product: {
+          id: item.product_id,
+          name: item.product_name,
+          sku: item.product_sku,
+          image: item.product_image || '/images/p1.jpg',
+          category: 'General',
+          price: Number(item.unit_price),
+        },
       })
     })
   }

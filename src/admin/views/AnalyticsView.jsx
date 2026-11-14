@@ -5,19 +5,19 @@ export default function AnalyticsView() {
   const { products, orders, categories, storeSettings } = useStoreData()
 
   // Calculate stats
-  const completedOrders = orders.filter(o => o.status === 'Delivered')
-  const totalRevenue = orders.filter(o => o.status !== 'Cancelled').reduce((sum, o) => sum + o.total, 0)
-  const deliveredRevenue = completedOrders.reduce((sum, o) => sum + o.total, 0)
-  const totalUnitsSold = orders.filter(o => o.status !== 'Cancelled').reduce((sum, o) => sum + o.items.reduce((s, i) => s + i.qty, 0), 0)
+  const completedOrders = (orders || []).filter(o => o.status === 'Delivered')
+  const totalRevenue = (orders || []).filter(o => o.status !== 'Cancelled').reduce((sum, o) => sum + Number(o.total || 0), 0)
+  const deliveredRevenue = completedOrders.reduce((sum, o) => sum + Number(o.total || 0), 0)
+  const totalUnitsSold = (orders || []).filter(o => o.status !== 'Cancelled').reduce((sum, o) => sum + (o.items || []).reduce((s, i) => s + (i.qty || 1), 0), 0)
   const estimatedProfit = Math.round(totalRevenue * 0.32) // Estimated 32% wholesale margin
 
   // City breakdown calculation
   const cityCounts = {}
-  orders.forEach(o => {
-    const city = o.customer.city || 'Other'
+  ;(orders || []).forEach(o => {
+    const city = o.customer?.city || o.customerCity || 'Other'
     cityCounts[city] = (cityCounts[city] || 0) + 1
   })
-  const totalOrdersCount = orders.length || 1
+  const totalOrdersCount = (orders || []).length || 1
 
   return (
     <div className="analytics-view">

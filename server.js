@@ -17,6 +17,7 @@ import {
 } from './src/services/homepageService.js'
 import * as catalogService from './src/services/catalogService.js'
 import * as mediaService from './src/services/mediaService.js'
+import { uploadBuffer, getPublicUrl } from './src/services/storageService.js'
 import { convertToWebP, generateWebPFilename, validateImage } from './src/services/imageProcessingService.js'
 import { initDatabase, query, isMemoryDb } from './src/db/index.js'
 
@@ -323,6 +324,20 @@ server.use(middlewares)
 server.use(express.json({ limit: '50mb' }))
 server.use(express.urlencoded({ extended: true, limit: '50mb' }))
 server.use('/uploads', express.static(UPLOADS_DIR))
+server.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')))
+
+// Fallback for /uploads if file is not on local disk (redirect to permanent Supabase Storage)
+server.get(['/uploads/:folder/:file', '/api/uploads/:folder/:file'], (req, res) => {
+  const { folder, file } = req.params
+  const local1 = path.join(UPLOADS_DIR, folder, file)
+  const local2 = path.join(__dirname, 'public', 'uploads', folder, file)
+  if (fs.existsSync(local1)) return res.sendFile(local1)
+  if (fs.existsSync(local2)) return res.sendFile(local2)
+
+  const supabaseUrl = process.env.SUPABASE_URL || 'https://piocbtkjzznzzdftyelh.supabase.co'
+  const targetUrl = `${supabaseUrl}/storage/v1/object/public/product-media/${folder}/${file}`
+  return res.redirect(302, targetUrl)
+})
 
 // ── MANDATORY GLOBAL WEBP IMAGE UPLOAD & CONVERSION HANDLER ──────────────────
 const handleImageUpload = async (req, res) => {
@@ -349,7 +364,7 @@ const handleImageUpload = async (req, res) => {
           return res.status(400).json({ error: `Invalid image data format at index ${i}` })
         }
         rawBuffer = Buffer.from(matches[1], 'base64')
-      } else if (typeof dataUrl === 'string' && dataUrl.startsWith('/uploads/') && dataUrl.endsWith('.webp')) {
+      } else if (typeof dataUrl === 'string' && (dataUrl.startsWith('/uploads/') || dataUrl.startsWith('http')) && dataUrl.endsWith('.webp')) {
         savedUrls.push(dataUrl)
         continue
       } else {
@@ -372,8 +387,36 @@ const handleImageUpload = async (req, res) => {
       const filename = generateWebPFilename(item.name || `media_${i}`, 'media')
       const filePath = path.join(PRODUCTS_UPLOADS_DIR, filename)
 
-      fs.writeFileSync(filePath, webpResult.webpBuffer)
-      savedUrls.push(`/uploads/products/${filename}`)
+      // Always write to local disk as fallback / local dev cache
+      try {
+        fs.writeFileSync(filePath, webpResult.webpBuffer)
+      } catch (wErr) {
+        console.warn('[LOCAL FILE WRITE WARNING]:', wErr.message)
+      }
+
+      // Upload directly to permanent Supabase Storage
+      let finalUrl = `/uploads/products/${filename}`
+      if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        try {
+          const uploadRes = await uploadBuffer(webpResult.webpBuffer, `products/${filename}`, 'image/webp')
+          if (uploadRes && uploadRes.publicUrl) {
+            finalUrl = uploadRes.publicUrl
+          }
+          await mediaService.registerMedia({
+            bucket: 'product-media',
+            path: `products/${filename}`,
+            filename,
+            mimeType: 'image/webp',
+            sizeBytes: webpResult.webpBuffer.length,
+            ownerType: 'product',
+            ownerId: 'upload',
+          }).catch(mErr => console.warn('[MEDIA REGISTER WARNING]:', mErr.message))
+        } catch (sErr) {
+          console.warn('[SUPABASE UPLOAD WARNING]:', sErr.message)
+        }
+      }
+
+      savedUrls.push(finalUrl)
     }
 
     if (savedUrls.length === 0) {

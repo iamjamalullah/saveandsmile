@@ -14,7 +14,7 @@
       "destination": "/api/index.js"
     },
     {
-      "source": "/(products|categories|orders|reviews|coupons|settings|sections|heroSlides|watchShop|auth|checkout|upload|homepage)(.*)",
+      "source": "/(products|categories|orders|reviews|coupons|settings|sections|heroSlides|watchShop|auth|checkout|upload|uploads|homepage)(.*)",
       "destination": "/api/index.js"
     },
     {

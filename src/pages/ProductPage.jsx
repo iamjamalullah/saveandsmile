@@ -591,6 +591,11 @@ export default function ProductPage() {
                   <img
                     src={activeMedia?.src || product.image}
                     alt={product.name}
+                    onError={(e) => {
+                      if (product.image && e.target.src !== product.image) {
+                        e.target.src = product.image
+                      }
+                    }}
                     style={{
                       width: '100%',
                       aspectRatio: '1 / 1',
@@ -649,7 +654,15 @@ export default function ProductPage() {
                   onClick={() => setMediaIndex(i)}
                   aria-label={m.type === 'video' ? 'Play product video' : `View image ${i + 1}`}
                 >
-                  <img src={m.type === 'video' ? product.image : m.src} alt="" />
+                  <img
+                    src={m.type === 'video' ? product.image : m.src}
+                    alt=""
+                    onError={(e) => {
+                      if (product.image && e.target.src !== product.image) {
+                        e.target.src = product.image
+                      }
+                    }}
+                  />
                   {m.type === 'video' && <span className="qpdp-thumb-play">▶</span>}
                 </button>
               ))}

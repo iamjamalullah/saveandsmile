@@ -46,7 +46,7 @@ export default function AnalyticsView() {
                 <i className="bi bi-graph-up-arrow"></i>
               </div>
             </div>
-            <h3 className="fw-bold mb-1">{storeSettings.currency} {totalRevenue.toLocaleString()}</h3>
+            <h3 className="fw-bold mb-1">{storeSettings?.currency || 'Rs.'} {totalRevenue.toLocaleString()}</h3>
             <div className="text-muted small">
               <span className="text-success fw-semibold">Rs. {deliveredRevenue.toLocaleString()}</span> collected
             </div>
@@ -61,7 +61,7 @@ export default function AnalyticsView() {
                 <i className="bi bi-cash-coin"></i>
               </div>
             </div>
-            <h3 className="fw-bold mb-1">{storeSettings.currency} {estimatedProfit.toLocaleString()}</h3>
+            <h3 className="fw-bold mb-1">{storeSettings?.currency || 'Rs.'} {estimatedProfit.toLocaleString()}</h3>
             <div className="text-success small fw-medium">
               <i className="bi bi-pie-chart-fill me-1"></i> ~32% Avg Gross Margin
             </div>

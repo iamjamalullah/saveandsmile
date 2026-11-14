@@ -16,7 +16,7 @@ export default function OrderModal({ order, onClose }) {
   // Clean phone number for WhatsApp link
   const cleanPhone = (order.customer?.mobile || order.customerMobile || '').replace(/[^0-9]/g, '')
   const waNumber = cleanPhone.startsWith('0') ? '92' + cleanPhone.slice(1) : cleanPhone
-  const waMessage = encodeURIComponent(`Assalam o Alaikum ${order.customer?.name || 'Customer'}, this is regarding your order ${order.id} on ${storeSettings.name}.`)
+  const waMessage = encodeURIComponent(`Assalam o Alaikum ${order.customer?.name || order.customerName || 'Customer'}, this is regarding your order ${order.id} on ${storeSettings?.name || 'Save & Smile'}.`)
   const waLink = `https://wa.me/${waNumber}?text=${waMessage}`
 
   const handleStatusChange = (newStatus) => {
@@ -47,10 +47,10 @@ export default function OrderModal({ order, onClose }) {
               <div>
                 <div className="d-flex align-items-center gap-2 mb-1">
                   <div className="admin-sidebar-logo" style={{ width: 32, height: 32, fontSize: '0.9rem' }}>G</div>
-                  <h4 className="fw-bold mb-0 text-dark">{storeSettings.name}</h4>
+                  <h4 className="fw-bold mb-0 text-dark">{storeSettings?.name || 'Save & Smile'}</h4>
                 </div>
-                <small className="text-muted d-block">{storeSettings.tagline}</small>
-                <small className="text-muted d-block">Contact: {storeSettings.phone} | {storeSettings.email}</small>
+                <small className="text-muted d-block">{storeSettings?.tagline || ''}</small>
+                <small className="text-muted d-block">Contact: {storeSettings?.phone || '0333-7221552'} | {storeSettings?.email || ''}</small>
               </div>
               <div className="text-end">
                 <span className="badge bg-secondary font-monospace">INVOICE</span>
@@ -97,9 +97,9 @@ export default function OrderModal({ order, onClose }) {
                 <div className="card h-100 bg-light border-0 p-3">
                   <h6 className="fw-bold text-uppercase small text-muted mb-2">Delivery Address</h6>
                   <div className="mb-1">
-                    <span className="badge bg-dark mb-1">{order.customer.city}</span>
+                    <span className="badge bg-dark mb-1">{order.customer?.city || order.customerCity || 'Pakistan'}</span>
                   </div>
-                  <p className="small text-dark mb-2">{order.customer.address}</p>
+                  <p className="small text-dark mb-2">{order.customer?.address || order.deliveryAddress || 'Standard Delivery Address'}</p>
                   {order.trackingNumber && (
                     <div className="small text-primary fw-semibold">
                       <i className="bi bi-truck me-1"></i> Courier Tracking: {order.trackingNumber}
@@ -158,10 +158,10 @@ export default function OrderModal({ order, onClose }) {
                         </td>
                         <td className="text-center fw-bold">{item.qty}</td>
                         <td className="text-end">
-                          {storeSettings.currency} {unitPrice.toLocaleString()}
+                          {storeSettings?.currency || 'Rs.'} {unitPrice.toLocaleString()}
                         </td>
                         <td className="text-end fw-bold">
-                          {storeSettings.currency} {(item.qty * unitPrice).toLocaleString()}
+                          {storeSettings?.currency || 'Rs.'} {((item.qty || 1) * unitPrice).toLocaleString()}
                         </td>
                       </tr>
                     )
@@ -176,7 +176,7 @@ export default function OrderModal({ order, onClose }) {
                 <div className="card bg-light border-0 p-3">
                   <div className="d-flex justify-content-between mb-1 small">
                     <span className="text-muted">Subtotal:</span>
-                    <span className="fw-semibold">{storeSettings.currency} {subtotal.toLocaleString()}</span>
+                    <span className="fw-semibold">{storeSettings?.currency || 'Rs.'} {subtotal.toLocaleString()}</span>
                   </div>
                   <div className="d-flex justify-content-between mb-1 small">
                     <span className="text-muted">Shipping Fee:</span>
@@ -184,14 +184,14 @@ export default function OrderModal({ order, onClose }) {
                       {shipping === 0 ? (
                         <span className="text-success fw-bold">FREE</span>
                       ) : (
-                        `${storeSettings.currency} ${shipping.toLocaleString()}`
+                        `${storeSettings?.currency || 'Rs.'} ${shipping.toLocaleString()}`
                       )}
                     </span>
                   </div>
                   <hr className="my-2" />
                   <div className="d-flex justify-content-between fs-5 fw-bold text-dark">
                     <span>Total Due (COD):</span>
-                    <span className="text-primary">{storeSettings.currency} {grandTotal.toLocaleString()}</span>
+                    <span className="text-primary">{storeSettings?.currency || 'Rs.'} {grandTotal.toLocaleString()}</span>
                   </div>
                 </div>
               </div>

@@ -34,7 +34,7 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
       const cMobile = o.customer?.mobile || o.customerMobile || ''
       const cCity = o.customer?.city || o.customerCity || ''
       const matchesSearch = !searchTerm ||
-        o.id.toLowerCase().includes(search) ||
+        String(o.id || '').toLowerCase().includes(search) ||
         cName.toLowerCase().includes(search) ||
         cMobile.includes(search) ||
         (cCity && cCity.toLowerCase().includes(search))
@@ -240,7 +240,7 @@ export default function OrdersView({ selectedOrderForModal, onSelectOrder }) {
                     </td>
                     <td>
                       <div className="fw-bold fs-6 text-dark">
-                        {storeSettings.currency} {Number(order.total || 0).toLocaleString()}
+                        {storeSettings?.currency || 'Rs.'} {Number(order.total || 0).toLocaleString()}
                       </div>
                       <small className="text-muted d-block">{order.paymentMethod || 'Cash on Delivery'}</small>
                     </td>

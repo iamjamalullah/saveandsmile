@@ -327,11 +327,11 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                         <td>
                           <div>
                             <span className="fw-bold text-dark">
-                              {storeSettings.currency} {p.price.toLocaleString()}
+                              {storeSettings?.currency || 'Rs.'} {p.price.toLocaleString()}
                             </span>
                             {p.oldPrice > p.price && (
                               <div className="small">
-                                <s className="text-muted me-1">{storeSettings.currency} {p.oldPrice.toLocaleString()}</s>
+                                <s className="text-muted me-1">{storeSettings?.currency || 'Rs.'} {p.oldPrice.toLocaleString()}</s>
                                 <span className="badge bg-danger-subtle text-danger">-{discount}%</span>
                               </div>
                             )}
@@ -410,10 +410,10 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                     <div className="mt-auto">
                       <div className="d-flex align-items-baseline gap-2 mb-3">
                         <span className="fw-bold fs-5 text-dark">
-                          {storeSettings.currency} {p.price.toLocaleString()}
+                          {storeSettings?.currency || 'Rs.'} {p.price.toLocaleString()}
                         </span>
                         {p.oldPrice > p.price && (
-                          <s className="small text-muted">{storeSettings.currency} {p.oldPrice.toLocaleString()}</s>
+                          <s className="small text-muted">{storeSettings?.currency || 'Rs.'} {p.oldPrice.toLocaleString()}</s>
                         )}
                       </div>
                       <div className="d-flex gap-2">

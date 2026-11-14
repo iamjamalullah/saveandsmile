@@ -5,16 +5,16 @@ export default function SettingsView() {
   const { storeSettings, updateStoreSettings, resetToDefaults, products, orders, categories } = useStoreData()
 
   const [form, setForm] = useState({
-    name: storeSettings.name || 'Gadget Store',
-    tagline: storeSettings.tagline || 'Gadgets Wholesaler',
-    announcement: storeSettings.announcement || '',
-    phone: storeSettings.phone || '',
-    whatsapp: storeSettings.whatsapp || '',
-    email: storeSettings.email || '',
-    currency: storeSettings.currency || 'Rs.',
-    shippingFee: storeSettings.shippingFee || 200,
-    freeShippingThreshold: storeSettings.freeShippingThreshold || 3000,
-    address: storeSettings.address || 'Wholesale Market, Karachi, Pakistan',
+    name: storeSettings?.name || 'Save & Smile',
+    tagline: storeSettings?.tagline || 'Your Trusted Online Shopping Hub',
+    announcement: storeSettings?.announcement || '',
+    phone: storeSettings?.phone || '0333-7221552',
+    whatsapp: storeSettings?.whatsapp || '923337221552',
+    email: storeSettings?.email || '',
+    currency: storeSettings?.currency || 'Rs.',
+    shippingFee: storeSettings?.shippingFee || 200,
+    freeShippingThreshold: storeSettings?.freeShippingThreshold || 3000,
+    address: storeSettings?.address || 'Karachi, Pakistan',
   })
 
   const handleSubmit = (e) => {

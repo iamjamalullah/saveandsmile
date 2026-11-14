@@ -97,7 +97,7 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
                 <i className="bi bi-currency-exchange"></i>
               </div>
             </div>
-            <h3 className="fw-bold mb-1">{storeSettings.currency} {totalRevenue.toLocaleString()}</h3>
+            <h3 className="fw-bold mb-1">{storeSettings?.currency || 'Rs.'} {totalRevenue.toLocaleString()}</h3>
             <div className="d-flex align-items-center text-success small fw-medium">
               <i className="bi bi-arrow-up-right me-1"></i>
               <span>+18.4% vs last month</span>
@@ -147,7 +147,7 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
                 <i className="bi bi-wallet2"></i>
               </div>
             </div>
-            <h3 className="fw-bold mb-1">{storeSettings.currency} {avgOrderValue.toLocaleString()}</h3>
+            <h3 className="fw-bold mb-1">{storeSettings?.currency || 'Rs.'} {avgOrderValue.toLocaleString()}</h3>
             <div className="d-flex align-items-center text-muted small">
               <i className="bi bi-cash-stack me-1"></i> Cash on Delivery (COD)
             </div>
@@ -173,7 +173,7 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <div>
                   <span className="text-muted small">Peak Month</span>
-                  <div className="fw-bold text-dark fs-5">October ({storeSettings.currency} 284,500)</div>
+                  <div className="fw-bold text-dark fs-5">October ({storeSettings?.currency || 'Rs.'} 284,500)</div>
                 </div>
                 <div className="d-flex gap-3 small">
                   <div className="d-flex align-items-center gap-1.5">                      <span className="d-inline-block rounded-circle" style={{ width: 10, height: 10, backgroundColor: '#049977' }}></span>
@@ -247,7 +247,7 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
                     }}
                   >
                     <div className="fw-bold">{monthsData[hoveredMonth].month} 2026</div>
-                    <div>{storeSettings.currency} {monthsData[hoveredMonth].revenue.toLocaleString()}</div>
+                    <div>{storeSettings?.currency || 'Rs.'} {monthsData[hoveredMonth].revenue.toLocaleString()}</div>
                     <div className="text-warning">{monthsData[hoveredMonth].orders} Orders</div>
                   </div>
                 )}
@@ -394,7 +394,7 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
                         </span>
                       </td>
                       <td className="fw-bold">
-                        {storeSettings.currency} {Number(order.total || 0).toLocaleString()}
+                        {storeSettings?.currency || 'Rs.'} {Number(order.total || 0).toLocaleString()}
                       </td>
                       <td>{renderStatusBadge(order.status)}</td>
                       <td className="text-end">
@@ -426,10 +426,10 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
                 {lowStockProducts.slice(0, 4).map((p) => (
                   <li key={p.id} className="list-group-item d-flex align-items-center justify-content-between py-3">
                     <div className="d-flex align-items-center gap-2.5">
-                      <img src={p.image} alt={p.name} className="admin-thumb" onError={(e) => { e.target.src = '/images/cat1.jpg' }} />
+                      <img src={p.image} alt={p?.name || 'Product'} className="admin-thumb" onError={(e) => { e.target.src = '/images/cat1.jpg' }} />
                       <div>
-                        <div className="fw-medium text-truncate" style={{ maxWidth: 170 }}>{p.name}</div>
-                        <small className="text-muted">{p.category}</small>
+                        <div className="fw-medium text-truncate" style={{ maxWidth: 170 }}>{p?.name || 'Product'}</div>
+                        <small className="text-muted">{p?.category || 'General'}</small>
                       </div>
                     </div>
                     <div className="text-end">
@@ -461,13 +461,13 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
                   <i className="bi bi-shop"></i>
                 </div>
                 <div>
-                  <div className="fw-bold">{storeSettings.name}</div>
-                  <small className="text-muted">{storeSettings.tagline}</small>
+                  <div className="fw-bold">{storeSettings?.name || 'Save & Smile'}</div>
+                  <small className="text-muted">{storeSettings?.tagline || 'Your Trusted Online Shopping Hub'}</small>
                 </div>
               </div>
               <p className="text-muted small mb-3">
-                <i className="bi bi-telephone text-success me-1"></i> {storeSettings.phone} &nbsp;|&nbsp;
-                <i className="bi bi-whatsapp text-success me-1"></i> {storeSettings.whatsapp}
+                <i className="bi bi-telephone text-success me-1"></i> {storeSettings?.phone || '0333-7221552'} &nbsp;|&nbsp;
+                <i className="bi bi-whatsapp text-success me-1"></i> {storeSettings?.whatsapp || '923337221552'}
               </p>
               <div className="d-grid gap-2">
                 <button

@@ -67,10 +67,10 @@ export default function WatchShopView() {
                 <div className="mt-auto">
                   <div className="d-flex align-items-baseline gap-2 mb-2">
                     <span className="fw-bold text-dark">
-                      {storeSettings.currency} {item.price.toLocaleString()}
+                      {storeSettings?.currency || 'Rs.'} {item.price.toLocaleString()}
                     </span>
                     {item.oldPrice > item.price && (
-                      <s className="small text-muted">{storeSettings.currency} {item.oldPrice.toLocaleString()}</s>
+                      <s className="small text-muted">{storeSettings?.currency || 'Rs.'} {item.oldPrice.toLocaleString()}</s>
                     )}
                   </div>
                   <button

@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useStoreData } from '../../context/StoreDataContext'
+import MobileAppReleaseSection from '../components/MobileAppReleaseSection'
 
 export default function SettingsView() {
   const { storeSettings, updateStoreSettings, resetToDefaults, products, orders, categories } = useStoreData()
+  const [activeTab, setActiveTab] = useState('general')
 
   const [form, setForm] = useState({
     name: storeSettings?.name || 'Save & Smile',
@@ -46,15 +48,36 @@ export default function SettingsView() {
   return (
     <div className="settings-view">
       {/* Top Header */}
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
         <div>
           <h3 className="fw-bold mb-1">Store &amp; System Settings</h3>
           <p className="text-muted small mb-0">
-            Customize branding, announcement marquee, contact channels, and fulfillment rules
+            Customize branding, announcement marquee, contact channels, and mobile app distribution
           </p>
         </div>
       </div>
 
+      {/* Settings Navigation Tabs */}
+      <div className="d-flex gap-2 border-bottom pb-2 mb-4">
+        <button
+          type="button"
+          className={`btn btn-sm ${activeTab === 'general' ? 'btn-dark fw-bold' : 'btn-outline-secondary'}`}
+          onClick={() => setActiveTab('general')}
+        >
+          <i className="bi bi-sliders me-1.5"></i> Store Configuration
+        </button>
+        <button
+          type="button"
+          className={`btn btn-sm ${activeTab === 'mobile' ? 'btn-success fw-bold' : 'btn-outline-secondary'}`}
+          onClick={() => setActiveTab('mobile')}
+        >
+          <i className="bi bi-android2 me-1.5"></i> Mobile App / Android APK (QR Code)
+        </button>
+      </div>
+
+      {activeTab === 'mobile' ? (
+        <MobileAppReleaseSection />
+      ) : (
       <div className="row g-4">
         {/* Left Form: Main Settings */}
         <div className="col-12 col-lg-8">
@@ -267,6 +290,7 @@ export default function SettingsView() {
           </div>
         </div>
       </div>
+      )}
     </div>
   )
 }

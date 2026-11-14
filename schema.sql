@@ -326,3 +326,25 @@ CREATE TABLE IF NOT EXISTS product_variant_images (
 
 CREATE INDEX IF NOT EXISTS idx_variant_images_product_id ON product_variant_images(product_id);
 CREATE INDEX IF NOT EXISTS idx_variant_images_color ON product_variant_images(color_name);
+
+-- 19. MOBILE APP RELEASES (Save & Smile Android Admin APK Distribution)
+CREATE TABLE IF NOT EXISTS app_releases (
+    id SERIAL PRIMARY KEY,
+    app_name VARCHAR(100) NOT NULL DEFAULT 'Save & Smile Admin',
+    package_name VARCHAR(120) NOT NULL DEFAULT 'com.saveandsmile.admin',
+    version VARCHAR(30) NOT NULL,
+    version_code INT NOT NULL DEFAULT 1,
+    file_path VARCHAR(500) NOT NULL,
+    file_size_bytes BIGINT NOT NULL,
+    file_size_formatted VARCHAR(30) NOT NULL,
+    checksum_sha256 VARCHAR(64) NOT NULL,
+    download_url VARCHAR(500) NOT NULL,
+    release_notes TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    uploaded_by VARCHAR(120) DEFAULT 'admin',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_app_releases_active ON app_releases(is_active);
+CREATE INDEX IF NOT EXISTS idx_app_releases_version ON app_releases(version);

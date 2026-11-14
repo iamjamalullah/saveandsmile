@@ -2,18 +2,31 @@ import React, { useState, useEffect, useMemo } from 'react'
 import QRCode from 'qrcode'
 
 export default function DownloadApkModal({ isOpen, onClose }) {
+  const [release, setRelease] = useState(null)
   const [qrCodeUrl, setQrCodeUrl] = useState('')
   const [copied, setCopied] = useState(false)
   const [activeTab, setActiveTab] = useState('qr')
 
+  // Load latest release info when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetch('/api/mobile/releases/latest')
+        .then(res => res.json())
+        .then(data => {
+          if (data?.release) setRelease(data.release)
+        })
+        .catch(() => {})
+    }
+  }, [isOpen])
+
   // Derive the active download URL
   const downloadUrl = useMemo(() => {
+    if (release?.downloadUrl) return release.downloadUrl
     if (typeof window !== 'undefined' && window.location.origin) {
-      // In production or custom domain:
-      return `${window.location.origin}/downloads/SaveAndSmile-Admin.apk`
+      return `${window.location.origin}/api/downloads/admin-apk`
     }
-    return 'https://saveandsmile.vercel.app/downloads/SaveAndSmile-Admin.apk'
-  }, [])
+    return 'https://saveandsmile.vercel.app/api/downloads/admin-apk'
+  }, [release])
 
   const githubReleaseUrl = 'https://github.com/iamjamalullah/saveandsmile/releases'
   const repoTreeUrl = 'https://github.com/iamjamalullah/saveandsmile/tree/main/android-admin'
@@ -83,7 +96,7 @@ export default function DownloadApkModal({ isOpen, onClose }) {
                 <div className="d-flex align-items-center gap-2 flex-wrap">
                   <h4 className="fw-bold mb-0 text-white">Save &amp; Smile — Android Admin App</h4>
                   <span className="badge bg-warning text-dark fw-bold px-2 py-1" style={{ fontSize: '11px' }}>
-                    v1.0.0 APK
+                    v{release?.version || '1.0.0'} APK
                   </span>
                 </div>
                 <p className="mb-0 text-white-50 small mt-1">
@@ -172,7 +185,7 @@ export default function DownloadApkModal({ isOpen, onClose }) {
                       style={{ backgroundColor: '#0f766e', borderColor: '#0f766e' }}
                     >
                       <i className="bi bi-download fs-5"></i>
-                      <span>Download APK Package (Direct 4.8 MB)</span>
+                      <span>Download APK Package (Direct {release?.fileSizeFormatted || '4.8 MB'})</span>
                     </a>
 
                     <a

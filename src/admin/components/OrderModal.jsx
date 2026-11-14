@@ -119,7 +119,7 @@ export default function OrderModal({ order, onClose }) {
 
             {/* Special Delivery Instructions / Notes */}
             {order.notes && (
-              <div className="alert alert-warning border border-warning-subtle d-flex align-items-start gap-2.5 mb-4 p-3 rounded-3 shadow-none">
+              <div className="alert alert-warning border border-warning-subtle d-flex align-items-start mb-4 p-3 rounded-3 shadow-none" style={{ gap: '10px' }}>
                 <i className="bi bi-chat-left-quote-fill fs-5 text-warning flex-shrink-0 mt-0.5"></i>
                 <div className="flex-grow-1">
                   <div className="fw-semibold text-dark small text-uppercase mb-1">Customer Special Delivery Instructions / Note:</div>
@@ -154,11 +154,20 @@ export default function OrderModal({ order, onClose }) {
                     return (
                       <tr key={idx}>
                         <td>
-                          <div className="d-flex align-items-center gap-2">
+                          <div className="d-flex align-items-center" style={{ gap: '12px' }}>
                             <img
                               src={itemImg}
                               alt={itemName}
                               className="admin-thumb"
+                              style={{
+                                width: '36px',
+                                height: '36px',
+                                minWidth: '36px',
+                                maxWidth: '36px',
+                                flex: '0 0 36px',
+                                objectFit: 'cover',
+                                borderRadius: '6px'
+                              }}
                               onError={(e) => { e.target.src = '/images/cat1.jpg' }}
                             />
                             <div>

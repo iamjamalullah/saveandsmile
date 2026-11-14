@@ -470,8 +470,22 @@ export default function DashboardView({ onViewOrder, onOpenAddProduct }) {
               <ul className="list-group list-group-flush">
                 {lowStockProducts.slice(0, 4).map((p) => (
                   <li key={p.id} className="list-group-item d-flex align-items-center justify-content-between py-3">
-                    <div className="d-flex align-items-center gap-2.5">
-                      <img src={p.image} alt={p?.name || 'Product'} className="admin-thumb" onError={(e) => { e.target.src = '/images/cat1.jpg' }} />
+                    <div className="d-flex align-items-center" style={{ gap: '12px' }}>
+                      <img
+                        src={p.image}
+                        alt={p?.name || 'Product'}
+                        className="admin-thumb"
+                        style={{
+                          width: '36px',
+                          height: '36px',
+                          minWidth: '36px',
+                          maxWidth: '36px',
+                          flex: '0 0 36px',
+                          objectFit: 'cover',
+                          borderRadius: '6px'
+                        }}
+                        onError={(e) => { e.target.src = '/images/cat1.jpg' }}
+                      />
                       <div>
                         <div className="fw-medium text-truncate" style={{ maxWidth: 170 }}>{p?.name || 'Product'}</div>
                         <small className="text-muted">{p?.category || 'General'}</small>

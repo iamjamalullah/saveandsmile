@@ -250,7 +250,7 @@ export default function DownloadApkModal({ isOpen, onClose }) {
                   <i className="bi bi-info-circle me-1 text-teal"></i> How to Install on Android Phone
                 </h6>
 
-                <div className="d-flex flex-column gap-2.5">
+                <div className="d-flex flex-column" style={{ gap: '10px' }}>
                   <div className="d-flex align-items-start gap-3 p-3 bg-light rounded-3 border">
                     <span
                       className="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center shrink-0"

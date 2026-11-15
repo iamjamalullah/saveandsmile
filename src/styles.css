@@ -1154,8 +1154,7 @@ img { max-width: 100%; }
 .qg-foot-bottom-links { display: none; }.qg-payments { display: flex; align-items: center; gap: 2px; }
 .qg-payments span {
   width: 50px; height: 31px; display: block;
-  background-image: url("https://www.qadrigadgets.pk/images/footer-sprites.png");
-  background-repeat: no-repeat; background-color: #fff; border-radius: 3px;
+  background-color: #fff; border-radius: 3px;
   background-size: 50px auto;
 }
 .qg-payments .visa { background-position: 0 0; }

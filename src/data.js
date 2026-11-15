@@ -1,10 +1,9 @@
 // ─────────────────────────────────────────────────────────────
 //  Save & Smile – static presentation config.
 //  Catalogue content (products, categories, hero banners, reviews)
-//  now lives in Supabase PostgreSQL / db.json and is served by
+//  lives in Supabase PostgreSQL / db.json and is served by
 //  StoreDataContext API layer.
 // ─────────────────────────────────────────────────────────────
-const CDN = 'https://www.qadrigadgets.pk'
 
 export const BRAND = {
   name: 'Save & Smile',
@@ -12,7 +11,7 @@ export const BRAND = {
   logo: '/LOGO001.png',
   logoWhite: '/logo-white.png',
   logoFooter: '/LOGO001.png',
-  menuIcon: `${CDN}/images/category_icon_mob.svg`,
+  menuIcon: '/LOGO001.png',
   phone: '0333-7221552',
   phone2: '0333-7221552',
   tel: '+923337221552',
@@ -28,22 +27,22 @@ export const BRAND = {
 }
 
 export const UI = {
-  quickView: `${CDN}/images/quick_view.svg`,
-  heart: `${CDN}/images/heart_wishlist.png`,
-  cart: `${CDN}/images/cart-new-icon.png`,
-  close: `${CDN}/images/theme_icons/close_icon.svg`,
-  min: `${CDN}/images/theme_icons/minus_icon.svg`,
-  plus: `${CDN}/images/theme_icons/plus_icon.svg`,
-  loader: `${CDN}/images/product-loader.webp`,
-  sprites: `${CDN}/images/footer-sprites.png`,
+  quickView: '/images/banner-placeholder.webp',
+  heart: '/images/banner-placeholder.webp',
+  cart: '/LOGO001.png',
+  close: '',
+  min: '',
+  plus: '',
+  loader: '/images/banner-placeholder.webp',
+  sprites: '',
 }
 
 export const HEADER_ICONS = {
-  search: `${CDN}/images/qadri-hdr-search.png`,
-  call: `${CDN}/images/qadri-hdr-call.png`,
-  wishlist: `${CDN}/images/qadri-hdr-wishlist.png`,
-  user: `${CDN}/images/qadri-hdr-user.png`,
-  cart: `${CDN}/images/qadri-hdr-cart.png`,
+  search: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+  call: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+  wishlist: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+  user: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  cart: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
 }
 
 export const NAV_LINKS = [
@@ -56,18 +55,18 @@ export const NAV_LINKS = [
 ]
 
 export const TRUST_BADGES = [
-  { title: 'Support 24/7', image: `${CDN}/images/banners/68ecda0c96323.webp` },
-  { title: 'Best Prices', image: `${CDN}/images/banners/68ecda0c969b4.webp` },
-  { title: 'Secure Payment', image: `${CDN}/images/banners/68ecda0c96cd0.webp` },
+  { title: 'Support 24/7', image: '/images/banner-placeholder.webp' },
+  { title: 'Best Prices', image: '/images/banner-placeholder.webp' },
+  { title: 'Secure Payment', image: '/images/banner-placeholder.webp' },
 ]
 
 export const SHOP_UNDER = [
-  { max: 500, image: `${CDN}/images/banners/6aad316c44160.webp` },
-  { max: 1000, image: `${CDN}/images/banners/6aad316c45003.webp` },
-  { max: 1500, image: `${CDN}/images/banners/6aad316c45708.webp` },
-  { max: 2000, image: `${CDN}/images/banners/6aad316c45e89.webp` },
-  { max: 3000, image: `${CDN}/images/banners/6aad316c464d6.webp` },
-  { max: 5000, image: `${CDN}/images/banners/6aad316c46e0c.webp` },
+  { max: 500, image: '/images/under1.png' },
+  { max: 1000, image: '/images/under2.png' },
+  { max: 1500, image: '/images/under3.png' },
+  { max: 2000, image: '/images/under4.png' },
+  { max: 3000, image: '/images/under5.png' },
+  { max: 5000, image: '/images/under6.png' },
 ]
 
 export const SEARCH_BANNER = {

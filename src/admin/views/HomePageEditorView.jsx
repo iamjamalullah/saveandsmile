@@ -35,7 +35,7 @@ export function createDefaultContentForBlockType(blockType, existingSec = {}) {
           ? existingSec.content.banners
           : [
             {
-              image: existingSec.image || 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+              image: existingSec.image || '/images/banner-placeholder.webp',
               link: '/shop',
               title,
               badge: 'Exclusive',
@@ -77,7 +77,7 @@ export function createDefaultContentForBlockType(blockType, existingSec = {}) {
     case 'image_text':
       return {
         image_text: {
-          image: existingSec.content?.image_text?.image || 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+          image: existingSec.content?.image_text?.image || '/images/banner-placeholder.webp',
           heading: title || 'Premium Quality Gadgets',
           text: subtitle || 'Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability.',
           buttonText: 'Explore Catalog',
@@ -240,7 +240,7 @@ export default function HomePageEditorView() {
       textColor: '#ffffff',
     },
     image_text: {
-      image: 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+      image: '/images/banner-placeholder.webp',
       imageAlt: 'Featured Showcase',
       heading: 'Premium Quality Gadgets',
       text: 'Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability.',
@@ -636,7 +636,7 @@ export default function HomePageEditorView() {
         textColor: '#ffffff',
       },
       image_text: {
-        image: 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+        image: '/images/banner-placeholder.webp',
         imageAlt: 'Featured Showcase',
         heading: 'Premium Quality Gadgets',
         text: 'Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability.',
@@ -816,7 +816,7 @@ export default function HomePageEditorView() {
     } else if (wizardBlockType === 'image_text') {
       content = {
         image_text: {
-          image: wizardData.image_text.image || 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+          image: wizardData.image_text.image || '/images/banner-placeholder.webp',
           imageAlt: wizardData.image_text.imageAlt || wizardData.title || 'Showcase',
           heading: wizardData.image_text.heading || wizardData.title || 'Premium Quality Gadgets',
           text: wizardData.image_text.text || wizardData.subtitle || 'Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability.',
@@ -1572,7 +1572,7 @@ export default function HomePageEditorView() {
                       alt={slide.alt || 'Hero Slide'}
                       className="card-img-top"
                       style={{ aspectRatio: '1536/538', objectFit: 'cover' }}
-                      onError={(e) => { e.target.src = 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp' }}
+                      onError={(e) => { e.target.src = '/images/banner-placeholder.webp' }}
                     />
                     <span className="badge bg-dark position-absolute top-0 start-0 m-2 rounded-pill px-2 py-1">
                       #{idx + 1}
@@ -3535,7 +3535,7 @@ export default function HomePageEditorView() {
                                             width="48"
                                             height="36"
                                             className="rounded border object-fit-cover"
-                                            onError={e => { e.target.src = 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp' }}
+                                            onError={e => { e.target.src = '/images/banner-placeholder.webp' }}
                                           />
                                         ) : (
                                           <div className="bg-secondary text-white rounded text-center py-1" style={{ width: 48, height: 36 }}>🎬</div>

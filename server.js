@@ -821,26 +821,6 @@ server.use((req, res, next) => {
     }
   }
 
-  // REVIEWS MODERATION & RATE LIMITING
-  if (pathWithoutApi.startsWith('/reviews') && method === 'POST') {
-    const rate = reviewLimiter.check(`review:${req.ip || '127.0.0.1'}`)
-    if (rate.limited) {
-      return res.status(429).json({ error: 'Too many review submissions. Please wait 10 minutes.' })
-    }
-    if (!session || (session.role !== 'admin' && session.role !== 'manager')) {
-      req.body = {
-        ...sanitizeObject(req.body),
-        status: 'pending',
-        date: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
-      }
-    }
-    res.on('finish', () => {
-      if (res.statusCode >= 200 && res.statusCode < 300) {
-        fcmService.notifyNewReview(req.body).catch(err => console.warn('[FCM REVIEW]:', err.message))
-      }
-    })
-  }
-
   next()
 })
 
@@ -1140,28 +1120,144 @@ const handleOrderCreation = async (req, res) => {
 server.post('/orders', handleOrderCreation)
 server.post('/api/orders', handleOrderCreation)
 
-// ── REVIEWS MODERATION: ANONYMOUS VS ADMIN ───────────────────
-const filterReviews = (req, res) => {
-  const db = router.db
-  let list = db.get('reviews').value() || []
-  // Only authenticated admin/manager can view pending/hidden reviews
-  if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'manager')) {
-    list = list.filter(r => r.status === 'approved' || !r.status)
+// ── AUTHORITATIVE REVIEWS HANDLERS (POSTGRESQL WITH JSON-SERVER FALLBACK) ──
+const handleGetReviews = async (req, res) => {
+  try {
+    const isAdmin = req.user && (req.user.role === 'admin' || req.user.role === 'manager')
+    const filters = {}
+    if (!isAdmin) {
+      filters.approvedOnly = true
+    } else if (req.query.status) {
+      filters.status = req.query.status
+    }
+    if (req.query.productId) {
+      filters.productId = req.query.productId
+    }
+
+    if (process.env.DATABASE_URL) {
+      const list = await catalogService.getReviews(filters)
+      return res.json(list)
+    }
+
+    const db = router.db
+    let list = db.get('reviews').value() || []
+    if (!isAdmin) {
+      list = list.filter(r => r.status === 'approved' || !r.status)
+    }
+    if (req.query.productId) {
+      list = list.filter(r => String(r.productId) === String(req.query.productId))
+    }
+    list = [...list].sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0))
+    return res.json(list)
+  } catch (err) {
+    console.error('[REVIEWS GET ERROR]:', err.message)
+    return res.status(500).json({ error: 'Failed to fetch reviews: ' + err.message })
   }
-  if (req.query.productId) {
-    list = list.filter(r => String(r.productId) === String(req.query.productId))
-  }
-  list = [...list].sort((a, b) => {
-    const idA = Number(a.id) || 0
-    const idB = Number(b.id) || 0
-    if (idA && idB && idA !== idB) return idB - idA
-    return (Date.parse(b.date) || 0) - (Date.parse(a.date) || 0)
-  })
-  return res.json(list)
 }
 
-server.get('/reviews', filterReviews)
-server.get('/api/reviews', filterReviews)
+const handleCreateReview = async (req, res) => {
+  try {
+    const isAdmin = req.user && (req.user.role === 'admin' || req.user.role === 'manager')
+    const sanitized = sanitizeObject(req.body || {})
+
+    if (!isAdmin) {
+      const rate = reviewLimiter.check(`review:${req.ip || '127.0.0.1'}`)
+      if (rate.limited) {
+        return res.status(429).json({ error: 'Too many review submissions. Please wait 10 minutes.' })
+      }
+    }
+
+    const reviewData = {
+      id: Number(sanitized.id) || Date.now(),
+      productId: sanitized.productId ? Number(sanitized.productId) : null,
+      name: sanitized.name || 'Customer',
+      title: sanitized.title || 'Verified Customer Review',
+      text: sanitized.text || sanitized.body || '',
+      rating: Number(sanitized.rating) || 5,
+      whatsapp: sanitized.whatsapp || '',
+      status: isAdmin ? (sanitized.status || 'approved') : 'pending',
+      date: sanitized.date || new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
+    }
+
+    if (!reviewData.name || !reviewData.text) {
+      return res.status(400).json({ error: 'Name and review text are required.' })
+    }
+
+    let created
+    if (process.env.DATABASE_URL) {
+      created = await catalogService.createReview(reviewData)
+    } else {
+      created = reviewData
+    }
+
+    try {
+      router.db.get('reviews').unshift(created).write?.()
+    } catch (_) {}
+
+    fcmService.notifyNewReview(created).catch(err => console.warn('[FCM REVIEW]:', err.message))
+
+    return res.status(201).json(created)
+  } catch (err) {
+    console.error('[REVIEWS POST ERROR]:', err.message)
+    return res.status(500).json({ error: 'Failed to create review: ' + err.message })
+  }
+}
+
+const handleUpdateReview = async (req, res) => {
+  try {
+    if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'manager')) {
+      return res.status(401).json({ error: 'Unauthorized: Admin authentication required' })
+    }
+
+    const reviewId = Number(req.params.id) || req.params.id
+    const updates = sanitizeObject(req.body || {})
+
+    let updated
+    if (process.env.DATABASE_URL) {
+      updated = await catalogService.updateReview(reviewId, updates)
+      if (!updated) return res.status(404).json({ error: 'Review not found' })
+    } else {
+      updated = { id: reviewId, ...updates }
+    }
+
+    try {
+      router.db.get('reviews').find({ id: reviewId }).assign(updated).write?.()
+    } catch (_) {}
+
+    return res.json(updated)
+  } catch (err) {
+    console.error('[REVIEWS PATCH ERROR]:', err.message)
+    return res.status(500).json({ error: 'Failed to update review: ' + err.message })
+  }
+}
+
+const handleDeleteReview = async (req, res) => {
+  try {
+    if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'manager')) {
+      return res.status(401).json({ error: 'Unauthorized: Admin authentication required' })
+    }
+
+    const reviewId = Number(req.params.id) || req.params.id
+    if (process.env.DATABASE_URL) {
+      await catalogService.deleteReview(reviewId)
+    }
+
+    try {
+      router.db.get('reviews').remove({ id: reviewId }).write?.()
+    } catch (_) {}
+
+    return res.json({ success: true, id: reviewId })
+  } catch (err) {
+    console.error('[REVIEWS DELETE ERROR]:', err.message)
+    return res.status(500).json({ error: 'Failed to delete review: ' + err.message })
+  }
+}
+
+server.get(['/reviews', '/api/reviews'], handleGetReviews)
+server.post(['/reviews', '/api/reviews'], handleCreateReview)
+server.patch(['/reviews/:id', '/api/reviews/:id'], handleUpdateReview)
+server.put(['/reviews/:id', '/api/reviews/:id'], handleUpdateReview)
+server.delete(['/reviews/:id', '/api/reviews/:id'], handleDeleteReview)
 
 // ── HOMEPAGE BUILDER DYNAMIC CMS ENDPOINTS ──────────────────
 const requireAdmin = (req, res, next) => {

@@ -60,7 +60,15 @@ export function getDatabasePool() {
 
 export async function query(text, params = []) {
   const p = getDatabasePool()
-  return p.query(text, params)
+  try {
+    return await p.query(text, params)
+  } catch (err) {
+    if (err.message?.includes('Connection terminated') || err.message?.includes('timeout') || err.code === 'ECONNRESET') {
+      console.warn('[POSTGRES] Retrying query after connection glitch:', err.message)
+      return await p.query(text, params)
+    }
+    throw err
+  }
 }
 
 export async function getClient() {

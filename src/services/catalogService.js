@@ -627,15 +627,56 @@ export async function getReviews(filters = {}) {
   if (filters.status) {
     params.push(filters.status)
     sql += ` AND status = $${params.length}`
+  } else if (filters.approvedOnly) {
+    sql += ` AND (status = 'approved' OR status IS NULL)`
   }
+
   if (filters.productId) {
-    params.push(filters.productId)
+    params.push(Number(filters.productId) || filters.productId)
     sql += ` AND product_id = $${params.length}`
   }
 
-  sql += ' ORDER BY id DESC'
+  sql += ' ORDER BY created_at DESC, id DESC'
   const res = await query(sql, params)
   return res.rows.map(r => ({
+    id: r.id,
+    productId: r.product_id,
+    name: r.name,
+    title: r.title,
+    text: r.text,
+    rating: Number(r.rating) || 5,
+    whatsapp: r.whatsapp || '',
+    status: r.status || 'pending',
+    date: r.date_formatted || (r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recently'),
+    createdAt: r.created_at,
+  }))
+}
+
+export async function createReview(data) {
+  let nextId = Number(data.id)
+  if (!nextId || isNaN(nextId)) {
+    const idRes = await query('SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM reviews')
+    nextId = idRes.rows[0]?.next_id || Date.now()
+  }
+
+  const res = await query(
+    `INSERT INTO reviews (id, product_id, name, title, text, rating, whatsapp, status, date_formatted, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP)
+     RETURNING *`,
+    [
+      nextId,
+      data.productId ? Number(data.productId) : null,
+      data.name || 'Customer',
+      data.title || 'Verified Customer Review',
+      data.text || '',
+      Number(data.rating) || 5,
+      data.whatsapp || '',
+      data.status || 'pending',
+      data.date || new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
+    ]
+  )
+  const r = res.rows[0]
+  return {
     id: r.id,
     productId: r.product_id,
     name: r.name,
@@ -646,34 +687,47 @@ export async function getReviews(filters = {}) {
     status: r.status,
     date: r.date_formatted,
     createdAt: r.created_at,
-  }))
+  }
 }
 
-export async function createReview(data) {
-  let nextId = data.id
-  if (!nextId) {
-    const idRes = await query('SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM reviews')
-    nextId = idRes.rows[0].next_id
-  }
+export async function updateReview(id, updates = {}) {
+  const currentRes = await query('SELECT * FROM reviews WHERE id = $1', [Number(id) || id])
+  if (!currentRes.rows.length) return null
+  const current = currentRes.rows[0]
+
+  const newStatus = updates.status !== undefined ? updates.status : current.status
+  const newTitle = updates.title !== undefined ? updates.title : current.title
+  const newText = updates.text !== undefined ? updates.text : current.text
+  const newRating = updates.rating !== undefined ? Number(updates.rating) : current.rating
 
   const res = await query(
-    `INSERT INTO reviews (id, product_id, name, title, text, rating, whatsapp, status, date_formatted)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    `UPDATE reviews SET
+       status = $1,
+       title = $2,
+       text = $3,
+       rating = $4
+     WHERE id = $5
      RETURNING *`,
-    [
-      nextId,
-      data.productId ? Number(data.productId) : null,
-      data.name,
-      data.title || '',
-      data.text,
-      Number(data.rating) || 5,
-      data.whatsapp || '',
-      data.status || 'pending',
-      data.date || new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
-    ]
+    [newStatus, newTitle, newText, newRating, Number(id) || id]
   )
   const r = res.rows[0]
-  return { id: r.id, productId: r.product_id, name: r.name, title: r.title, text: r.text, rating: Number(r.rating), status: r.status }
+  return {
+    id: r.id,
+    productId: r.product_id,
+    name: r.name,
+    title: r.title,
+    text: r.text,
+    rating: Number(r.rating),
+    whatsapp: r.whatsapp,
+    status: r.status,
+    date: r.date_formatted,
+    createdAt: r.created_at,
+  }
+}
+
+export async function deleteReview(id) {
+  const res = await query('DELETE FROM reviews WHERE id = $1 RETURNING id', [Number(id) || id])
+  return res.rowCount > 0
 }
 
 // ── STORE SETTINGS ──

@@ -55,6 +55,13 @@ interface ApiService {
     @DELETE("reviews/{id}")
     suspend fun deleteReview(@Path("id") id: String): Response<Map<String, Any>>
 
+    // ── FCM Push Notifications ──
+    @POST("notifications/fcm-token")
+    suspend fun registerFcmToken(@Body request: Map<String, String>): Response<Map<String, Any>>
+
+    @HTTP(method = "DELETE", path = "notifications/fcm-token", hasBody = true)
+    suspend fun removeFcmToken(@Body request: Map<String, String>): Response<Map<String, Any>>
+
     // ── System Health ──
     @GET("health")
     suspend fun getHealth(): Response<Map<String, Any>>

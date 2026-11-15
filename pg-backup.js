@@ -14,8 +14,13 @@ if (!fs.existsSync(BACKUP_DIR)) {
 
 const TABLES = [
   'staff_accounts',
+  'system_config',
   'categories',
   'products',
+  'product_variants',
+  'product_options',
+  'product_option_values',
+  'product_variant_images',
   'customers',
   'coupons',
   'orders',
@@ -27,6 +32,12 @@ const TABLES = [
   'sections',
   'watch_shop',
   'idempotency_keys',
+  'media_objects',
+  'cleanup_queue',
+  'app_releases',
+  'revoked_tokens',
+  'homepage_draft',
+  'homepage_section_versions',
 ]
 
 /**

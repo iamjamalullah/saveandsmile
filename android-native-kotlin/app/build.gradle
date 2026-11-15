@@ -78,6 +78,9 @@ dependencies {
     // Security & Encrypted Storage
     implementation 'androidx.security:security-crypto:1.1.0-alpha06'
 
+    // Firebase Cloud Messaging (FCM)
+    implementation 'com.google.firebase:firebase-messaging-ktx:23.4.1'
+
     // Image Loading (Coil for Compose)
     implementation 'io.coil-kt:coil-compose:2.5.0'
 

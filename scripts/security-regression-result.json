@@ -1,0 +1,52 @@
+{
+  "allPassed": true,
+  "results": [
+    {
+      "name": "Anonymous Access to Orders Protected",
+      "pass": true,
+      "status": 401,
+      "expected": 401
+    },
+    {
+      "name": "Anonymous Access to Inquiries Protected",
+      "pass": true,
+      "status": 401,
+      "expected": 401
+    },
+    {
+      "name": "Unauthorized File Upload Rejected",
+      "pass": true,
+      "status": 401,
+      "expected": 401
+    },
+    {
+      "name": "Homepage Draft Restricted to Staff",
+      "pass": true,
+      "status": 401,
+      "expected": 401
+    },
+    {
+      "name": "Admin Staff Login",
+      "pass": true,
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "Manager RBAC Permissions Boundary",
+      "pass": true,
+      "expected": "GET:200, DELETE:403"
+    },
+    {
+      "name": "Invalid Credentials Rejected",
+      "pass": true,
+      "status": 401,
+      "expected": 401
+    },
+    {
+      "name": "Frontend Bundle Zero Secrets Leak",
+      "pass": true,
+      "leakedFiles": []
+    }
+  ],
+  "timestamp": "2026-11-15T07:46:55.070Z"
+}

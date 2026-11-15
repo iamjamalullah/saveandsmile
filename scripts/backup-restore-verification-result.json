@@ -1,0 +1,131 @@
+{
+  "checksumValid": true,
+  "targetChecksum": "94977603e73e79438341e68fe7e99b695f8e4d48f0b556a4e664da2189bc6b3c",
+  "recalculated": "94977603e73e79438341e68fe7e99b695f8e4d48f0b556a4e664da2189bc6b3c",
+  "restoreDurationMs": 13326,
+  "tablesInBackup": [
+    "staff_accounts",
+    "categories",
+    "products",
+    "customers",
+    "coupons",
+    "orders",
+    "order_items",
+    "reviews",
+    "contact_inquiries",
+    "store_settings",
+    "hero_slides",
+    "sections",
+    "watch_shop",
+    "idempotency_keys"
+  ],
+  "comparisonResults": {
+    "staff_accounts": {
+      "inBackup": 2,
+      "restoredInStaging": 2,
+      "liveInPublic": 2,
+      "matchesBackup": true
+    },
+    "categories": {
+      "inBackup": 23,
+      "restoredInStaging": 23,
+      "liveInPublic": 23,
+      "matchesBackup": true
+    },
+    "products": {
+      "inBackup": 62,
+      "restoredInStaging": 62,
+      "liveInPublic": 62,
+      "matchesBackup": true
+    },
+    "customers": {
+      "inBackup": 21,
+      "restoredInStaging": 21,
+      "liveInPublic": 21,
+      "matchesBackup": true
+    },
+    "coupons": {
+      "inBackup": 4,
+      "restoredInStaging": 4,
+      "liveInPublic": 4,
+      "matchesBackup": true
+    },
+    "orders": {
+      "inBackup": 23,
+      "restoredInStaging": 23,
+      "liveInPublic": 23,
+      "matchesBackup": true
+    },
+    "order_items": {
+      "inBackup": 30,
+      "restoredInStaging": 30,
+      "liveInPublic": 30,
+      "matchesBackup": true
+    },
+    "reviews": {
+      "inBackup": 12,
+      "restoredInStaging": 12,
+      "liveInPublic": 12,
+      "matchesBackup": true
+    },
+    "contact_inquiries": {
+      "inBackup": 9,
+      "restoredInStaging": 9,
+      "liveInPublic": 9,
+      "matchesBackup": true
+    },
+    "store_settings": {
+      "inBackup": 1,
+      "restoredInStaging": 1,
+      "liveInPublic": 1,
+      "matchesBackup": true
+    },
+    "hero_slides": {
+      "inBackup": 7,
+      "restoredInStaging": 7,
+      "liveInPublic": 7,
+      "matchesBackup": true
+    },
+    "sections": {
+      "inBackup": 21,
+      "restoredInStaging": 21,
+      "liveInPublic": 21,
+      "matchesBackup": true
+    },
+    "watch_shop": {
+      "inBackup": 6,
+      "restoredInStaging": 6,
+      "liveInPublic": 6,
+      "matchesBackup": true
+    },
+    "idempotency_keys": {
+      "inBackup": 0,
+      "restoredInStaging": 0,
+      "liveInPublic": 0,
+      "matchesBackup": true
+    }
+  },
+  "missingFromBackup": [
+    "app_releases",
+    "cleanup_queue",
+    "homepage_draft",
+    "homepage_section_versions",
+    "media_objects",
+    "product_option_values",
+    "product_options",
+    "product_variant_images",
+    "product_variants",
+    "revoked_tokens",
+    "system_config"
+  ],
+  "financial": {
+    "stagingSum": 51150,
+    "publicSum": 51150,
+    "stagingCount": 23,
+    "publicCount": 23
+  },
+  "foreignKeys": {
+    "orphanItems": 0,
+    "orphanReviews": 0
+  }
+}

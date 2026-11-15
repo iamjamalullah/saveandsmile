@@ -117,10 +117,21 @@ async function build() {
       DomStorageEnabled: true,
       DatabaseEnabled: true
     },
+    notifications: {
+      enabled: true,
+      engine: 'firebase_cloud_messaging',
+      token_endpoint: 'https://saveandsmile.vercel.app/api/notifications/fcm-token',
+      channels: [
+        { id: 'channel_orders', name: 'Customer Orders', importance: 'high' },
+        { id: 'channel_inquiries', name: 'Customer Inquiries', importance: 'high' },
+        { id: 'channel_inventory', name: 'Low Inventory', importance: 'high' },
+        { id: 'channel_reviews', name: 'Product Reviews', importance: 'default' }
+      ]
+    },
     source: 'assets',
     appName: 'Save & Smile Admin',
-    version: '1.0.0',
-    versionCode: 1,
+    version: '1.1.0',
+    versionCode: 2,
     timestamp: new Date().toISOString()
   }
 

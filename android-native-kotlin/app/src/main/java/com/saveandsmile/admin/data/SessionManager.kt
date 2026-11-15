@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import java.util.UUID
 
 object SessionManager {
 
@@ -12,6 +13,8 @@ object SessionManager {
     private const val KEY_USER_NAME = "auth_user_name"
     private const val KEY_USER_ROLE = "auth_user_role"
     private const val KEY_USER_EMAIL = "auth_user_email"
+    private const val KEY_DEVICE_ID = "fcm_device_id"
+    private const val KEY_FCM_TOKEN = "fcm_registration_token"
 
     private lateinit var prefs: SharedPreferences
 
@@ -51,7 +54,30 @@ object SessionManager {
 
     fun isLoggedIn(): Boolean = !getToken().isNullOrBlank()
 
+    fun saveFcmToken(token: String) {
+        prefs.edit().putString(KEY_FCM_TOKEN, token).apply()
+    }
+
+    fun getFcmToken(): String? = prefs.getString(KEY_FCM_TOKEN, null)
+
+    fun getDeviceId(context: Context): String {
+        if (!::prefs.isInitialized) {
+            init(context)
+        }
+        var deviceId = prefs.getString(KEY_DEVICE_ID, null)
+        if (deviceId.isNullOrBlank()) {
+            deviceId = "android-" + UUID.randomUUID().toString()
+            prefs.edit().putString(KEY_DEVICE_ID, deviceId).apply()
+        }
+        return deviceId
+    }
+
     fun logout() {
+        val deviceId = prefs.getString(KEY_DEVICE_ID, null)
         prefs.edit().clear().apply()
+        // Preserve deviceId across logouts
+        if (!deviceId.isNullOrBlank()) {
+            prefs.edit().putString(KEY_DEVICE_ID, deviceId).apply()
+        }
     }
 }

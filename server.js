@@ -20,6 +20,7 @@ import * as mediaService from './src/services/mediaService.js'
 import { uploadBuffer, getPublicUrl } from './src/services/storageService.js'
 import { convertToWebP, generateWebPFilename, validateImage } from './src/services/imageProcessingService.js'
 import { initDatabase, query, isMemoryDb } from './src/db/index.js'
+import * as fcmService from './src/services/fcmService.js'
 
 // Initialize PostgreSQL / pg-mem schema on startup
 initDatabase().then(() => mediaService.ensureMetadataTables()).catch(err => console.error('[POSTGRES INIT ERROR]:', err))
@@ -654,6 +655,72 @@ server.post('/api/auth/logout', handleLogout)
 server.post('/auth/change-password', handleChangePassword)
 server.post('/api/auth/change-password', handleChangePassword)
 
+// ── FIREBASE CLOUD MESSAGING (FCM) PUSH NOTIFICATION ROUTES ──
+server.post(['/api/notifications/fcm-token', '/notifications/fcm-token'], async (req, res) => {
+  try {
+    const token = extractBearerToken(req)
+    const session = verifyToken(token)
+    const { deviceId, token: fcmToken, platform, appVersion } = req.body || {}
+    if (!deviceId || !fcmToken) {
+      return res.status(400).json({ error: 'deviceId and token are required for push notification registration.' })
+    }
+    const registered = await fcmService.registerFcmToken({
+      staffId: session?.id || null,
+      deviceId,
+      token: fcmToken,
+      platform: platform || 'android',
+      appVersion: appVersion || '1.0.0',
+    })
+    return res.json({ success: true, registered })
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to register FCM device token: ' + err.message })
+  }
+})
+
+server.delete(['/api/notifications/fcm-token', '/notifications/fcm-token'], async (req, res) => {
+  try {
+    const { deviceId, token: fcmToken } = req.body || {}
+    const result = await fcmService.removeFcmToken({ deviceId, token: fcmToken })
+    return res.json({ success: true, ...result })
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to unregister FCM device token: ' + err.message })
+  }
+})
+
+server.get(['/api/notifications', '/notifications'], async (req, res) => {
+  const token = extractBearerToken(req)
+  const session = verifyToken(token)
+  if (!session || (session.role !== 'admin' && session.role !== 'manager')) {
+    return res.status(401).json({ error: 'Unauthorized: Staff authentication required to view notifications.' })
+  }
+  try {
+    const limit = parseInt(req.query.limit || '50', 10)
+    const listRes = await query('SELECT * FROM admin_notifications ORDER BY created_at DESC LIMIT $1', [limit])
+    return res.json(listRes.rows)
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to fetch notification history: ' + err.message })
+  }
+})
+
+server.post(['/api/notifications/test', '/notifications/test'], async (req, res) => {
+  const token = extractBearerToken(req)
+  const session = verifyToken(token)
+  if (!session || (session.role !== 'admin' && session.role !== 'manager')) {
+    return res.status(401).json({ error: 'Unauthorized: Administrator authentication required to trigger test notification.' })
+  }
+  try {
+    const result = await fcmService.dispatchNotification({
+      eventType: 'test_notification',
+      title: 'Save & Smile Test Push 🚀',
+      body: 'Firebase Cloud Messaging integration test verified successfully.',
+      data: { type: 'test', timestamp: String(Date.now()) },
+    })
+    return res.json({ success: true, result })
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to dispatch test notification: ' + err.message })
+  }
+})
+
 // ── INQUIRIES ROUTE COMPATIBILITY ALIAS (/inquiries <-> /contacts) ──
 server.use((req, res, next) => {
   if (req.url.startsWith('/api/inquiries')) {
@@ -711,6 +778,11 @@ server.use((req, res, next) => {
       if (rate.limited) {
         return res.status(429).json({ error: 'Too many contact requests. Please wait a few minutes.' })
       }
+      res.on('finish', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          fcmService.notifyNewInquiry(req.body).catch(err => console.warn('[FCM INQUIRY]:', err.message))
+        }
+      })
     }
   }
 
@@ -762,6 +834,11 @@ server.use((req, res, next) => {
         date: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
       }
     }
+    res.on('finish', () => {
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        fcmService.notifyNewReview(req.body).catch(err => console.warn('[FCM REVIEW]:', err.message))
+      }
+    })
   }
 
   next()
@@ -770,7 +847,8 @@ server.use((req, res, next) => {
 // ── PHASE 3: SECURE AUTHORITATIVE CHECKOUT INTERCEPTOR ────────
 // Never trust client-submitted prices or totals.
 const handleOrderCreation = async (req, res) => {
-  const rate = orderLimiter.check(`checkout:${req.ip || '127.0.0.1'}`)
+  const clientIp = (req.headers['x-forwarded-for'] || req.ip || '127.0.0.1').split(',')[0].trim()
+  const rate = orderLimiter.check(`checkout:${clientIp}`)
   if (rate.limited) {
     return res.status(429).json({
       error: 'Too many checkout requests. Please wait a few minutes before submitting again.',
@@ -853,6 +931,17 @@ const handleOrderCreation = async (req, res) => {
             stock: Math.max(0, currentProd.stock - item.qty),
             ...(updatedVariants ? { variants: updatedVariants } : {}),
           }).write()
+        }
+      }
+
+      // Trigger FCM Push Notification for new customer order
+      fcmService.notifyNewOrder(pgOrderResult.order).catch(err => console.warn('[FCM ORDER]:', err.message))
+
+      // Trigger FCM Low Inventory Alert when stock drops below threshold (<= 5)
+      for (const item of (pgOrderResult.order.items || [])) {
+        const prod = db.get('products').find({ id: item.productId }).value()
+        if (prod && prod.stock <= 5) {
+          fcmService.notifyLowInventory(prod, prod.stock).catch(err => console.warn('[FCM LOW STOCK]:', err.message))
         }
       }
 
@@ -1290,6 +1379,9 @@ if (process.env.DATABASE_URL) {
       const { status, trackingNumber } = req.body
       const updated = await orderService.updateOrderStatus(req.params.id, status, trackingNumber)
       if (!updated) return res.status(404).json({ error: 'Order not found' })
+      fcmService.notifyOrderStatusChange(req.params.id, 'Updated', status).catch(err => {
+        console.warn('[FCM ORDER STATUS]:', err.message)
+      })
       return res.json(updated)
     } catch (err) {
       return res.status(500).json({ error: 'Failed to update order in PostgreSQL: ' + err.message })
@@ -1510,6 +1602,17 @@ server.get(['/products', '/api/products'], (req, res, next) => {
         )
       } catch (dbErr) {
         console.warn('[DB RELEASE INSERT WARNING]:', dbErr.message)
+      }
+
+      // Trigger FCM Push Notification for new customer order
+      fcmService.notifyNewOrder(pgOrderResult.order).catch(err => console.warn('[FCM ORDER]:', err.message))
+
+      // Trigger FCM Low Inventory Alert when stock drops below threshold (<= 5)
+      for (const item of (pgOrderResult.order.items || [])) {
+        const prod = db.get('products').find({ id: item.productId }).value()
+        if (prod && prod.stock <= 5) {
+          fcmService.notifyLowInventory(prod, prod.stock).catch(err => console.warn('[FCM LOW STOCK]:', err.message))
+        }
       }
 
       return res.status(201).json({

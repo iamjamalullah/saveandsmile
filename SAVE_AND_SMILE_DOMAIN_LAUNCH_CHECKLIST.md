@@ -1,96 +1,78 @@
 # SAVE & SMILE — PRODUCTION DOMAIN LAUNCH CHECKLIST
-**Document ID:** `SAMS-DOM-2026`  
-**Target:** Custom Production Domain Binding & Vercel Migration  
-**Auditor:** Lead DevOps & Cloud Infrastructure Engineer
+**Document ID:** `SAMS-DOM-CHECKLIST-2026`  
+**DevOps & Infrastructure Lead:** Senior DevOps Engineer  
+**Scope:** Custom Production Domain Binding, DNS Routing, and Vercel Deployment  
 
 ---
 
-## 1. PRE-FLIGHT DOMAIN READINESS CHECKLIST
-
-Before pointing DNS records to Vercel, ensure the following steps are prepared:
-
-- [ ] Domain name purchased (e.g. `saveandsmile.pk` or `saveandsmile.com`) via PKNIC / Namecheap / GoDaddy.
-- [ ] Vercel project access with administrative permissions to add Custom Domains.
-- [ ] Supabase production project active with SSL enforcement enabled.
-- [ ] Codebase cleaned of legacy `qadrigadgets.pk` references.
-
----
-
-## 2. DNS CONFIGURATION GUIDE (VERCEL PRODUCTION)
-
-Configure the following DNS records at your domain registrar or Cloudflare DNS manager:
-
-| Type | Name / Host | Target Value | TTL | Purpose |
-| :---: | :---: | :---: | :---: | :--- |
-| **A** | `@` (Root) | `76.76.21.21` | Auto / 300 | Points apex root domain to Vercel Global Edge Network. |
-| **CNAME** | `www` | `cname.vercel-dns.com.` | Auto / 300 | Aliases `www` subdomain to Vercel Edge. |
-| **TXT** | `_vercel` | *(Vercel verification token)* | Auto | Proves domain ownership during Vercel initial binding. |
+## 1. PRE-FLIGHT OWNER DOMAIN CONFIRMATION
 
 > [!IMPORTANT]
-> If using Cloudflare DNS, set the Proxy status to **DNS Only (Grey Cloud)** during initial certificate generation so Let's Encrypt ACME challenges resolve directly to Vercel without SSL loop errors. Once active, Full (Strict) SSL proxy may be enabled.
+> The platform code has been completely decoupled from temporary or legacy domains and now dynamically adapts to **any custom domain** approved and registered by the owner (e.g. `saveandsmile.pk`, `saveandsmile.com`, or `saveandsmile.store`). Do not change DNS records until the confirmed registrar domain is active in your control panel.
+
+### Checklist:
+- [ ] Domain name purchased via PKNIC / Namecheap / GoDaddy / Cloudflare.
+- [ ] Vercel dashboard access with Administrator role on `saveandsmile` project.
+- [ ] Production branch `feature/final-production-readiness` (or `main` after owner merge) deployed.
 
 ---
 
-## 3. CANONICAL REDIRECTS & SSL CERTIFICATE
+## 2. DNS CONFIGURATION RECORDS (VERCEL PRODUCTION)
 
-1. In Vercel Project Settings ➔ **Domains**:
-   - Add both `saveandsmile.pk` and `www.saveandsmile.pk`.
-   - Set `www.saveandsmile.pk` as the **Primary Domain**.
-   - Configure `saveandsmile.pk` to automatically 301 Redirect to `www.saveandsmile.pk` (ensures single canonical URL for Google SEO indexing).
-2. **SSL / TLS Certificate:**
-   - Vercel automatically provisions and renews a free Let's Encrypt wildcard SSL certificate with automated HTTP-01 challenge verification.
+Add these records at your DNS management panel (Cloudflare / PKNIC / Namecheap):
+
+| Record Type | Host / Name | Target / Destination | TTL | Purpose |
+| :---: | :---: | :---: | :---: | :--- |
+| **A** | `@` (Apex) | `76.76.21.21` | Auto / 300 | Routes root domain traffic directly to Vercel Global Edge. |
+| **CNAME** | `www` | `cname.vercel-dns.com.` | Auto / 300 | Routes `www` traffic to Vercel Edge. |
+| **TXT** | `_vercel` | *(Issued by Vercel)* | Auto | Verifies domain ownership during binding. |
+
+> [!TIP]
+> If using Cloudflare DNS, set the Proxy status to **DNS Only (Grey Cloud)** for the initial Let's Encrypt SSL issuance. Once Vercel issues the certificate, you may switch to Proxied (Orange Cloud) with Full (Strict) SSL.
 
 ---
 
-## 4. CODEBASE & CONFIGURATION UPDATES UPON DOMAIN ACTIVATION
+## 3. VERCEL CANONICAL REDIRECT & SSL PROVISIONING
 
-### A. Environment Variables (Vercel Project Settings)
-Update the following environment keys on Vercel Dashboard:
-```env
-PUBLIC_URL=https://www.saveandsmile.pk
-BASE_URL=https://www.saveandsmile.pk
-CORS_ORIGIN=https://www.saveandsmile.pk,https://saveandsmile.pk
-```
+1. In Vercel Project ➔ **Settings** ➔ **Domains**:
+   - Add your apex domain: `YOUR_DOMAIN.pk`
+   - Add your `www` subdomain: `www.YOUR_DOMAIN.pk`
+   - Select `www.YOUR_DOMAIN.pk` as **Recommended / Primary Domain**.
+   - Configure apex `YOUR_DOMAIN.pk` to **Redirect (301 Permanent)** to `www.YOUR_DOMAIN.pk`.
+2. **Automated SSL:**
+   - Vercel automatically negotiates with Let's Encrypt and provisions a free wildcard SSL certificate. Renewal is 100% automated.
 
-### B. Robots.txt Canonical Update (`public/robots.txt`)
-Update line 28 to point to the new custom domain:
-```txt
-Sitemap: https://www.saveandsmile.pk/sitemap.xml
-```
+---
 
-### C. Dynamic Sitemap Regeneration
-Update `scripts/generate-sitemap.js`:
-```js
-const BASE_URL = 'https://www.saveandsmile.pk'
+## 4. ONE-CLICK SITEMAP & ENVIRONMENT REGENERATION
+
+Once your custom domain is connected, run:
+```bash
+# Example: If your domain is https://www.saveandsmile.pk
+node scripts/generate-sitemap.js https://www.saveandsmile.pk
 ```
-Run `node scripts/generate-sitemap.js` to rebuild `public/sitemap.xml` with all 62 products and 23 categories mapped to the new canonical URL.
+This regenerates `public/sitemap.xml` with all 93 canonical URLs mapped to your new domain.
+
+The frontend client-side utility `src/utils/seo.js` (`getBaseUrl()`) will **automatically detect the custom domain from the live browser origin** and output the correct canonical tags, OpenGraph URLs, and Schema.org JSON-LD without any manual code changes!
 
 ---
 
 ## 5. POST-LAUNCH VERIFICATION COMMANDS
 
-Run the following terminal commands to verify SSL, headers, and redirects immediately after DNS propagation:
+Run these commands in PowerShell or terminal once DNS propagates:
 
 ```bash
 # 1. Verify Apex Root 301 Redirect to WWW
-curl -I https://saveandsmile.pk
-# Expected: HTTP/2 301 Moved Permanently -> Location: https://www.saveandsmile.pk/
+curl -I https://YOUR_DOMAIN.pk
+# Output: HTTP/2 301 -> location: https://www.YOUR_DOMAIN.pk/
 
 # 2. Verify WWW Primary Canonical Domain
-curl -I https://www.saveandsmile.pk
-# Expected: HTTP/2 200 OK
+curl -I https://www.YOUR_DOMAIN.pk
+# Output: HTTP/2 200 OK
 
-# 3. Verify SSL Certificate Validity
-curl -vI https://www.saveandsmile.pk 2>&1 | grep "SSL certificate verify ok"
+# 3. Verify SSL Certificate Chain
+curl -vI https://www.YOUR_DOMAIN.pk 2>&1 | grep "SSL certificate verify ok"
 
 # 4. Verify OWASP Security Headers on Custom Domain
-curl -I https://www.saveandsmile.pk/api/products | grep -i "strict-transport-security"
+curl -I https://www.YOUR_DOMAIN.pk/api/products | grep -i "strict-transport-security"
 ```
-
----
-
-## 6. SEARCH CONSOLE & TRACKING HANDOFF
-
-1. **Google Search Console:** Submit `https://www.saveandsmile.pk/sitemap.xml`.
-2. **Google Merchant Center:** Submit product catalog feed if running Google Shopping ads.
-3. **Facebook Pixel / TikTok Pixel:** Update base domain in pixel settings to track catalog conversions.

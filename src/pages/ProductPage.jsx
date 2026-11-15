@@ -1004,7 +1004,10 @@ export default function ProductPage() {
 
             <div className="qpdp-trust">
               {TRUST_BADGES.map(b => (
-                <div key={b.title}><img src={b.image} alt="" /><span>{b.title}</span></div>
+                <div key={b.title}>
+                  <img src={b.image} alt={b.title} width="34" height="34" />
+                  <span>{b.title}</span>
+                </div>
               ))}
             </div>
           </div>

@@ -238,16 +238,24 @@ export default function Header({ user, onLogout }) {
 
             <div className="qh-actions">
               <button className="qh-icon" type="button" aria-label="Search" onClick={() => setSearchOpen(v => !v)}>
-                <img src={HEADER_ICONS.search} width="24" height="24" alt="" />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
               </button>
               <Link className="qh-icon" to="/wishlist" aria-label="Wishlist">
-                <img src={HEADER_ICONS.wishlist} width="24" height="24" alt="" />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
                 <Count n={wishlist.length} />
               </Link>
 
               <div className="qh-account" ref={accountRef}>
                 <button className="qh-icon" type="button" aria-label="Account" onClick={() => setAccountOpen(v => !v)}>
-                  <img src={HEADER_ICONS.user} width="24" height="24" alt="" />
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
                 </button>
                 {accountOpen && (
                   <div className="qh-account-drop">
@@ -303,7 +311,10 @@ export default function Header({ user, onLogout }) {
                 aria-label="Search products"
               />
               <button type="submit" aria-label="Search">
-                <img src={HEADER_ICONS.search} alt="" />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
               </button>
               <button type="button" className="qh-search-x" onClick={() => setSearchOpen(false)} aria-label="Close search">✕</button>
             </form>

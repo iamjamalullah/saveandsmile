@@ -210,6 +210,7 @@
   transform: translateY(-1px);
 }
 .qh-icon img { display: block; width: 20px; height: 20px; object-fit: contain; }
+.qh-icon svg { display: block; width: 20px; height: 20px; stroke: #ffffff !important; flex-shrink: 0; }
 .qh-cart-btn {
   background: rgba(255, 255, 255, 0.22) !important;
   border: 1.5px solid rgba(255, 255, 255, 0.48) !important;
@@ -587,7 +588,8 @@
     justify-content: center !important;
     padding: 0 !important;
   }
-  .qh-icon img { width: 18px !important; height: 18px !important; }
+  .qh-icon img,
+  .qh-icon svg { width: 18px !important; height: 18px !important; }
   .qh-cart-btn {
     background: rgba(255, 255, 255, 0.22) !important;
     border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
@@ -602,5 +604,6 @@
   .qh-logo img { width: 104px; height: 36px; }
   .qh-menu-btn { width: 33px !important; height: 33px !important; }
   .qh-icon { width: 33px !important; height: 33px !important; }
-  .qh-icon img { width: 16px !important; height: 16px !important; }
+  .qh-icon img,
+  .qh-icon svg { width: 16px !important; height: 16px !important; }
 }

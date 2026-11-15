@@ -103,7 +103,7 @@ export function setPageSeo({
   setTwitter('twitter:card', 'summary_large_image')
   setTwitter('twitter:title', fullTitle)
   setTwitter('twitter:description', metaDesc)
-  setTwitter('twitter:image', ogImage.startsWith('http') ? ogImage : `${BASE_URL}${ogImage}`)
+  setTwitter('twitter:image', ogImage.startsWith('http') ? ogImage : `${activeBaseUrl}${ogImage}`)
 
   // 7. Structured Data (JSON-LD)
   const SCRIPT_ID = 'saveandsmile-structured-data'

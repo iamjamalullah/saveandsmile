@@ -1,0 +1,257 @@
+{
+  "timestamp": "2026-11-15T06:10:49.173Z",
+  "endpoints": [
+    {
+      "name": "API Health Ping",
+      "url": "https://saveandsmile.vercel.app/api/health",
+      "error": "fetch failed",
+      "passed": false
+    },
+    {
+      "name": "Products Catalog",
+      "url": "https://saveandsmile.vercel.app/api/products",
+      "expected": 200,
+      "status": 200,
+      "durationMs": 2275,
+      "passed": true,
+      "headers": {
+        "contentType": "application/json; charset=utf-8",
+        "xFrameOptions": "SAMEORIGIN",
+        "xContentTypeOptions": "nosniff",
+        "xXssProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains; preload"
+      },
+      "dataSummary": "Array[62]"
+    },
+    {
+      "name": "Categories List",
+      "url": "https://saveandsmile.vercel.app/api/categories",
+      "expected": 200,
+      "status": 200,
+      "durationMs": 556,
+      "passed": true,
+      "headers": {
+        "contentType": "application/json; charset=utf-8",
+        "xFrameOptions": "SAMEORIGIN",
+        "xContentTypeOptions": "nosniff",
+        "xXssProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains; preload"
+      },
+      "dataSummary": "Array[23]"
+    },
+    {
+      "name": "Store Settings",
+      "url": "https://saveandsmile.vercel.app/api/settings",
+      "expected": 200,
+      "status": 200,
+      "durationMs": 278,
+      "passed": true,
+      "headers": {
+        "contentType": "application/json; charset=utf-8",
+        "xFrameOptions": "SAMEORIGIN",
+        "xContentTypeOptions": "nosniff",
+        "xXssProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains; preload"
+      },
+      "dataSummary": "Array[1]"
+    },
+    {
+      "name": "Homepage Sections",
+      "url": "https://saveandsmile.vercel.app/api/sections",
+      "expected": 200,
+      "status": 200,
+      "durationMs": 798,
+      "passed": true,
+      "headers": {
+        "contentType": "application/json; charset=utf-8",
+        "xFrameOptions": "SAMEORIGIN",
+        "xContentTypeOptions": "nosniff",
+        "xXssProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains; preload"
+      },
+      "dataSummary": "Array[21]"
+    },
+    {
+      "name": "Hero Slides",
+      "url": "https://saveandsmile.vercel.app/api/heroSlides",
+      "expected": 200,
+      "status": 200,
+      "durationMs": 272,
+      "passed": true,
+      "headers": {
+        "contentType": "application/json; charset=utf-8",
+        "xFrameOptions": "SAMEORIGIN",
+        "xContentTypeOptions": "nosniff",
+        "xXssProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains; preload"
+      },
+      "dataSummary": "Array[7]"
+    },
+    {
+      "name": "Customer Reviews",
+      "url": "https://saveandsmile.vercel.app/api/reviews",
+      "expected": 200,
+      "status": 200,
+      "durationMs": 301,
+      "passed": true,
+      "headers": {
+        "contentType": "application/json; charset=utf-8",
+        "xFrameOptions": "SAMEORIGIN",
+        "xContentTypeOptions": "nosniff",
+        "xXssProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains; preload"
+      },
+      "dataSummary": "Array[10]"
+    },
+    {
+      "name": "Mobile Release Info",
+      "url": "https://saveandsmile.vercel.app/api/mobile/releases/latest",
+      "expected": 200,
+      "status": 200,
+      "durationMs": 527,
+      "passed": true,
+      "headers": {
+        "contentType": "application/json; charset=utf-8",
+        "xFrameOptions": "SAMEORIGIN",
+        "xContentTypeOptions": "nosniff",
+        "xXssProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains; preload"
+      },
+      "dataSummary": [
+        "success",
+        "release"
+      ]
+    },
+    {
+      "name": "Orders Unauthenticated (401 Expected)",
+      "url": "https://saveandsmile.vercel.app/api/orders",
+      "expected": 401,
+      "status": 401,
+      "durationMs": 308,
+      "passed": true,
+      "headers": {
+        "contentType": "application/json; charset=utf-8",
+        "xFrameOptions": "SAMEORIGIN",
+        "xContentTypeOptions": "nosniff",
+        "xXssProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains; preload"
+      },
+      "dataSummary": [
+        "error"
+      ]
+    },
+    {
+      "name": "Releases History Unauthenticated (401 Expected)",
+      "url": "https://saveandsmile.vercel.app/api/mobile/releases",
+      "expected": 401,
+      "status": 401,
+      "durationMs": 321,
+      "passed": true,
+      "headers": {
+        "contentType": "application/json; charset=utf-8",
+        "xFrameOptions": "SAMEORIGIN",
+        "xContentTypeOptions": "nosniff",
+        "xXssProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains; preload"
+      },
+      "dataSummary": [
+        "error"
+      ]
+    },
+    {
+      "name": "Cleanup Status Unauthenticated (401 Expected)",
+      "url": "https://saveandsmile.vercel.app/api/cleanup-status",
+      "expected": 401,
+      "status": 401,
+      "durationMs": 274,
+      "passed": true,
+      "headers": {
+        "contentType": "application/json; charset=utf-8",
+        "xFrameOptions": "SAMEORIGIN",
+        "xContentTypeOptions": "nosniff",
+        "xXssProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains; preload"
+      },
+      "dataSummary": [
+        "error"
+      ]
+    },
+    {
+      "name": "Authorized Orders List",
+      "url": "https://saveandsmile.vercel.app/api/orders",
+      "expected": 200,
+      "status": 200,
+      "durationMs": 681,
+      "passed": true,
+      "headers": {
+        "contentType": "application/json; charset=utf-8",
+        "xFrameOptions": "SAMEORIGIN",
+        "xContentTypeOptions": "nosniff",
+        "xXssProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains; preload"
+      },
+      "dataSummary": "Array[23]"
+    },
+    {
+      "name": "Authorized Customer Inquiries",
+      "url": "https://saveandsmile.vercel.app/api/inquiries",
+      "expected": 200,
+      "status": 404,
+      "durationMs": 262,
+      "passed": false,
+      "headers": {
+        "contentType": "application/json; charset=utf-8",
+        "xFrameOptions": "SAMEORIGIN",
+        "xContentTypeOptions": "nosniff",
+        "xXssProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains; preload"
+      },
+      "dataSummary": []
+    },
+    {
+      "name": "Authorized Coupons List",
+      "url": "https://saveandsmile.vercel.app/api/coupons",
+      "expected": 200,
+      "status": 200,
+      "durationMs": 284,
+      "passed": true,
+      "headers": {
+        "contentType": "application/json; charset=utf-8",
+        "xFrameOptions": "SAMEORIGIN",
+        "xContentTypeOptions": "nosniff",
+        "xXssProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains; preload"
+      },
+      "dataSummary": "Array[4]"
+    }
+  ],
+  "security": [],
+  "performance": {
+    "latencies": [
+      262,
+      272,
+      274,
+      278,
+      284,
+      301,
+      308,
+      321,
+      527,
+      556,
+      681,
+      798,
+      2275
+    ],
+    "p50": 308,
+    "p95": 2275,
+    "p99": 2275,
+    "avg": 549
+  },
+  "counts": {
+    "totalProducts": 62,
+    "totalCategories": 23,
+    "totalOrders": 23,
+    "totalCoupons": 4
+  },
+  "issues": []
+}

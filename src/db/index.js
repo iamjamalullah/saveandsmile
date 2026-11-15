@@ -121,9 +121,22 @@ export async function transaction(callback) {
 
 /**
  * Execute DDL schema to ensure all PostgreSQL tables exist.
+ * Optimized for serverless: skips 50+ serial network round-trips if production tables already exist.
  */
-export async function initDatabase() {
+export async function initDatabase(force = false) {
   const p = getDatabasePool()
+
+  // Cold Start Optimization: If running against live PostgreSQL and not forced,
+  // do a single lightweight probe instead of running 50 serial DDL round-trips over TLS.
+  if (!isMemoryDb && !force && !process.env.FORCE_DB_INIT) {
+    try {
+      await p.query('SELECT 1 FROM products LIMIT 1')
+      return true
+    } catch (_) {
+      console.log('[POSTGRES] Base tables probe failed; executing full DDL initialization...')
+    }
+  }
+
   const sql = fs.readFileSync(SCHEMA_PATH, 'utf8')
 
   // Strip line comments before splitting statements

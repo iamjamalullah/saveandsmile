@@ -320,6 +320,40 @@ server.use((req, res, next) => {
   next()
 })
 
+// ── SMART EDGE & CACHE CONTROL DIRECTIVE ─────────────────────
+server.use((req, res, next) => {
+  const clean = (req.url || '').split('?')[0].replace(/^\/api/, '')
+  const method = req.method
+
+  // Critical transactional & authenticated paths: strictly prohibited from caching
+  if (
+    clean.startsWith('/orders') ||
+    clean.startsWith('/auth') ||
+    clean.startsWith('/checkout') ||
+    clean.startsWith('/contacts') ||
+    clean.startsWith('/inquiries') ||
+    clean.startsWith('/settings') ||
+    clean.startsWith('/cleanup') ||
+    clean.startsWith('/mobile/releases') ||
+    method !== 'GET'
+  ) {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+  } else if (
+    clean === '/products' ||
+    clean.startsWith('/products/') ||
+    clean === '/categories' ||
+    clean.startsWith('/categories/') ||
+    clean === '/heroSlides' ||
+    clean === '/sections' ||
+    clean === '/watchShop' ||
+    clean === '/reviews'
+  ) {
+    // Public catalog read endpoints: 60s client, 300s edge CDN, stale-while-revalidate 600s
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600')
+  }
+  next()
+})
+
 server.use(middlewares)
 server.use(express.json({ limit: '50mb' }))
 server.use(express.urlencoded({ extended: true, limit: '50mb' }))
@@ -341,6 +375,12 @@ server.get(['/uploads/:folder/:file', '/api/uploads/:folder/:file'], (req, res) 
 
 // ── MANDATORY GLOBAL WEBP IMAGE UPLOAD & CONVERSION HANDLER ──────────────────
 const handleImageUpload = async (req, res) => {
+  const token = extractBearerToken(req)
+  const session = verifyToken(token)
+  if (!session || (session.role !== 'admin' && session.role !== 'manager')) {
+    return res.status(401).json({ error: 'Unauthorized: Media uploads are restricted to authenticated staff.' })
+  }
+
   try {
     const images = req.body?.images
     if (!images || !Array.isArray(images) || images.length === 0) {
@@ -614,9 +654,20 @@ server.post('/api/auth/logout', handleLogout)
 server.post('/auth/change-password', handleChangePassword)
 server.post('/api/auth/change-password', handleChangePassword)
 
+// ── INQUIRIES ROUTE COMPATIBILITY ALIAS (/inquiries <-> /contacts) ──
+server.use((req, res, next) => {
+  if (req.url.startsWith('/api/inquiries')) {
+    req.url = req.url.replace('/api/inquiries', '/api/contacts')
+  } else if (req.url.startsWith('/inquiries')) {
+    req.url = req.url.replace('/inquiries', '/contacts')
+  }
+  next()
+})
+
 // ── RBAC AUTHORIZATION MIDDLEWARE ────────────────────────────
 server.use((req, res, next) => {
-  const pathWithoutApi = req.path.replace(/^\/api/, '')
+  const cleanPath = (req.url || req.path || '').split('?')[0].replace(/^\/api/, '')
+  const pathWithoutApi = cleanPath.startsWith('/inquiries') ? cleanPath.replace(/^\/inquiries/, '/contacts') : cleanPath
   const method = req.method
   const token = extractBearerToken(req)
   const session = verifyToken(token)

@@ -88,7 +88,7 @@ export function normalizeSection(s, index = 0) {
     },
     // 3. Image + Text Section
     image_text: existingContent.image_text || s.image_text || {
-      image: s.image || existingContent.image || 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+      image: s.image || existingContent.image || '/images/banner-placeholder.webp',
       imageAlt: s.imageAlt || s.title || 'Featured Showcase',
       heading: s.title || 'Premium Quality Gadgets & Electronics',
       text: s.text || s.subtitle || 'Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.',

@@ -317,7 +317,7 @@ export function WelcomePopup() {
     <div className="qg-overlay qg-welcome-overlay" onClick={browse}>
       <div className="qg-welcome" onClick={e => e.stopPropagation()} role="dialog" aria-label="Welcome offer">
         <button className="qg-welcome-close" onClick={browse} aria-label="Close">✕</button>
-        <img src="https://www.qadrigadgets.pk/images/banners/69d3c0cacfc5f.webp" alt="Welcome to Save &amp; Smile – reseller information" />
+        <img src="/images/banner-placeholder.webp" alt="Welcome to Save &amp; Smile – reseller information" />
       </div>
     </div>
   )

@@ -13,7 +13,7 @@ import CategoryTabs from './CategoryTabs'
 export function PromoBannerSingle({ section }) {
   const content = section.content || {}
   const banner = (content.banners && content.banners[0]) || content.banner || {
-    image: section.image || section.bg || 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+    image: section.image || section.bg || '/images/banner-placeholder.webp',
     mobileImage: '',
     link: section.link || '/shop',
     title: section.title || 'Special Promotion',
@@ -22,7 +22,7 @@ export function PromoBannerSingle({ section }) {
     ctaText: '',
   }
 
-  const imageSrc = banner.image || 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp'
+  const imageSrc = banner.image || '/images/banner-placeholder.webp'
   const mobileImageSrc = banner.mobileImage || imageSrc
   const linkTo = banner.link || '/shop'
 
@@ -38,7 +38,7 @@ export function PromoBannerSingle({ section }) {
                 alt={banner.alt || banner.title || 'Banner'}
                 loading="lazy"
                 className="qg-banner-img w-100 d-block"
-                onError={(e) => { e.target.src = 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp' }}
+                onError={(e) => { e.target.src = '/images/banner-placeholder.webp' }}
               />
             </picture>
             {banner.badge && (
@@ -66,13 +66,13 @@ export function PromoBannerDouble({ section }) {
   const content = section.content || {}
   const banners = content.banners || []
   const banner1 = banners[0] || {
-    image: 'https://www.qadrigadgets.pk/images/banners/6a7af65669503.webp',
+    image: '/images/banner-placeholder.webp',
     link: '/shop',
     title: 'Featured Collection',
     badge: 'Trending',
   }
   const banner2 = banners[1] || {
-    image: 'https://www.qadrigadgets.pk/images/banners/6a7af65669d26.webp',
+    image: '/images/banner-placeholder.webp',
     link: '/shop',
     title: 'Best Sellers',
     badge: 'Popular',
@@ -99,11 +99,11 @@ export function PromoBannerDouble({ section }) {
           <div className="qg-banner-card col-item shadow-sm">
             <Link to={banner1.link || '/shop'} className="qg-banner-link" aria-label={banner1.title || 'Promotion 1'}>
               <img
-                src={banner1.image || 'https://www.qadrigadgets.pk/images/banners/6a7af65669503.webp'}
+                src={banner1.image || '/images/banner-placeholder.webp'}
                 alt={banner1.alt || banner1.title || 'Promo Banner'}
                 loading="lazy"
                 className="qg-banner-img"
-                onError={(e) => { e.target.src = 'https://www.qadrigadgets.pk/images/banners/6a7af65669503.webp' }}
+                onError={(e) => { e.target.src = '/images/banner-placeholder.webp' }}
               />
               {banner1.badge && (
                 <span className="qg-banner-badge-floating">
@@ -117,11 +117,11 @@ export function PromoBannerDouble({ section }) {
           <div className="qg-banner-card col-item shadow-sm">
             <Link to={banner2.link || '/shop'} className="qg-banner-link" aria-label={banner2.title || 'Promotion 2'}>
               <img
-                src={banner2.image || 'https://www.qadrigadgets.pk/images/banners/6a7af65669d26.webp'}
+                src={banner2.image || '/images/banner-placeholder.webp'}
                 alt={banner2.alt || banner2.title || 'Promo Banner'}
                 loading="lazy"
                 className="qg-banner-img"
-                onError={(e) => { e.target.src = 'https://www.qadrigadgets.pk/images/banners/6a7af65669d26.webp' }}
+                onError={(e) => { e.target.src = '/images/banner-placeholder.webp' }}
               />
               {banner2.badge && (
                 <span className="qg-banner-badge-floating">
@@ -199,7 +199,7 @@ export function AnnouncementSection({ section }) {
 export function ImageTextSection({ section }) {
   const content = section.content || {}
   const data = content.image_text || {
-    image: section.image || 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp',
+    image: section.image || '/images/banner-placeholder.webp',
     imageAlt: section.title || 'Showcase',
     heading: section.title || 'Premium Quality Gadgets',
     text: section.subtitle || 'Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability.',
@@ -225,11 +225,11 @@ export function ImageTextSection({ section }) {
         <div className={`qg-imagetext-grid ${gridClass} ${isRight ? 'is-reversed' : ''}`}>
           <div className="qg-imagetext-media">
             <img
-              src={data.image || 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp'}
+              src={data.image || '/images/banner-placeholder.webp'}
               alt={data.imageAlt || data.heading}
               loading="lazy"
               className="qg-imagetext-img shadow-sm"
-              onError={e => { e.target.src = 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp' }}
+              onError={e => { e.target.src = '/images/banner-placeholder.webp' }}
             />
           </div>
           <div className="qg-imagetext-body" style={{ color: data.textColor || '#1e293b' }}>

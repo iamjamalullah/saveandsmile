@@ -3,8 +3,23 @@
  * Manages Dynamic Document Titles, Meta Descriptions, Canonical Tags, OpenGraph, Twitter Cards, and Schema.org JSON-LD
  */
 
-const BASE_URL = 'https://saveandsmile.vercel.app'
-const DEFAULT_IMAGE = `${BASE_URL}/LOGO001.png`
+/**
+ * Dynamically resolves the active canonical origin:
+ * 1. Current live browser origin (e.g. https://www.saveandsmile.pk or custom domain)
+ * 2. Build-time environment variable VITE_SITE_URL
+ * 3. Default fallback production URL (https://saveandsmile.vercel.app)
+ */
+export function getBaseUrl() {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    const origin = window.location.origin
+    if (!origin.includes('localhost') && !origin.includes('127.0.0.1')) {
+      return origin
+    }
+  }
+  return (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SITE_URL) || 'https://saveandsmile.vercel.app'
+}
+
+const DEFAULT_IMAGE = '/LOGO001.png'
 const SITE_NAME = 'Save & Smile'
 
 export function setPageSeo({
@@ -46,7 +61,8 @@ export function setPageSeo({
   }
 
   // 4. Canonical Tag
-  const canonicalUrl = canonical ? (canonical.startsWith('http') ? canonical : `${BASE_URL}${canonical}`) : `${BASE_URL}${window.location.pathname}`
+  const activeBaseUrl = getBaseUrl()
+  const canonicalUrl = canonical ? (canonical.startsWith('http') ? canonical : `${activeBaseUrl}${canonical}`) : `${activeBaseUrl}${window.location.pathname}`
   let canonLink = document.querySelector('link[rel="canonical"]')
   if (!canonLink) {
     canonLink = document.createElement('link')
@@ -71,7 +87,7 @@ export function setPageSeo({
   setOg('og:description', metaDesc)
   setOg('og:type', ogType)
   setOg('og:url', canonicalUrl)
-  setOg('og:image', ogImage.startsWith('http') ? ogImage : `${BASE_URL}${ogImage}`)
+  setOg('og:image', ogImage.startsWith('http') ? ogImage : `${activeBaseUrl}${ogImage}`)
 
   // 6. Twitter Card
   const setTwitter = (name, content) => {

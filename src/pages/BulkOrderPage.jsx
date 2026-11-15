@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 import { useStoreData } from '../context/StoreDataContext'
 import { useCart } from '../context/CartContext'
 
-const CDN = 'https://www.qadrigadgets.pk'
+const CDN = ''
 
 export default function BulkOrderPage() {
   const { submitContact } = useStoreData()
@@ -66,7 +66,11 @@ export default function BulkOrderPage() {
 
         <div className="qbulk">
           <div className="qbulk-poster">
-            <img src={`${CDN}/images/bulk-order-banner.webp`} alt="Wholesale bulk ordering discounts at Save &amp; Smile" />
+            <img
+              src="/images/banner-placeholder.webp"
+              alt="Wholesale bulk ordering discounts at Save &amp; Smile"
+              onError={e => { e.target.src = '/images/banner-placeholder.webp' }}
+            />
           </div>
           <form className="qbulk-form" onSubmit={handleSubmit} aria-label="Wholesale Bulk Order Request">
             {error && <div style={{ color: '#dc2626', background: '#fee2e2', padding: '8px 12px', borderRadius: '6px', fontSize: '13px', gridColumn: '1 / -1' }}>{error}</div>}

@@ -1,7 +1,9 @@
 import fs from 'node:fs'
 
 const db = JSON.parse(fs.readFileSync('db.json', 'utf8'))
-const BASE_URL = 'https://saveandsmile.vercel.app'
+const targetUrl = (process.env.SITE_URL || process.argv[2] || 'https://saveandsmile.vercel.app').replace(/\/+$/, '')
+const BASE_URL = targetUrl
+console.log(`[SITEMAP] Generating sitemap for origin: ${BASE_URL}`)
 const today = new Date().toISOString().split('T')[0]
 
 const staticRoutes = [

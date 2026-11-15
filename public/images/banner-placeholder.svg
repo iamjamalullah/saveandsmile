@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#047857" />
+      <stop offset="50%" stop-color="#065f46" />
+      <stop offset="100%" stop-color="#022c22" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="1200" height="400" fill="url(#bgGrad)" />
+  <circle cx="1050" cy="200" r="180" fill="#ffffff" fill-opacity="0.04" />
+  <circle cx="150" cy="350" r="220" fill="#ffffff" fill-opacity="0.03" />
+  
+  <!-- Subtle decorative accents -->
+  <rect x="80" y="70" width="120" height="6" rx="3" fill="url(#accentGrad)" />
+  
+  <!-- Brand Heading -->
+  <text x="80" y="160" font-family="system-ui, -apple-system, sans-serif" font-size="46" font-weight="800" fill="#ffffff" letter-spacing="-0.5">
+    Save &amp; Smile
+  </text>
+  <text x="80" y="210" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="500" fill="#a7f3d0">
+    Smart Lifestyle Gadgets &amp; Accessories
+  </text>
+  <text x="80" y="250" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="400" fill="#d1fae5" fill-opacity="0.8">
+    Verified Quality Guaranteed • Wholesale &amp; Retail Across Pakistan
+  </text>
+  
+  <!-- Action Button Graphic -->
+  <g transform="translate(80, 290)">
+    <rect width="180" height="46" rx="23" fill="#ffffff" />
+    <text x="90" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#065f46" text-anchor="middle">
+      Explore Catalog →
+    </text>
+  </g>
+</svg>

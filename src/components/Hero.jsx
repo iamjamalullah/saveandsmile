@@ -78,7 +78,7 @@ export default function Hero() {
               alt={s.alt || ''}
               loading={idx === 0 ? 'eager' : 'lazy'}
               fetchPriority={idx === 0 ? 'high' : 'auto'}
-              onError={(e) => { e.target.src = 'https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp' }}
+              onError={(e) => { e.target.src = '/images/banner-placeholder.webp' }}
             />
           )
           return (

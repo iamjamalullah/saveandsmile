@@ -4647,16 +4647,134 @@
       "containerLayout": "single",
       "blockType": "hero",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": null,
       "color": "#00998f",
       "bg": "",
+      "viewAll": false,
+      "seeMore": false,
       "content": {
         "hero": {
           "autoplay": true,
           "duration": 5200,
           "showArrows": true,
           "showDots": true
-        }
+        },
+        "banners": [],
+        "announcement": {
+          "heading": "Hero Banner Slider",
+          "subheading": "Dynamic full-width image slider showcase",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Hero Banner Slider",
+          "heading": "Hero Banner Slider",
+          "text": "Dynamic full-width image slider showcase",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Hero Banner Slider",
+          "subheading": "Dynamic full-width image slider showcase",
+          "targetDate": "2026-11-15T08:36:18.687Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Hero Banner Slider",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#00998f",
+          "textColor": "#1e293b"
+        },
+        "categories": {
+          "heading": "Hero Banner Slider",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Hero Banner Slider",
+          "subtitle": "Dynamic full-width image slider showcase",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Hero Banner Slider",
+          "tag": "Reviews",
+          "subtitle": "Dynamic full-width image slider showcase",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Hero Banner Slider",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "group": null,
+        "category": null,
+        "color": "#00998f",
+        "bg": "",
+        "viewAll": false,
+        "seeMore": false
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -4667,15 +4785,134 @@
       "containerLayout": "single",
       "blockType": "categories",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": null,
       "color": "#00998f",
       "bg": "",
+      "viewAll": false,
+      "seeMore": false,
       "content": {
         "categories": {
           "heading": "Shop By Categories",
           "showAll": true,
           "categorySlugs": []
-        }
+        },
+        "banners": [],
+        "announcement": {
+          "heading": "Shop By Categories",
+          "subheading": "Endless smooth carousel of product categories",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Shop By Categories",
+          "heading": "Shop By Categories",
+          "text": "Endless smooth carousel of product categories",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Shop By Categories",
+          "subheading": "Endless smooth carousel of product categories",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Shop By Categories",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#00998f",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "reels": {
+          "heading": "Shop By Categories",
+          "subtitle": "Endless smooth carousel of product categories",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Shop By Categories",
+          "tag": "Reviews",
+          "subtitle": "Endless smooth carousel of product categories",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Shop By Categories",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "group": null,
+        "category": null,
+        "color": "#00998f",
+        "bg": "",
+        "viewAll": false,
+        "seeMore": false
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -4686,9 +4923,13 @@
       "containerLayout": "single",
       "blockType": "trust_bar",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": null,
       "color": "#00998f",
       "bg": "",
+      "viewAll": false,
+      "seeMore": false,
       "content": {
         "trust_bar": {
           "heading": "",
@@ -4697,21 +4938,114 @@
           "items": [
             {
               "title": "Support 24/7",
-              "image": "https://www.qadrigadgets.pk/images/banners/68ecda0c96323.webp",
+              "image": "https://piocbtkjzznzzdftyelh.supabase.co/storage/v1/object/public/product-media/68ecda0c96323.webp",
               "subtitle": "Live customer support"
             },
             {
               "title": "Best Prices",
-              "image": "https://www.qadrigadgets.pk/images/banners/68ecda0c969b4.webp",
+              "image": "https://piocbtkjzznzzdftyelh.supabase.co/storage/v1/object/public/product-media/68ecda0c969b4.webp",
               "subtitle": "Direct wholesale rates"
             },
             {
               "title": "Secure Payment",
-              "image": "https://www.qadrigadgets.pk/images/banners/68ecda0c96cd0.webp",
+              "image": "https://piocbtkjzznzzdftyelh.supabase.co/storage/v1/object/public/product-media/68ecda0c96cd0.webp",
               "subtitle": "100% Cash on Delivery"
             }
           ]
-        }
+        },
+        "banners": [],
+        "announcement": {
+          "heading": "Why Shop With Us / Trust Bar",
+          "subheading": "Customer confidence badges and guarantees",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Why Shop With Us / Trust Bar",
+          "heading": "Why Shop With Us / Trust Bar",
+          "text": "Customer confidence badges and guarantees",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Why Shop With Us / Trust Bar",
+          "subheading": "Customer confidence badges and guarantees",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Why Shop With Us / Trust Bar",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Why Shop With Us / Trust Bar",
+          "subtitle": "Customer confidence badges and guarantees",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Why Shop With Us / Trust Bar",
+          "tag": "Reviews",
+          "subtitle": "Customer confidence badges and guarantees",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Why Shop With Us / Trust Bar",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "group": null,
+        "category": null,
+        "color": "#00998f",
+        "bg": "",
+        "viewAll": false,
+        "seeMore": false
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -4722,10 +5056,11 @@
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "new",
       "color": "#cf9c44",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69e3673551452.png",
-      "group": "new",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -4733,7 +5068,122 @@
         "color": "#cf9c44",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/69e3673551452.png",
         "viewAll": true,
-        "seeMore": true
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "New Arrivals",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#cf9c44",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "New Arrivals",
+          "heading": "New Arrivals",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "New Arrivals",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#cf9c44",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "New Arrivals",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#cf9c44",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "New Arrivals",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "New Arrivals",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "New Arrivals",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "New Arrivals",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -4744,10 +5194,11 @@
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "hot",
       "color": "#00998f",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69e367452a403.png",
-      "group": "hot",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -4755,7 +5206,122 @@
         "color": "#00998f",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/69e367452a403.png",
         "viewAll": true,
-        "seeMore": true
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "Hot Selling Products",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Hot Selling Products",
+          "heading": "Hot Selling Products",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Hot Selling Products",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Hot Selling Products",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#00998f",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Hot Selling Products",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Hot Selling Products",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Hot Selling Products",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Hot Selling Products",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -4766,10 +5332,11 @@
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "home",
       "color": "#6980c3",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/694aac30cb418.png",
-      "group": "home",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -4777,7 +5344,122 @@
         "color": "#6980c3",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/694aac30cb418.png",
         "viewAll": true,
-        "seeMore": true
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "Home Essentials Organizers",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#6980c3",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Home Essentials Organizers",
+          "heading": "Home Essentials Organizers",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Home Essentials Organizers",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#6980c3",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Home Essentials Organizers",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#6980c3",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Home Essentials Organizers",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Home Essentials Organizers",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Home Essentials Organizers",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Home Essentials Organizers",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -4788,10 +5470,11 @@
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "like",
       "color": "#cf9c44",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1cfb86d85.png",
-      "group": "like",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -4799,7 +5482,122 @@
         "color": "#cf9c44",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1cfb86d85.png",
         "viewAll": true,
-        "seeMore": true
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "You May Also Like",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#cf9c44",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "You May Also Like",
+          "heading": "You May Also Like",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "You May Also Like",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#cf9c44",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "You May Also Like",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#cf9c44",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "You May Also Like",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "You May Also Like",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "You May Also Like",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "You May Also Like",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -4810,10 +5608,11 @@
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "perfume",
       "color": "#6980c3",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69e36752dd560.png",
-      "group": "perfume",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -4821,7 +5620,122 @@
         "color": "#6980c3",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/69e36752dd560.png",
         "viewAll": true,
-        "seeMore": true
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "Top Picks Fragrances",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#6980c3",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Top Picks Fragrances",
+          "heading": "Top Picks Fragrances",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Top Picks Fragrances",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#6980c3",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Top Picks Fragrances",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#6980c3",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Top Picks Fragrances",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Top Picks Fragrances",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Top Picks Fragrances",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Top Picks Fragrances",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -4832,10 +5746,11 @@
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "trending",
       "color": "#00998f",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1ce2b376d.png",
-      "group": "trending",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -4843,7 +5758,122 @@
         "color": "#00998f",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1ce2b376d.png",
         "viewAll": true,
-        "seeMore": true
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "Trending Now",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Trending Now",
+          "heading": "Trending Now",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Trending Now",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Trending Now",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#00998f",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Trending Now",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Trending Now",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Trending Now",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Trending Now",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -4854,10 +5884,11 @@
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "jewelry",
       "color": "#cf9c44",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c7309e3f.png",
-      "group": "jewelry",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -4865,44 +5896,137 @@
         "color": "#cf9c44",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c7309e3f.png",
         "viewAll": true,
-        "seeMore": true
-      }
-    },
-    {
-      "id": "sec-1794173571404-997",
-      "order": 11,
-      "title": "Promotional Showcase",
-      "subtitle": "Exclusive seasonal savings & wholesale deals",
-      "containerLayout": "single",
-      "blockType": "banner",
-      "enabled": true,
-      "isPublished": true,
-      "color": "#00998f",
-      "bg": "",
-      "content": {
-        "banners": [
-          {
-            "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
-            "link": "/shop",
-            "title": "Special Promotion",
-            "alt": "Promotional Offer",
-            "badge": "Special Offer"
-          }
-        ]
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "Elegant Jewelry & Accessories",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#cf9c44",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Elegant Jewelry & Accessories",
+          "heading": "Elegant Jewelry & Accessories",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Elegant Jewelry & Accessories",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#cf9c44",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Elegant Jewelry & Accessories",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#cf9c44",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Elegant Jewelry & Accessories",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Elegant Jewelry & Accessories",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Elegant Jewelry & Accessories",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Elegant Jewelry & Accessories",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
       "id": "8",
-      "order": 12,
+      "order": 11,
       "title": "Exclusive Watches",
       "subtitle": "",
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "watch",
       "color": "#6980c3",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c4780d7b.png",
-      "group": "watch",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -4910,59 +6034,415 @@
         "color": "#6980c3",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c4780d7b.png",
         "viewAll": true,
-        "seeMore": true
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "Exclusive Watches",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#6980c3",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Exclusive Watches",
+          "heading": "Exclusive Watches",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Exclusive Watches",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#6980c3",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Exclusive Watches",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#6980c3",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Exclusive Watches",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Exclusive Watches",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Exclusive Watches",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Exclusive Watches",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
       "id": "sec-watch-shop",
-      "order": 13,
+      "order": 12,
       "title": "Watch & Shop",
       "subtitle": "In motion",
       "containerLayout": "single",
       "blockType": "reels",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": null,
       "color": "#00998f",
       "bg": "",
+      "viewAll": false,
+      "seeMore": false,
       "content": {
         "reels": {
           "heading": "Watch & Shop",
           "subtitle": "In motion",
           "maxItems": 8
-        }
+        },
+        "banners": [],
+        "announcement": {
+          "heading": "Watch & Shop",
+          "subheading": "In motion",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Watch & Shop",
+          "heading": "Watch & Shop",
+          "text": "In motion",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Watch & Shop",
+          "subheading": "In motion",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Watch & Shop",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#00998f",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Watch & Shop",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reviews": {
+          "heading": "Watch & Shop",
+          "tag": "Reviews",
+          "subtitle": "In motion",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Watch & Shop",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "group": null,
+        "category": null,
+        "color": "#00998f",
+        "bg": "",
+        "viewAll": false,
+        "seeMore": false
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
       "id": "sec-reviews",
-      "order": 14,
+      "order": 13,
       "title": "What Our Clients Say",
       "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
       "containerLayout": "single",
       "blockType": "reviews",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": null,
       "color": "#00998f",
       "bg": "",
+      "viewAll": false,
+      "seeMore": false,
       "content": {
         "reviews": {
           "heading": "What Our Clients Say",
           "tag": "Reviews",
           "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
           "maxItems": 12
-        }
+        },
+        "banners": [],
+        "announcement": {
+          "heading": "What Our Clients Say",
+          "subheading": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "What Our Clients Say",
+          "heading": "What Our Clients Say",
+          "text": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "What Our Clients Say",
+          "subheading": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "What Our Clients Say",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#00998f",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "What Our Clients Say",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "What Our Clients Say",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 8
+        },
+        "category_tabs": {
+          "heading": "What Our Clients Say",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "group": null,
+        "category": null,
+        "color": "#00998f",
+        "bg": "",
+        "viewAll": false,
+        "seeMore": false
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
       "id": "sec-category-tabs",
-      "order": 15,
+      "order": 14,
       "title": "Category Tabs + Product Grid",
       "subtitle": "Tabbed collections with category-specific products",
       "containerLayout": "single",
       "blockType": "category_tabs",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": null,
       "color": "#00998f",
       "bg": "",
+      "viewAll": false,
+      "seeMore": false,
       "content": {
         "category_tabs": {
           "heading": "Category Tabs",
@@ -4994,7 +6474,96 @@
               "group": "like"
             }
           ]
-        }
+        },
+        "banners": [],
+        "announcement": {
+          "heading": "Category Tabs + Product Grid",
+          "subheading": "Tabbed collections with category-specific products",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Category Tabs + Product Grid",
+          "heading": "Category Tabs + Product Grid",
+          "text": "Tabbed collections with category-specific products",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Category Tabs + Product Grid",
+          "subheading": "Tabbed collections with category-specific products",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Category Tabs + Product Grid",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#00998f",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Category Tabs + Product Grid",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Category Tabs + Product Grid",
+          "subtitle": "Tabbed collections with category-specific products",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Category Tabs + Product Grid",
+          "tag": "Reviews",
+          "subtitle": "Tabbed collections with category-specific products",
+          "maxItems": 12
+        },
+        "group": null,
+        "category": null,
+        "color": "#00998f",
+        "bg": "",
+        "viewAll": false,
+        "seeMore": false
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     }
   ],
@@ -6033,16 +7602,134 @@
       "containerLayout": "single",
       "blockType": "hero",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": null,
       "color": "#00998f",
       "bg": "",
+      "viewAll": false,
+      "seeMore": false,
       "content": {
         "hero": {
           "autoplay": true,
           "duration": 5200,
           "showArrows": true,
           "showDots": true
-        }
+        },
+        "banners": [],
+        "announcement": {
+          "heading": "Hero Banner Slider",
+          "subheading": "Dynamic full-width image slider showcase",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Hero Banner Slider",
+          "heading": "Hero Banner Slider",
+          "text": "Dynamic full-width image slider showcase",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Hero Banner Slider",
+          "subheading": "Dynamic full-width image slider showcase",
+          "targetDate": "2026-11-15T08:36:18.687Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Hero Banner Slider",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#00998f",
+          "textColor": "#1e293b"
+        },
+        "categories": {
+          "heading": "Hero Banner Slider",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Hero Banner Slider",
+          "subtitle": "Dynamic full-width image slider showcase",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Hero Banner Slider",
+          "tag": "Reviews",
+          "subtitle": "Dynamic full-width image slider showcase",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Hero Banner Slider",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "group": null,
+        "category": null,
+        "color": "#00998f",
+        "bg": "",
+        "viewAll": false,
+        "seeMore": false
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -6053,15 +7740,134 @@
       "containerLayout": "single",
       "blockType": "categories",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": null,
       "color": "#00998f",
       "bg": "",
+      "viewAll": false,
+      "seeMore": false,
       "content": {
         "categories": {
           "heading": "Shop By Categories",
           "showAll": true,
           "categorySlugs": []
-        }
+        },
+        "banners": [],
+        "announcement": {
+          "heading": "Shop By Categories",
+          "subheading": "Endless smooth carousel of product categories",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Shop By Categories",
+          "heading": "Shop By Categories",
+          "text": "Endless smooth carousel of product categories",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Shop By Categories",
+          "subheading": "Endless smooth carousel of product categories",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Shop By Categories",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#00998f",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "reels": {
+          "heading": "Shop By Categories",
+          "subtitle": "Endless smooth carousel of product categories",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Shop By Categories",
+          "tag": "Reviews",
+          "subtitle": "Endless smooth carousel of product categories",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Shop By Categories",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "group": null,
+        "category": null,
+        "color": "#00998f",
+        "bg": "",
+        "viewAll": false,
+        "seeMore": false
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -6072,9 +7878,13 @@
       "containerLayout": "single",
       "blockType": "trust_bar",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": null,
       "color": "#00998f",
       "bg": "",
+      "viewAll": false,
+      "seeMore": false,
       "content": {
         "trust_bar": {
           "heading": "",
@@ -6083,21 +7893,114 @@
           "items": [
             {
               "title": "Support 24/7",
-              "image": "https://www.qadrigadgets.pk/images/banners/68ecda0c96323.webp",
+              "image": "https://piocbtkjzznzzdftyelh.supabase.co/storage/v1/object/public/product-media/68ecda0c96323.webp",
               "subtitle": "Live customer support"
             },
             {
               "title": "Best Prices",
-              "image": "https://www.qadrigadgets.pk/images/banners/68ecda0c969b4.webp",
+              "image": "https://piocbtkjzznzzdftyelh.supabase.co/storage/v1/object/public/product-media/68ecda0c969b4.webp",
               "subtitle": "Direct wholesale rates"
             },
             {
               "title": "Secure Payment",
-              "image": "https://www.qadrigadgets.pk/images/banners/68ecda0c96cd0.webp",
+              "image": "https://piocbtkjzznzzdftyelh.supabase.co/storage/v1/object/public/product-media/68ecda0c96cd0.webp",
               "subtitle": "100% Cash on Delivery"
             }
           ]
-        }
+        },
+        "banners": [],
+        "announcement": {
+          "heading": "Why Shop With Us / Trust Bar",
+          "subheading": "Customer confidence badges and guarantees",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Why Shop With Us / Trust Bar",
+          "heading": "Why Shop With Us / Trust Bar",
+          "text": "Customer confidence badges and guarantees",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Why Shop With Us / Trust Bar",
+          "subheading": "Customer confidence badges and guarantees",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Why Shop With Us / Trust Bar",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Why Shop With Us / Trust Bar",
+          "subtitle": "Customer confidence badges and guarantees",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Why Shop With Us / Trust Bar",
+          "tag": "Reviews",
+          "subtitle": "Customer confidence badges and guarantees",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Why Shop With Us / Trust Bar",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "group": null,
+        "category": null,
+        "color": "#00998f",
+        "bg": "",
+        "viewAll": false,
+        "seeMore": false
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -6108,10 +8011,11 @@
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "new",
       "color": "#cf9c44",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69e3673551452.png",
-      "group": "new",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -6119,7 +8023,122 @@
         "color": "#cf9c44",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/69e3673551452.png",
         "viewAll": true,
-        "seeMore": true
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "New Arrivals",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#cf9c44",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "New Arrivals",
+          "heading": "New Arrivals",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "New Arrivals",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#cf9c44",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "New Arrivals",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#cf9c44",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "New Arrivals",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "New Arrivals",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "New Arrivals",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "New Arrivals",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -6130,10 +8149,11 @@
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "hot",
       "color": "#00998f",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69e367452a403.png",
-      "group": "hot",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -6141,7 +8161,122 @@
         "color": "#00998f",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/69e367452a403.png",
         "viewAll": true,
-        "seeMore": true
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "Hot Selling Products",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Hot Selling Products",
+          "heading": "Hot Selling Products",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Hot Selling Products",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Hot Selling Products",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#00998f",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Hot Selling Products",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Hot Selling Products",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Hot Selling Products",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Hot Selling Products",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -6152,10 +8287,11 @@
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "home",
       "color": "#6980c3",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/694aac30cb418.png",
-      "group": "home",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -6163,7 +8299,122 @@
         "color": "#6980c3",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/694aac30cb418.png",
         "viewAll": true,
-        "seeMore": true
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "Home Essentials Organizers",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#6980c3",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Home Essentials Organizers",
+          "heading": "Home Essentials Organizers",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Home Essentials Organizers",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#6980c3",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Home Essentials Organizers",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#6980c3",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Home Essentials Organizers",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Home Essentials Organizers",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Home Essentials Organizers",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Home Essentials Organizers",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -6174,10 +8425,11 @@
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "like",
       "color": "#cf9c44",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1cfb86d85.png",
-      "group": "like",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -6185,7 +8437,122 @@
         "color": "#cf9c44",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1cfb86d85.png",
         "viewAll": true,
-        "seeMore": true
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "You May Also Like",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#cf9c44",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "You May Also Like",
+          "heading": "You May Also Like",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "You May Also Like",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#cf9c44",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "You May Also Like",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#cf9c44",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "You May Also Like",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "You May Also Like",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "You May Also Like",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "You May Also Like",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -6196,10 +8563,11 @@
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "perfume",
       "color": "#6980c3",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69e36752dd560.png",
-      "group": "perfume",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -6207,7 +8575,122 @@
         "color": "#6980c3",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/69e36752dd560.png",
         "viewAll": true,
-        "seeMore": true
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "Top Picks Fragrances",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#6980c3",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Top Picks Fragrances",
+          "heading": "Top Picks Fragrances",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Top Picks Fragrances",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#6980c3",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Top Picks Fragrances",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#6980c3",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Top Picks Fragrances",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Top Picks Fragrances",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Top Picks Fragrances",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Top Picks Fragrances",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -6218,10 +8701,11 @@
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "trending",
       "color": "#00998f",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1ce2b376d.png",
-      "group": "trending",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -6229,7 +8713,122 @@
         "color": "#00998f",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1ce2b376d.png",
         "viewAll": true,
-        "seeMore": true
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "Trending Now",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Trending Now",
+          "heading": "Trending Now",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Trending Now",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Trending Now",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#00998f",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Trending Now",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Trending Now",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Trending Now",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Trending Now",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
@@ -6240,10 +8839,11 @@
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "jewelry",
       "color": "#cf9c44",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c7309e3f.png",
-      "group": "jewelry",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -6251,44 +8851,137 @@
         "color": "#cf9c44",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c7309e3f.png",
         "viewAll": true,
-        "seeMore": true
-      }
-    },
-    {
-      "id": "sec-1794173571404-997",
-      "order": 11,
-      "title": "Promotional Showcase",
-      "subtitle": "Exclusive seasonal savings & wholesale deals",
-      "containerLayout": "single",
-      "blockType": "banner",
-      "enabled": true,
-      "isPublished": true,
-      "color": "#00998f",
-      "bg": "",
-      "content": {
-        "banners": [
-          {
-            "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
-            "link": "/shop",
-            "title": "Special Promotion",
-            "alt": "Promotional Offer",
-            "badge": "Special Offer"
-          }
-        ]
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "Elegant Jewelry & Accessories",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#cf9c44",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Elegant Jewelry & Accessories",
+          "heading": "Elegant Jewelry & Accessories",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Elegant Jewelry & Accessories",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#cf9c44",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Elegant Jewelry & Accessories",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#cf9c44",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Elegant Jewelry & Accessories",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Elegant Jewelry & Accessories",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Elegant Jewelry & Accessories",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Elegant Jewelry & Accessories",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
       "id": "8",
-      "order": 12,
+      "order": 11,
       "title": "Exclusive Watches",
       "subtitle": "",
       "containerLayout": "single",
       "blockType": "products",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": "watch",
       "color": "#6980c3",
       "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c4780d7b.png",
-      "group": "watch",
       "viewAll": true,
       "seeMore": true,
       "content": {
@@ -6296,59 +8989,415 @@
         "color": "#6980c3",
         "bg": "https://www.qadrigadgets.pk/images/builder_background/69ea1c4780d7b.png",
         "viewAll": true,
-        "seeMore": true
+        "seeMore": true,
+        "banners": [],
+        "announcement": {
+          "heading": "Exclusive Watches",
+          "subheading": "",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#6980c3",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Exclusive Watches",
+          "heading": "Exclusive Watches",
+          "text": "Discover innovative lifestyle accessories and smart gadgets engineered for performance and durability. Tested and verified for authentic quality.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Exclusive Watches",
+          "subheading": "Special discounted wholesale rates available until timer expires!",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#6980c3",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Exclusive Watches",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#6980c3",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Exclusive Watches",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Exclusive Watches",
+          "subtitle": "In motion",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Exclusive Watches",
+          "tag": "Reviews",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Exclusive Watches",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "category": null
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
       "id": "sec-watch-shop",
-      "order": 13,
+      "order": 12,
       "title": "Watch & Shop",
       "subtitle": "In motion",
       "containerLayout": "single",
       "blockType": "reels",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": null,
       "color": "#00998f",
       "bg": "",
+      "viewAll": false,
+      "seeMore": false,
       "content": {
         "reels": {
           "heading": "Watch & Shop",
           "subtitle": "In motion",
           "maxItems": 8
-        }
+        },
+        "banners": [],
+        "announcement": {
+          "heading": "Watch & Shop",
+          "subheading": "In motion",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Watch & Shop",
+          "heading": "Watch & Shop",
+          "text": "In motion",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Watch & Shop",
+          "subheading": "In motion",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Watch & Shop",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#00998f",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Watch & Shop",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reviews": {
+          "heading": "Watch & Shop",
+          "tag": "Reviews",
+          "subtitle": "In motion",
+          "maxItems": 12
+        },
+        "category_tabs": {
+          "heading": "Watch & Shop",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "group": null,
+        "category": null,
+        "color": "#00998f",
+        "bg": "",
+        "viewAll": false,
+        "seeMore": false
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
       "id": "sec-reviews",
-      "order": 14,
+      "order": 13,
       "title": "What Our Clients Say",
       "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
       "containerLayout": "single",
       "blockType": "reviews",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": null,
       "color": "#00998f",
       "bg": "",
+      "viewAll": false,
+      "seeMore": false,
       "content": {
         "reviews": {
           "heading": "What Our Clients Say",
           "tag": "Reviews",
           "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
           "maxItems": 12
-        }
+        },
+        "banners": [],
+        "announcement": {
+          "heading": "What Our Clients Say",
+          "subheading": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "What Our Clients Say",
+          "heading": "What Our Clients Say",
+          "text": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "What Our Clients Say",
+          "subheading": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "What Our Clients Say",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#00998f",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "What Our Clients Say",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "What Our Clients Say",
+          "subtitle": "Trusted by thousands of resellers and shopkeepers across Pakistan.",
+          "maxItems": 8
+        },
+        "category_tabs": {
+          "heading": "What Our Clients Say",
+          "defaultActive": "storage",
+          "maxProducts": 8,
+          "tabs": [
+            {
+              "key": "storage",
+              "label": [
+                "Storage &",
+                "Organization"
+              ],
+              "group": "home"
+            },
+            {
+              "key": "jewelry",
+              "label": [
+                "Jewelry &",
+                "Accessories"
+              ],
+              "group": "jewelry"
+            },
+            {
+              "key": "bags",
+              "label": [
+                "Fashion Bags &",
+                "Travel"
+              ],
+              "group": "like"
+            }
+          ]
+        },
+        "group": null,
+        "category": null,
+        "color": "#00998f",
+        "bg": "",
+        "viewAll": false,
+        "seeMore": false
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     },
     {
       "id": "sec-category-tabs",
-      "order": 15,
+      "order": 14,
       "title": "Category Tabs + Product Grid",
       "subtitle": "Tabbed collections with category-specific products",
       "containerLayout": "single",
       "blockType": "category_tabs",
       "enabled": true,
+      "isVisible": true,
       "isPublished": true,
+      "group": null,
       "color": "#00998f",
       "bg": "",
+      "viewAll": false,
+      "seeMore": false,
       "content": {
         "category_tabs": {
           "heading": "Category Tabs",
@@ -6380,7 +9429,96 @@
               "group": "like"
             }
           ]
-        }
+        },
+        "banners": [],
+        "announcement": {
+          "heading": "Category Tabs + Product Grid",
+          "subheading": "Tabbed collections with category-specific products",
+          "buttonText": "Shop Now",
+          "buttonLink": "/shop",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff",
+          "align": "center"
+        },
+        "image_text": {
+          "image": "https://www.qadrigadgets.pk/images/banners/6a7af6566994b.webp",
+          "imageAlt": "Category Tabs + Product Grid",
+          "heading": "Category Tabs + Product Grid",
+          "text": "Tabbed collections with category-specific products",
+          "buttonText": "Explore Catalog",
+          "buttonLink": "/shop",
+          "imagePosition": "left",
+          "bgColor": "#ffffff",
+          "textColor": "#1e293b"
+        },
+        "countdown": {
+          "heading": "Category Tabs + Product Grid",
+          "subheading": "Tabbed collections with category-specific products",
+          "targetDate": "2026-11-15T08:36:18.688Z",
+          "buttonText": "Shop Sale Now",
+          "buttonLink": "/shop?group=hot",
+          "bgColor": "#00998f",
+          "textColor": "#ffffff"
+        },
+        "trust_bar": {
+          "heading": "Category Tabs + Product Grid",
+          "items": [
+            {
+              "icon": "🚚",
+              "title": "Free Delivery",
+              "subtitle": "On orders over Rs. 3,000"
+            },
+            {
+              "icon": "💬",
+              "title": "24/7 WhatsApp Help",
+              "subtitle": "Live chat support anytime"
+            },
+            {
+              "icon": "🛡️",
+              "title": "100% Genuine Items",
+              "subtitle": "Tested & verified products"
+            },
+            {
+              "icon": "💵",
+              "title": "Cash on Delivery",
+              "subtitle": "Pay when your parcel arrives"
+            }
+          ],
+          "bgColor": "#00998f",
+          "textColor": "#1e293b"
+        },
+        "hero": {
+          "autoplay": true,
+          "duration": 5200,
+          "showArrows": true,
+          "showDots": true
+        },
+        "categories": {
+          "heading": "Category Tabs + Product Grid",
+          "showAll": true,
+          "categorySlugs": []
+        },
+        "reels": {
+          "heading": "Category Tabs + Product Grid",
+          "subtitle": "Tabbed collections with category-specific products",
+          "maxItems": 8
+        },
+        "reviews": {
+          "heading": "Category Tabs + Product Grid",
+          "tag": "Reviews",
+          "subtitle": "Tabbed collections with category-specific products",
+          "maxItems": 12
+        },
+        "group": null,
+        "category": null,
+        "color": "#00998f",
+        "bg": "",
+        "viewAll": false,
+        "seeMore": false
+      },
+      "responsiveSettings": {
+        "mobileStack": true,
+        "hideOnMobile": false
       }
     }
   ],

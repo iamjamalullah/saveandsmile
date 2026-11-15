@@ -412,8 +412,8 @@ export async function publishSections({ sections, label, staffUser, routerDb }) 
       await client.query(`DELETE FROM sections`)
       for (let i = 0; i < normalized.length; i++) {
         const s = normalized[i]
-        const numId = i + 1
-        const effectiveGroup = s.group || s.content?.group || `custom-${numId}`
+        const secId = String(s.id || `sec-${i + 1}`)
+        const effectiveGroup = s.group || s.content?.group || `custom-${secId}`
         const fullContent = {
           ...(s.content || {}),
           group: s.group || null,
@@ -440,7 +440,7 @@ export async function publishSections({ sections, label, staffUser, routerDb }) 
              is_visible = EXCLUDED.is_visible,
              is_published = EXCLUDED.is_published`,
           [
-            numId,
+            secId,
             effectiveGroup,
             s.title,
             s.subtitle || '',

@@ -69,9 +69,28 @@ export default function HomePage() {
   }
 
   // Authoritative Single Source of Truth: only published, enabled, visible sections
-  const displaySections = [...sections]
+  // Includes strict deduplication guard for singleton components and catalog groups
+  const sortedSections = [...sections]
     .filter(s => s.enabled !== false && s.isVisible !== false)
     .sort((a, b) => (Number(a.order) || Number(a.id) || 0) - (Number(b.order) || Number(b.id) || 0))
+
+  const seenKeys = new Set()
+  const displaySections = sortedSections.filter(s => {
+    const blockType = s.blockType || s.block_type || 'products'
+    let dedupeKey = s.id ? `id-${s.id}` : null
+
+    if (['hero', 'categories', 'trust_bar', 'reels', 'reviews', 'category_tabs'].includes(blockType)) {
+      dedupeKey = `singleton-${blockType}`
+    } else if (blockType === 'products' && (s.group || s.content?.group)) {
+      dedupeKey = `group-${s.group || s.content?.group}`
+    }
+
+    if (dedupeKey) {
+      if (seenKeys.has(dedupeKey)) return false
+      seenKeys.add(dedupeKey)
+    }
+    return true
+  })
 
   // True catastrophic fallback ONLY if sections array failed to load from API/DB completely
   const isCompletelyEmptyConfig = !loading && sections.length === 0

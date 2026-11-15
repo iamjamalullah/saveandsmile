@@ -1,0 +1,9 @@
+<resources>
+    <color name="primary_dark">#0F3C28</color>
+    <color name="primary_emerald">#037F62</color>
+    <color name="accent_mint">#34D399</color>
+    <color name="background_light">#F8FAFC</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="text_dark">#0F172A</color>
+    <color name="text_muted">#64748B</color>
+</resources>

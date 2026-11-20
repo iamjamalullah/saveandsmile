@@ -14,6 +14,7 @@ import {
   publishSections,
   getSectionVersions,
   restoreSectionVersion,
+  extractYouTubeId,
 } from './src/services/homepageService.js'
 import * as catalogService from './src/services/catalogService.js'
 import * as mediaService from './src/services/mediaService.js'
@@ -1258,6 +1259,236 @@ server.post(['/reviews', '/api/reviews'], handleCreateReview)
 server.patch(['/reviews/:id', '/api/reviews/:id'], handleUpdateReview)
 server.put(['/reviews/:id', '/api/reviews/:id'], handleUpdateReview)
 server.delete(['/reviews/:id', '/api/reviews/:id'], handleDeleteReview)
+
+// ── AUTHORITATIVE WATCH & SHOP / REELS HANDLERS (POSTGRESQL WITH JSON-SERVER FALLBACK) ──
+const handleGetWatchShop = async (req, res) => {
+  try {
+    if (process.env.DATABASE_URL) {
+      const dbRes = await query(`
+        SELECT id, title, video_url, image_url, views_count, likes_count, product_id, sort_order,
+               description, price, old_price, youtube_url, is_active
+        FROM watch_shop
+        ORDER BY sort_order ASC, id ASC
+      `)
+      const list = dbRes.rows.map(r => ({
+        id: r.id,
+        name: r.title,
+        title: r.title,
+        description: r.description || '',
+        youtubeUrl: r.youtube_url || r.video_url || '',
+        video: r.video_url || '',
+        image: r.image_url || '',
+        price: Number(r.price) || 0,
+        oldPrice: Number(r.old_price) || 0,
+        productId: r.product_id,
+        order: r.sort_order || 0,
+        active: r.is_active !== false,
+        viewsCount: r.views_count || 0,
+        likesCount: r.likes_count || 0,
+      }))
+      return res.json(list)
+    }
+
+    const list = router.db.get('watchShop').value() || []
+    return res.json(list)
+  } catch (err) {
+    console.error('[WATCH_SHOP GET ERROR]:', err.message)
+    const list = router.db.get('watchShop').value() || []
+    return res.json(list)
+  }
+}
+
+const handleCreateWatchShop = async (req, res) => {
+  try {
+    if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'manager')) {
+      return res.status(401).json({ error: 'Unauthorized: Admin authentication required' })
+    }
+
+    const body = sanitizeObject(req.body || {})
+    const title = (body.title || body.name || '').trim()
+    if (!title) {
+      return res.status(400).json({ error: 'Product name/title is required.' })
+    }
+
+    const description = (body.description || body.text || '').trim()
+    const youtubeUrl = (body.youtubeUrl || body.video || '').trim()
+    const ytId = extractYouTubeId(youtubeUrl)
+    const imageUrl = body.image || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '/images/banner-placeholder.webp')
+    const productId = body.productId ? Number(body.productId) : null
+    const price = Number(body.price) || 0
+    const oldPrice = Number(body.oldPrice) || 0
+    const order = Number(body.order) || 0
+    const active = body.active !== false
+
+    let createdItem
+    if (process.env.DATABASE_URL) {
+      const insRes = await query(`
+        INSERT INTO watch_shop (title, video_url, image_url, product_id, sort_order, description, price, old_price, youtube_url, is_active)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        RETURNING *
+      `, [title, youtubeUrl, imageUrl, productId, order, description, price, oldPrice, youtubeUrl, active])
+      const r = insRes.rows[0]
+      createdItem = {
+        id: r.id,
+        name: r.title,
+        title: r.title,
+        description: r.description || '',
+        youtubeUrl: r.youtube_url || r.video_url || '',
+        video: r.video_url || '',
+        image: r.image_url || '',
+        price: Number(r.price) || 0,
+        oldPrice: Number(r.old_price) || 0,
+        productId: r.product_id,
+        order: r.sort_order || 0,
+        active: r.is_active !== false,
+      }
+    } else {
+      createdItem = {
+        id: Date.now(),
+        name: title,
+        title,
+        description,
+        youtubeUrl,
+        video: youtubeUrl,
+        image: imageUrl,
+        price,
+        oldPrice,
+        productId,
+        order,
+        active,
+      }
+    }
+
+    try {
+      router.db.get('watchShop').push(createdItem).write?.()
+    } catch (_) {}
+
+    return res.status(201).json(createdItem)
+  } catch (err) {
+    console.error('[WATCH_SHOP POST ERROR]:', err.message)
+    return res.status(500).json({ error: 'Failed to create video product: ' + err.message })
+  }
+}
+
+const handleUpdateWatchShop = async (req, res) => {
+  try {
+    if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'manager')) {
+      return res.status(401).json({ error: 'Unauthorized: Admin authentication required' })
+    }
+
+    const id = Number(req.params.id) || req.params.id
+    const body = sanitizeObject(req.body || {})
+    const title = body.title || body.name
+    const description = body.description
+    const youtubeUrl = body.youtubeUrl || body.video
+    const ytId = youtubeUrl ? extractYouTubeId(youtubeUrl) : null
+    const imageUrl = body.image || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : undefined)
+    const productId = body.productId !== undefined ? (body.productId ? Number(body.productId) : null) : undefined
+    const price = body.price !== undefined ? Number(body.price) : undefined
+    const oldPrice = body.oldPrice !== undefined ? Number(body.oldPrice) : undefined
+    const order = body.order !== undefined ? Number(body.order) : undefined
+    const active = body.active !== undefined ? Boolean(body.active) : undefined
+
+    let updatedItem
+    if (process.env.DATABASE_URL) {
+      const currentRes = await query('SELECT * FROM watch_shop WHERE id = $1', [id])
+      if (!currentRes.rows.length) {
+        return res.status(404).json({ error: 'Video product not found.' })
+      }
+      const cur = currentRes.rows[0]
+      const upRes = await query(`
+        UPDATE watch_shop SET
+          title = COALESCE($1, title),
+          description = COALESCE($2, description),
+          youtube_url = COALESCE($3, youtube_url),
+          video_url = COALESCE($3, video_url),
+          image_url = COALESCE($4, image_url),
+          price = COALESCE($5, price),
+          old_price = COALESCE($6, old_price),
+          product_id = COALESCE($7, product_id),
+          sort_order = COALESCE($8, sort_order),
+          is_active = COALESCE($9, is_active)
+        WHERE id = $10
+        RETURNING *
+      `, [
+        title,
+        description,
+        youtubeUrl,
+        imageUrl,
+        price,
+        oldPrice,
+        productId,
+        order,
+        active,
+        id
+      ])
+      const r = upRes.rows[0]
+      updatedItem = {
+        id: r.id,
+        name: r.title,
+        title: r.title,
+        description: r.description || '',
+        youtubeUrl: r.youtube_url || r.video_url || '',
+        video: r.video_url || '',
+        image: r.image_url || '',
+        price: Number(r.price) || 0,
+        oldPrice: Number(r.old_price) || 0,
+        productId: r.product_id,
+        order: r.sort_order || 0,
+        active: r.is_active !== false,
+      }
+    } else {
+      updatedItem = { id, ...body }
+    }
+
+    try {
+      router.db.get('watchShop').find({ id }).assign(updatedItem).write?.()
+    } catch (_) {}
+
+    return res.json(updatedItem)
+  } catch (err) {
+    console.error('[WATCH_SHOP PATCH ERROR]:', err.message)
+    return res.status(500).json({ error: 'Failed to update video product: ' + err.message })
+  }
+}
+
+const handleDeleteWatchShop = async (req, res) => {
+  try {
+    if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'manager')) {
+      return res.status(401).json({ error: 'Unauthorized: Admin authentication required' })
+    }
+
+    const id = req.params.id ? (Number(req.params.id) || req.params.id) : null
+    if (id) {
+      if (process.env.DATABASE_URL) {
+        await query('DELETE FROM watch_shop WHERE id = $1', [id])
+      }
+      try {
+        router.db.get('watchShop').remove({ id }).write?.()
+      } catch (_) {}
+      return res.json({ success: true, id })
+    } else {
+      // Clear all
+      if (process.env.DATABASE_URL) {
+        await query('DELETE FROM watch_shop')
+      }
+      try {
+        router.db.set('watchShop', []).write?.()
+      } catch (_) {}
+      return res.json({ success: true, message: 'All video products deleted.' })
+    }
+  } catch (err) {
+    console.error('[WATCH_SHOP DELETE ERROR]:', err.message)
+    return res.status(500).json({ error: 'Failed to delete video product: ' + err.message })
+  }
+}
+
+server.get(['/watchShop', '/api/watchShop'], handleGetWatchShop)
+server.post(['/watchShop', '/api/watchShop'], handleCreateWatchShop)
+server.patch(['/watchShop/:id', '/api/watchShop/:id'], handleUpdateWatchShop)
+server.put(['/watchShop/:id', '/api/watchShop/:id'], handleUpdateWatchShop)
+server.delete(['/watchShop/:id', '/api/watchShop/:id'], handleDeleteWatchShop)
+server.delete(['/watchShop', '/api/watchShop'], handleDeleteWatchShop)
 
 // ── HOMEPAGE BUILDER DYNAMIC CMS ENDPOINTS ──────────────────
 const requireAdmin = (req, res, next) => {

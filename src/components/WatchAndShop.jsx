@@ -72,18 +72,24 @@ export default function WatchAndShop({ section, onShopAll }) {
 
         <div className="qg-reels-rail" ref={rail}>
           {items.map((item, idx) => {
-            const ytId = item.videoId || extractYouTubeId(item.youtubeUrl)
+            const ytId = item.videoId || extractYouTubeId(item.youtubeUrl || item.video)
             const associatedProduct = getAssociatedProduct(item)
 
             const displayName = item.title || item.name || (associatedProduct ? associatedProduct.name : 'Featured Gadget')
             const displayImage = item.image || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : (associatedProduct ? associatedProduct.image : ''))
-            const price = Number(associatedProduct?.price || item.price || 0)
-            const oldPrice = Number(associatedProduct?.oldPrice || item.oldPrice || 0)
+            const price = Number(item.price || associatedProduct?.price || 0)
+            const oldPrice = Number(item.oldPrice || associatedProduct?.oldPrice || 0)
             const discount = item.discount || (oldPrice > price && price > 0 ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0)
 
             const handleCardClick = () => {
               if (ytId) {
-                setActiveYtVideo({ ...item, videoId: ytId, title: displayName, associatedProduct })
+                setActiveYtVideo({
+                  ...item,
+                  videoId: ytId,
+                  title: displayName,
+                  description: item.description || associatedProduct?.description || '',
+                  associatedProduct: associatedProduct || (price > 0 ? { ...item, id: item.productId || item.id, name: displayName, price, oldPrice, image: displayImage } : null),
+                })
               } else if (associatedProduct) {
                 setQuickView(associatedProduct)
               } else if (item.name && item.price) {

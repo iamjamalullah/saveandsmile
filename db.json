@@ -7432,62 +7432,7 @@
       "active": true
     }
   ],
-  "watchShop": [
-    {
-      "id": 901,
-      "name": "Portable Shoes Cleaning Wipes, Disposable Shoe Wipes, Dirt Cleaning Wipes",
-      "oldPrice": 780,
-      "price": 100,
-      "image": "https://www.qadrigadgets.pk/images/product_gallery/md_1779693668_ChatGPT_Image_May_25,_2026,_12_20_36_PM.png",
-      "video": "https://www.qadrigadgets.pk/images/banners/6aace4c897b73.mp4",
-      "discount": 87
-    },
-    {
-      "id": 902,
-      "name": "Multi-Purpose Greek Yogurt Maker Hung Curd Strainer Box with Mesh Filter",
-      "oldPrice": 2000,
-      "price": 1200,
-      "image": "https://www.qadrigadgets.pk/images/product_gallery/md_1785755331_601b16a6-72ce-4ba1-9c5e-cebd029ea827.png",
-      "video": "https://www.qadrigadgets.pk/images/banners/6aace4c89b264.mp4",
-      "discount": 40
-    },
-    {
-      "id": 903,
-      "name": "Fighter Plane Remote Control Aircraft High Speed LED Lights Rechargeable Battery Durable Foam RC",
-      "oldPrice": 3200,
-      "price": 2250,
-      "image": "https://www.qadrigadgets.pk/images/product_gallery/md_1780914419_ChatGPT_Image_Jun_8,_2026,_03_21_58_PM.png",
-      "video": "https://www.qadrigadgets.pk/images/banners/6aace4c89f68c.mp4",
-      "discount": 30
-    },
-    {
-      "id": 904,
-      "name": "Professional Triangle Mop 360 Rotatable Adjustable Cleaning Mop for Tub/ Tile/ Floor/ Handle Reusable",
-      "oldPrice": 1350,
-      "price": 600,
-      "image": "https://www.qadrigadgets.pk/images/product_gallery/md_1780384460_ChatGPT_Image_Jun_2,_2026,_12_13_13_PM.png",
-      "video": "https://www.qadrigadgets.pk/images/banners/6aace4c8a30fd.mp4",
-      "discount": 56
-    },
-    {
-      "id": 905,
-      "name": "Steel Dish Scrubber Liquid Brush",
-      "oldPrice": 840,
-      "price": 150,
-      "image": "https://www.qadrigadgets.pk/images/product_gallery/md_1783941498_add715b4-f656-4f27-b4d8-a2baba9edbff.png",
-      "video": "https://www.qadrigadgets.pk/images/banners/6aace4c8a8146.mp4",
-      "discount": 82
-    },
-    {
-      "id": 906,
-      "name": "3 Sided Soft Bristles Toothbrush -Non-Slip Deep Cleaning Triple Head Tooth Brush - Soft Toothbrush",
-      "oldPrice": 600,
-      "price": 150,
-      "image": "https://www.qadrigadgets.pk/images/product_gallery/md_1782124711_ChatGPT_Image_Jun_22,_2026,_03_37_16_PM.png",
-      "video": "https://www.qadrigadgets.pk/images/banners/6aace4c8b5e07.mp4",
-      "discount": 75
-    }
-  ],
+  "watchShop": [],
   "cities": [
     "Karachi",
     "Lahore",

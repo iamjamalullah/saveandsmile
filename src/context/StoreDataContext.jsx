@@ -447,6 +447,70 @@ export function StoreDataProvider({ children }) {
     }
   }, [data.watchShop, replaceLocal, notify])
 
+  const loadWatchShop = useCallback(async () => {
+    try {
+      const list = await api.list('watchShop')
+      const items = Array.isArray(list) ? list : []
+      setData(prev => ({ ...prev, watchShop: items }))
+      return items
+    } catch (err) {
+      console.warn('Watch & Shop load error:', err.message)
+      return []
+    }
+  }, [])
+
+  const addWatchShopItem = useCallback(async (item) => {
+    try {
+      const created = await api.create('watchShop', item)
+      if (created) {
+        replaceLocal('watchShop', list => [created, ...list])
+        notify('Video product added successfully!')
+        return created
+      }
+    } catch (err) {
+      notify(err.message, 'danger')
+      throw err
+    }
+  }, [replaceLocal, notify])
+
+  const updateWatchShopItem = useCallback(async (id, fields) => {
+    try {
+      const updated = await api.patch('watchShop', id, fields)
+      if (updated) {
+        replaceLocal('watchShop', list => list.map(item => String(item.id) === String(id) ? { ...item, ...updated } : item))
+        notify('Video product updated successfully!')
+        return updated
+      }
+    } catch (err) {
+      notify(err.message, 'danger')
+      throw err
+    }
+  }, [replaceLocal, notify])
+
+  const deleteWatchShopItem = useCallback(async (id) => {
+    try {
+      await api.remove('watchShop', id)
+      replaceLocal('watchShop', list => list.filter(item => String(item.id) !== String(id)))
+      notify('Video product removed.', 'info')
+      return true
+    } catch (err) {
+      notify(err.message, 'danger')
+      throw err
+    }
+  }, [replaceLocal, notify])
+
+  const clearAllWatchShop = useCallback(async () => {
+    try {
+      await api.remove('watchShop', '')
+      replaceLocal('watchShop', () => [])
+      notify('All video products cleared.', 'info')
+      return true
+    } catch (err) {
+      notify(err.message, 'danger')
+      throw err
+    }
+  }, [replaceLocal, notify])
+
   const resetToDefaults = useCallback(async () => {
     notify('Reloading catalogue data…', 'info')
     await load()
@@ -614,6 +678,11 @@ export function StoreDataProvider({ children }) {
     deleteReview,
     updateStoreSettings,
     setWatchShop,
+    loadWatchShop,
+    addWatchShopItem,
+    updateWatchShopItem,
+    deleteWatchShopItem,
+    clearAllWatchShop,
     resetToDefaults,
     showToast: notify,
     notify,
@@ -655,6 +724,11 @@ export function StoreDataProvider({ children }) {
     deleteReview,
     updateStoreSettings,
     setWatchShop,
+    loadWatchShop,
+    addWatchShopItem,
+    updateWatchShopItem,
+    deleteWatchShopItem,
+    clearAllWatchShop,
     resetToDefaults,
     notify,
     markAllNotificationsRead,

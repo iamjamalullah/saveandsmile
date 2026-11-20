@@ -84,7 +84,7 @@ export const api = {
   create: (resource, body) => request(`/${resource}`, { method: 'POST', body }),
   patch: (resource, id, body) => request(`/${resource}/${encodeURIComponent(id)}`, { method: 'PATCH', body }),
   replace: (resource, id, body) => request(`/${resource}/${encodeURIComponent(id)}`, { method: 'PUT', body }),
-  remove: (resource, id) => request(`/${resource}/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+  remove: (resource, id) => request(id !== undefined && id !== '' ? `/${resource}/${encodeURIComponent(id)}` : `/${resource}`, { method: 'DELETE' }),
 
   auth: {
     login: (email, password) => request('/auth/login', { method: 'POST', body: { email, password } }),

@@ -470,18 +470,70 @@ export default function WatchShopView() {
                     </div>
                   </div>
 
-                  {/* Thumbnail Image URL & Display Order */}
-                  <div className="row g-3 mb-3">
-                    <div className="col-12 col-md-8">
-                      <label className="form-label fw-semibold">Custom Thumbnail Image URL (Optional)</label>
+                  {/* Product Photo / Thumbnail Upload Section */}
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold d-flex justify-content-between align-items-center">
+                      <span>Product Photo / Custom Thumbnail</span>
+                      <span className="badge bg-light text-muted">Upload Photo or Auto-from-YouTube</span>
+                    </label>
+                    <div className="input-group mb-2">
+                      <input
+                        type="file"
+                        id="watchShopImageUpload"
+                        className="d-none"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
+                          const reader = new FileReader()
+                          reader.onload = (loadEvt) => {
+                            setForm(prev => ({ ...prev, image: loadEvt.target?.result || '' }))
+                            notify('Product photo attached successfully!')
+                          }
+                          reader.readAsDataURL(file)
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-outline-success d-flex align-items-center gap-2"
+                        onClick={() => document.getElementById('watchShopImageUpload')?.click()}
+                      >
+                        <i className="bi bi-cloud-arrow-up-fill"></i> Upload Picture
+                      </button>
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Leave blank to use YouTube's high-res thumbnail"
+                        placeholder="Or paste image URL (Optional)"
                         value={form.image}
                         onChange={(e) => setForm({ ...form, image: e.target.value })}
                       />
+                      {form.image && (
+                        <button
+                          type="button"
+                          className="btn btn-outline-danger"
+                          onClick={() => setForm({ ...form, image: '' })}
+                          title="Clear image"
+                        >
+                          ✕
+                        </button>
+                      )}
                     </div>
+                    {form.image && (
+                      <div className="d-flex align-items-center gap-2 p-2 bg-light rounded border">
+                        <img
+                          src={form.image}
+                          alt="Thumbnail Preview"
+                          style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '8px' }}
+                        />
+                        <small className="text-success fw-semibold">
+                          <i className="bi bi-check-circle-fill me-1"></i> Custom photo attached
+                        </small>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Display Order */}
+                  <div className="row g-3 mb-3">
                     <div className="col-12 col-md-4">
                       <label className="form-label fw-semibold">Display Order</label>
                       <input

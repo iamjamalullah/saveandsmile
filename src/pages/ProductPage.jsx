@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext'
 import { useStoreData } from '../context/StoreDataContext'
 import ProductCard from '../components/ProductCard'
 import { setPageSeo } from '../utils/seo'
+import { extractYouTubeId } from '../components/WatchAndShop'
 
 const PRESET_COLORS = [
   { name: 'Black', hex: '#111827' },
@@ -70,17 +71,56 @@ function mediaList(product, selectedColor) {
     images = [...new Set([product.image, ...(product.images || [])].filter(Boolean))]
   }
 
+  const videoUrl = product.video || product.youtubeUrl
+
   return [
     ...images.map((src, i) => ({ type: 'image', src, key: `img-${selectedColor || 'def'}-${i}` })),
-    ...(product.video ? [{ type: 'video', src: product.video, key: 'video' }] : []),
+    ...(videoUrl ? [{ type: 'video', src: videoUrl, key: 'video' }] : []),
   ]
 }
 
 export default function ProductPage() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const { products = [], categories = [], reviews = [], loading, addReview } = useStoreData()
-  const product = findProductIn(products, slug)
+  const { products = [], categories = [], reviews = [], watchShop = [], loading, addReview } = useStoreData()
+  let product = findProductIn(products, slug)
+
+  // Fallback: Check watchShop for video products
+  if (!product && Array.isArray(watchShop) && watchShop.length > 0) {
+    const wsItem = watchShop.find(w => {
+      const wSlug = productSlug(w)
+      return wSlug === slug || String(w.id) === String(slug) || (w.productId && String(w.productId) === String(slug))
+    })
+    if (wsItem) {
+      if (wsItem.productId) {
+        product = products.find(p => String(p.id) === String(wsItem.productId))
+      }
+      if (!product) {
+        const ytId = extractYouTubeId(wsItem.youtubeUrl || wsItem.video)
+        const effectiveImg = wsItem.image || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '/images/banner-placeholder.webp')
+        product = {
+          id: wsItem.id,
+          name: wsItem.title || wsItem.name || 'Featured Video Product',
+          slug: productSlug(wsItem),
+          price: Number(wsItem.price) || 0,
+          oldPrice: Number(wsItem.oldPrice) || Number(wsItem.price) || 0,
+          description: wsItem.description || 'Exclusive video demonstration product with premium build quality and nationwide delivery.',
+          image: effectiveImg,
+          images: wsItem.images && wsItem.images.length > 0 ? wsItem.images : [effectiveImg],
+          video: wsItem.youtubeUrl || wsItem.video || '',
+          inStock: true,
+          stock: 99,
+          category: wsItem.category || 'Lifestyle & Gadgets',
+          highlights: [
+            'Wholesale pricing for resellers & retailers',
+            'Cash on delivery all over Pakistan',
+            'Dispatched quickly with reliable tracking',
+            'Authentic product with live video demonstration'
+          ]
+        }
+      }
+    }
+  }
   const { add, buyNow, toggleWish, wishlist, notify } = useCart()
   const [qty, setQty] = useState(1)
   const [mediaIndex, setMediaIndex] = useState(0)
@@ -559,7 +599,33 @@ export default function ProductPage() {
           <div className="qpdp-gallery">
             <div className={`qpdp-main ${activeMedia?.type === 'video' ? 'is-video' : ''}`}>
               {activeMedia?.type === 'video' ? (
-                <video key={activeMedia.src} src={activeMedia.src} poster={product.image} controls autoPlay playsInline />
+                (() => {
+                  const ytId = extractYouTubeId(activeMedia.src)
+                  if (ytId) {
+                    return (
+                      <div className="qpdp-yt-wrap" style={{ width: '100%', height: '100%', minHeight: '360px', background: '#000', borderRadius: '16px', overflow: 'hidden' }}>
+                        <iframe
+                          src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&playsinline=1`}
+                          title={product.name}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          style={{ width: '100%', height: '100%', minHeight: '360px', border: 0 }}
+                        />
+                      </div>
+                    )
+                  }
+                  return (
+                    <video
+                      key={activeMedia.src}
+                      src={activeMedia.src}
+                      poster={product.image}
+                      controls
+                      autoPlay
+                      playsInline
+                      style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '16px' }}
+                    />
+                  )
+                })()
               ) : (
                 <div
                   ref={lensContainerRef}
@@ -637,31 +703,35 @@ export default function ProductPage() {
             </div>
 
             <div className="qpdp-thumbs" role="tablist" aria-label="Product media">
-              {media.map((m, i) => (
-                <button
-                  key={m.key}
-                  type="button"
-                  role="tab"
-                  aria-selected={i === mediaIndex}
-                  className={`${i === mediaIndex ? 'on' : ''} ${m.type === 'video' ? 'is-video' : ''}`}
-                  onClick={() => setMediaIndex(i)}
-                  aria-label={m.type === 'video' ? 'Play product video' : `View image ${i + 1}`}
-                >
-                  <img
-                    src={m.type === 'video' ? product.image : m.src}
-                    alt=""
-                    onError={(e) => {
-                      if (product.image && !e.target.src.endsWith(product.image)) {
-                        e.target.src = product.image
-                      } else {
+              {media.map((m, i) => {
+                const isVid = m.type === 'video'
+                const ytThumbId = isVid ? extractYouTubeId(m.src) : null
+                const thumbSrc = isVid
+                  ? (ytThumbId ? `https://img.youtube.com/vi/${ytThumbId}/hqdefault.jpg` : product.image)
+                  : m.src
+
+                return (
+                  <button
+                    key={m.key}
+                    type="button"
+                    role="tab"
+                    aria-selected={i === mediaIndex}
+                    className={`${i === mediaIndex ? 'on' : ''} ${isVid ? 'is-video' : ''}`}
+                    onClick={() => setMediaIndex(i)}
+                    aria-label={isVid ? 'Play product video' : `View image ${i + 1}`}
+                  >
+                    <img
+                      src={thumbSrc}
+                      alt=""
+                      onError={(e) => {
                         e.target.onerror = null
-                        e.target.src = '/images/p1.jpg'
-                      }
-                    }}
-                  />
-                  {m.type === 'video' && <span className="qpdp-thumb-play">▶</span>}
-                </button>
-              ))}
+                        e.target.src = product.image || '/images/p1.jpg'
+                      }}
+                    />
+                    {isVid && <span className="qpdp-thumb-play">▶</span>}
+                  </button>
+                )
+              })}
             </div>
 
             {product.video && (

@@ -767,16 +767,29 @@ export default function ProductFormModal({ product, isOpen, onClose }) {
                   />
                 </div>
 
-                {/* Product Video URL */}
+                {/* Product Video URL (YouTube, Pinterest, MP4) */}
                 <div className="col-12 col-sm-6">
-                  <label className="form-label fw-semibold">Product Video URL <span className="text-muted">(optional)</span></label>
+                  <div className="d-flex justify-content-between align-items-center mb-1">
+                    <label className="form-label fw-semibold mb-0">
+                      <i className="bi bi-play-circle-fill text-danger me-1"></i>
+                      Product Video URL <span className="text-muted">(optional)</span>
+                    </label>
+                    <span className="badge bg-secondary-subtle text-secondary" style={{ fontSize: '11px' }}>
+                      YouTube · Pinterest · MP4
+                    </span>
+                  </div>
                   <input
                     type="url"
                     className="form-control font-monospace"
-                    placeholder="https://…/product-video.mp4"
+                    placeholder="e.g. https://www.youtube.com/watch?v=... or https://pin.it/..."
                     value={form.video}
                     onChange={(e) => setForm({ ...form, video: e.target.value })}
                   />
+                  {form.video && (
+                    <small className="text-success d-block mt-1">
+                      <i className="bi bi-check-circle-fill me-1"></i> Video link attached (will display in product media gallery alongside photos)
+                    </small>
+                  )}
                 </div>
 
                 {/* ── MULTI-IMAGE UPLOAD & FRONT IMAGE SECTION ──────── */}

@@ -4,11 +4,17 @@ export const slugify = s => s
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-+|-+$/g, '')
 
-export const productSlug = p => p.slug || `${slugify(p.name).slice(0, 70)}--${String(p.sku || p.id).toLowerCase()}`
+export const productSlug = p => {
+  if (!p) return ''
+  if (p.slug) return p.slug
+  const baseName = p.name || p.title || 'product'
+  const identifier = p.sku || p.id || 'item'
+  return `${slugify(baseName).slice(0, 70)}--${String(identifier).toLowerCase()}`
+}
 
 export const productPath = p => `/product/${productSlug(p)}`
 
-export const findProductIn = (products, slug) => (products || []).find(p => productSlug(p) === slug) || null
+export const findProductIn = (products, slug) => (products || []).find(p => productSlug(p) === slug || String(p.id) === String(slug) || (p.sku && String(p.sku).toLowerCase() === String(slug).toLowerCase())) || null
 
 export const findCategoryIn = (categories, slug) => (categories || []).find(c => c.slug === slug) || null
 

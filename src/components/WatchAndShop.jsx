@@ -1,6 +1,8 @@
 import { useRef, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router'
 import { useCart } from '../context/CartContext'
 import { useStoreData } from '../context/StoreDataContext'
+import { productPath } from '../content'
 
 export function extractYouTubeId(url) {
   if (!url || typeof url !== 'string') return null
@@ -8,24 +10,143 @@ export function extractYouTubeId(url) {
   return match ? match[1] : null
 }
 
+function ReelCard({ item, idx, associatedProduct, onAddToCart }) {
+  const navigate = useNavigate()
+  const [isHovered, setIsHovered] = useState(false)
+  const [isInView, setIsInView] = useState(false)
+  const cardRef = useRef(null)
+
+  useEffect(() => {
+    if (!('IntersectionObserver' in window)) {
+      setIsInView(true)
+      return
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting)
+      },
+      { threshold: 0.25 }
+    )
+
+    if (cardRef.current) observer.observe(cardRef.current)
+    return () => observer.disconnect()
+  }, [])
+
+  const ytId = item.videoId || extractYouTubeId(item.youtubeUrl || item.video)
+  const targetProduct = associatedProduct || item
+  const displayName = item.title || item.name || (associatedProduct ? associatedProduct.name : 'Featured Video Product')
+  const displayImage = item.image || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : (associatedProduct ? associatedProduct.image : ''))
+  const price = Number(item.price || associatedProduct?.price || 0)
+  const oldPrice = Number(item.oldPrice || associatedProduct?.oldPrice || 0)
+  const discount = item.discount || (oldPrice > price && price > 0 ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0)
+
+  const handleOpenProduct = (e) => {
+    e?.stopPropagation?.()
+    navigate(productPath(targetProduct))
+  }
+
+  // Active autoplay when mouse hovers on desktop or scrolled into view on mobile
+  const shouldPlayVideo = isHovered || isInView
+
+  return (
+    <article
+      className={`qg-reel ${isHovered ? 'is-hovered' : ''}`}
+      ref={cardRef}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={handleOpenProduct}
+      style={{ cursor: 'pointer' }}
+    >
+      <div className="qg-reel-media">
+        {ytId ? (
+          shouldPlayVideo ? (
+            <div className="qg-reel-video-container">
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${ytId}&playsinline=1&modestbranding=1&rel=0&showinfo=0&disablekb=1&fs=0`}
+                title={displayName}
+                className="qg-reel-iframe"
+                loading="lazy"
+                tabIndex="-1"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              />
+            </div>
+          ) : (
+            <img
+              src={displayImage}
+              alt={displayName}
+              loading="lazy"
+              onError={e => {
+                e.target.src = '/images/banner-placeholder.webp'
+              }}
+            />
+          )
+        ) : item.video ? (
+          <video
+            src={item.video}
+            poster={displayImage}
+            muted
+            loop
+            playsInline
+            autoPlay={shouldPlayVideo}
+            preload="metadata"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <img src={displayImage} alt={displayName} loading="lazy" />
+        )}
+
+        {discount > 0 && <span className="qg-reel-off">{discount}% OFF</span>}
+
+        <button
+          className="qg-reel-play"
+          type="button"
+          onClick={handleOpenProduct}
+          aria-label={`Open product page for ${displayName}`}
+        >
+          ▶
+        </button>
+      </div>
+
+      <div className="qg-reel-info" onClick={handleOpenProduct}>
+        <img src={displayImage} alt={displayName} loading="lazy" width="48" height="48" />
+        <span>
+          <b>{displayName}</b>
+          {price > 0 && (
+            <span className="qg-reel-price">
+              {oldPrice > price && <del>Rs. {oldPrice.toLocaleString()}</del>}
+              <em>Rs. {price.toLocaleString()}</em>
+            </span>
+          )}
+        </span>
+      </div>
+
+      <div className="qg-reel-actions-row" onClick={e => e.stopPropagation()}>
+        <button
+          className="qg-reel-view-btn"
+          type="button"
+          onClick={handleOpenProduct}
+        >
+          View Details
+        </button>
+        {(associatedProduct || (item.name && item.price)) && (
+          <button
+            className="qg-reel-add-btn"
+            type="button"
+            onClick={() => onAddToCart(associatedProduct || item)}
+          >
+            Add to Cart
+          </button>
+        )}
+      </div>
+    </article>
+  )
+}
+
 export default function WatchAndShop({ section, onShopAll }) {
   const { watchShop = [], products = [] } = useStoreData()
   const rail = useRef(null)
-  const [muted, setMuted] = useState(true)
-  const [activeYtVideo, setActiveYtVideo] = useState(null)
-  const { add, setQuickView } = useCart()
+  const { add } = useCart()
   const scroll = dir => rail.current?.scrollBy({ left: dir * 520, behavior: 'smooth' })
-
-  // Keyboard listener to close modal on Escape
-  useEffect(() => {
-    const handleKeyDown = e => {
-      if (e.key === 'Escape') setActiveYtVideo(null)
-    }
-    if (activeYtVideo) {
-      window.addEventListener('keydown', handleKeyDown)
-    }
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [activeYtVideo])
 
   // Resolve section items or fallback to legacy watchShop
   const sectionContent = section?.content?.reels || {}
@@ -72,100 +193,15 @@ export default function WatchAndShop({ section, onShopAll }) {
 
         <div className="qg-reels-rail" ref={rail}>
           {items.map((item, idx) => {
-            const ytId = item.videoId || extractYouTubeId(item.youtubeUrl || item.video)
             const associatedProduct = getAssociatedProduct(item)
-
-            const displayName = item.title || item.name || (associatedProduct ? associatedProduct.name : 'Featured Gadget')
-            const displayImage = item.image || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : (associatedProduct ? associatedProduct.image : ''))
-            const price = Number(item.price || associatedProduct?.price || 0)
-            const oldPrice = Number(item.oldPrice || associatedProduct?.oldPrice || 0)
-            const discount = item.discount || (oldPrice > price && price > 0 ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0)
-
-            const handleCardClick = () => {
-              if (ytId) {
-                setActiveYtVideo({
-                  ...item,
-                  videoId: ytId,
-                  title: displayName,
-                  description: item.description || associatedProduct?.description || '',
-                  associatedProduct: associatedProduct || (price > 0 ? { ...item, id: item.productId || item.id, name: displayName, price, oldPrice, image: displayImage } : null),
-                })
-              } else if (associatedProduct) {
-                setQuickView(associatedProduct)
-              } else if (item.name && item.price) {
-                setQuickView(item)
-              }
-            }
-
             return (
-              <article className="qg-reel" key={item.id || ytId || idx}>
-                <div className="qg-reel-media" onClick={handleCardClick} style={{ cursor: 'pointer' }}>
-                  {ytId ? (
-                    <img
-                      src={displayImage}
-                      alt={displayName}
-                      loading="lazy"
-                      onError={e => {
-                        e.target.src = '/images/banner-placeholder.webp'
-                      }}
-                    />
-                  ) : item.video ? (
-                    <video
-                      src={item.video}
-                      poster={displayImage}
-                      muted={muted}
-                      loop
-                      playsInline
-                      autoPlay
-                      preload="metadata"
-                      onMouseEnter={e => e.currentTarget.play().catch(() => {})}
-                    />
-                  ) : (
-                    <img src={displayImage} alt={displayName} loading="lazy" />
-                  )}
-
-                  {item.video && !ytId && (
-                    <button
-                      className="qg-reel-sound"
-                      onClick={e => { e.stopPropagation(); setMuted(m => !m); }}
-                      aria-label={muted ? 'Unmute video' : 'Mute video'}
-                    >
-                      {muted ? '🔇' : '🔊'}
-                    </button>
-                  )}
-
-                  {discount > 0 && <span className="qg-reel-off">{discount}% OFF</span>}
-                  <button
-                    className="qg-reel-play"
-                    onClick={e => { e.stopPropagation(); handleCardClick(); }}
-                    aria-label={`Play ${displayName}`}
-                  >
-                    ▶
-                  </button>
-                </div>
-
-                <button className="qg-reel-info" onClick={handleCardClick}>
-                  <img src={displayImage} alt={displayName} loading="lazy" width="48" height="48" />
-                  <span>
-                    <b>{displayName}</b>
-                    {price > 0 && (
-                      <span className="qg-reel-price">
-                        {oldPrice > price && <del>Rs. {oldPrice.toLocaleString()}</del>}
-                        <em>Rs. {price.toLocaleString()}</em>
-                      </span>
-                    )}
-                  </span>
-                </button>
-
-                {(associatedProduct || (item.name && item.price)) && (
-                  <button
-                    className="qg-reel-add"
-                    onClick={() => add(associatedProduct || item)}
-                  >
-                    Add to cart
-                  </button>
-                )}
-              </article>
+              <ReelCard
+                key={item.id || item.videoId || idx}
+                item={item}
+                idx={idx}
+                associatedProduct={associatedProduct}
+                onAddToCart={(prod) => add(prod)}
+              />
             )
           })}
         </div>
@@ -174,52 +210,6 @@ export default function WatchAndShop({ section, onShopAll }) {
           <button className="qg-pill-outline" onClick={onShopAll}>Shop all products</button>
         </div>
       </div>
-
-      {/* YouTube Responsive Modal Player */}
-      {activeYtVideo && (
-        <div className="qg-yt-backdrop" onClick={() => setActiveYtVideo(null)} role="dialog" aria-modal="true">
-          <div className="qg-yt-dialog" onClick={e => e.stopPropagation()}>
-            <button className="qg-yt-close" onClick={() => setActiveYtVideo(null)} aria-label="Close video player">✕</button>
-            <div className="qg-yt-player-box">
-              <iframe
-                src={`https://www.youtube.com/embed/${activeYtVideo.videoId}?autoplay=1&rel=0`}
-                title={activeYtVideo.title || 'YouTube Video'}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
-            </div>
-            <div className="qg-yt-footer">
-              <div className="qg-yt-meta">
-                <h4>{activeYtVideo.title}</h4>
-                {activeYtVideo.description && (
-                  <p className="text-secondary small mb-0 mt-1">{activeYtVideo.description}</p>
-                )}
-              </div>
-              {activeYtVideo.associatedProduct && (
-                <div className="qg-yt-product">
-                  <img
-                    src={activeYtVideo.associatedProduct.image || activeYtVideo.associatedProduct.images?.[0]}
-                    alt={activeYtVideo.associatedProduct.name}
-                  />
-                  <div className="qg-yt-product-info">
-                    <span className="qg-yt-product-title">{activeYtVideo.associatedProduct.name}</span>
-                    <span className="qg-yt-product-price">Rs. {Number(activeYtVideo.associatedProduct.price).toLocaleString()}</span>
-                  </div>
-                  <button
-                    className="btn btn-sm btn-success ms-2"
-                    onClick={() => {
-                      add(activeYtVideo.associatedProduct)
-                      setActiveYtVideo(null)
-                    }}
-                  >
-                    Add to Cart
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   )
 }

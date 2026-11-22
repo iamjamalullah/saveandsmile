@@ -554,7 +554,7 @@ export function StoreDataProvider({ children }) {
 
   const deleteHeroSlide = useCallback(async (id) => {
     const before = data.heroSlides
-    const filtered = (data.heroSlides || []).filter(s => s.id !== id)
+    const filtered = (data.heroSlides || []).filter(s => String(s.id) !== String(id))
     replaceLocal('heroSlides', () => filtered)
     try {
       await api.remove('heroSlides', id)

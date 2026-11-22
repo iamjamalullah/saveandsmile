@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useStoreData } from '../../context/StoreDataContext'
 import { extractYouTubeId } from '../../components/WatchAndShop'
+import { convertFileToWebp, uploadWebpImages } from '../../utils/imageUpload'
 
 const EMPTY_FORM = {
   title: '',
@@ -35,6 +36,7 @@ export default function WatchShopView() {
   const [deleteConfirm, setDeleteConfirm] = useState(null)
   const [showClearConfirm, setShowClearConfirm] = useState(false)
   const [previewVideo, setPreviewVideo] = useState(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   useEffect(() => {
     loadWatchShop?.()
@@ -482,23 +484,46 @@ export default function WatchShopView() {
                         id="watchShopImageUpload"
                         className="d-none"
                         accept="image/*"
-                        onChange={(e) => {
+                        disabled={uploadingImage}
+                        onChange={async (e) => {
                           const file = e.target.files?.[0]
                           if (!file) return
-                          const reader = new FileReader()
-                          reader.onload = (loadEvt) => {
-                            setForm(prev => ({ ...prev, image: loadEvt.target?.result || '' }))
-                            notify('Product photo attached successfully!')
+                          setUploadingImage(true)
+                          try {
+                            const webp = await convertFileToWebp(file, 1280, 0.85)
+                            const urls = await uploadWebpImages([webp])
+                            if (urls && urls[0]) {
+                              setForm(prev => ({ ...prev, image: urls[0] }))
+                              notify('Product photo converted to WebP and uploaded successfully!')
+                            } else {
+                              setForm(prev => ({ ...prev, image: webp.dataUrl }))
+                              notify('Product photo converted to WebP!')
+                            }
+                          } catch (err) {
+                            console.error('Watch shop image upload error:', err)
+                            alert('Image upload failed: ' + (err.message || 'Unknown error'))
+                          } finally {
+                            setUploadingImage(false)
+                            if (e.target) e.target.value = ''
                           }
-                          reader.readAsDataURL(file)
                         }}
                       />
                       <button
                         type="button"
                         className="btn btn-outline-success d-flex align-items-center gap-2"
+                        disabled={uploadingImage}
                         onClick={() => document.getElementById('watchShopImageUpload')?.click()}
                       >
-                        <i className="bi bi-cloud-arrow-up-fill"></i> Upload Picture
+                        {uploadingImage ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Converting to WebP...
+                          </>
+                        ) : (
+                          <>
+                            <i className="bi bi-cloud-arrow-up-fill"></i> Upload Picture (WebP)
+                          </>
+                        )}
                       </button>
                       <input
                         type="text"

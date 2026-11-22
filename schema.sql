@@ -197,7 +197,7 @@ CREATE TABLE IF NOT EXISTS store_settings (
 
 -- 10. HERO SLIDES
 CREATE TABLE IF NOT EXISTS hero_slides (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     image_url VARCHAR(500) NOT NULL,
     alt_text VARCHAR(255),
     title VARCHAR(200),

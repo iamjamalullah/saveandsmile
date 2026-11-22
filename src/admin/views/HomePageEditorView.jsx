@@ -382,7 +382,7 @@ export default function HomePageEditorView() {
     if (!slideToDelete) return
     try {
       await deleteHeroSlide(slideToDelete.id)
-      setLocalHeroSlides(prev => prev.filter(s => s.id !== slideToDelete.id))
+      setLocalHeroSlides(prev => prev.filter(s => String(s.id) !== String(slideToDelete.id)))
       setSlideToDelete(null)
       if (reload) reload()
       if (showToast) showToast('Hero slide deleted successfully.', 'success')

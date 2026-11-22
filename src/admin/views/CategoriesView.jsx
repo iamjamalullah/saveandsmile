@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useStoreData } from '../../context/StoreDataContext'
+import { convertFileToWebp, uploadWebpImages } from '../../utils/imageUpload'
 
 export default function CategoriesView() {
   const { categories, products, sections = [], addCategory, updateCategory, deleteCategory } = useStoreData()
@@ -8,19 +9,61 @@ export default function CategoriesView() {
   const [targetCategory, setTargetCategory] = useState(null)
   const [form, setForm] = useState({ name: '', icon: '📦', image: '/images/cat1.jpg' })
 
+  // Image upload states
+  const [uploading, setUploading] = useState(false)
+  const [uploadMsg, setUploadMsg] = useState('')
+  const [uploadError, setUploadError] = useState('')
+
   // Emojis for quick icon selection
   const quickIcons = ['🧸', '🍱', '🧼', '🥤', '💄', '🧴', '🚰', '🗄️', '💍', '👜', '🍳', '⌚', '🎧', '📚', '⚡', '💎', '🔪', '🍼']
 
   const openAdd = () => {
-    setForm({ name: '', icon: '📦', image: '/images/cat1.jpg' })
+    setForm({ name: '', icon: '📦', image: '' })
     setTargetCategory(null)
+    setUploadError('')
+    setUploadMsg('')
     setModalMode('add')
   }
 
   const openEdit = (cat) => {
-    setForm({ name: cat.name, icon: cat.icon || '📦', image: cat.image || '/images/cat1.jpg' })
+    setForm({ name: cat.name, icon: cat.icon || '📦', image: cat.image || '' })
     setTargetCategory(cat)
+    setUploadError('')
+    setUploadMsg('')
     setModalMode('edit')
+  }
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Please select a valid image file (JPG, PNG, WebP).')
+      return
+    }
+
+    setUploadError('')
+    setUploading(true)
+    setUploadMsg('Optimizing image to WebP...')
+
+    try {
+      const webp = await convertFileToWebp(file, 1200, 0.85)
+      setUploadMsg('Uploading image to cloud storage...')
+      const urls = await uploadWebpImages([webp])
+      if (urls && urls[0]) {
+        setForm(prev => ({ ...prev, image: urls[0] }))
+        setUploadMsg('Image uploaded successfully!')
+        setTimeout(() => setUploadMsg(''), 2500)
+      } else {
+        throw new Error('Upload returned no URL.')
+      }
+    } catch (err) {
+      console.error('Category image upload failed:', err)
+      setUploadError(err.message || 'Image upload failed. Please try again.')
+    } finally {
+      setUploading(false)
+      // reset file input
+      e.target.value = ''
+    }
   }
 
   const handleSave = (e) => {
@@ -72,11 +115,22 @@ export default function CategoriesView() {
               <div className="card h-100 shadow-sm border">
                 <div className="card-body p-3 d-flex flex-column">
                   <div className="d-flex align-items-start justify-content-between mb-3">
-                    <div
-                      className="d-flex align-items-center justify-content-center bg-light rounded-3 shadow-sm"
-                      style={{ width: 52, height: 52, fontSize: '1.75rem' }}
-                    >
-                      {cat.icon || '📦'}
+                    <div className="d-flex align-items-center gap-2">
+                      {cat.image ? (
+                        <img
+                          src={cat.image}
+                          alt={cat.name}
+                          className="rounded-3 object-fit-cover border shadow-sm"
+                          style={{ width: 52, height: 52 }}
+                          onError={(e) => { e.currentTarget.style.display = 'none' }}
+                        />
+                      ) : null}
+                      <div
+                        className="d-flex align-items-center justify-content-center bg-light rounded-3 shadow-sm border"
+                        style={{ width: 52, height: 52, fontSize: '1.75rem' }}
+                      >
+                        {cat.icon || '📦'}
+                      </div>
                     </div>
                     <span className="badge bg-secondary-subtle text-secondary fw-semibold">
                       {count} Products
@@ -221,14 +275,97 @@ export default function CategoriesView() {
                   </div>
 
                   <div className="mb-3">
-                    <label className="form-label fw-semibold">Cover Image Path</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="/images/cat1.jpg"
-                      value={form.image}
-                      onChange={(e) => setForm({ ...form, image: e.target.value })}
-                    />
+                    <label className="form-label fw-semibold d-flex justify-content-between align-items-center mb-1">
+                      <span>Category Picture / Image</span>
+                      {form.image && (
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-link text-danger p-0 text-decoration-none"
+                          onClick={() => setForm({ ...form, image: '' })}
+                        >
+                          <i className="bi bi-x-circle me-1"></i> Remove
+                        </button>
+                      )}
+                    </label>
+
+                    {/* Image Preview if present */}
+                    {form.image && (
+                      <div className="d-flex align-items-center gap-3 p-2 mb-2 bg-light rounded border">
+                        <img
+                          src={form.image}
+                          alt="Category preview"
+                          className="rounded border shadow-sm object-fit-cover"
+                          style={{ width: 68, height: 68 }}
+                          onError={(e) => { e.currentTarget.style.opacity = '0.5' }}
+                        />
+                        <div className="small flex-grow-1 text-truncate">
+                          <strong className="d-block text-dark mb-1">Current Picture</strong>
+                          <span className="text-muted font-monospace text-truncate d-block" style={{ maxWidth: 260 }}>
+                            {form.image}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Upload Button & Area */}
+                    <div className="d-flex flex-column gap-2">
+                      <div>
+                        <input
+                          type="file"
+                          id="category-image-upload-input"
+                          className="d-none"
+                          accept="image/*"
+                          onChange={handleFileUpload}
+                          disabled={uploading}
+                        />
+                        <label
+                          htmlFor="category-image-upload-input"
+                          className={`btn btn-outline-primary btn-sm w-100 py-2 d-flex align-items-center justify-content-center gap-2 ${uploading ? 'disabled' : ''}`}
+                          style={{ cursor: uploading ? 'not-allowed' : 'pointer' }}
+                        >
+                          {uploading ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                              <span>{uploadMsg || 'Uploading...'}</span>
+                            </>
+                          ) : (
+                            <>
+                              <i className="bi bi-cloud-arrow-up-fill fs-6"></i>
+                              <span className="fw-semibold">
+                                {form.image ? 'Change / Upload New Picture' : 'Click to Upload Category Picture'}
+                              </span>
+                            </>
+                          )}
+                        </label>
+                      </div>
+
+                      {uploadError && (
+                        <div className="alert alert-danger py-2 px-3 small mb-1" role="alert">
+                          <i className="bi bi-exclamation-triangle-fill me-1"></i> {uploadError}
+                        </div>
+                      )}
+
+                      {uploadMsg && !uploading && (
+                        <div className="text-success small fw-semibold">
+                          <i className="bi bi-check-circle-fill me-1"></i> {uploadMsg}
+                        </div>
+                      )}
+
+                      {/* Manual URL input fallback */}
+                      <div className="mt-1">
+                        <label className="form-text small text-muted mb-1 d-block">
+                          Or enter image URL / path manually:
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          placeholder="https://... or /images/cat1.jpg"
+                          value={form.image}
+                          onChange={(e) => setForm({ ...form, image: e.target.value })}
+                          disabled={uploading}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="modal-footer bg-light">

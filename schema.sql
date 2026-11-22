@@ -1,5 +1,5 @@
 -- ============================================================================
--- QADRI GADGETS – PRODUCTION POSTGRESQL DATABASE SCHEMA (MIGRATION READY)
+-- SAVE & SMILE – PRODUCTION POSTGRESQL DATABASE SCHEMA (MIGRATION READY)
 -- Compatible with PostgreSQL 13+, Supabase, Neon, AWS RDS, and pg-mem
 -- ============================================================================
 
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS products (
     price NUMERIC(12, 2) NOT NULL CHECK (price >= 0),
     old_price NUMERIC(12, 2) CHECK (old_price >= price),
     stock_quantity INT NOT NULL DEFAULT 0 CHECK (stock_quantity >= 0),
-    brand VARCHAR(120) DEFAULT 'Qadri Select',
+    brand VARCHAR(120) DEFAULT 'Save & Smile',
     description TEXT,
     video_url VARCHAR(500),
     image_main VARCHAR(500) NOT NULL,
@@ -180,12 +180,12 @@ CREATE INDEX IF NOT EXISTS idx_inquiries_resolved ON contact_inquiries(is_resolv
 -- 9. STORE SETTINGS
 CREATE TABLE IF NOT EXISTS store_settings (
     id INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
-    store_name VARCHAR(120) NOT NULL DEFAULT 'Qadri Gadgets',
-    tagline VARCHAR(200) NOT NULL DEFAULT 'Gadgets Wholesaler',
-    phone VARCHAR(30) NOT NULL DEFAULT '0321-8273588',
-    whatsapp VARCHAR(30) NOT NULL DEFAULT '923218273588',
-    email VARCHAR(180) NOT NULL DEFAULT 'info@qadrigadgets.pk',
-    address TEXT NOT NULL,
+    store_name VARCHAR(120) NOT NULL DEFAULT 'Save & Smile',
+    tagline VARCHAR(200) NOT NULL DEFAULT 'Pakistan Wholesale & Retail Store',
+    phone VARCHAR(30) NOT NULL DEFAULT '03302760775',
+    whatsapp VARCHAR(30) NOT NULL DEFAULT '923302760775',
+    email VARCHAR(180) NOT NULL DEFAULT 'info@saveandsmile.pk',
+    address TEXT NOT NULL DEFAULT 'Shop # G-40 - 41 Central Mall ground Floor Near Gul Plaza Saddar Karachi',
     free_shipping_threshold NUMERIC(12, 2) NOT NULL DEFAULT 3000,
     shipping_fee NUMERIC(12, 2) NOT NULL DEFAULT 200,
     express_shipping_fee NUMERIC(12, 2) NOT NULL DEFAULT 350,

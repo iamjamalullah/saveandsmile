@@ -190,7 +190,11 @@ export async function processCheckout({
       shippingFee = 0
     }
 
-    const total = Math.max(0, subtotal - discount + shippingFee)
+    // D2. Tax Calculation from store_settings
+    const taxRate = Number(settings.tax_rate) || 0
+    const taxAmount = Math.round((subtotal * taxRate) / 100)
+
+    const total = Math.max(0, subtotal - discount + shippingFee + taxAmount)
 
     // E. Upsert Customer Record
     const mobile = (customer.mobile || '').trim()
@@ -209,13 +213,16 @@ export async function processCheckout({
 
     // F. Create Order Header (Guaranteed unique ID even under high concurrency)
     const orderId = `GS-ORD-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+    const invoiceNumber = `INV-${dateStr}-${orderId.replace(/[^0-9]/g, '').slice(-4).padStart(4, '0')}`
+
     await client.query(
       `INSERT INTO orders (
          id, customer_id, customer_name, customer_mobile, customer_email,
          customer_city, delivery_address, delivery_method, payment_method,
-         status, subtotal, discount, coupon_code, shipping_fee, total,
-         customer_notes, idempotency_key
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
+         status, subtotal, discount, coupon_code, shipping_fee, tax_rate, tax_amount,
+         total, invoice_number, customer_notes, idempotency_key, status_history
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)`,
       [
         orderId,
         customerId,
@@ -231,9 +238,13 @@ export async function processCheckout({
         discount,
         verifiedCouponCode,
         shippingFee,
+        taxRate,
+        taxAmount,
         total,
+        invoiceNumber,
         customerNotes,
         idempotencyKey,
+        JSON.stringify([{ status: 'Pending', changedAt: new Date().toISOString(), note: 'Order placed' }]),
       ]
     )
 
@@ -263,7 +274,10 @@ export async function processCheckout({
         discount,
         couponCode: verifiedCouponCode,
         shippingFee,
+        taxRate,
+        taxAmount,
         total,
+        invoiceNumber,
         items: validatedItems,
         createdAt: new Date().toISOString(),
       },
@@ -293,8 +307,9 @@ export async function getOrders() {
     SELECT o.id, o.customer_id, o.customer_name, o.customer_mobile, o.customer_email,
            o.customer_city, o.delivery_address, o.delivery_method, o.payment_method,
            o.status, o.tracking_number, o.subtotal::numeric, o.discount::numeric,
-           o.coupon_code, o.shipping_fee::numeric, o.total::numeric, o.customer_notes,
-           o.created_at, o.updated_at
+           o.coupon_code, o.shipping_fee::numeric, o.tax_rate::numeric, o.tax_amount::numeric,
+           o.total::numeric, o.invoice_number, o.cancellation_reason, o.status_history,
+           o.customer_notes, o.created_at, o.updated_at
     FROM orders o
     ORDER BY o.created_at DESC
   `)
@@ -363,7 +378,12 @@ export async function getOrders() {
     discount: Number(o.discount),
     coupon: o.coupon_code || '',
     shippingFee: Number(o.shipping_fee),
+    taxRate: Number(o.tax_rate) || 0,
+    taxAmount: Number(o.tax_amount) || 0,
     total: Number(o.total),
+    invoiceNumber: o.invoice_number || `INV-${o.id}`,
+    cancellationReason: o.cancellation_reason || '',
+    statusHistory: typeof o.status_history === 'string' ? JSON.parse(o.status_history) : (o.status_history || []),
     deliveryMethod: o.delivery_method,
     paymentMethod: o.payment_method,
     status: o.status,
@@ -379,20 +399,66 @@ export async function getOrderById(orderId) {
   return orders.find(o => String(o.id) === String(orderId)) || null
 }
 
-export async function updateOrderStatus(orderId, status, trackingNumber = null) {
-  const updates = ['status = $1']
-  const params = [status, orderId]
-  if (trackingNumber !== null && trackingNumber !== undefined) {
-    params.push(trackingNumber)
-    updates.push(`tracking_number = $${params.length}`)
-  }
-  updates.push('updated_at = CURRENT_TIMESTAMP')
-  const res = await query(
-    `UPDATE orders SET ${updates.join(', ')} WHERE id = $2 RETURNING *`,
-    params
-  )
-  if (!res.rows.length) return null
-  return getOrderById(orderId)
+export async function updateOrderStatus(orderId, status, trackingNumber = null, cancellationReason = null) {
+  return await transaction(async client => {
+    const curRes = await client.query('SELECT status, status_history FROM orders WHERE id = $1 FOR UPDATE', [orderId])
+    if (curRes.rows.length === 0) return null
+    const oldStatus = curRes.rows[0].status
+    let statusHistory = []
+    try {
+      statusHistory = typeof curRes.rows[0].status_history === 'string'
+        ? JSON.parse(curRes.rows[0].status_history)
+        : (curRes.rows[0].status_history || [])
+    } catch {
+      statusHistory = []
+    }
+
+    const RESTORATION_STATUSES = ['Cancelled', 'Returned', 'RTO']
+    if (RESTORATION_STATUSES.includes(status) && !RESTORATION_STATUSES.includes(oldStatus)) {
+      // Restore inventory stock atomically
+      const itemsRes = await client.query('SELECT product_id, variant_id, quantity FROM order_items WHERE order_id = $1', [orderId])
+      for (const item of itemsRes.rows) {
+        if (item.variant_id) {
+          await client.query(
+            'UPDATE product_variants SET stock_quantity = stock_quantity + CAST($1 AS INT) WHERE id = $2',
+            [item.quantity, item.variant_id]
+          )
+        }
+        await client.query(
+          'UPDATE products SET stock_quantity = stock_quantity + CAST($1 AS INT) WHERE id = $2',
+          [item.quantity, item.product_id]
+        )
+      }
+      console.log(`[ORDER] Restored inventory stock for cancelled/returned order ${orderId}`)
+    }
+
+    statusHistory.push({
+      from: oldStatus,
+      to: status,
+      changedAt: new Date().toISOString(),
+      ...(cancellationReason ? { reason: cancellationReason } : {}),
+    })
+
+    const updates = ['status = $1', 'status_history = $2', 'updated_at = CURRENT_TIMESTAMP']
+    const params = [status, JSON.stringify(statusHistory)]
+
+    if (trackingNumber !== null && trackingNumber !== undefined) {
+      params.push(trackingNumber)
+      updates.push(`tracking_number = $${params.length}`)
+    }
+    if (cancellationReason) {
+      params.push(cancellationReason)
+      updates.push(`cancellation_reason = $${params.length}`)
+    }
+
+    params.push(orderId)
+    await client.query(
+      `UPDATE orders SET ${updates.join(', ')} WHERE id = $${params.length}`,
+      params
+    )
+
+    return getOrderById(orderId)
+  })
 }
 
 export async function deleteOrder(orderId) {

@@ -11,6 +11,9 @@ async function runTestSuite() {
   console.log('\n[SETUP] Initializing schema and migrating baseline data...')
   await runMigration()
 
+  // Ensure test baseline stock for Product #1
+  await query('UPDATE products SET stock_quantity = 50 WHERE id = 1')
+
   // 2. Inspect initial stock of target test product
   const initialProdRes = await query('SELECT id, name, price, stock_quantity FROM products WHERE id = 1')
   const initialProd = initialProdRes.rows[0]

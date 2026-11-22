@@ -96,7 +96,7 @@ export default function CheckoutPage() {
     }))
 
     const localOrder = {
-      id: `QG-${Date.now().toString().slice(-6)}`,
+      id: `SS-${Date.now().toString().slice(-6)}`,
       name: f.name, mobile: f.mobile, email: f.email, city: f.city, address: deliveryId === 'pickup' ? 'Store pickup · Saddar, Karachi' : f.address,
       notes: f.notes,
       items: orderItems, subtotal: total, discount, coupon: coupon?.code || '', shipping, total: grand,
@@ -105,8 +105,8 @@ export default function CheckoutPage() {
     }
     try {
       try {
-        const prev = JSON.parse(localStorage.getItem('qg_orders') || '[]')
-        localStorage.setItem('qg_orders', JSON.stringify([localOrder, ...prev]))
+        const prev = JSON.parse(localStorage.getItem('ss_orders') || localStorage.getItem('qg_orders') || '[]')
+        localStorage.setItem('ss_orders', JSON.stringify([localOrder, ...prev]))
       } catch {}
 
       const created = await addOrder({

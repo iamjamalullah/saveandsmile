@@ -44,7 +44,8 @@ async function runVariantsTestSuite() {
 
   // ── TEST 2: SIMPLE PRODUCT BACKWARD COMPATIBILITY ──
   console.log('\n--- TEST 2: SIMPLE PRODUCT BACKWARD COMPATIBILITY ---')
-  // Product #1 is a simple product
+  // Ensure baseline stock for simple product test
+  await pool.query('UPDATE products SET stock_quantity = 25 WHERE id = 1')
   const p1 = (await pool.query('SELECT id, name, price, stock_quantity, has_variants FROM products WHERE id = 1')).rows[0]
   assert.strictEqual(p1.has_variants, false, 'Product 1 should have has_variants=false')
   const prevStock = p1.stock_quantity

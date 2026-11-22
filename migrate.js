@@ -10,7 +10,7 @@ const DB_JSON_PATH = path.join(__dirname, 'db.json')
 
 export async function runMigration() {
   console.log('===============================================================')
-  console.log('   QADRI GADGETS – POSTGRESQL DATA MIGRATION RUNNER')
+  console.log('   SAVE & SMILE – POSTGRESQL DATA MIGRATION RUNNER')
   console.log('===============================================================')
 
   // 1. Initialize schema DDL
@@ -80,7 +80,7 @@ export async function runMigration() {
           Number(p.price) || 0,
           Number(p.oldPrice) || Number(p.price) || 0,
           Number(p.stock) || 0,
-          p.brand || 'Qadri Select',
+          p.brand || 'Save & Smile',
           p.description || '',
           p.video || null,
           p.image || '/images/p1.jpg',
@@ -348,12 +348,12 @@ export async function runMigration() {
          free_shipping_threshold = EXCLUDED.free_shipping_threshold,
          shipping_fee = EXCLUDED.shipping_fee`,
       [
-        settings.name || 'Qadri Gadgets',
-        settings.tagline || 'Gadgets Wholesaler',
-        settings.phone || '0321-8273588',
-        settings.whatsapp || '923218273588',
-        settings.email || 'info@qadrigadgets.pk',
-        settings.address || 'Karachi, Pakistan',
+        settings.name || 'Save & Smile',
+        settings.tagline || 'Pakistan Wholesale & Retail Store',
+        settings.phone || '03302760775',
+        settings.whatsapp || '923302760775',
+        settings.email || 'info@saveandsmile.pk',
+        settings.address || 'Shop # G-40 - 41 Central Mall ground Floor Near Gul Plaza Saddar Karachi',
         Number(settings.freeShippingThreshold) || 3000,
         Number(settings.shippingFee) || 200,
         Number(settings.expressShippingFee) || 350,
@@ -450,15 +450,25 @@ export async function runMigration() {
 
     await client.query(
       `INSERT INTO staff_accounts (id, name, email, password_hash, role, is_active)
-       VALUES (1, 'Store Administrator', 'admin@qadrigadgets.pk', $1, 'admin', TRUE)
-       ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash`,
+       VALUES (1, 'Store Administrator', 'admin@saveandsmile.pk', $1, 'admin', TRUE)
+       ON CONFLICT (id) DO UPDATE SET
+         name = EXCLUDED.name,
+         email = EXCLUDED.email,
+         password_hash = EXCLUDED.password_hash,
+         role = EXCLUDED.role,
+         is_active = EXCLUDED.is_active`,
       [adminPassHash]
     )
 
     await client.query(
       `INSERT INTO staff_accounts (id, name, email, password_hash, role, is_active)
-       VALUES (2, 'Operations Manager', 'manager@qadrigadgets.pk', $1, 'manager', TRUE)
-       ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash`,
+       VALUES (2, 'Operations Manager', 'manager@saveandsmile.pk', $1, 'manager', TRUE)
+       ON CONFLICT (id) DO UPDATE SET
+         name = EXCLUDED.name,
+         email = EXCLUDED.email,
+         password_hash = EXCLUDED.password_hash,
+         role = EXCLUDED.role,
+         is_active = EXCLUDED.is_active`,
       [managerPassHash]
     )
 

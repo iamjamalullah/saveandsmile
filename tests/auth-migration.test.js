@@ -3,7 +3,7 @@ import crypto from 'node:crypto'
 import { runMigration } from '../migrate.js'
 import { query } from '../src/db/index.js'
 
-const APP_SECRET = process.env.APP_SECRET || 'qadri_dev_secret_key_prod_hardening_2026'
+const APP_SECRET = process.env.APP_SECRET || 'saveandsmile_dev_secret_key_prod_hardening_2026'
 
 function createStaffToken(user) {
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url')
@@ -42,7 +42,7 @@ async function runAuthMigrationTest() {
 
   // 1. Check Admin Authentication
   console.log('\n--- 1. Testing Admin Authentication ---')
-  const adminRes = await query('SELECT * FROM staff_accounts WHERE email = $1', ['admin@qadrigadgets.pk'])
+  const adminRes = await query('SELECT * FROM staff_accounts WHERE email = $1', ['admin@saveandsmile.pk'])
   if (adminRes.rows.length === 0) throw new Error('Admin account not found in database!')
   const admin = adminRes.rows[0]
 
@@ -56,7 +56,7 @@ async function runAuthMigrationTest() {
 
   // 2. Check Manager Authentication
   console.log('\n--- 2. Testing Manager Authentication ---')
-  const managerRes = await query('SELECT * FROM staff_accounts WHERE email = $1', ['manager@qadrigadgets.pk'])
+  const managerRes = await query('SELECT * FROM staff_accounts WHERE email = $1', ['manager@saveandsmile.pk'])
   if (managerRes.rows.length === 0) throw new Error('Manager account not found in database!')
   const manager = managerRes.rows[0]
 

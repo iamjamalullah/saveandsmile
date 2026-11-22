@@ -24,7 +24,9 @@ import { initDatabase, query, isMemoryDb } from './src/db/index.js'
 import * as fcmService from './src/services/fcmService.js'
 
 // Initialize PostgreSQL / pg-mem schema on startup
-initDatabase().then(() => mediaService.ensureMetadataTables()).catch(err => console.error('[POSTGRES INIT ERROR]:', err))
+initDatabase()
+  .then(() => Promise.all([mediaService.ensureMetadataTables(), preloadRevokedTokens()]))
+  .catch(err => console.error('[POSTGRES INIT ERROR]:', err))
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -103,21 +105,68 @@ const HOST = process.env.HOST || '0.0.0.0'
 const NODE_ENV = process.env.NODE_ENV || 'development'
 const IS_PROD = NODE_ENV === 'production'
 
-// Secure secret generation: fallback to secure secret if not provided in env
-const APP_SECRET = process.env.APP_SECRET || 'saveandsmile-secure-auth-secret-key-2026-v2-prod'
+// Secure secret configuration: require secure secret in production
+const APP_SECRET = process.env.APP_SECRET || process.env.JWT_SECRET || (IS_PROD ? (() => {
+  console.warn('[SECURITY WARNING] Neither APP_SECRET nor JWT_SECRET set in production! Generating secure ephemeral key.')
+  return crypto.randomBytes(32).toString('hex')
+})() : 'saveandsmile-dev-auth-secret-key-2026')
 
 // Token expiration: 8 hours in milliseconds
 const TOKEN_EXPIRY_MS = parseInt(process.env.TOKEN_EXPIRY_MS, 10) || 8 * 60 * 60 * 1000
 
-// Active session token blocklist (revocation on logout)
-const revokedTokens = new Set()
+// Active session token blocklist (revocation on logout & password change)
+const revokedTokenHashes = new Set()
 
-function revokeToken(token) {
-  if (token) revokedTokens.add(token)
+async function preloadRevokedTokens() {
+  if (!process.env.DATABASE_URL) return
+  try {
+    const res = await query('SELECT token_hash FROM revoked_tokens WHERE expires_at > CURRENT_TIMESTAMP')
+    for (const r of res.rows) {
+      revokedTokenHashes.add(r.token_hash)
+    }
+    console.log(`[AUTH] Preloaded ${res.rows.length} active revoked token(s) into memory filter.`)
+  } catch (err) {
+    console.warn('[AUTH] Could not preload revoked tokens:', err.message)
+  }
+}
+
+async function revokeToken(token) {
+  if (!token) return
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
+  revokedTokenHashes.add(tokenHash)
+  if (process.env.DATABASE_URL) {
+    try {
+      const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_MS)
+      await query(
+        'INSERT INTO revoked_tokens (token_hash, expires_at) VALUES ($1, $2) ON CONFLICT (token_hash) DO NOTHING',
+        [tokenHash, expiresAt]
+      )
+    } catch (err) {
+      console.warn('[AUTH] Could not persist revoked token to Postgres:', err.message)
+    }
+  }
 }
 
 function isTokenRevoked(token) {
-  return revokedTokens.has(token)
+  if (!token) return true
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
+  return revokedTokenHashes.has(tokenHash)
+}
+
+function normalizePakistaniMobile(input) {
+  if (!input || typeof input !== 'string') return null
+  const cleaned = input.trim().replace(/[\s\-\(\)]/g, '')
+  const intlMatch = cleaned.match(/^(?:\+?92|0092)(3\d{9})$/)
+  if (intlMatch) {
+    return '0' + intlMatch[1]
+  }
+  if (/^03\d{9}$/.test(cleaned)) {
+    return cleaned
+  }
+  if (/^3\d{9}$/.test(cleaned)) {
+    return '0' + cleaned
+  }
+  return null
 }
 
 // ── STAFF CREDENTIALS STORE (BCRYPT HASHED) ─────────────────
@@ -217,7 +266,7 @@ function generateToken(payload) {
 
 function verifyToken(token) {
   if (!token || typeof token !== 'string') return null
-  if (revokedTokens.has(token)) return null
+  if (isTokenRevoked(token)) return null
 
   const parts = token.split('.')
   if (parts.length !== 3) return null
@@ -295,15 +344,17 @@ function createSnapshotBackup() {
 
 // ── SECURITY HEADERS & CORS ─────────────────────────────────
 server.use((req, res, next) => {
-  // CORS Configuration
+  // CORS Configuration - Strict Production Allowlist
   const origin = req.headers.origin
-  const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173,https://saveandsmile.vercel.app,https://saveandsmile.pk').split(',')
-  const isAllowedOrigin = !origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app') || !IS_PROD
+  const exactAllowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,https://saveandsmile.vercel.app,https://saveandsmile.pk,https://www.saveandsmile.pk').split(',')
+  const isPreviewVercel = origin && /^https:\/\/saveandsmile(?:-[a-z0-9-]+)?\.vercel\.app$/.test(origin)
+  const isAllowedOrigin = !origin || exactAllowedOrigins.includes('*') || exactAllowedOrigins.includes(origin) || isPreviewVercel || !IS_PROD
+
   if (origin && isAllowedOrigin) {
     res.setHeader('Access-Control-Allow-Origin', origin)
     res.setHeader('Access-Control-Allow-Credentials', 'true')
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS')
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,idempotency-key,x-idempotency-key')
   }
 
   // Security Headers (OWASP Recommended)
@@ -437,23 +488,34 @@ const handleImageUpload = async (req, res) => {
       }
 
       // Upload directly to permanent Supabase Storage
-      let finalUrl = `/uploads/products/${filename}`
+      let finalUrl = null
       try {
         const uploadRes = await uploadBuffer(webpResult.webpBuffer, `products/${filename}`, 'image/webp')
         if (uploadRes && uploadRes.publicUrl) {
           finalUrl = uploadRes.publicUrl
         }
-        await mediaService.registerMedia({
-          bucket: 'product-media',
-          path: `products/${filename}`,
-          filename,
-          mimeType: 'image/webp',
-          sizeBytes: webpResult.webpBuffer.length,
-          ownerType: 'product',
-          ownerId: 'upload',
-        }).catch(mErr => console.warn('[MEDIA REGISTER WARNING]:', mErr.message))
+        if (finalUrl) {
+          await mediaService.registerMedia({
+            bucket: 'product-media',
+            path: `products/${filename}`,
+            filename,
+            mimeType: 'image/webp',
+            sizeBytes: webpResult.webpBuffer.length,
+            ownerType: 'product',
+            ownerId: 'upload',
+          }).catch(mErr => console.warn('[MEDIA REGISTER WARNING]:', mErr.message))
+        }
       } catch (sErr) {
         console.warn('[SUPABASE UPLOAD WARNING]:', sErr.message)
+      }
+
+      if (!finalUrl) {
+        if (IS_PROD || IS_VERCEL) {
+          return res.status(502).json({
+            error: 'Cloud media upload failed. Ephemeral storage is disabled in production to guarantee image durability.',
+          })
+        }
+        finalUrl = `/uploads/products/${filename}`
       }
 
       savedUrls.push(finalUrl)
@@ -513,16 +575,10 @@ server.get(['/', '/api'], (req, res) => {
 server.get('/health', healthHandler)
 server.get('/api/health', healthHandler)
 
-// ── REVISED AUTH ENDPOINTS (BCRYPT + RATE LIMITING) ─────────
+// ── REVISED AUTH ENDPOINTS (POSTGRESQL BCRYPT + PERSISTENT SESSIONS) ─────────
 const handleLogin = async (req, res) => {
   const { email, username, password } = req.body || {}
   const identifier = (email || username || '').trim().toLowerCase()
-
-  // Reset rate limiting if valid admin credentials are being submitted
-  if ((identifier === 'admin' || identifier.includes('admin')) && (password === 'admin123' || (process.env.ADMIN_PASSWORD && password === process.env.ADMIN_PASSWORD))) {
-    loginLimiter.hits.delete(`login:${identifier}`)
-    loginLimiter.hits.delete('login:admin')
-  }
 
   const rateStatus = loginLimiter.check(`login:${identifier}`)
   if (rateStatus.limited) {
@@ -532,13 +588,48 @@ const handleLogin = async (req, res) => {
     })
   }
 
-  const user = staffCredentials.find(a =>
-    a.email.toLowerCase() === identifier ||
-    (a.username && a.username.toLowerCase() === identifier) ||
-    (identifier === 'admin' && a.role === 'admin') ||
-    (identifier === 'manager' && a.role === 'manager') ||
-    (identifier.includes('admin') && a.role === 'admin')
-  )
+  let user = null
+
+  // 1. Authoritative PostgreSQL staff_accounts lookup
+  if (process.env.DATABASE_URL) {
+    try {
+      const dbRes = await query(
+        `SELECT id, name, email, password_hash, role, is_active
+         FROM staff_accounts
+         WHERE LOWER(email) = LOWER($1)
+            OR (LOWER($1) = 'admin' AND role = 'admin')
+            OR (LOWER($1) = 'manager' AND role = 'manager')`,
+        [identifier]
+      )
+      if (dbRes.rows.length > 0) {
+        const staff = dbRes.rows[0]
+        if (!staff.is_active) {
+          return res.status(403).json({ error: 'This staff account has been deactivated. Please contact security administration.' })
+        }
+        user = {
+          id: staff.id,
+          name: staff.name,
+          email: staff.email,
+          passwordHash: staff.password_hash,
+          role: staff.role || 'admin',
+          fromDb: true,
+        }
+      }
+    } catch (dbErr) {
+      console.warn('[AUTH DB LOOKUP ERROR]:', dbErr.message)
+    }
+  }
+
+  // 2. In-memory staffCredentials fallback for local testing without database
+  if (!user) {
+    user = staffCredentials.find(a =>
+      a.email.toLowerCase() === identifier ||
+      (a.username && a.username.toLowerCase() === identifier) ||
+      (identifier === 'admin' && a.role === 'admin') ||
+      (identifier === 'manager' && a.role === 'manager')
+    )
+  }
+
   if (!user) {
     return res.status(401).json({ error: 'Invalid staff email/username or security password.' })
   }
@@ -550,25 +641,15 @@ const handleLogin = async (req, res) => {
     })
   }
 
-  let passwordValid = false
-  if (user.role === 'admin') {
-    if (password === 'admin123' || (process.env.ADMIN_PASSWORD && password === process.env.ADMIN_PASSWORD)) {
-      passwordValid = true
-    } else {
-      passwordValid = await bcrypt.compare(password || '', user.passwordHash)
-    }
-  } else if (user.role === 'manager') {
-    if (password === 'manager123' || (process.env.MANAGER_PASSWORD && password === process.env.MANAGER_PASSWORD)) {
-      passwordValid = true
-    } else {
-      passwordValid = await bcrypt.compare(password || '', user.passwordHash)
-    }
-  } else {
-    passwordValid = await bcrypt.compare(password || '', user.passwordHash)
-  }
-
+  const passwordValid = await bcrypt.compare(password || '', user.passwordHash)
   if (!passwordValid) {
     return res.status(401).json({ error: 'Invalid staff email or security password.' })
+  }
+
+  // Update last_login_at in PostgreSQL
+  if (user.fromDb) {
+    query('UPDATE staff_accounts SET last_login_at = CURRENT_TIMESTAMP WHERE id = $1', [user.id])
+      .catch(err => console.warn('[AUTH] Could not update last_login_at:', err.message))
   }
 
   // Reset rate limiting hits on successful authentication
@@ -599,10 +680,10 @@ const handleVerify = (req, res) => {
   return res.json({ user })
 }
 
-const handleLogout = (req, res) => {
+const handleLogout = async (req, res) => {
   const token = extractBearerToken(req)
   if (token) {
-    revokeToken(token)
+    await revokeToken(token)
   }
   return res.json({ success: true, message: 'Session successfully revoked.' })
 }
@@ -615,12 +696,25 @@ const handleChangePassword = async (req, res) => {
   }
 
   const { oldPassword, newPassword } = req.body || {}
-  const user = staffCredentials.find(s => s.id === session.id)
+
+  let user = null
+  if (process.env.DATABASE_URL) {
+    try {
+      const dbRes = await query('SELECT id, name, email, password_hash, role, is_active FROM staff_accounts WHERE id = $1', [session.id])
+      if (dbRes.rows.length > 0) {
+        user = dbRes.rows[0]
+      }
+    } catch (e) {}
+  }
+  if (!user) {
+    user = staffCredentials.find(s => s.id === session.id)
+  }
   if (!user) {
     return res.status(404).json({ error: 'Staff account not found.' })
   }
 
-  const matches = await bcrypt.compare(oldPassword || '', user.passwordHash)
+  const currentHash = user.password_hash || user.passwordHash
+  const matches = await bcrypt.compare(oldPassword || '', currentHash)
   if (!matches) {
     return res.status(400).json({ error: 'Current password verification failed.' })
   }
@@ -637,12 +731,27 @@ const handleChangePassword = async (req, res) => {
     return res.status(400).json({ error: 'Common/default passwords are not permitted.' })
   }
 
-  // Update in-memory hash
-  user.passwordHash = await bcrypt.hash(newPassword, 10)
-  user.isDefaultPassword = false
+  const newHash = await bcrypt.hash(newPassword, 10)
 
-  // Revoke current token forcing re-login with new password
-  revokeToken(token)
+  // Persist password update to PostgreSQL staff_accounts table
+  if (process.env.DATABASE_URL) {
+    try {
+      await query('UPDATE staff_accounts SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2', [newHash, session.id])
+      console.log(`[AUTH] Successfully updated password in staff_accounts for user #${session.id}`)
+    } catch (dbErr) {
+      console.error('[AUTH DB UPDATE PASSWORD ERROR]:', dbErr.message)
+    }
+  }
+
+  // Update in-memory fallback
+  const memUser = staffCredentials.find(s => s.id === session.id)
+  if (memUser) {
+    memUser.passwordHash = newHash
+    memUser.isDefaultPassword = false
+  }
+
+  // Revoke current token in memory and PostgreSQL revoked_tokens table
+  await revokeToken(token)
 
   return res.json({ success: true, message: 'Password updated successfully. Please log in with your new credentials.' })
 }
@@ -844,7 +953,8 @@ const handleOrderCreation = async (req, res) => {
 
   // 1. Validate Customer Contact
   const name = sanitizeString(customer.name || body.name || '')
-  const mobile = sanitizeString(customer.mobile || body.mobile || '').replace(/[^\d+]/g, '')
+  const rawMobile = customer.mobile || body.mobile || ''
+  const mobile = normalizePakistaniMobile(rawMobile) || sanitizeString(rawMobile).replace(/[^\d+]/g, '')
   const email = sanitizeString(customer.email || body.email || '')
   const city = sanitizeString(customer.city || body.city || '')
   const address = sanitizeString(customer.address || body.address || '')
@@ -853,7 +963,7 @@ const handleOrderCreation = async (req, res) => {
     return res.status(400).json({ error: 'Please enter a valid customer name.' })
   }
   if (!mobile || mobile.length < 10) {
-    return res.status(400).json({ error: 'Please provide a valid 11-digit mobile number.' })
+    return res.status(400).json({ error: 'Please provide a valid Pakistani mobile number (e.g., 03001234567).' })
   }
   if (!city) {
     return res.status(400).json({ error: 'Please select a delivery city.' })
@@ -1703,8 +1813,8 @@ if (process.env.DATABASE_URL) {
   })
   server.patch(['/orders/:id', '/api/orders/:id'], requireAdmin, async (req, res, next) => {
     try {
-      const { status, trackingNumber } = req.body
-      const updated = await orderService.updateOrderStatus(req.params.id, status, trackingNumber)
+      const { status, trackingNumber, cancellationReason } = req.body
+      const updated = await orderService.updateOrderStatus(req.params.id, status, trackingNumber, cancellationReason)
       if (!updated) return res.status(404).json({ error: 'Order not found' })
       fcmService.notifyOrderStatusChange(req.params.id, 'Updated', status).catch(err => {
         console.warn('[FCM ORDER STATUS]:', err.message)

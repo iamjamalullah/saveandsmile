@@ -78,12 +78,14 @@ export default function ProductFormModal({ product, isOpen, onClose }) {
   const [manualUrlInput, setManualUrlInput] = useState('')
   const [errors, setErrors] = useState({})
   const [showImagePicker, setShowImagePicker] = useState(false)
+  const [isCustomGroup, setIsCustomGroup] = useState(false)
 
   // Populate form when editing or resetting
   useEffect(() => {
     if (product) {
       const existingImages = [...new Set([product.image, ...(product.images || [])].filter(Boolean))]
       setGalleryList(existingImages)
+      setIsCustomGroup(Boolean(product.group && !['hot', 'new', 'trending', 'home', 'like', 'perfume', 'jewelry', 'watch', 'bestseller', 'audio', 'accessories'].includes(product.group)))
       setForm({
         name: product.name || '',
         category: product.category || 'Storage & Organization',
@@ -166,6 +168,7 @@ export default function ProductFormModal({ product, isOpen, onClose }) {
       }
     } else {
       setGalleryList([])
+      setIsCustomGroup(false)
       setForm({
         name: '',
         category: categories[0]?.name || 'Storage & Organization',
@@ -492,6 +495,21 @@ export default function ProductFormModal({ product, isOpen, onClose }) {
       }
       return filtered
     })
+    // Permanently remove from server storage if it's an uploaded media file
+    if (imgUrl && (imgUrl.includes('/uploads/') || imgUrl.includes('/product-media/'))) {
+      let token = null
+      try {
+        token = localStorage.getItem('qg_token') || localStorage.getItem('token') || localStorage.getItem('ss_token') || localStorage.getItem('admin_token')
+      } catch {}
+      fetch('/api/media/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ url: imgUrl })
+      }).catch(err => console.warn('[MEDIA DELETE WARNING]:', err.message))
+    }
   }
 
   const handleAddManualUrl = () => {
@@ -669,18 +687,59 @@ export default function ProductFormModal({ product, isOpen, onClose }) {
 
                 {/* Catalog Group */}
                 <div className="col-12 col-sm-6">
-                  <label className="form-label fw-semibold">Catalog Section Group</label>
+                  <label className="form-label fw-semibold d-flex justify-content-between align-items-center">
+                    <span>Catalog Section Group</span>
+                    <small className="text-muted">Target Homepage Feed</small>
+                  </label>
                   <select
                     className="form-select"
-                    value={form.group}
-                    onChange={(e) => setForm({ ...form, group: e.target.value })}
+                    value={
+                      ['hot', 'new', 'trending', 'home', 'like', 'perfume', 'jewelry', 'watch', 'bestseller', 'audio', 'accessories'].includes(form.group)
+                        ? form.group
+                        : 'custom'
+                    }
+                    onChange={(e) => {
+                      if (e.target.value === 'custom') {
+                        setIsCustomGroup(true)
+                        if (['hot', 'new', 'trending', 'home', 'like', 'perfume', 'jewelry', 'watch', 'bestseller', 'audio', 'accessories'].includes(form.group)) {
+                          setForm({ ...form, group: '' })
+                        }
+                      } else {
+                        setIsCustomGroup(false)
+                        setForm({ ...form, group: e.target.value })
+                      }
+                    }}
                   >
+                    <option value="hot">🔥 Hot Selling Products</option>
                     <option value="new">🆕 New Arrivals</option>
-                    <option value="trending">🔥 Trending Wholesale Gadgets</option>
+                    <option value="trending">⚡ Trending Now / Wholesale</option>
+                    <option value="home">🏠 Home Essentials &amp; Organizers</option>
+                    <option value="like">✨ You May Also Like</option>
+                    <option value="perfume">🌸 Top Picks Fragrances</option>
+                    <option value="jewelry">💍 Elegant Jewelry &amp; Accessories</option>
+                    <option value="watch">⌚ Exclusive Watches</option>
                     <option value="bestseller">⭐ Best Sellers</option>
                     <option value="audio">🎧 Smart Audio &amp; Wireless</option>
                     <option value="accessories">🔌 Cables, Hubs &amp; Accessories</option>
+                    <option value="custom">✏️ Custom Catalog Group...</option>
                   </select>
+                  {(isCustomGroup || (form.group && !['hot', 'new', 'trending', 'home', 'like', 'perfume', 'jewelry', 'watch', 'bestseller', 'audio', 'accessories'].includes(form.group))) && (
+                    <div className="mt-2">
+                      <div className="input-group input-group-sm">
+                        <span className="input-group-text bg-light text-muted">Group Key:</span>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          placeholder="e.g. clearance, eid_sale, hot_deals"
+                          value={form.group}
+                          onChange={(e) => setForm({ ...form, group: e.target.value.toLowerCase().replace(/\s+/g, '_') })}
+                        />
+                      </div>
+                      <small className="text-muted d-block mt-1">
+                        Use this same key in Homepage Editor &rarr; Target Feed &rarr; Custom Group.
+                      </small>
+                    </div>
+                  )}
                 </div>
 
                 {/* Price (PKR) */}

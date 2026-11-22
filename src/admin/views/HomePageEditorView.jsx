@@ -6,12 +6,15 @@ import DynamicHomeSection from '../../components/HomeCustomSections'
 const PRESET_GROUPS = [
   { key: 'new', label: 'Catalog Group: New Arrivals' },
   { key: 'hot', label: 'Catalog Group: Hot Selling Products' },
+  { key: 'trending', label: 'Catalog Group: Trending Now' },
   { key: 'home', label: 'Catalog Group: Home Essentials Organizers' },
   { key: 'like', label: 'Catalog Group: You May Also Like' },
   { key: 'perfume', label: 'Catalog Group: Top Picks Fragrances' },
-  { key: 'trending', label: 'Catalog Group: Trending Now' },
   { key: 'jewelry', label: 'Catalog Group: Elegant Jewelry & Accessories' },
   { key: 'watch', label: 'Catalog Group: Exclusive Watches' },
+  { key: 'bestseller', label: 'Catalog Group: Best Sellers' },
+  { key: 'audio', label: 'Catalog Group: Smart Audio & Wireless' },
+  { key: 'accessories', label: 'Catalog Group: Cables & Accessories' },
 ]
 
 export function createDefaultContentForBlockType(blockType, existingSec = {}) {

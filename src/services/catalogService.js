@@ -13,7 +13,7 @@
 
 import { query, transaction, isMemoryDb } from '../db/index.js';
 import { handleProductDeletion } from './homepageCleanupService.js';
-import { enqueueDeletion, extractImagePaths, unregisterMedia } from './mediaService.js';
+import { enqueueDeletion, extractImagePaths, unregisterMedia, deletePermanently } from './mediaService.js';
 
 function formatProductRow(row) {
   let images = []
@@ -521,6 +521,7 @@ export async function deleteProduct(id) {
       for (const objPath of storagePaths) {
         await enqueueDeletion({ objectPath: objPath, ownerType: 'product', ownerId: String(id) })
       }
+      await deletePermanently(imagesToCheck, 'product', String(id))
       await unregisterMedia({ ownerType: 'product', ownerId: String(id) })
     } catch (mediaErr) {
       console.warn('[MEDIA CLEANUP WARNING]:', mediaErr.message)
@@ -610,6 +611,7 @@ export async function deleteCategory(id, options = {}) {
       for (const objPath of paths) {
         await enqueueDeletion({ objectPath: objPath, ownerType: 'category', ownerId: String(id) })
       }
+      await deletePermanently([cat.image_url], 'category', String(id))
       await unregisterMedia({ ownerType: 'category', ownerId: String(id) })
     } catch (catMediaErr) {
       console.warn('[CATEGORY MEDIA CLEANUP WARNING]:', catMediaErr.message)

@@ -1572,6 +1572,12 @@ const handleDeleteWatchShop = async (req, res) => {
     const id = req.params.id ? (Number(req.params.id) || req.params.id) : null
     if (id) {
       if (process.env.DATABASE_URL) {
+        try {
+          const itemRes = await query('SELECT image_url FROM watch_shop WHERE id = $1', [id])
+          if (itemRes.rows[0]?.image_url) {
+            await mediaService.deletePermanently([itemRes.rows[0].image_url], 'watch_shop', String(id))
+          }
+        } catch (_) {}
         await query('DELETE FROM watch_shop WHERE id = $1', [id])
       }
       try {
@@ -1581,6 +1587,11 @@ const handleDeleteWatchShop = async (req, res) => {
     } else {
       // Clear all
       if (process.env.DATABASE_URL) {
+        try {
+          const itemsRes = await query('SELECT image_url FROM watch_shop WHERE image_url IS NOT NULL')
+          const urls = itemsRes.rows.map(r => r.image_url).filter(Boolean)
+          if (urls.length) await mediaService.deletePermanently(urls, 'watch_shop')
+        } catch (_) {}
         await query('DELETE FROM watch_shop')
       }
       try {
@@ -1864,6 +1875,21 @@ server.get(['/products', '/api/products'], (req, res, next) => {
     }
   })
 
+  // Permanent Media Deletion Endpoint
+  server.post(['/api/media/delete', '/media/delete'], requireAdmin, async (req, res) => {
+    try {
+      const urls = req.body.urls || (req.body.url ? [req.body.url] : (req.body.image ? [req.body.image] : []))
+      if (!urls.length) {
+        return res.status(400).json({ error: 'No media URLs provided for deletion.' })
+      }
+      const result = await mediaService.deletePermanently(urls)
+      return res.json({ success: true, ...result })
+    } catch (err) {
+      console.error('[MEDIA DELETE API ERROR]:', err)
+      return res.status(500).json({ error: 'Failed to permanently delete media: ' + err.message })
+    }
+  })
+
   // ── HERO SLIDES CRUD (Authoritative PostgreSQL Persistence) ──────────────────
   server.get(['/heroSlides', '/api/heroSlides', '/hero_slides', '/api/hero_slides'], async (req, res, next) => {
     try {
@@ -1957,6 +1983,7 @@ server.get(['/products', '/api/products'], (req, res, next) => {
           for (const objPath of paths) {
             await mediaService.enqueueDeletion({ objectPath: objPath, ownerType: 'hero_slide', ownerId: String(id) })
           }
+          await mediaService.deletePermanently([slide.image_url], 'hero_slide', String(id))
           await mediaService.unregisterMedia({ ownerType: 'hero_slide', ownerId: String(id) })
         } catch (mErr) { console.warn('[HERO MEDIA CLEANUP]:', mErr.message) }
       }

@@ -10,6 +10,8 @@
  *   cleanup_queue   — durable outbox for pending storage deletions
  */
 
+import fs from 'fs'
+import path from 'path'
 import { query } from '../db/index.js'
 import { deleteObject, objectExists } from './storageService.js'
 
@@ -158,19 +160,132 @@ export async function unregisterMedia({ bucket = BUCKET, ownerType, ownerId }) {
 }
 
 /**
- * Collect all image paths associated with a product.
- * Returns an array of storage-relevant path strings.
+ * Collect all image paths associated with an entity.
+ * Robustly parses:
+ * - Supabase public URLs (.../product-media/products/...)
+ * - Local upload URLs (/uploads/products/..., uploads/...)
+ * - Direct filenames (prod_xxx.webp)
+ * Returns an array of storage-relevant path strings (e.g. ['products/prod_123.webp']).
  */
 export function extractImagePaths(imageUrls) {
-  if (!Array.isArray(imageUrls)) return []
+  if (!Array.isArray(imageUrls)) {
+    if (typeof imageUrls === 'string' && imageUrls.trim()) {
+      imageUrls = [imageUrls]
+    } else {
+      return []
+    }
+  }
   return imageUrls
     .filter(u => u && typeof u === 'string')
     .map(u => {
-      // Extract the path after /product-media/
-      const match = u.match(/\/product-media\/(.+)$/)
-      return match ? match[1] : null
+      // 1. Supabase public URL: .../product-media/products/...
+      const sbMatch = u.match(/\/product-media\/(.+)$/)
+      if (sbMatch) return sbMatch[1].split('?')[0]
+
+      // 2. Local uploads: /uploads/products/xxx.webp or uploads/products/xxx.webp
+      const upMatch = u.match(/\/uploads\/(.+)$/) || u.match(/^uploads\/(.+)$/)
+      if (upMatch) return upMatch[1].split('?')[0]
+
+      // 3. Direct filename: prod_xxx.webp or media_xxx.webp
+      const clean = u.split('?')[0]
+      if (clean.endsWith('.webp') && !clean.includes('/') && !clean.includes('\\')) {
+        return `products/${clean}`
+      }
+
+      return null
     })
     .filter(Boolean)
+}
+
+/**
+ * Permanently deletes media files from both local disk and Supabase cloud storage.
+ * Enforces shared-media reference protection so files used by other active records are safe.
+ *
+ * @param {string|string[]} imageUrls - Image URL(s) to permanently eradicate
+ * @param {string} [ownerType] - Owner type being deleted (e.g. 'product', 'category', 'hero_slide')
+ * @param {string} [ownerId] - Owner ID being deleted
+ * @returns {Promise<{ deleted: string[], errors: any[] }>}
+ */
+export async function deletePermanently(imageUrls, ownerType = null, ownerId = null) {
+  const paths = extractImagePaths(imageUrls)
+  if (!paths.length) return { deleted: [], errors: [] }
+
+  const deleted = []
+  const errors = []
+
+  for (const objPath of paths) {
+    // 1. Never delete static placeholder images
+    if (
+      objPath.includes('placeholder') ||
+      objPath.includes('default') ||
+      objPath.startsWith('images/') ||
+      objPath.startsWith('/images/')
+    ) {
+      continue
+    }
+
+    // 2. Shared-media protection check
+    try {
+      const unused = await isObjectUnused(objPath, ownerType, ownerId)
+      if (!unused) {
+        console.log(`[MEDIA DELETE] Skipping ${objPath}: still actively referenced by another entity.`)
+        continue
+      }
+    } catch (e) {
+      console.warn(`[MEDIA DELETE] Ref check failed for ${objPath}:`, e.message)
+    }
+
+    // 3. Permanent deletion from Local Disk
+    try {
+      const filename = path.basename(objPath)
+      const possibleLocalPaths = [
+        path.join(process.cwd(), 'public', 'uploads', objPath),
+        path.join(process.cwd(), 'uploads', objPath),
+        path.join(process.cwd(), 'public', 'uploads', 'products', filename),
+        path.join(process.cwd(), 'uploads', 'products', filename),
+        path.join(process.cwd(), 'public', 'uploads', 'categories', filename),
+        path.join(process.cwd(), 'uploads', 'categories', filename),
+      ]
+      for (const p of possibleLocalPaths) {
+        if (fs.existsSync(p)) {
+          try {
+            fs.unlinkSync(p)
+            console.log(`[LOCAL STORAGE] Permanently deleted file: ${p}`)
+          } catch (unlinkErr) {
+            console.warn(`[LOCAL STORAGE WARNING]: Could not unlink ${p}:`, unlinkErr.message)
+          }
+        }
+      }
+    } catch (fsErr) {
+      console.warn(`[LOCAL FS ERROR]:`, fsErr.message)
+    }
+
+    // 4. Permanent deletion from Supabase Cloud Storage
+    try {
+      await deleteObject(objPath)
+      console.log(`[SUPABASE STORAGE] Permanently deleted object: ${objPath}`)
+    } catch (sbErr) {
+      // Non-fatal if remote object does not exist or storage offline
+      console.warn(`[SUPABASE STORAGE WARNING] Delete failed for ${objPath}:`, sbErr.message)
+    }
+
+    // 5. Clean up from database registry and cleanup queue
+    try {
+      await query(
+        `DELETE FROM media_objects WHERE bucket = $1 AND (path = $2 OR path LIKE $3)`,
+        [BUCKET, objPath, `%${path.basename(objPath)}`]
+      )
+      await query(
+        `DELETE FROM cleanup_queue WHERE bucket = $1 AND object_path = $2`,
+        [BUCKET, objPath]
+      )
+      deleted.push(objPath)
+    } catch (dbErr) {
+      errors.push({ path: objPath, error: dbErr.message })
+    }
+  }
+
+  return { deleted, errors }
 }
 
 /**

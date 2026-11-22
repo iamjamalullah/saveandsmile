@@ -79,6 +79,7 @@ export default function ProductFormModal({ product, isOpen, onClose }) {
   const [errors, setErrors] = useState({})
   const [showImagePicker, setShowImagePicker] = useState(false)
   const [isCustomGroup, setIsCustomGroup] = useState(false)
+  const [selectedCategories, setSelectedCategories] = useState([])
 
   // Populate form when editing or resetting
   useEffect(() => {
@@ -86,9 +87,17 @@ export default function ProductFormModal({ product, isOpen, onClose }) {
       const existingImages = [...new Set([product.image, ...(product.images || [])].filter(Boolean))]
       setGalleryList(existingImages)
       setIsCustomGroup(Boolean(product.group && !['hot', 'new', 'trending', 'home', 'like', 'perfume', 'jewelry', 'watch', 'bestseller', 'audio', 'accessories'].includes(product.group)))
+
+      const rawCats = Array.isArray(product.categories) && product.categories.length
+        ? product.categories
+        : (product.category ? [product.category] : [categories[0]?.name || 'Storage & Organization'])
+      const initialCats = [...new Set(rawCats.filter(Boolean))]
+      setSelectedCategories(initialCats)
+
       setForm({
         name: product.name || '',
-        category: product.category || 'Storage & Organization',
+        category: initialCats[0] || 'Storage & Organization',
+        categories: initialCats,
         group: product.group || 'new',
         price: product.price || '',
         oldPrice: product.oldPrice || '',
@@ -169,9 +178,12 @@ export default function ProductFormModal({ product, isOpen, onClose }) {
     } else {
       setGalleryList([])
       setIsCustomGroup(false)
+      const defaultCat = categories[0]?.name || 'Storage & Organization'
+      setSelectedCategories([defaultCat])
       setForm({
         name: '',
-        category: categories[0]?.name || 'Storage & Organization',
+        category: defaultCat,
+        categories: [defaultCat],
         group: 'new',
         price: '',
         oldPrice: '',
@@ -531,6 +543,7 @@ export default function ProductFormModal({ product, isOpen, onClose }) {
     if (!form.price || Number(form.price) <= 0) errs.price = 'Valid price is required'
     const frontImg = form.image || galleryList[0]
     if (!frontImg) errs.image = 'At least one product photo is required'
+    if (!selectedCategories.length && !form.category) errs.category = 'Please select at least one category'
 
     if (options.length > 0) {
       const emptyOpt = options.find(o => o.values.length === 0)
@@ -578,8 +591,11 @@ export default function ProductFormModal({ product, isOpen, onClose }) {
       barcode: v.barcode || '',
     })) : []
 
+    const catsToSave = selectedCategories.length ? selectedCategories : [form.category || 'General']
     const payload = {
       ...form,
+      category: catsToSave[0],
+      categories: catsToSave,
       image: frontImage,
       images: allImages,
       price: Number(form.price),
@@ -667,22 +683,101 @@ export default function ProductFormModal({ product, isOpen, onClose }) {
                   {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                 </div>
 
-                {/* Category Selection */}
+                {/* Category Multi-Selection */}
                 <div className="col-12 col-sm-6">
-                  <label className="form-label fw-semibold">
-                    Category <span className="text-danger">*</span>
+                  <label className="form-label fw-semibold d-flex justify-content-between align-items-center mb-1">
+                    <span>
+                      Categories (Multi-Select) <span className="text-danger">*</span>
+                    </span>
+                    <span className="badge bg-light text-primary border" style={{ fontSize: '10px' }}>
+                      {selectedCategories.length} Selected
+                    </span>
                   </label>
-                  <select
-                    className="form-select"
-                    value={form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+
+                  {/* Active Selected Badges */}
+                  <div
+                    className={`d-flex flex-wrap gap-1 p-1.5 bg-light rounded border mb-2 ${errors.category ? 'border-danger' : ''}`}
+                    style={{ minHeight: '40px', alignItems: 'center' }}
                   >
-                    {categories.map((c) => (
-                      <option key={c.id || c.name} value={c.name}>
-                        {c.icon || '📦'} {c.name}
-                      </option>
-                    ))}
-                  </select>
+                    {selectedCategories.map((catName, idx) => {
+                      const catObj = categories.find(c => c.name === catName)
+                      const isPrimary = idx === 0
+                      return (
+                        <span
+                          key={catName}
+                          className={`badge d-inline-flex align-items-center gap-1.5 py-1 px-2 ${
+                            isPrimary ? 'bg-success text-white' : 'bg-primary text-white'
+                          }`}
+                          style={{ fontSize: '0.8rem', fontWeight: 500 }}
+                        >
+                          {catObj?.icon && <span>{catObj.icon}</span>}
+                          <span>{catName}</span>
+                          {isPrimary ? (
+                            <span className="badge bg-warning text-dark px-1 py-0" style={{ fontSize: '8.5px' }} title="Primary Category">
+                              Primary
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              className="btn btn-link p-0 text-white-50 text-decoration-none"
+                              style={{ fontSize: '8.5px', lineHeight: 1 }}
+                              title="Set as Primary Category"
+                              onClick={() => {
+                                const reordered = [catName, ...selectedCategories.filter(c => c !== catName)]
+                                setSelectedCategories(reordered)
+                                setForm(f => ({ ...f, categories: reordered, category: catName }))
+                              }}
+                            >
+                              (Make 1st)
+                            </button>
+                          )}
+                          {selectedCategories.length > 1 && (
+                            <button
+                              type="button"
+                              className="btn-close btn-close-white"
+                              style={{ width: '0.45em', height: '0.45em', padding: 0 }}
+                              title="Remove category"
+                              onClick={() => {
+                                const next = selectedCategories.filter(c => c !== catName)
+                                setSelectedCategories(next)
+                                setForm(f => ({ ...f, categories: next, category: next[0] || '' }))
+                              }}
+                            />
+                          )}
+                        </span>
+                      )
+                    })}
+                  </div>
+
+                  {/* Dropdown to add more categories */}
+                  <div className="input-group input-group-sm">
+                    <span className="input-group-text bg-white text-muted">➕</span>
+                    <select
+                      className="form-select form-select-sm"
+                      value=""
+                      onChange={(e) => {
+                        const catToAdd = e.target.value
+                        if (catToAdd && !selectedCategories.includes(catToAdd)) {
+                          const next = [...selectedCategories, catToAdd]
+                          setSelectedCategories(next)
+                          setForm(f => ({ ...f, categories: next, category: next[0] || '' }))
+                        }
+                      }}
+                    >
+                      <option value="" disabled>Click to add another category...</option>
+                      {categories
+                        .filter(c => !selectedCategories.includes(c.name))
+                        .map((c) => (
+                          <option key={c.id || c.name} value={c.name}>
+                            {c.icon || '📦'} {c.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                  {errors.category && <div className="text-danger small mt-1">{errors.category}</div>}
+                  <small className="text-muted d-block mt-1" style={{ fontSize: '10.5px' }}>
+                    This product will be listed in all selected categories. The first category is Primary.
+                  </small>
                 </div>
 
                 {/* Catalog Group */}

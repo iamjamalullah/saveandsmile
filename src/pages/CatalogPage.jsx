@@ -91,11 +91,11 @@ export default function CatalogPage({ mode = 'shop' }) {
   const results = useMemo(() => {
     let list = [...products]
     if (mode === 'wishlist') list = list.filter(p => wishlist.includes(p.id))
-    if (category) list = list.filter(p => p.category === category.name)
+    if (category) list = list.filter(p => p.category === category.name || (Array.isArray(p.categories) && p.categories.includes(category.name)))
     if (group) list = list.filter(p => p.group === group)
     if (query) {
       const q = query.toLowerCase()
-      list = list.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q))
+      list = list.filter(p => p.name.toLowerCase().includes(q) || (p.category && p.category.toLowerCase().includes(q)) || (Array.isArray(p.categories) && p.categories.some(c => c.toLowerCase().includes(q))))
     }
     list = list.filter(p => p.price >= min && p.price <= max)
     if (inStock) list = list.filter(p => p.stock > 0)

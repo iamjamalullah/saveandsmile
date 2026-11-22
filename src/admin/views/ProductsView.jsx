@@ -33,10 +33,13 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
       const matchesSearch = !searchTerm ||
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (p.sku && p.sku.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        p.category.toLowerCase().includes(searchTerm.toLowerCase())
+        (p.category && p.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (Array.isArray(p.categories) && p.categories.some(c => c.toLowerCase().includes(searchTerm.toLowerCase())))
 
       // Category
-      const matchesCategory = selectedCategory === 'ALL' || p.category === selectedCategory
+      const matchesCategory = selectedCategory === 'ALL' ||
+        p.category === selectedCategory ||
+        (Array.isArray(p.categories) && p.categories.includes(selectedCategory))
 
       // Group
       const matchesGroup = selectedGroup === 'ALL' || p.group === selectedGroup
@@ -309,10 +312,14 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                             </div>
                           </div>
                         </td>
-                        <td style={{ padding: '0.5rem 0.75rem', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
-                          <span className="badge bg-light text-dark border" style={{ fontSize: '9.5px', padding: '2.5px 7px', fontWeight: 500 }}>
-                            {p.category}
-                          </span>
+                        <td style={{ padding: '0.5rem 0.75rem', verticalAlign: 'middle' }}>
+                          <div className="d-flex flex-wrap gap-1" style={{ maxWidth: '220px' }}>
+                            {(Array.isArray(p.categories) && p.categories.length ? p.categories : [p.category]).map(c => (
+                              <span key={c} className="badge bg-light text-dark border" style={{ fontSize: '9px', padding: '2px 5px', fontWeight: 500 }}>
+                                {c}
+                              </span>
+                            ))}
+                          </div>
                         </td>
                         <td style={{ padding: '0.5rem 0.75rem', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
                           <div>
@@ -394,7 +401,11 @@ export default function ProductsView({ onEditProduct, onDeleteProduct, onOpenAdd
                   </div>
                   <div className="card-body d-flex flex-column p-3">
                     <div className="d-flex justify-content-between align-items-start mb-2">
-                      <span className="badge bg-light text-dark border small">{p.category}</span>
+                      <div className="d-flex flex-wrap gap-1" style={{ maxWidth: '70%' }}>
+                        {(Array.isArray(p.categories) && p.categories.length ? p.categories : [p.category]).map(c => (
+                          <span key={c} className="badge bg-light text-dark border small" style={{ fontSize: '9px' }}>{c}</span>
+                        ))}
+                      </div>
                       <span className={`badge ${p.stock === 0 ? 'bg-danger' : p.stock <= 5 ? 'bg-warning text-dark' : 'bg-success'}`}>
                         {p.stock === 0 ? 'Out of Stock' : `${p.stock} in stock`}
                       </span>

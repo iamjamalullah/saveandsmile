@@ -80,7 +80,7 @@ export default function CategoriesView() {
   }
 
   const handleDelete = (catName) => {
-    const assignedProducts = products.filter(p => p.category === catName)
+    const assignedProducts = products.filter(p => p.category === catName || (Array.isArray(p.categories) && p.categories.includes(catName)))
     if (assignedProducts.length > 0) {
       if (!window.confirm(`Category "${catName}" has ${assignedProducts.length} products assigned to it. Deleting it will keep the products. Continue?`)) {
         return
@@ -109,7 +109,7 @@ export default function CategoriesView() {
       {/* Categories Grid */}
       <div className="row g-3 mb-5">
         {categories.map((cat) => {
-          const count = products.filter(p => p.category === cat.name).length
+          const count = products.filter(p => p.category === cat.name || (Array.isArray(p.categories) && p.categories.includes(cat.name))).length
           return (
             <div key={cat.name} className="col-12 col-sm-6 col-md-4 col-xl-3">
               <div className="card h-100 shadow-sm border">

@@ -30,7 +30,7 @@ export default function ProductSection({ section, onViewAll, onSeeMore }) {
   const effectiveCategoryId = section?.categoryId || section?.content?.categoryId || null
 
   const items = products.filter(p => {
-    if (effectiveCategory && (p.category === effectiveCategory || p.categorySlug === effectiveCategory)) return true
+    if (effectiveCategory && (p.category === effectiveCategory || p.categorySlug === effectiveCategory || (Array.isArray(p.categories) && p.categories.includes(effectiveCategory)))) return true
     if (effectiveCategoryId && (p.categoryId === effectiveCategoryId || p.category_id === effectiveCategoryId)) return true
     if (effectiveGroup && p.group === effectiveGroup) return true
     return false

@@ -20,11 +20,19 @@ function formatProductRow(row) {
   let highlights = []
   let specs = []
   let bulkTiers = []
+  let categories = []
 
   try { images = typeof row.images_gallery === 'string' ? JSON.parse(row.images_gallery) : (row.images_gallery || []) } catch (_) {}
   try { highlights = typeof row.highlights === 'string' ? JSON.parse(row.highlights) : (row.highlights || []) } catch (_) {}
   try { specs = typeof row.specs_json === 'string' ? JSON.parse(row.specs_json) : (row.specs_json || []) } catch (_) {}
   try { bulkTiers = typeof row.bulk_tiers_json === 'string' ? JSON.parse(row.bulk_tiers_json) : (row.bulk_tiers_json || []) } catch (_) {}
+  try { categories = typeof row.categories_json === 'string' ? JSON.parse(row.categories_json) : (row.categories_json || []) } catch (_) {}
+
+  if (!Array.isArray(categories) || !categories.length) {
+    categories = row.category_name ? [row.category_name] : ['General']
+  } else if (row.category_name && !categories.includes(row.category_name)) {
+    categories = [row.category_name, ...categories]
+  }
 
   return {
     id: row.id,
@@ -32,6 +40,7 @@ function formatProductRow(row) {
     name: row.name,
     slug: row.slug,
     category: row.category_name,
+    categories,
     group: row.group_name,
     price: Number(row.price),
     oldPrice: row.old_price ? Number(row.old_price) : Number(row.price),
@@ -311,7 +320,7 @@ export async function getProducts(filters = {}) {
 
   if (filters.category && filters.category !== 'ALL') {
     params.push(filters.category)
-    sql += ` AND category_name = $${params.length}`
+    sql += ` AND (category_name = $${params.length} OR categories_json ILIKE '%' || $${params.length} || '%')`
   }
   if (filters.group && filters.group !== 'ALL') {
     params.push(filters.group)
@@ -361,23 +370,30 @@ export async function createProduct(data) {
     const sku = data.sku || `QGW-${1000 + nextId}`
     const slug = data.slug || `${data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${sku.toLowerCase()}`
 
+    const categoriesArray = Array.isArray(data.categories) && data.categories.length
+      ? [...new Set(data.categories.filter(Boolean))]
+      : [data.category || 'General']
+    const primaryCategory = data.category || categoriesArray[0] || 'General'
+    const categoriesJson = JSON.stringify(categoriesArray)
+
     const hasVars = Boolean(data.hasVariants || (Array.isArray(data.variants) && data.variants.length > 0))
     const variantConfig = data.variantConfig || (hasVars ? 'color' : 'none')
 
     const res = await client.query(
       `INSERT INTO products (
-         id, sku, name, slug, category_name, group_name, price, old_price,
+         id, sku, name, slug, category_name, categories_json, group_name, price, old_price,
          stock_quantity, brand, description, video_url, image_main,
          images_gallery, highlights, specs_json, bulk_tiers_json,
          is_featured, has_variants, variant_config, rating, reviews_count
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
        RETURNING *`,
       [
         nextId,
         sku,
         data.name,
         slug,
-        data.category || 'General',
+        primaryCategory,
+        categoriesJson,
         data.group || 'new',
         Number(data.price) || 0,
         Number(data.oldPrice) || Number(data.price) || 0,
@@ -455,6 +471,14 @@ export async function updateProduct(id, fields) {
       } else if (key === 'bulkTiers') {
         params.push(JSON.stringify(val))
         updates.push(`bulk_tiers_json = $${params.length}`)
+      } else if (key === 'categories') {
+        const catArray = Array.isArray(val) ? [...new Set(val.filter(Boolean))] : [val].filter(Boolean)
+        params.push(JSON.stringify(catArray))
+        updates.push(`categories_json = $${params.length}`)
+        if (catArray.length > 0 && !fields.category) {
+          params.push(catArray[0])
+          updates.push(`category_name = $${params.length}`)
+        }
       }
     }
 

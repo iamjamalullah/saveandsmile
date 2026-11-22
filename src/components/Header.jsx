@@ -97,7 +97,11 @@ export default function Header({ user, onLogout }) {
   const matches = useMemo(() => {
     const s = q.trim().toLowerCase()
     if (!s) return []
-    return products.filter(p => p.name.toLowerCase().includes(s) || p.category.toLowerCase().includes(s)).slice(0, 6)
+    return products.filter(p => (
+      p.name.toLowerCase().includes(s) ||
+      (p.category && p.category.toLowerCase().includes(s)) ||
+      (Array.isArray(p.categories) && p.categories.some(c => c.toLowerCase().includes(s)))
+    )).slice(0, 6)
   }, [q, products])
 
   const submitSearch = e => {

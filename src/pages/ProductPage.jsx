@@ -434,7 +434,11 @@ export default function ProductPage() {
   const related = useMemo(() => {
     if (!product) return []
     return products
-      .filter(p => p.id !== product.id && (p.category === product.category || p.group === product.group))
+      .filter(p => p.id !== product.id && (
+        p.category === product.category ||
+        p.group === product.group ||
+        (Array.isArray(p.categories) && Array.isArray(product.categories) && p.categories.some(c => product.categories.includes(c)))
+      ))
       .slice(0, 4)
   }, [product, products])
 
@@ -557,8 +561,9 @@ export default function ProductPage() {
   const liked = wishlist.includes(product.id)
   const stars = Math.round(avgRating)
   const category = categories.find(c => c.name === product.category)
+  const allCatNames = (Array.isArray(product.categories) && product.categories.length ? product.categories : [product.category]).join(', ')
   const specs = product.specs?.length ? product.specs : [
-    { label: 'Category', value: product.category },
+    { label: 'Categories', value: allCatNames },
     { label: 'SKU', value: currentSku },
     { label: 'Stock', value: `${currentStock} units` },
   ]
@@ -810,9 +815,17 @@ export default function ProductPage() {
               </div>
             )}
 
-            <div className="qpdp-meta">
+            <div className="qpdp-meta d-flex flex-wrap align-items-center gap-1">
               <span className="qpdp-meta-brand">{product.brand || 'Save & Smile'}</span>
-              {category && <><i /><Link to={`/category/${category.slug}`} className="qpdp-meta-cat">{product.category}</Link></>}
+              {(Array.isArray(product.categories) && product.categories.length ? product.categories : [product.category]).map((cName, idx) => {
+                const cObj = categories.find(c => c.name === cName)
+                return cObj ? (
+                  <span key={cName} className="d-inline-flex align-items-center gap-1">
+                    <i className="text-muted">•</i>
+                    <Link to={`/category/${cObj.slug}`} className="qpdp-meta-cat">{cName}</Link>
+                  </span>
+                ) : null
+              })}
             </div>
             <h1>{product.name}</h1>
             <div className="qpdp-rating">

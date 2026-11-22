@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS products (
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(300) UNIQUE NOT NULL,
     category_name VARCHAR(120) NOT NULL,
+    categories_json TEXT, -- JSON array of assigned category names
     group_name VARCHAR(60) NOT NULL DEFAULT 'general',
     price NUMERIC(12, 2) NOT NULL CHECK (price >= 0),
     old_price NUMERIC(12, 2) CHECK (old_price >= price),

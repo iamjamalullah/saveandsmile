@@ -1894,15 +1894,24 @@ server.get(['/products', '/api/products'], (req, res, next) => {
   server.get(['/heroSlides', '/api/heroSlides', '/hero_slides', '/api/hero_slides'], async (req, res, next) => {
     try {
       const dbRes = await query('SELECT * FROM hero_slides ORDER BY sort_order ASC, id ASC')
-      const formatted = dbRes.rows.map(r => ({
-        id: r.id,
-        image: r.image_url,
-        alt: r.alt_text || '',
-        title: r.title || '',
-        subtitle: r.subtitle || '',
-        link: r.link_url || '/shop',
-        order: r.sort_order,
-      }))
+      const formatted = dbRes.rows.map(r => {
+        let slideData = {}
+        try {
+          slideData = typeof r.slide_data_json === 'string' ? JSON.parse(r.slide_data_json) : (r.slide_data_json || {})
+        } catch (_) {}
+        return {
+          id: r.id,
+          image: r.image_url,
+          tabletImage: r.tablet_image_url || slideData.images?.tablet || '',
+          mobileImage: r.mobile_image_url || slideData.images?.mobile || '',
+          alt: r.alt_text || '',
+          title: r.title || slideData.title || '',
+          subtitle: r.subtitle || slideData.subtitle || '',
+          link: r.link_url || slideData.primaryCta?.link || '/shop',
+          order: r.sort_order,
+          slideData,
+        }
+      })
       return res.json(formatted)
     } catch (err) {
       return next(err)
@@ -1911,23 +1920,29 @@ server.get(['/products', '/api/products'], (req, res, next) => {
 
   server.post(['/heroSlides', '/api/heroSlides', '/hero_slides', '/api/hero_slides'], requireAdmin, async (req, res) => {
     try {
-      const { image, alt, title, subtitle, link, order } = req.body
+      const { image, tabletImage, mobileImage, alt, title, subtitle, link, order, slideData } = req.body
       const sortOrder = typeof order === 'number' ? order : 0
+      const slideDataStr = slideData ? JSON.stringify(slideData) : null
       const insertRes = await query(
-        `INSERT INTO hero_slides (image_url, alt_text, title, subtitle, link_url, sort_order)
-         VALUES ($1, $2, $3, $4, $5, $6)
+        `INSERT INTO hero_slides (image_url, tablet_image_url, mobile_image_url, alt_text, title, subtitle, link_url, sort_order, slide_data_json)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
          RETURNING *`,
-        [image || '', alt || '', title || '', subtitle || '', link || '/shop', sortOrder]
+        [image || '', tabletImage || null, mobileImage || null, alt || '', title || '', subtitle || '', link || '/shop', sortOrder, slideDataStr]
       )
       const r = insertRes.rows[0]
+      let parsedData = {}
+      try { parsedData = typeof r.slide_data_json === 'string' ? JSON.parse(r.slide_data_json) : (r.slide_data_json || {}) } catch (_) {}
       const created = {
         id: r.id,
         image: r.image_url,
+        tabletImage: r.tablet_image_url || '',
+        mobileImage: r.mobile_image_url || '',
         alt: r.alt_text || '',
         title: r.title || '',
         subtitle: r.subtitle || '',
         link: r.link_url || '/shop',
         order: r.sort_order,
+        slideData: parsedData,
       }
       try { router.db.get('heroSlides').push(created).write?.() } catch {}
       return res.status(201).json(created)
@@ -1939,29 +1954,37 @@ server.get(['/products', '/api/products'], (req, res, next) => {
   server.patch(['/heroSlides/:id', '/api/heroSlides/:id', '/hero_slides/:id', '/api/hero_slides/:id'], requireAdmin, async (req, res) => {
     try {
       const id = Number(req.params.id) || req.params.id
-      const { image, alt, title, subtitle, link, order } = req.body
+      const { image, tabletImage, mobileImage, alt, title, subtitle, link, order, slideData } = req.body
       const updates = []
       const params = [id]
       if (image !== undefined) { params.push(image); updates.push(`image_url = $${params.length}`) }
+      if (tabletImage !== undefined) { params.push(tabletImage); updates.push(`tablet_image_url = $${params.length}`) }
+      if (mobileImage !== undefined) { params.push(mobileImage); updates.push(`mobile_image_url = $${params.length}`) }
       if (alt !== undefined) { params.push(alt); updates.push(`alt_text = $${params.length}`) }
       if (title !== undefined) { params.push(title); updates.push(`title = $${params.length}`) }
       if (subtitle !== undefined) { params.push(subtitle); updates.push(`subtitle = $${params.length}`) }
       if (link !== undefined) { params.push(link); updates.push(`link_url = $${params.length}`) }
       if (order !== undefined) { params.push(order); updates.push(`sort_order = $${params.length}`) }
+      if (slideData !== undefined) { params.push(typeof slideData === 'string' ? slideData : JSON.stringify(slideData)); updates.push(`slide_data_json = $${params.length}`) }
 
       if (!updates.length) return res.status(400).json({ error: 'No fields to update' })
       const sql = `UPDATE hero_slides SET ${updates.join(', ')} WHERE id = $1 RETURNING *`
       const updateRes = await query(sql, params)
       if (!updateRes.rows.length) return res.status(404).json({ error: 'Hero slide not found' })
       const r = updateRes.rows[0]
+      let parsedData = {}
+      try { parsedData = typeof r.slide_data_json === 'string' ? JSON.parse(r.slide_data_json) : (r.slide_data_json || {}) } catch (_) {}
       const updated = {
         id: r.id,
         image: r.image_url,
+        tabletImage: r.tablet_image_url || '',
+        mobileImage: r.mobile_image_url || '',
         alt: r.alt_text || '',
         title: r.title || '',
         subtitle: r.subtitle || '',
         link: r.link_url || '/shop',
         order: r.sort_order,
+        slideData: parsedData,
       }
       try { router.db.get('heroSlides').find({ id: Number(id) || id }).assign(updated).write?.() } catch {}
       return res.json(updated)
@@ -1977,13 +2000,14 @@ server.get(['/products', '/api/products'], (req, res, next) => {
       if (!slideRes.rows.length) return res.status(404).json({ error: 'Hero slide not found' })
       const slide = slideRes.rows[0]
       await query('DELETE FROM hero_slides WHERE id = $1', [id])
-      if (slide.image_url) {
+      const imagesToEradicate = [slide.image_url, slide.tablet_image_url, slide.mobile_image_url].filter(Boolean)
+      if (imagesToEradicate.length) {
         try {
-          const paths = mediaService.extractImagePaths([slide.image_url])
+          const paths = mediaService.extractImagePaths(imagesToEradicate)
           for (const objPath of paths) {
             await mediaService.enqueueDeletion({ objectPath: objPath, ownerType: 'hero_slide', ownerId: String(id) })
           }
-          await mediaService.deletePermanently([slide.image_url], 'hero_slide', String(id))
+          await mediaService.deletePermanently(imagesToEradicate, 'hero_slide', String(id))
           await mediaService.unregisterMedia({ ownerType: 'hero_slide', ownerId: String(id) })
         } catch (mErr) { console.warn('[HERO MEDIA CLEANUP]:', mErr.message) }
       }

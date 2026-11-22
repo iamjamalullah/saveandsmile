@@ -581,6 +581,18 @@ export function StoreDataProvider({ children }) {
     }
   }, [data.heroSlides, replaceLocal, notify])
 
+  const updateHeroSlide = useCallback(async (id, payload) => {
+    try {
+      const updated = await api.patch('heroSlides', id, payload)
+      replaceLocal('heroSlides', list => (list || []).map(s => String(s.id) === String(id) ? { ...s, ...updated } : s))
+      notify('Hero slide updated successfully!')
+      return updated
+    } catch (err) {
+      notify(err.message, 'danger')
+      throw err
+    }
+  }, [replaceLocal, notify])
+
   const saveSectionsLayout = useCallback(async (sectionsList) => {
     const before = data.sections
     replaceLocal('sections', () => sectionsList)
@@ -689,6 +701,7 @@ export function StoreDataProvider({ children }) {
     notify,
     markAllNotificationsRead,
     addHeroSlide,
+    updateHeroSlide,
     deleteHeroSlide,
     reorderHeroSlides,
     saveSectionsLayout,
@@ -734,6 +747,7 @@ export function StoreDataProvider({ children }) {
     notify,
     markAllNotificationsRead,
     addHeroSlide,
+    updateHeroSlide,
     deleteHeroSlide,
     reorderHeroSlides,
     saveSectionsLayout,

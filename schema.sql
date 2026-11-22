@@ -200,11 +200,14 @@ CREATE TABLE IF NOT EXISTS store_settings (
 CREATE TABLE IF NOT EXISTS hero_slides (
     id BIGSERIAL PRIMARY KEY,
     image_url VARCHAR(500) NOT NULL,
+    tablet_image_url VARCHAR(500),
+    mobile_image_url VARCHAR(500),
     alt_text VARCHAR(255),
     title VARCHAR(200),
     subtitle VARCHAR(300),
     link_url VARCHAR(500),
-    sort_order INT DEFAULT 0
+    sort_order INT DEFAULT 0,
+    slide_data_json TEXT -- Rich responsive typography, CTA buttons, animations, overlay & device layouts
 );
 
 -- 11. HOMEPAGE SECTIONS (ELEMENTOR-STYLE DYNAMIC BUILDER)

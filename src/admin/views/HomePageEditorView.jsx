@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useStoreData } from '../../context/StoreDataContext'
 import { convertFileToWebp, uploadWebpImages } from '../../utils/imageUpload'
 import DynamicHomeSection from '../../components/HomeCustomSections'
+import HeroSlideEditorModal from '../components/HeroSlideEditorModal'
 
 const PRESET_GROUPS = [
   { key: 'new', label: 'Catalog Group: New Arrivals' },
@@ -171,6 +172,7 @@ export default function HomePageEditorView() {
     reviews = [],
     watchShop = [],
     addHeroSlide,
+    updateHeroSlide,
     deleteHeroSlide,
     reorderHeroSlides,
     saveSectionsLayout,
@@ -189,7 +191,8 @@ export default function HomePageEditorView() {
   const [localHeroSlides, setLocalHeroSlides] = useState([])
   const [hasUnsavedHeroSlides, setHasUnsavedHeroSlides] = useState(false)
   const [savingHeroSlides, setSavingHeroSlides] = useState(false)
-  const [showAddSlideModal, setShowAddSlideModal] = useState(false)
+  const [showSlideModal, setShowSlideModal] = useState(false)
+  const [editingSlide, setEditingSlide] = useState(null)
   const [slideToDelete, setSlideToDelete] = useState(null)
   const [slidePosition, setSlidePosition] = useState('first')
   const [newSlide, setNewSlide] = useState({ image: '', alt: '', link: '/shop' })
@@ -301,7 +304,7 @@ export default function HomePageEditorView() {
 
   // Sync heroSlides
   useEffect(() => {
-    if (heroSlides && heroSlides.length) {
+    if (Array.isArray(heroSlides)) {
       const sorted = [...heroSlides].sort((a, b) => (Number(a.order) || Number(a.id) || 0) - (Number(b.order) || Number(b.id) || 0))
       setLocalHeroSlides(sorted)
     }
@@ -331,53 +334,22 @@ export default function HomePageEditorView() {
   }, [sections, loadDraftSections])
 
   // ── Hero Slides Handlers ───────────────────────────────────
-  const handleFileUpload = async (e) => {
-    const files = e.target.files
-    if (!files || !files.length) return
-
-    setUploading(true)
-    setUploadError('')
-    setUploadMsg('Converting banner to high-efficiency .WebP...')
-
+  const handleSaveSlide = async (payload) => {
     try {
-      const webp = await convertFileToWebp(files[0], 1920, 0.85)
-      setUploadMsg('Uploading WebP slide banner to server...')
-      const urls = await uploadWebpImages([webp])
-      if (urls && urls[0]) {
-        setNewSlide(prev => ({ ...prev, image: urls[0] }))
-        setUploadMsg('')
+      if (editingSlide && editingSlide.id) {
+        await updateHeroSlide(editingSlide.id, payload)
       } else {
-        throw new Error('Upload succeeded but no image URL was returned.')
+        await addHeroSlide(payload)
       }
-    } catch (err) {
-      console.error('Slide upload error:', err)
-      setUploadError(err.message || 'Image upload failed. Please try again.')
-    } finally {
-      setUploading(false)
-      setUploadMsg('')
-    }
-  }
-
-  const handleSaveNewSlide = async (e) => {
-    e.preventDefault()
-    if (!newSlide.image.trim()) {
-      setUploadError('Please select or upload a banner image')
-      return
-    }
-
-    try {
-      await addHeroSlide({
-        image: newSlide.image.trim(),
-        alt: newSlide.alt.trim() || 'Hero Banner Promotion',
-        link: newSlide.link.trim() || '/shop',
-        position: slidePosition,
-      })
-      setShowAddSlideModal(false)
-      setNewSlide({ image: '', alt: '', link: '/shop' })
+      setShowSlideModal(false)
+      setEditingSlide(null)
       setHasUnsavedHeroSlides(false)
       if (reload) reload()
+      if (showToast) showToast(editingSlide ? 'Hero slide updated successfully!' : 'Hero slide added successfully!', 'success')
     } catch (err) {
-      setUploadError(err.message)
+      console.error('Save slide error:', err)
+      if (showToast) showToast(err.message || 'Failed to save hero slide', 'error')
+      throw err
     }
   }
 
@@ -1035,10 +1007,9 @@ export default function HomePageEditorView() {
                 type="button"
                 className="btn btn-success fw-semibold px-3 d-flex align-items-center gap-2"
                 onClick={() => {
-                  setNewSlide({ image: '', alt: '', link: '/shop' })
+                  setEditingSlide(null)
                   setSlidePosition('first')
-                  setUploadError('')
-                  setShowAddSlideModal(true)
+                  setShowSlideModal(true)
                 }}
               >
                 <i className="bi bi-plus-lg"></i>
@@ -1583,14 +1554,31 @@ export default function HomePageEditorView() {
                   </div>
                   <div className="card-body p-3 d-flex flex-column justify-content-between">
                     <div>
-                      <p className="fw-semibold text-dark small mb-1 text-truncate">
-                        {slide.alt || 'Hero Slide Banner'}
-                      </p>
-                      <small className="text-muted text-truncate d-block mb-2">
+                      <div className="d-flex align-items-center justify-content-between gap-2 mb-1">
+                        <p className="fw-semibold text-dark small mb-0 text-truncate">
+                          {slide.title || slide.alt || 'Hero Slide Banner'}
+                        </p>
+                        {slide.slideData && (
+                          <span className="badge bg-success-subtle text-success border border-success-subtle" style={{ fontSize: '0.65rem' }}>
+                            Animated
+                          </span>
+                        )}
+                      </div>
+                      {slide.subtitle && (
+                        <p className="text-muted small mb-1 text-truncate" style={{ fontSize: '0.75rem' }}>
+                          {slide.subtitle}
+                        </p>
+                      )}
+                      <small className="text-muted text-truncate d-block mb-2" style={{ fontSize: '0.75rem' }}>
                         Link: {slide.link || '/shop'}
                       </small>
+                      <div className="d-flex flex-wrap gap-1 mb-2">
+                        {slide.image && <span className="badge bg-light text-dark border" style={{ fontSize: '0.65rem' }}>Desktop</span>}
+                        {(slide.tabletImage || slide.slideData?.images?.tablet) && <span className="badge bg-light text-dark border" style={{ fontSize: '0.65rem' }}>Tablet</span>}
+                        {(slide.mobileImage || slide.slideData?.images?.mobile) && <span className="badge bg-light text-dark border" style={{ fontSize: '0.65rem' }}>Mobile</span>}
+                      </div>
                     </div>
-                    <div className="d-flex align-items-center justify-content-between pt-2 border-top">
+                    <div className="d-flex align-items-center justify-content-between pt-2 border-top gap-1">
                       <div className="btn-group btn-group-sm">
                         <button
                           type="button"
@@ -1611,13 +1599,28 @@ export default function HomePageEditorView() {
                           <i className="bi bi-arrow-right"></i>
                         </button>
                       </div>
-                      <button
-                        type="button"
-                        className="btn btn-outline-danger btn-sm"
-                        onClick={() => setSlideToDelete(slide)}
-                      >
-                        <i className="bi bi-trash3 me-1"></i> Delete
-                      </button>
+                      <div className="d-flex align-items-center gap-1">
+                        <button
+                          type="button"
+                          className="btn btn-primary btn-sm d-flex align-items-center gap-1"
+                          onClick={() => {
+                            setEditingSlide(slide)
+                            setShowSlideModal(true)
+                          }}
+                          title="Edit Slide, Animations & Responsive Design"
+                        >
+                          <i className="bi bi-pencil-square"></i>
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-outline-danger btn-sm"
+                          onClick={() => setSlideToDelete(slide)}
+                          title="Delete Slide"
+                        >
+                          <i className="bi bi-trash3"></i>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -3161,7 +3164,7 @@ export default function HomePageEditorView() {
                           type="button"
                           className="btn btn-primary btn-sm rounded-pill px-3"
                           onClick={() => {
-                            setShowAddSlideModal(false)
+                            setShowSlideModal(false)
                             setEditingSection(null)
                             setActiveTab('hero')
                           }}
@@ -3944,74 +3947,18 @@ export default function HomePageEditorView() {
         </div>
       )}
 
-      {/* ── Add Slide Modal (Hero Slides) ── */}
-      {showAddSlideModal && (
-        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.55)', zIndex: 1060 }}>
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content border-0 shadow-lg rounded-3">
-              <div className="modal-header border-bottom py-3">
-                <h5 className="modal-title fw-bold text-dark">
-                  <i className="bi bi-plus-circle text-success me-2"></i>
-                  Add New Hero Slide Banner
-                </h5>
-                <button type="button" className="btn-close" onClick={() => setShowAddSlideModal(false)} />
-              </div>
-              <form onSubmit={handleSaveNewSlide}>
-                <div className="modal-body p-4">
-                  {uploadError && <div className="alert alert-danger py-2 small">{uploadError}</div>}
-                  <div className="mb-3">
-                    <label className="form-label fw-semibold small">Upload Slide Banner (.WebP Automatic)</label>
-                    <input type="file" className="form-control" accept="image/*" onChange={handleFileUpload} disabled={uploading} />
-                    {uploadMsg && <div className="text-success small mt-1">{uploadMsg}</div>}
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label fw-semibold small">Image URL</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={newSlide.image}
-                      onChange={e => setNewSlide({ ...newSlide, image: e.target.value })}
-                      placeholder="https://..."
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label fw-semibold small">Slide Alt / Title</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={newSlide.alt}
-                      onChange={e => setNewSlide({ ...newSlide, alt: e.target.value })}
-                      placeholder="e.g. Special Eid Gadgets Promotion"
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label fw-semibold small">Click Destination URL</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={newSlide.link}
-                      onChange={e => setNewSlide({ ...newSlide, link: e.target.value })}
-                      placeholder="/shop"
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label fw-semibold small">Slide Placement</label>
-                    <select className="form-select" value={slidePosition} onChange={e => setSlidePosition(e.target.value)}>
-                      <option value="first">Show as 1st Slide (Featured)</option>
-                      <option value="last">Append to End</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="modal-footer border-top py-2 px-3">
-                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowAddSlideModal(false)}>Cancel</button>
-                  <button type="submit" className="btn btn-success btn-sm px-3" disabled={uploading || !newSlide.image}>Save &amp; Publish Slide</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ── Advanced Animated & Responsive Hero Slide Editor Modal ── */}
+      <HeroSlideEditorModal
+        isOpen={showSlideModal}
+        onClose={() => {
+          setShowSlideModal(false)
+          setEditingSlide(null)
+        }}
+        slide={editingSlide}
+        onSave={handleSaveSlide}
+        slidePosition={slidePosition}
+        setSlidePosition={setSlidePosition}
+      />
 
       {/* ── Delete Slide Modal ── */}
       {slideToDelete && (

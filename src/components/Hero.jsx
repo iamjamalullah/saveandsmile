@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { useStoreData } from '../context/StoreDataContext'
+import HeroSlideItem, { getResolvedSlideData } from './HeroSlideItem'
 
-const AUTOPLAY_MS = 5200
+const DEFAULT_AUTOPLAY_MS = 5200
 
 export default function Hero() {
   const { heroSlides = [] } = useStoreData()
@@ -34,9 +35,13 @@ export default function Hero() {
 
   useEffect(() => {
     if (paused || hidden || count < 2) return undefined
-    const timer = window.setInterval(() => setI(v => (v + 1) % count), AUTOPLAY_MS)
+    const activeSlide = sortedSlides[i]
+    const resolved = activeSlide ? getResolvedSlideData(activeSlide) : null
+    const duration = resolved?.animation?.duration || DEFAULT_AUTOPLAY_MS
+
+    const timer = window.setInterval(() => setI(v => (v + 1) % count), duration)
     return () => window.clearInterval(timer)
-  }, [paused, hidden, count])
+  }, [paused, hidden, count, i, sortedSlides])
 
   if (!count) {
     return <section className="qg-hero qg-hero-skeleton" aria-label="Featured offers loading"><span /></section>
@@ -72,29 +77,24 @@ export default function Hero() {
         }}
       >
         {sortedSlides.map((s, idx) => {
-          const imageEl = (
-            <img
-              src={s.image}
-              alt={s.alt || ''}
-              loading={idx === 0 ? 'eager' : 'lazy'}
-              fetchPriority={idx === 0 ? 'high' : 'auto'}
-              onError={(e) => { e.target.src = '/images/banner-placeholder.webp' }}
-            />
-          )
+          const isCurrent = idx === i
+          const resolved = getResolvedSlideData(s)
+          const hasCta = resolved.primaryCta.show && resolved.primaryCta.text
+
           return (
             <div
-              className="qg-hero-slide"
+              className={`qg-hero-slide ${isCurrent ? 'is-active' : ''}`}
               key={s.id || s.image || idx}
-              aria-hidden={idx !== i}
+              aria-hidden={!isCurrent}
               aria-roledescription="slide"
               aria-label={`${idx + 1} of ${count}`}
             >
-              {s.link ? (
-                <Link to={s.link} style={{ display: 'block', width: '100%' }}>
-                  {imageEl}
+              {s.link && !hasCta ? (
+                <Link to={s.link} style={{ display: 'block', width: '100%', height: '100%', textDecoration: 'none' }}>
+                  <HeroSlideItem slide={s} isActive={isCurrent} priority={idx === 0} device="auto" />
                 </Link>
               ) : (
-                imageEl
+                <HeroSlideItem slide={s} isActive={isCurrent} priority={idx === 0} device="auto" />
               )}
             </div>
           )

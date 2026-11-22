@@ -49,6 +49,7 @@ export function AuthProvider({ children }) {
       setAuthToken(res.token)
       try {
         localStorage.setItem('qg_staff_user', JSON.stringify(res.user))
+        localStorage.setItem('token', res.token)
       } catch {}
       return res.user
     }
@@ -64,6 +65,7 @@ export function AuthProvider({ children }) {
     setAuthToken(null)
     try {
       localStorage.removeItem('qg_staff_user')
+      localStorage.removeItem('token')
     } catch {}
   }, [])
 

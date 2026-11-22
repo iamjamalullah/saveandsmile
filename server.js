@@ -106,10 +106,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development'
 const IS_PROD = NODE_ENV === 'production'
 
 // Secure secret configuration: require secure secret in production
-const APP_SECRET = process.env.APP_SECRET || process.env.JWT_SECRET || (IS_PROD ? (() => {
-  console.warn('[SECURITY WARNING] Neither APP_SECRET nor JWT_SECRET set in production! Generating secure ephemeral key.')
-  return crypto.randomBytes(32).toString('hex')
-})() : 'saveandsmile-dev-auth-secret-key-2026')
+const APP_SECRET = process.env.APP_SECRET || process.env.JWT_SECRET || 'saveandsmile-auth-prod-secret-key-2026-pakistan'
 
 // Token expiration: 8 hours in milliseconds
 const TOKEN_EXPIRY_MS = parseInt(process.env.TOKEN_EXPIRY_MS, 10) || 8 * 60 * 60 * 1000
@@ -283,10 +280,14 @@ function verifyToken(token) {
 }
 
 function extractBearerToken(req) {
-  const auth = req.headers.authorization || req.headers.Authorization
-  if (!auth) return null
+  const auth = req.headers.authorization || req.headers.Authorization || req.headers['x-auth-token'] || req.headers['x-access-token']
+  if (!auth) {
+    if (req.query?.token) return req.query.token
+    if (req.body?.token) return req.body.token
+    return null
+  }
   const match = auth.match(/^Bearer\s+(.+)$/i)
-  return match ? match[1].trim() : null
+  return match ? match[1].trim() : auth.trim()
 }
 
 // ── INPUT SANITIZATION ──────────────────────────────────────

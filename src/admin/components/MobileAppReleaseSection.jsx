@@ -43,7 +43,7 @@ export default function MobileAppReleaseSection() {
 
       const histRes = await fetch('/api/mobile/releases', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          Authorization: `Bearer ${localStorage.getItem('qg_token') || localStorage.getItem('token') || ''}`,
         },
       }).catch(() => null)
 
@@ -129,7 +129,7 @@ export default function MobileAppReleaseSection() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+              Authorization: `Bearer ${localStorage.getItem('qg_token') || localStorage.getItem('token') || ''}`,
             },
             body: JSON.stringify({
               base64Data,

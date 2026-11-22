@@ -71,6 +71,7 @@ export async function convertFileToWebp(file, maxWidth = 1600, quality = 0.85) {
 
 /**
  * Uploads an array of converted WebP images to the backend server.
+ * Attaches authenticated staff session credentials.
  *
  * @param {Array<{ name: string, dataUrl: string }>} webpImages
  * @returns {Promise<string[]>} Array of saved URLs (e.g. ['/uploads/products/prod_123.webp'])
@@ -78,19 +79,40 @@ export async function convertFileToWebp(file, maxWidth = 1600, quality = 0.85) {
 export async function uploadWebpImages(webpImages) {
   if (!webpImages || !webpImages.length) return []
 
+  let token = null
+  try {
+    const { getAuthToken } = await import('../api')
+    token = getAuthToken()
+  } catch {}
+  if (!token && typeof localStorage !== 'undefined') {
+    try {
+      token = localStorage.getItem('qg_token') ||
+              localStorage.getItem('token') ||
+              localStorage.getItem('ss_token') ||
+              localStorage.getItem('admin_token')
+    } catch {}
+  }
+
   const payload = {
     images: webpImages.map(img => ({
       name: img.name,
       data: img.dataUrl,
     })),
+    token: token || undefined,
+  }
+
+  const headers = {
+    'Content-Type': 'application/json',
+  }
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+    headers['x-auth-token'] = token
   }
 
   // Use proxy path /api/upload or direct /upload
   const response = await fetch('/api/upload', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify(payload),
   })
 
